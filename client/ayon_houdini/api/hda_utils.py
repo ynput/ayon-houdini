@@ -463,16 +463,17 @@ def select_folder_path(node):
 
             filter_widget.textChanged.connect(folder_widget.set_name_filter)
 
-            folder_widget.double_clicked.connect(self.accept)
-            accept_button.clicked.connect(self.accept)
+            folder_widget.double_clicked.connect(self.on_confirm)
+            accept_button.clicked.connect(self.on_confirm)
 
             self.folder_widget = folder_widget
 
         def get_selected_folder_path(self):
             return self.folder_widget.get_selected_folder_path()
 
-    # Note: The following dialog doesn't support changing `the project_name`
-    #         But, having a semi-functional dialog is better than nothing.
+        def on_confirm(self):
+            self.close()
+
     dialog = PickDialog(parent=main_window)
     dialog.folder_widget.set_project_name(project_name)
     if folder_path:
@@ -481,14 +482,12 @@ def select_folder_path(node):
         #       refresh
         dialog.folder_widget.set_selected_folder_path(folder_path)
     dialog.setStyleSheet(load_stylesheet())
-
-    result = dialog.exec_()
-    if result != QtWidgets.QDialog.Accepted:
-        return
+    dialog.exec_()
 
     selected_folder_path = dialog.get_selected_folder_path()
+
     if not selected_folder_path:
-        # Do nothing if user accepted with nothing selected
+        # Do nothing if user picked nothing
         return
 
     if selected_folder_path == get_current_folder_path():
