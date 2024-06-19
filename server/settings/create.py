@@ -168,11 +168,11 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
         ]
     },
     "CreateUSD": {
-        "enabled": False,
+        "enabled": True,
         "default_variants": ["Main"]
     },
     "CreateUSDRender": {
-        "enabled": False,
+        "enabled": True,
         "default_variants": ["Main"],
         "default_renderer": "Karma CPU"
     },
