@@ -10,7 +10,7 @@ class CreateUSD(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.usd"
     label = "USD (experimental)"
     product_type = "usd"
-    icon = "gears"
+    icon = "cubes"
     enabled = False
 
     def create(self, product_name, instance_data, pre_create_data):
