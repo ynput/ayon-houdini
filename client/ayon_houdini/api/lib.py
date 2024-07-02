@@ -104,6 +104,21 @@ def get_output_parameter(node):
         return node.parm("outputimage")
     elif node_type == "vray_renderer":
         return node.parm("SettingsOutput_img_file_path")
+    elif node_type == "labs::karma::2.0":
+        return node.parm("picture")
+
+    if isinstance(node, hou.RopNode):
+        # Use the parm name fallback that SideFX applies for detecting output
+        # files from PDG/TOPs graphs for ROP nodes. See #ayon-core/692
+        parm_names = [
+            "vm_picture", "sopoutput", "dopoutput", "lopoutput", "picture",
+            "copoutput", "filename", "usdfile", "file", "output",
+            "outputfilepath", "outputimage", "outfile"
+        ]
+        for name in parm_names:
+            parm = node.parm(name)
+            if parm:
+                return parm
 
     raise TypeError("Node type '%s' not supported" % node_type)
 
@@ -1363,3 +1378,16 @@ def prompt_reset_context():
         update_content_on_context_change()
 
     dialog.deleteLater()
+
+
+@contextmanager
+def no_auto_create_publishable():
+    value = os.environ.get("AYON_HOUDINI_AUTOCREATE")
+    os.environ["AYON_HOUDINI_AUTOCREATE"] = "0"
+    try:
+        yield
+    finally:
+        if value is None:
+            del os.environ["AYON_HOUDINI_AUTOCREATE"]
+        else:
+            os.environ["AYON_HOUDINI_AUTOCREATE"] = value
