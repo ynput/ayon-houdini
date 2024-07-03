@@ -1,7 +1,7 @@
-# Dialog script for ayon::lop_load_shot::1.0 automatically generated
+# Dialog script for ayon::load_shot::1.0 automatically generated
 
 {
-    name	ayon::lop_load_shot::1.0
+    name	ayon::load_shot::1.0
     script	load_asset::1.0
     label	"AYON Load Shot"
 
@@ -139,20 +139,6 @@
             type    string
             default { "" }
             parmtag { "script_callback_language" "python" }
-        }
-        parm {
-            name    "primpath1"
-            label   "Primitive Root"
-            type    string
-            default { "`chs(\"folder_path\")`/$OS" }
-            menureplace {
-                [ "opmenu -l -a reference_character primpath1" ]
-            }
-            parmtag { "autoscope" "0000000000000000" }
-            parmtag { "script_action" "import loputils\nloputils.selectPrimsInParm(kwargs, False)" }
-            parmtag { "script_action_help" "Select a primitive in the Scene Viewer or Scene Graph Tree pane.\nCtrl-click to select using the primitive picker dialog.\nAlt-click to toggle movement of the display flag." }
-            parmtag { "script_action_icon" "BUTTONS_reselect" }
-            parmtag { "sidefx::usdpathtype" "prim" }
         }
         groupcollapsible {
             name    "extra_options"
