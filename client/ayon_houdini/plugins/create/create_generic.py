@@ -30,6 +30,8 @@ def attribute_def_to_parm_template(attribute_def, key=None):
 
     Arguments:
         attribute_def (AbstractAttrDef): Attribute Definition.
+        key (Optional[str]): Name for the parm template.
+            If not provided defaults to the Attribute Definition's key.
 
     Returns:
         hou.ParmTemplate: Parm Template matching the Attribute Definition.
