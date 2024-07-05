@@ -569,13 +569,16 @@ def get_available_products(node):
     if not folder_entity:
         return []
 
+    # Apply filter only if any value is set
+    product_types = [product_type] if product_type else None
+
     products = ayon_api.get_products(
         project_name,
         folder_ids=[folder_entity["id"]],
-        product_types=[product_type]
+        product_types=product_types
     )
 
-    return [product["name"] for product in products]
+    return list(sorted(product["name"] for product in products))
 
 
 def set_to_latest_version(node):

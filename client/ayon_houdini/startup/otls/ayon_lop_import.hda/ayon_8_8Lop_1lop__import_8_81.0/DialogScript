@@ -3,7 +3,7 @@
 {
     name	ayon::lop_import::1.0
     script	load_asset::1.0
-    label	"Load Asset"
+    label	"AYON Load Asset"
 
     help {
 	""
@@ -52,6 +52,12 @@
             label   "Product Type"
             type    string
             default { "usd" }
+            menu {
+                "usd"           "usd"
+                "pointcache"    "pointcache"
+                "model"         "model"
+                ""              "*"
+            }
         }
         parm {
             name    "product_name"
