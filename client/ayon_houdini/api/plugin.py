@@ -317,6 +317,16 @@ class HoudiniLoader(load.LoaderPlugin):
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
 
+    def filepath_from_context(cls, context):
+        from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
+        return construct_ayon_entity_uri(
+            project_name=context["project"]["name"],
+            folder_path=context["folder"]["path"],
+            product=context["product"]["name"],
+            version=int(context["version"]["version"]),
+            representation_name=context["representation"]["name"],
+        )
+
 
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
     """Base class for Houdini instance publish plugins."""
