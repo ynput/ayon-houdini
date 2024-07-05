@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""OpenPype startup script."""
+"""AYON startup script."""
 from ayon_core.pipeline import install_host
 from ayon_houdini.api import HoudiniHost
 
