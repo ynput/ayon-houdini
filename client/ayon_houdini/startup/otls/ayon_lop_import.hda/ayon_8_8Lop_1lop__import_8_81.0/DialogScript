@@ -53,10 +53,11 @@
             type    string
             default { "usd" }
             menu {
-                "usd"           "usd"
-                "pointcache"    "pointcache"
-                "model"         "model"
                 ""              "*"
+                "camera"        "camera"
+                "model"         "model"
+                "pointcache"    "pointcache"
+                "usd"           "usd"
             }
         }
         parm {
