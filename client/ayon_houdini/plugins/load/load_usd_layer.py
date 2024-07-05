@@ -1,5 +1,4 @@
 from ayon_core.pipeline import (
-    get_representation_path,
     AVALON_CONTAINER_ID,
 )
 from ayon_houdini.api import (
@@ -21,6 +20,8 @@ class USDSublayerLoader(plugin.HoudiniLoader):
 
     icon = "code-fork"
     color = "orange"
+
+    use_ayon_entity_uri = True
 
     def load(self, context, name=None, namespace=None, data=None):
 
@@ -60,18 +61,17 @@ class USDSublayerLoader(plugin.HoudiniLoader):
         return container
 
     def update(self, container, context):
-        repre_entity = context["representation"]
         node = container["node"]
 
         # Update the file path
-        file_path = get_representation_path(repre_entity)
+        file_path = self.filepath_from_context(context)
         file_path = file_path.replace("\\", "/")
 
         # Update attributes
         node.setParms(
             {
                 "filepath1": file_path,
-                "representation": repre_entity["id"],
+                "representation": context["representation"]["id"],
             }
         )
 
