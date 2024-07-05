@@ -132,7 +132,7 @@ def update_info(node, context):
     # Update the product type filter to match the type
     current = node.evalParm("product_type")
     product_type = context["product"]["productType"]
-    if current or current != product_type:
+    if current and current != product_type:
         # If current is empty we consider no filtering applied and we allow
         # that to be a state that needs no switching
         parms["product_type"] = product_type
