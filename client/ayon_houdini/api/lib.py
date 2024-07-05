@@ -14,7 +14,6 @@ from ayon_core.lib import StringTemplate
 from ayon_core.settings import get_current_project_settings
 from ayon_core.pipeline import (
     Anatomy,
-    get_current_project_name,
     get_current_folder_path,
     registered_host,
     get_current_context,
@@ -392,30 +391,29 @@ def parm_values(overrides):
 def reset_framerange(fps=True, frame_range=True):
     """Set frame range and FPS to current folder."""
 
-    project_name = get_current_project_name()
-    folder_path = get_current_folder_path()
-
-    folder_entity = ayon_api.get_folder_by_path(project_name, folder_path)
-    folder_attributes = folder_entity["attrib"]
+    task_entity = get_current_task_entity()
 
     # Set FPS
     if fps:
-        fps = get_entity_fps(folder_entity)
+        fps = get_entity_fps(task_entity)
         print("Setting scene FPS to {}".format(int(fps)))
         set_scene_fps(fps)
 
     if frame_range:
 
         # Set Start and End Frames
-        frame_start = folder_attributes.get("frameStart")
-        frame_end = folder_attributes.get("frameEnd")
+        frame_start = task_entity.get("frameStart")
+        frame_end = task_entity.get("frameEnd")
 
         if frame_start is None or frame_end is None:
-            log.warning("No edit information found for '%s'", folder_path)
+            folder_path = get_current_folder_path()
+            task_name = task_entity["name"]
+            log.warning("No edit information found for '%s' > '%s'",
+                        folder_path, task_name)
             return
 
-        handle_start = folder_attributes.get("handleStart", 0)
-        handle_end = folder_attributes.get("handleEnd", 0)
+        handle_start = task_entity.get("handleStart", 0)
+        handle_end = task_entity.get("handleEnd", 0)
 
         frame_start -= int(handle_start)
         frame_end += int(handle_end)
@@ -507,7 +505,7 @@ def get_frame_data(node, log=None):
 
         log.info(
             "Node '{}' has 'Render current frame' set.\n"
-            "Folder Handles are ignored.\n"
+            "Task handles are ignored.\n"
             "frameStart and frameEnd are set to the "
             "current frame.".format(node.path())
         )
@@ -647,7 +645,7 @@ def get_output_children(output_node, include_sops=True):
 
 
 def get_resolution_from_entity(entity):
-    """Get resolution from the given folder entity.
+    """Get resolution from the given entity.
 
     Args:
         entity (dict[str, Any]): Project, Folder or Task entity.
@@ -657,20 +655,15 @@ def get_resolution_from_entity(entity):
 
     """
     if not entity or "attrib" not in entity:
-        print("Entered folder is not valid. \"{}\"".format(
-            str(entity)
-        ))
-        return None
+        raise ValueError(f"Entity is not valid: \"{entity}\"")
 
-    folder_attributes = entity["attrib"]
-    resolution_width = folder_attributes.get("resolutionWidth")
-    resolution_height = folder_attributes.get("resolutionHeight")
+    attributes = entity["attrib"]
+    resolution_width = attributes.get("resolutionWidth")
+    resolution_height = attributes.get("resolutionHeight")
 
     # Make sure both width and height are set
     if resolution_width is None or resolution_height is None:
-        print("No resolution information found for '{}'".format(
-            entity["path"]
-        ))
+        print(f"No resolution information found in entity: '{entity}'")
         return None
 
     return int(resolution_width), int(resolution_height)
@@ -843,7 +836,7 @@ def get_context_var_changes():
 
 
 def update_houdini_vars_context():
-    """Update folder context variables"""
+    """Update task context variables"""
 
     for var, (_old, new, is_directory) in get_context_var_changes().items():
         if is_directory:
@@ -862,7 +855,7 @@ def update_houdini_vars_context():
 
 
 def update_houdini_vars_context_dialog():
-    """Show pop-up to update folder context variables"""
+    """Show pop-up to update task context variables"""
     update_vars = get_context_var_changes()
     if not update_vars:
         # Nothing to change
@@ -878,7 +871,7 @@ def update_houdini_vars_context_dialog():
     parent = hou.ui.mainQtWindow()
     dialog = SimplePopup(parent=parent)
     dialog.setModal(True)
-    dialog.setWindowTitle("Houdini scene has outdated folder variables")
+    dialog.setWindowTitle("Houdini scene has outdated task variables")
     dialog.set_message(message)
     dialog.set_button_text("Fix")
 
