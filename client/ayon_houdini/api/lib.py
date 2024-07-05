@@ -22,7 +22,7 @@ from ayon_core.pipeline import (
 )
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.template_data import get_template_data
-from ayon_core.pipeline.context_tools import get_current_folder_entity
+from ayon_core.pipeline.context_tools import get_current_task_entity
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
 
@@ -35,12 +35,12 @@ log = logging.getLogger(__name__)
 JSON_PREFIX = "JSON:::"
 
 
-def get_folder_fps(folder_entity=None):
-    """Return current folder fps."""
+def get_entity_fps(entity=None):
+    """Return current task fps or fps from an entity."""
 
-    if folder_entity is None:
-        folder_entity = get_current_folder_entity(fields=["attrib.fps"])
-    return folder_entity["attrib"]["fps"]
+    if entity is None:
+        entity = get_current_task_entity(fields=["attrib.fps"])
+    return entity["attrib"]["fps"]
 
 
 def get_output_parameter(node):
@@ -121,7 +121,7 @@ def validate_fps():
 
     """
 
-    fps = get_folder_fps()
+    fps = get_entity_fps()
     current_fps = hou.fps()  # returns float
 
     if current_fps != fps:
@@ -400,7 +400,7 @@ def reset_framerange(fps=True, frame_range=True):
 
     # Set FPS
     if fps:
-        fps = get_folder_fps(folder_entity)
+        fps = get_entity_fps(folder_entity)
         print("Setting scene FPS to {}".format(int(fps)))
         set_scene_fps(fps)
 
@@ -646,43 +646,43 @@ def get_output_children(output_node, include_sops=True):
     return out_list
 
 
-def get_resolution_from_folder(folder_entity):
+def get_resolution_from_entity(entity):
     """Get resolution from the given folder entity.
 
     Args:
-        folder_entity (dict[str, Any]): Folder entity.
+        entity (dict[str, Any]): Project, Folder or Task entity.
 
     Returns:
         Union[Tuple[int, int], None]: Resolution width and height.
 
     """
-    if not folder_entity or "attrib" not in folder_entity:
+    if not entity or "attrib" not in entity:
         print("Entered folder is not valid. \"{}\"".format(
-            str(folder_entity)
+            str(entity)
         ))
         return None
 
-    folder_attributes = folder_entity["attrib"]
+    folder_attributes = entity["attrib"]
     resolution_width = folder_attributes.get("resolutionWidth")
     resolution_height = folder_attributes.get("resolutionHeight")
 
     # Make sure both width and height are set
     if resolution_width is None or resolution_height is None:
         print("No resolution information found for '{}'".format(
-            folder_entity["path"]
+            entity["path"]
         ))
         return None
 
     return int(resolution_width), int(resolution_height)
 
 
-def set_camera_resolution(camera, folder_entity=None):
-    """Apply resolution to camera from folder entity of the publish"""
+def set_camera_resolution(camera, task_entity=None):
+    """Apply resolution to camera from task entity of the publish"""
 
-    if not folder_entity:
-        folder_entity = get_current_folder_entity()
+    if not task_entity:
+        task_entity = get_current_task_entity()
 
-    resolution = get_resolution_from_folder(folder_entity)
+    resolution = get_resolution_from_entity(task_entity)
 
     if resolution:
         print("Setting camera resolution: {} -> {}x{}".format(
@@ -705,10 +705,13 @@ def get_camera_from_container(container):
     return cameras[0]
 
 
-def get_current_context_template_data_with_folder_attrs():
-    """
+def get_current_context_template_data_with_entity_attrs():
+    """Return template data including current context folder and task attribs.
 
-    Output contains 'folderAttributes' key with folder attribute values.
+    Output contains:
+      - Regular template data from `get_template_data`
+      - 'folderAttributes' key with folder attribute values.
+      - 'taskAttributes' key with task attribute values.
 
     Returns:
          dict[str, Any]: Template data to fill templates.
@@ -729,23 +732,25 @@ def get_current_context_template_data_with_folder_attrs():
 
     # get context specific vars
     folder_attributes = folder_entity["attrib"]
+    task_attributes = task_entity["attrib"]
 
     # compute `frameStartHandle` and `frameEndHandle`
-    frame_start = folder_attributes.get("frameStart")
-    frame_end = folder_attributes.get("frameEnd")
-    handle_start = folder_attributes.get("handleStart")
-    handle_end = folder_attributes.get("handleEnd")
-    if frame_start is not None and handle_start is not None:
-        folder_attributes["frameStartHandle"] = frame_start - handle_start
-
-    if frame_end is not None and handle_end is not None:
-        folder_attributes["frameEndHandle"] = frame_end + handle_end
+    for attributes in [folder_attributes, task_attributes]:
+        frame_start = attributes.get("frameStart")
+        frame_end = attributes.get("frameEnd")
+        handle_start = attributes.get("handleStart")
+        handle_end = attributes.get("handleEnd")
+        if frame_start is not None and handle_start is not None:
+            attributes["frameStartHandle"] = frame_start - handle_start
+        if frame_end is not None and handle_end is not None:
+            attributes["frameEndHandle"] = frame_end + handle_end
 
     template_data = get_template_data(
         project_entity, folder_entity, task_entity, host_name
     )
     template_data["root"] = anatomy.roots
     template_data["folderAttributes"] = folder_attributes
+    template_data["taskAttributes"] = task_attributes
 
     return template_data
 
@@ -806,7 +811,7 @@ def get_context_var_changes():
         return houdini_vars_to_update
 
     # Get Template data
-    template_data = get_current_context_template_data_with_folder_attrs()
+    template_data = get_current_context_template_data_with_entity_attrs()
 
     # Set Houdini Vars
     for item in houdini_vars:

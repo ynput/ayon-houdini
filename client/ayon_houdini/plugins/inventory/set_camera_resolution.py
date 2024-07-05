@@ -3,7 +3,7 @@ from ayon_houdini.api.lib import (
     get_camera_from_container,
     set_camera_resolution
 )
-from ayon_core.pipeline.context_tools import get_current_folder_entity
+from ayon_core.pipeline.context_tools import get_current_task_entity
 
 
 class SetCameraResolution(InventoryAction):
@@ -19,8 +19,8 @@ class SetCameraResolution(InventoryAction):
         )
 
     def process(self, containers):
-        folder_entity = get_current_folder_entity()
+        task_entity = get_current_task_entity()
         for container in containers:
             node = container["node"]
             camera = get_camera_from_container(node)
-            set_camera_resolution(camera, folder_entity)
+            set_camera_resolution(camera, task_entity)
