@@ -44,16 +44,12 @@ class HoudiniPlaceholderCreatePlugin(
 
     def collect_placeholders(self):
         output = []
-        scene_placeholders = self.collect_scene_placeholders()
-        for node_name, node in scene_placeholders.items():
-            plugin_identifier = node.evalParm("plugin_identifier")
-            if plugin_identifier != self.identifier:
-                continue
+        create_placeholders = self.collect_scene_placeholders()
 
+        for node in create_placeholders:
             placeholder_data = read(node)
-
             output.append(
-                CreatePlaceholderItem(node_name, placeholder_data, self)
+                CreatePlaceholderItem(node.path(), placeholder_data, self)
             )
 
         return output

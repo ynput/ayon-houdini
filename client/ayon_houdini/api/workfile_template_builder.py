@@ -198,21 +198,21 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         imprint(placeholder_node, placeholder_data)
     
     def collect_scene_placeholders(self):
-        # Read the cache
+        # Read the cache by identifier
         placeholder_nodes = self.builder.get_shared_populate_data(
-            "placeholder_nodes"
+            self.identifier
         )
         if placeholder_nodes is None:
-            placeholder_nodes = {}
+            placeholder_nodes = []
 
             nodes = lsattr("plugin_identifier", self.identifier)
 
             for node in nodes:
-                placeholder_nodes[node.path()] = node
+                placeholder_nodes.append(node)
 
-            # Set the cache
+            # Set the cache by identifier
             self.builder.set_shared_populate_data(
-                    "placeholder_nodes", placeholder_nodes
+                    self.identifier, placeholder_nodes
                 )
             
         return placeholder_nodes
