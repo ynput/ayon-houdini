@@ -436,6 +436,19 @@ class CreateHoudiniGeneric(plugin.HoudiniCreator):
             ayon_folder = hou.FolderParmTemplate("folder", "AYON")
             parm_group.addParmTemplate(ayon_folder)
 
+        # Add publish button
+        publish_button_parm = hou.ButtonParmTemplate(
+            "AYON_self_publish",
+            "Publish",
+            help="Directly publishes only this node and any inputs with a "
+                 "comment entered in a popup prompt. All other instances will "
+                 "be disabled in the publish.",
+            script_callback="from ayon_houdini.api.lib import "
+                            "self_publish; self_publish()",
+            script_callback_language=hou.scriptLanguage.Python,
+        )
+        ayon_folder.addParmTemplate(publish_button_parm)
+
         attributes_folder = parm_group.find("AYON_attributes")
         if not attributes_folder:
             attributes_folder = hou.FolderParmTemplate(
