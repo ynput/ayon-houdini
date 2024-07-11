@@ -129,6 +129,14 @@ def update_info(node, context):
              if node.evalParm(key) != value}
     parms["load_message"] = ""  # clear any warnings/errors
 
+    # Update the product type filter to match the type
+    current = node.evalParm("product_type")
+    product_type = context["product"]["productType"]
+    if current and current != product_type:
+        # If current is empty we consider no filtering applied and we allow
+        # that to be a state that needs no switching
+        parms["product_type"] = product_type
+
     # Note that these never trigger any parm callbacks since we do not
     # trigger the `parm.pressButton` and programmatically setting values
     # in Houdini does not trigger callbacks automatically
@@ -569,13 +577,16 @@ def get_available_products(node):
     if not folder_entity:
         return []
 
+    # Apply filter only if any value is set
+    product_types = [product_type] if product_type else None
+
     products = ayon_api.get_products(
         project_name,
         folder_ids=[folder_entity["id"]],
-        product_types=[product_type]
+        product_types=product_types
     )
 
-    return [product["name"] for product in products]
+    return list(sorted(product["name"] for product in products))
 
 
 def set_to_latest_version(node):
