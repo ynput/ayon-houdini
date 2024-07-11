@@ -669,13 +669,19 @@ def get_resolution_from_entity(entity):
     return int(resolution_width), int(resolution_height)
 
 
-def set_camera_resolution(camera, task_entity=None):
-    """Apply resolution to camera from task entity of the publish"""
+def set_camera_resolution(camera, entity=None):
+    """Apply resolution to camera from task or folder entity.
 
-    if not task_entity:
-        task_entity = get_current_task_entity()
+    Arguments:
+        camera (hou.OpNode): Camera node.
+        entity (Optional[Dict[str, Any]]): Folder or task entity.
+            If not provided falls back to current task entity.
+    """
 
-    resolution = get_resolution_from_entity(task_entity)
+    if not entity:
+        entity = get_current_task_entity()
+
+    resolution = get_resolution_from_entity(entity)
 
     if resolution:
         print("Setting camera resolution: {} -> {}x{}".format(
