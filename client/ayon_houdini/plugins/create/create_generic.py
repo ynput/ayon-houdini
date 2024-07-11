@@ -587,7 +587,8 @@ class CreateHoudiniGeneric(plugin.HoudiniCreator):
             ),
             hou.ToggleParmTemplate(
                 "AYON_active", "Active",
-                default_value=True
+                default_value=True,
+                help="Whether the instance is enabled for publishing."
             )
         ]:
             if not parm_group.find(attribute.name()):
