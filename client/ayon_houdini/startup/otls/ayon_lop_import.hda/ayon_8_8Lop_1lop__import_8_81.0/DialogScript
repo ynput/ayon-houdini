@@ -54,6 +54,7 @@
             default { "usd" }
             menu {
                 ""              "*"
+                "animation"     "animation"
                 "camera"        "camera"
                 "model"         "model"
                 "pointcache"    "pointcache"
