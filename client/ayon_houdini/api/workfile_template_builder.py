@@ -182,8 +182,13 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         """
  
         node = hou.node("/out").createNode("null", node_name)
-        node.parm("execute").hide(True)
-        node.parm("renderdialog").hide(True)
+        node.moveToGoodPosition()
+        parms = node.parmTemplateGroup()
+        for parm in {"execute", "renderdialog"}:
+            p = parms.find(parm)
+            p.hide(True)
+            parms.replace(parm, p)
+        node.setParmTemplateGroup(parms) 
         return node
     
     def create_placeholder(self, placeholder_data):
