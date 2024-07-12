@@ -8,7 +8,7 @@ from ayon_houdini.api import plugin
 
 class CollectAssetHandles(plugin.HoudiniInstancePlugin,
                           AYONPyblishPluginMixin):
-    """Apply folder handles.
+    """Apply instance's task entity handles.
 
     If instance does not have:
         - frameStart
@@ -19,7 +19,7 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
         - frameStartHandle
         - frameEndHandle
 
-    Then we will retrieve the folder's handles to compute
+    Then we will retrieve the task's handles to compute
     the exclusive frame range and actual handle ranges.
     """
 
@@ -27,7 +27,7 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
     # this plugin runs after CollectAnatomyInstanceData
     order = pyblish.api.CollectorOrder + 0.499
 
-    label = "Collect Folder Handles"
+    label = "Collect Task Handles"
     use_asset_handles = True
 
     def process(self, instance):
@@ -50,9 +50,11 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
 
         attr_values = self.get_attr_values_from_data(instance.data)
         if attr_values.get("use_handles", self.use_asset_handles):
-            folder_attributes = instance.data["folderEntity"]["attrib"]
-            handle_start = folder_attributes.get("handleStart", 0)
-            handle_end = folder_attributes.get("handleEnd", 0)
+            # Get from task (if task is set), otherwise from folder
+            entity = instance.data.get("taskEntity",
+                                       instance.data["folderEntity"])
+            handle_start = entity["attrib"].get("handleStart", 0)
+            handle_end = entity["attrib"].get("handleEnd", 0)
         else:
             handle_start = 0
             handle_end = 0
@@ -116,7 +118,7 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
             BoolDef("use_handles",
                     tooltip="Disable this if you want the publisher to"
                     " ignore start and end handles specified in the"
-                    " folder attributes for this publish instance",
+                    " task attributes for this publish instance",
                     default=cls.use_asset_handles,
                     label="Use asset handles")
         ]
