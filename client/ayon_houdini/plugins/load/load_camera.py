@@ -121,7 +121,7 @@ class CameraLoader(plugin.HoudiniLoader):
 
         camera = get_camera_from_container(node)
         self._match_maya_render_mask(camera)
-        set_camera_resolution(camera, folder_entity=context["folder"])
+        set_camera_resolution(camera, entity=context["folder"])
         self[:] = nodes
 
         return pipeline.containerise(node_name,
