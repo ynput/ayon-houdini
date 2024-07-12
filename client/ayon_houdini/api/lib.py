@@ -14,7 +14,6 @@ from ayon_core.lib import StringTemplate
 from ayon_core.settings import get_current_project_settings
 from ayon_core.pipeline import (
     Anatomy,
-    get_current_folder_path,
     registered_host,
     get_current_context,
     get_current_host_name,
