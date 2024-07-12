@@ -402,18 +402,12 @@ def reset_framerange(fps=True, frame_range=True):
     if frame_range:
 
         # Set Start and End Frames
-        frame_start = task_entity.get("frameStart")
-        frame_end = task_entity.get("frameEnd")
+        task_attrib = task_entity["attrib"]
+        frame_start = task_attrib.get("frameStart", 0)
+        frame_end = task_attrib.get("frameEnd", 0)
 
-        if frame_start is None or frame_end is None:
-            folder_path = get_current_folder_path()
-            task_name = task_entity["name"]
-            log.warning("No edit information found for '%s' > '%s'",
-                        folder_path, task_name)
-            return
-
-        handle_start = task_entity.get("handleStart", 0)
-        handle_end = task_entity.get("handleEnd", 0)
+        handle_start = task_attrib.get("handleStart", 0)
+        handle_end = task_attrib.get("handleEnd", 0)
 
         frame_start -= int(handle_start)
         frame_end += int(handle_end)
