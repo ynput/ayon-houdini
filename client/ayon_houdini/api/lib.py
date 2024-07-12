@@ -391,7 +391,7 @@ def parm_values(overrides):
 def reset_framerange(fps=True, frame_range=True):
     """Set frame range and FPS to current folder."""
 
-    task_entity = get_current_task_entity()
+    task_entity = get_current_task_entity(fields={"attrib"})
 
     # Set FPS
     if fps:
