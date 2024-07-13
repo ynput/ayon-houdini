@@ -19,7 +19,6 @@ class CreateUSDLook(plugin.HoudiniCreator):
 
     def create(self, product_name, instance_data, pre_create_data):
 
-        instance_data.pop("active", None)
         instance_data.update({"node_type": "usd"})
 
         instance = super(CreateUSDLook, self).create(
