@@ -159,10 +159,12 @@ class HoudiniTemplateBuilder(AbstractTemplateBuilder):
 
         # TODO Check if template is already imported
 
-        # Load template workfile
-        self.host.open_workfile(path)
-
-        return True
+        # Merge (Load) template workfile in the current scene.
+        try: 
+            hou.hipFile.merge(path, ignore_load_warnings=True)
+            return True
+        except hou.OperationFailed:
+            return False
 
 
 class HoudiniPlaceholderPlugin(PlaceholderPlugin):
