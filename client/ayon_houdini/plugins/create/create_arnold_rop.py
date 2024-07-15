@@ -26,7 +26,6 @@ class CreateArnoldRop(plugin.HoudiniCreator):
                 creator_attributes[key] = pre_create_data[key]
 
         # Remove the active, we are checking the bypass flag of the nodes
-        instance_data.pop("active", None)
         instance_data.update({"node_type": "arnold"})
 
         # Add chunk size attribute
