@@ -24,7 +24,6 @@ class CreateKarmaROP(plugin.HoudiniCreator):
             if key in pre_create_data:
                 creator_attributes[key] = pre_create_data[key]
 
-        instance_data.pop("active", None)
         instance_data.update({"node_type": "karma"})
         # Add chunk size attribute
         instance_data["chunkSize"] = 10

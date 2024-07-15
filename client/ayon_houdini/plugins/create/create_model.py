@@ -17,7 +17,6 @@ from ayon_core.lib import BoolDef
 import hou
 
 
-
 class CreateModel(plugin.HoudiniCreator):
     """Create Model"""
     identifier = "io.openpype.creators.houdini.model"
@@ -26,7 +25,6 @@ class CreateModel(plugin.HoudiniCreator):
     icon = "cube"
 
     def create(self, product_name, instance_data, pre_create_data):
-        instance_data.pop("active", None)
         instance_data.update({"node_type": "alembic"})
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
