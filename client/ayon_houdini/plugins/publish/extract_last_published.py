@@ -1,12 +1,11 @@
 import os
 import shutil
-import hou
 
 import clique
 import pyblish.api
 
 from ayon_core.lib import collect_frames
-from ayon_houdini.api import plugin, lib
+from ayon_houdini.api import plugin
 
 
 class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
