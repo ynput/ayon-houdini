@@ -1,5 +1,6 @@
 import os
 import hou
+import clique 
 
 import pyblish.api
 
@@ -33,9 +34,32 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        self.log.debug(f"Rendering {rop_node.path()} to {first_file}..")
+        last_published = instance.data.get("last_version_published_files")
 
-        render_rop(rop_node)
+        self.log.debug(
+            "Rendering {node_path} to {location}".format(
+                node_path=rop_node.path(),
+                location=instance.data['stagingDir'] if isinstance(files, (list, tuple)) else files
+            )
+        )
+        if last_published and len(last_published) > 1:
+            # Render only frames to fix
+            frames_to_fix = clique.parse(instance.data["frames_to_fix"], "{ranges}")
+            for frame_range in frames_to_fix.separate():
+                frame_range = list(frame_range)
+                self.log.debug(
+                    "Rendering frames to fix [{f1}, {f2}]".format(
+                        f1=frame_range[0],
+                        f2=frame_range[-1]
+                    )
+                )
+                frame_range = (
+                    int(frame_range[0]), int(frame_range[-1]), instance.data["byFrameStep"]
+                )
+                render_rop(rop_node, frame_range=frame_range)
+                        
+        else:
+            render_rop(rop_node)
         self.validate_expected_frames(instance)
 
         # In some cases representation name is not the the extension
