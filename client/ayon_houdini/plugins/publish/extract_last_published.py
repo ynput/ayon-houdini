@@ -72,8 +72,7 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
                     ["{}/{}".format(staging_dir, f) for f in frames]
                 )
 
-        if not os.path.exists(staging_dir):
-            os.makedirs(staging_dir)
+        os.makedirs(staging_dir, exist_ok=True)
 
         anatomy = instance.context.data["anatomy"]
         last_published_and_frames = collect_frames(last_published)
