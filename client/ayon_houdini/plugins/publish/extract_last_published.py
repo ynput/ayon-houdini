@@ -34,23 +34,8 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             self.log.debug("Skipping, No frames to fix.")
             return
 
-        # Get a list of expected filenames
-        node = hou.node(instance.data.get("instance_node", ""))
-        if not node:
-            self.log.debug("Skipping, Instance has no instance_node")
-            return
-        output_parm = lib.get_output_parameter(node)
-        if not output_parm:
-            self.log.debug("Skipping, ROP node type '{}' is not supported."
-                           .format(node.type().name()))
-            return
-        filepath = output_parm.eval()
-        if not filepath:
-            self.log.debug("Skipping, No filepath value found.")
-            return
-
         expected_filenames = []
-        staging_dir, _ = os.path.split(filepath)
+        staging_dir = instance.data.get("stagingDir")
         expectedFiles = instance.data.get("expectedFiles", [])
 
         # 'expectedFiles' are preferred over 'frames'
@@ -65,7 +50,7 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             frames = instance.data.get("frames", "")
             if isinstance(frames, str):
                 # single file.
-                expected_filenames.append(filepath)
+                expected_filenames.append("{}/{}".format(staging_dir, frames))
             else:
                 # list of frame.
                 expected_filenames.extend(
@@ -88,7 +73,8 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             target_file_name = frames_and_expected.get(frame)
             if not target_file_name:
                 continue
-
+            
+            # FIXME This won't work with render products.
             out_path = os.path.join(staging_dir, target_file_name)
 
             # Copy only the frames that we won't render.
