@@ -9,9 +9,8 @@ from ayon_houdini.api.action import SelectInvalidAction
 from ayon_houdini.api import plugin
 
 
-
-class DisableUseFolderHandlesAction(RepairAction):
-    label = "Disable use folder handles"
+class DisableUseTaskHandlesAction(RepairAction):
+    label = "Disable use task handles"
     icon = "mdi.toggle-switch-off"
 
 
@@ -25,7 +24,7 @@ class ValidateFrameRange(plugin.HoudiniInstancePlugin):
 
     order = pyblish.api.ValidatorOrder - 0.1
     label = "Validate Frame Range"
-    actions = [DisableUseFolderHandlesAction, SelectInvalidAction]
+    actions = [DisableUseTaskHandlesAction, SelectInvalidAction]
 
     def process(self, instance):
 
@@ -43,11 +42,11 @@ class ValidateFrameRange(plugin.HoudiniInstancePlugin):
                     "## Invalid Frame Range\n"
                     "The frame range for the instance is invalid because "
                     "the start frame is higher than the end frame.\n\nThis "
-                    "is likely due to folder handles being applied to your "
+                    "is likely due to task handles being applied to your "
                     "instance or the ROP node's start frame "
                     "is set higher than the end frame.\n\nIf your ROP frame "
-                    "range is correct and you do not want to apply folder "
-                    "handles make sure to disable Use folder handles on the "
+                    "range is correct and you do not want to apply task "
+                    "handles make sure to disable Use task handles on the "
                     "publish instance."
                 )
             )
@@ -73,7 +72,7 @@ class ValidateFrameRange(plugin.HoudiniInstancePlugin):
             cls.log.info(
                 "The ROP node render range is set to "
                 "{0[frameStartHandle]} - {0[frameEndHandle]} "
-                "The folder handles applied to the instance are start handle "
+                "The task handles applied to the instance are start handle "
                 "{0[handleStart]} and end handle {0[handleEnd]}"
                 .format(instance.data)
             )
@@ -86,7 +85,7 @@ class ValidateFrameRange(plugin.HoudiniInstancePlugin):
             # Already fixed
             return
 
-        # Disable use folder handles
+        # Disable use task handles
         context = instance.context
         create_context = context.data["create_context"]
         instance_id = instance.data.get("instance_id")
@@ -104,5 +103,5 @@ class ValidateFrameRange(plugin.HoudiniInstancePlugin):
         created_instance.publish_attributes["CollectAssetHandles"]["use_handles"] = False  # noqa
 
         create_context.save_changes()
-        cls.log.debug("use folder handles is turned off for '{}'"
+        cls.log.debug("use task handles is turned off for '{}'"
                       .format(instance))

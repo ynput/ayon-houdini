@@ -14,15 +14,13 @@ from ayon_core.lib import StringTemplate
 from ayon_core.settings import get_current_project_settings
 from ayon_core.pipeline import (
     Anatomy,
-    get_current_project_name,
-    get_current_folder_path,
     registered_host,
     get_current_context,
     get_current_host_name,
 )
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.template_data import get_template_data
-from ayon_core.pipeline.context_tools import get_current_folder_entity
+from ayon_core.pipeline.context_tools import get_current_task_entity
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
 
@@ -35,12 +33,12 @@ log = logging.getLogger(__name__)
 JSON_PREFIX = "JSON:::"
 
 
-def get_folder_fps(folder_entity=None):
-    """Return current folder fps."""
+def get_entity_fps(entity=None):
+    """Return current task fps or fps from an entity."""
 
-    if folder_entity is None:
-        folder_entity = get_current_folder_entity(fields=["attrib.fps"])
-    return folder_entity["attrib"]["fps"]
+    if entity is None:
+        entity = get_current_task_entity(fields=["attrib.fps"])
+    return entity["attrib"]["fps"]
 
 
 def get_output_parameter(node):
@@ -121,7 +119,7 @@ def validate_fps():
 
     """
 
-    fps = get_folder_fps()
+    fps = get_entity_fps()
     current_fps = hou.fps()  # returns float
 
     if current_fps != fps:
@@ -392,30 +390,23 @@ def parm_values(overrides):
 def reset_framerange(fps=True, frame_range=True):
     """Set frame range and FPS to current folder."""
 
-    project_name = get_current_project_name()
-    folder_path = get_current_folder_path()
-
-    folder_entity = ayon_api.get_folder_by_path(project_name, folder_path)
-    folder_attributes = folder_entity["attrib"]
+    task_entity = get_current_task_entity(fields={"attrib"})
 
     # Set FPS
     if fps:
-        fps = get_folder_fps(folder_entity)
+        fps = get_entity_fps(task_entity)
         print("Setting scene FPS to {}".format(int(fps)))
         set_scene_fps(fps)
 
     if frame_range:
 
         # Set Start and End Frames
-        frame_start = folder_attributes.get("frameStart")
-        frame_end = folder_attributes.get("frameEnd")
+        task_attrib = task_entity["attrib"]
+        frame_start = task_attrib.get("frameStart", 0)
+        frame_end = task_attrib.get("frameEnd", 0)
 
-        if frame_start is None or frame_end is None:
-            log.warning("No edit information found for '%s'", folder_path)
-            return
-
-        handle_start = folder_attributes.get("handleStart", 0)
-        handle_end = folder_attributes.get("handleEnd", 0)
+        handle_start = task_attrib.get("handleStart", 0)
+        handle_end = task_attrib.get("handleEnd", 0)
 
         frame_start -= int(handle_start)
         frame_end += int(handle_end)
@@ -507,7 +498,7 @@ def get_frame_data(node, log=None):
 
         log.info(
             "Node '{}' has 'Render current frame' set.\n"
-            "Folder Handles are ignored.\n"
+            "Task handles are ignored.\n"
             "frameStart and frameEnd are set to the "
             "current frame.".format(node.path())
         )
@@ -646,43 +637,44 @@ def get_output_children(output_node, include_sops=True):
     return out_list
 
 
-def get_resolution_from_folder(folder_entity):
-    """Get resolution from the given folder entity.
+def get_resolution_from_entity(entity):
+    """Get resolution from the given entity.
 
     Args:
-        folder_entity (dict[str, Any]): Folder entity.
+        entity (dict[str, Any]): Project, Folder or Task entity.
 
     Returns:
         Union[Tuple[int, int], None]: Resolution width and height.
 
     """
-    if not folder_entity or "attrib" not in folder_entity:
-        print("Entered folder is not valid. \"{}\"".format(
-            str(folder_entity)
-        ))
-        return None
+    if not entity or "attrib" not in entity:
+        raise ValueError(f"Entity is not valid: \"{entity}\"")
 
-    folder_attributes = folder_entity["attrib"]
-    resolution_width = folder_attributes.get("resolutionWidth")
-    resolution_height = folder_attributes.get("resolutionHeight")
+    attributes = entity["attrib"]
+    resolution_width = attributes.get("resolutionWidth")
+    resolution_height = attributes.get("resolutionHeight")
 
     # Make sure both width and height are set
     if resolution_width is None or resolution_height is None:
-        print("No resolution information found for '{}'".format(
-            folder_entity["path"]
-        ))
+        print(f"No resolution information found in entity: '{entity}'")
         return None
 
     return int(resolution_width), int(resolution_height)
 
 
-def set_camera_resolution(camera, folder_entity=None):
-    """Apply resolution to camera from folder entity of the publish"""
+def set_camera_resolution(camera, entity=None):
+    """Apply resolution to camera from task or folder entity.
 
-    if not folder_entity:
-        folder_entity = get_current_folder_entity()
+    Arguments:
+        camera (hou.OpNode): Camera node.
+        entity (Optional[Dict[str, Any]]): Folder or task entity.
+            If not provided falls back to current task entity.
+    """
 
-    resolution = get_resolution_from_folder(folder_entity)
+    if not entity:
+        entity = get_current_task_entity()
+
+    resolution = get_resolution_from_entity(entity)
 
     if resolution:
         print("Setting camera resolution: {} -> {}x{}".format(
@@ -705,10 +697,13 @@ def get_camera_from_container(container):
     return cameras[0]
 
 
-def get_current_context_template_data_with_folder_attrs():
-    """
+def get_current_context_template_data_with_entity_attrs():
+    """Return template data including current context folder and task attribs.
 
-    Output contains 'folderAttributes' key with folder attribute values.
+    Output contains:
+      - Regular template data from `get_template_data`
+      - 'folderAttributes' key with folder attribute values.
+      - 'taskAttributes' key with task attribute values.
 
     Returns:
          dict[str, Any]: Template data to fill templates.
@@ -729,23 +724,25 @@ def get_current_context_template_data_with_folder_attrs():
 
     # get context specific vars
     folder_attributes = folder_entity["attrib"]
+    task_attributes = task_entity["attrib"]
 
     # compute `frameStartHandle` and `frameEndHandle`
-    frame_start = folder_attributes.get("frameStart")
-    frame_end = folder_attributes.get("frameEnd")
-    handle_start = folder_attributes.get("handleStart")
-    handle_end = folder_attributes.get("handleEnd")
-    if frame_start is not None and handle_start is not None:
-        folder_attributes["frameStartHandle"] = frame_start - handle_start
-
-    if frame_end is not None and handle_end is not None:
-        folder_attributes["frameEndHandle"] = frame_end + handle_end
+    for attributes in [folder_attributes, task_attributes]:
+        frame_start = attributes.get("frameStart")
+        frame_end = attributes.get("frameEnd")
+        handle_start = attributes.get("handleStart")
+        handle_end = attributes.get("handleEnd")
+        if frame_start is not None and handle_start is not None:
+            attributes["frameStartHandle"] = frame_start - handle_start
+        if frame_end is not None and handle_end is not None:
+            attributes["frameEndHandle"] = frame_end + handle_end
 
     template_data = get_template_data(
         project_entity, folder_entity, task_entity, host_name
     )
     template_data["root"] = anatomy.roots
     template_data["folderAttributes"] = folder_attributes
+    template_data["taskAttributes"] = task_attributes
 
     return template_data
 
@@ -806,7 +803,7 @@ def get_context_var_changes():
         return houdini_vars_to_update
 
     # Get Template data
-    template_data = get_current_context_template_data_with_folder_attrs()
+    template_data = get_current_context_template_data_with_entity_attrs()
 
     # Set Houdini Vars
     for item in houdini_vars:
@@ -838,7 +835,7 @@ def get_context_var_changes():
 
 
 def update_houdini_vars_context():
-    """Update folder context variables"""
+    """Update task context variables"""
 
     for var, (_old, new, is_directory) in get_context_var_changes().items():
         if is_directory:
@@ -857,7 +854,7 @@ def update_houdini_vars_context():
 
 
 def update_houdini_vars_context_dialog():
-    """Show pop-up to update folder context variables"""
+    """Show pop-up to update task context variables"""
     update_vars = get_context_var_changes()
     if not update_vars:
         # Nothing to change
@@ -873,7 +870,7 @@ def update_houdini_vars_context_dialog():
     parent = hou.ui.mainQtWindow()
     dialog = SimplePopup(parent=parent)
     dialog.setModal(True)
-    dialog.setWindowTitle("Houdini scene has outdated folder variables")
+    dialog.setWindowTitle("Houdini scene has outdated task variables")
     dialog.set_message(message)
     dialog.set_button_text("Fix")
 
