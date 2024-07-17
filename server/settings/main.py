@@ -16,6 +16,9 @@ from .publish import (
     PublishPluginsModel,
     DEFAULT_HOUDINI_PUBLISH_SETTINGS,
 )
+from .templated_workfile_build import (
+    TemplatedWorkfileBuildModel
+)
 
 
 class HoudiniSettings(BaseSettingsModel):
@@ -39,6 +42,10 @@ class HoudiniSettings(BaseSettingsModel):
         default_factory=PublishPluginsModel,
         title="Publish Plugins",
     )
+    templated_workfile_build: TemplatedWorkfileBuildModel = SettingsField(
+        title="Templated Workfile Build",
+        default_factory=TemplatedWorkfileBuildModel
+    )
 
 
 DEFAULT_VALUES = {
@@ -46,5 +53,8 @@ DEFAULT_VALUES = {
     "imageio": DEFAULT_IMAGEIO_SETTINGS,
     "shelves": [],
     "create": DEFAULT_HOUDINI_CREATE_SETTINGS,
-    "publish": DEFAULT_HOUDINI_PUBLISH_SETTINGS
+    "publish": DEFAULT_HOUDINI_PUBLISH_SETTINGS,
+    "templated_workfile_build": {
+        "profiles": []
+    }
 }

@@ -14,9 +14,6 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
 
     def create(self, product_name, instance_data, pre_create_data):
 
-        # Remove the active, we are checking the bypass flag of the nodes
-        instance_data.pop("active", None)
-
         # Redshift provides a `Redshift_Proxy_Output` node type which shows
         # a limited set of parameters by default and is set to extract a
         # Redshift Proxy. However when "imprinting" extra parameters needed

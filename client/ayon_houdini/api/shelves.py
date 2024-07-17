@@ -10,7 +10,7 @@ from ayon_core.lib import StringTemplate
 
 import hou
 
-from .lib import get_current_context_template_data_with_folder_attrs
+from .lib import get_current_context_template_data_with_entity_attrs
 
 log = logging.getLogger("ayon_houdini.shelves")
 
@@ -31,7 +31,7 @@ def generate_shelves():
         return
 
     # Get Template data
-    template_data = get_current_context_template_data_with_folder_attrs()
+    template_data = get_current_context_template_data_with_entity_attrs()
 
     for config in shelves_configs:
         selected_option = config["options"]

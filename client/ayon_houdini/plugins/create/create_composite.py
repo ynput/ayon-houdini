@@ -19,7 +19,6 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
     def create(self, product_name, instance_data, pre_create_data):
         import hou  # noqa
 
-        instance_data.pop("active", None)
         instance_data.update({"node_type": "comp"})
 
         instance = super(CreateCompositeSequence, self).create(
