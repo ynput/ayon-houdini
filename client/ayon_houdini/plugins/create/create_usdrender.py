@@ -46,8 +46,6 @@ class CreateUSDRender(plugin.HoudiniCreator):
         # TODO: Support creation in /stage if wanted by user
         # pre_create_data["parent"] = "/stage"
 
-        # Remove the active, we are checking the bypass flag of the nodes
-        instance_data.pop("active", None)
         instance_data.update({"node_type": "usdrender"})
 
         # Override default value for the Export Chunk Size because if the
