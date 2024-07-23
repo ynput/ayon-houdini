@@ -66,7 +66,7 @@ class HoudiniImageIOModel(BaseSettingsModel):
 
 
 DEFAULT_IMAGEIO_SETTINGS = {
-    "activate_host_color_management": False,
+    "activate_host_color_management": True,
     "file_rules": {
         "activate_host_rules": False,
         "rules": []
