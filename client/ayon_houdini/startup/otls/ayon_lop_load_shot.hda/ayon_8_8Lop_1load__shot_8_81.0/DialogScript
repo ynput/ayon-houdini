@@ -257,7 +257,7 @@
             name    "loader"
             label   "Loader"
             type    label
-            default { "LOPLoadAssetLoader" }
+            default { "LOPLoadShotLoader" }
         }
         parm {
             name    "id"
