@@ -14,6 +14,7 @@ from ayon_core.pipeline import (
     register_creator_plugin_path,
     register_loader_plugin_path,
     register_inventory_action_path,
+    register_workfile_build_plugin_path,
     AVALON_CONTAINER_ID,
     AYON_CONTAINER_ID,
 )
@@ -41,6 +42,7 @@ PUBLISH_PATH = os.path.join(PLUGINS_DIR, "publish")
 LOAD_PATH = os.path.join(PLUGINS_DIR, "load")
 CREATE_PATH = os.path.join(PLUGINS_DIR, "create")
 INVENTORY_PATH = os.path.join(PLUGINS_DIR, "inventory")
+WORKFILE_BUILD_PATH = os.path.join(PLUGINS_DIR, "workfile_build")
 
 # Track whether the workfile tool is about to save
 _about_to_save = False
@@ -63,6 +65,7 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         register_loader_plugin_path(LOAD_PATH)
         register_creator_plugin_path(CREATE_PATH)
         register_inventory_action_path(INVENTORY_PATH)
+        register_workfile_build_plugin_path(WORKFILE_BUILD_PATH)
 
         log.info("Installing callbacks ... ")
         # register_event_callback("init", on_init)

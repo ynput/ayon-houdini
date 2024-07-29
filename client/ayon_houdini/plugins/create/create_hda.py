@@ -250,14 +250,6 @@ class CreateHDA(plugin.HoudiniCreator):
 
         return hda_node
 
-    def create(self, product_name, instance_data, pre_create_data):
-        instance_data.pop("active", None)
-
-        return super(CreateHDA, self).create(
-            product_name,
-            instance_data,
-            pre_create_data)
-
     def get_network_categories(self):
         # Houdini allows creating sub-network nodes inside
         # these categories.

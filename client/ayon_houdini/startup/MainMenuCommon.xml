@@ -104,6 +104,63 @@ parent = hou.qt.mainWindow()
 host_tools.show_experimental_tools_dialog(parent)
 ]]></scriptCode>
             </scriptItem>
+            <separatorItem/>
+            <subMenu id="Template Builder">
+                <label>Template Builder</label>
+                <scriptItem id="build_workfile_template">
+                    <label>Build Workfile from template</label>
+                    <scriptCode><![CDATA[
+from ayon_houdini.api.workfile_template_builder import (
+    build_workfile_template
+)
+build_workfile_template()
+    ]]></scriptCode>
+                </scriptItem>
+                <scriptItem id="update_workfile_template">
+                    <label>Update Workfile from template</label>
+                    <scriptCode><![CDATA[
+from ayon_houdini.api.workfile_template_builder import (
+    update_workfile_template
+)
+update_workfile_template()
+    ]]></scriptCode>
+                </scriptItem>
+                <separatorItem/>
+                <scriptItem id="open_workfile_template">
+                    <label>Open Template</label>
+                    <scriptCode><![CDATA[
+import hou
+from ayon_core.pipeline import registered_host
+from ayon_core.tools.workfile_template_build import open_template_ui
+from ayon_houdini.api.workfile_template_builder import (
+    HoudiniTemplateBuilder,
+)
+
+open_template_ui(
+    HoudiniTemplateBuilder(registered_host()),
+    hou.qt.mainWindow()
+)
+    ]]></scriptCode>
+                </scriptItem>
+                <scriptItem id="create_workfile_placeholder">
+                    <label>Create Placeholder...</label>
+                    <scriptCode><![CDATA[
+from ayon_houdini.api.workfile_template_builder import (
+    create_placeholder
+)
+create_placeholder()
+   ]]></scriptCode>
+                </scriptItem>
+                <scriptItem id="update_workfile_placeholder">
+                    <label>Update Placeholder</label>
+                    <scriptCode><![CDATA[
+from ayon_houdini.api.workfile_template_builder import (
+    update_placeholder
+)
+update_placeholder()
+    ]]></scriptCode>
+                </scriptItem>
+            </subMenu>
         </subMenu>
     </menuBar>
 </mainMenu>
