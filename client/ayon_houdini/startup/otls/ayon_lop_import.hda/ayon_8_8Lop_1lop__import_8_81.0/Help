@@ -1,6 +1,6 @@
 = AYON Load Asset =
 
-#icon: path/to/icon
+#icon: opdef:/ayon::Lop/lop_import::1.0?AYON_icon.png
 
 """References a USD file, usually an asset."""
 
