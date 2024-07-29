@@ -1,0 +1,13 @@
+= My Asset =
+
+"""Mute USD layers by wildcard path matching."""
+
+== Overview ==
+
+Sets used USD layers in the stage to be Muted downstream. 
+
+For example using `*usdAsset_look*` this can ensure to mute all look related layers, or `*usdShot_lighting*` to do the same for lighting.
+
+The `pattern` parameter has a drop-down to easily set or disable often used presets.
+
+@parameters

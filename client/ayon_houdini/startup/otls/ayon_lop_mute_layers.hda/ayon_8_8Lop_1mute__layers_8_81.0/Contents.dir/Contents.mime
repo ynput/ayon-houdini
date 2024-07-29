@@ -1,0 +1,418 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY"
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="node_type"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+Lop
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.init"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+type = ayon::mute_layers::1.0
+matchesdef = 0
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.def"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+comment ""
+position -3.49676 -0.462294
+connectornextid 1
+flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+outputsNamed3
+{
+}
+inputsNamed3
+{
+0 	load_shot1 0 1 "input1"
+}
+inputs
+{
+0 	load_shot1 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author User@HP-Z820-03
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.userdata"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.inp"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+1
+0 0 6 2 0 __NO_OWNER_NETWORK_BOX__ "FROMOUTPUT"
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/output0.init"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+type = output
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/output0.def"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+comment ""
+position -1.11759e-08 2.91502
+connectornextid 1
+flags =  lock off model off template off footprint off xray off bypass off display off render on highlight off unload off savedata off compress on colordefault on exposed on debug off
+outputsNamed3
+{
+}
+inputsNamed3
+{
+0 	mute_layers 1 1 "input1"
+}
+inputs
+{
+0 	mute_layers 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author User@HP-Z820-03
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/output0.parm"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+{
+version 0.8
+outputidx	[ 0	locks=0 ]	(	0	)
+modifiedprims	[ 0	locks=0 ]	(	"`lopinputprims(\".\", 0)`"	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/output0.userdata"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_layers.init"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+type = pythonscript
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_layers.def"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+comment ""
+position -1.11759e-08 4.9334
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+0 	(0) "" 1 "input1"
+}
+inputs
+{
+0 	(0) 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author User@HP-Z820-03
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_layers.spareparmdef"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+    parm {
+        name    "pattern"
+        label   "Pattern"
+        type    string
+        default { "" }
+        menureplace {
+            ""  "*usdAsset_look*"
+            ""  "*usdAsset_model*"
+            ""  "*usdShot_fx*"
+            ""  "*usdShot_lighting*"
+        }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "casesensitive"
+        label   "Case Sensitive"
+        type    toggle
+        default { "0" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "python"
+        baseparm
+        label   "Python Code"
+        export  none
+    }
+    parm {
+        name    "maintainstate"
+        baseparm
+        label   "Maintain State"
+        export  none
+    }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_layers.chn"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+{
+    channel pattern {
+      lefttype = extend
+      righttype = extend
+      defaultString = chs(\"../mute_pattern\")
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../mute_pattern\") }
+    }
+    channel casesensitive {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      start = 40
+      segment { length = 0 expr = ch(\"../casesensitive\") }
+    }
+  }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_layers.parm"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+{
+version 0.8
+python	[ 0	locks=0 ]	(	"import os
+from pxr import Usd
+
+
+def get_paths(stage: Usd.Stage, pattern: str, case_sensitive: bool) -> list[str]:
+    \"\"\"Return matching filepaths used by composed Usd.Stage that match the `pattern`.\"\"\"
+
+    if not pattern:
+        return []
+    
+    paths = []
+    layers = stage.GetUsedLayers()
+    for layer in layers:
+        identifier = layer.identifier
+        
+        # Ignore identifiers that are not a file
+        path = identifier.split(\":SDF_FORMAT_ARGS:\")[0]
+        
+        if not os.path.exists(path):
+            continue
+            
+        if not hou.text.patternMatch(
+            pattern, 
+            path,
+            ignore_case=not case_sensitive,
+            path_match=True):
+            continue
+            
+        paths.append(identifier)
+        
+    return paths
+            
+    
+node = hou.pwd()
+stage = node.editableStage()
+pattern = node.evalParm(\"pattern\")
+case_sensitive = node.evalParm(\"casesensitive\")
+paths = get_paths(stage, pattern, case_sensitive)
+
+# Update mute layers value on next node
+parm = node.parent().parm(\"mutepaths\")
+parm.lock(False)
+parm.set(\"\\n\".join(paths))
+parm.lock(True)"	)
+maintainstate	[ 0	locks=0 ]	(	"off"	)
+pattern	[ 0	locks=0 ]	(	[ pattern	"" ] 	)
+casesensitive	[ 0	locks=0 ]	(	[ casesensitive	0 ] 	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_layers.userdata"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/mute_layers.init"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+type = configurestage
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/mute_layers.def"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+comment ""
+position -1.11759e-08 3.99421
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+0 	get_layers 1 1 "input1"
+}
+inputs
+{
+0 	get_layers 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author User@HP-Z820-03
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/mute_layers.chn"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+{
+    channel editmute {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"set\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../editmute\") }
+    }
+  }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/mute_layers.parm"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+{
+version 0.8
+editpopulate	[ 0	locks=0 ]	(	nochange	)
+populatepattern	[ 0	locks=0 ]	(	""	)
+unpopulatepattern	[ 0	locks=0 ]	(	""	)
+populatepaths	[ 0	locks=0 ]	(	""	)
+unpopulatepaths	[ 0	locks=0 ]	(	""	)
+separator_load	[ 0	locks=0 ]	(	)
+editload	[ 0	locks=0 ]	(	nochange	)
+loadpattern	[ 0	locks=0 ]	(	""	)
+unloadpattern	[ 0	locks=0 ]	(	""	)
+loadpaths	[ 0	locks=0 ]	(	""	)
+unloadpaths	[ 0	locks=0 ]	(	""	)
+separator_mute	[ 0	locks=0 ]	(	)
+editmute	[ 0	locks=0 ]	(	[ editmute	nochange ] 	)
+mutepaths	[ 8	locks=0 ]	(	`chs(\"../mutepaths\")`	)
+unmutepaths	[ 0	locks=0 ]	(	""	)
+separator_resolver	[ 0	locks=0 ]	(	)
+resolvercontextassetpath	[ 0	locks=0 ]	(	""	)
+resolvercontextstringcount	[ 0	locks=0 ]	(	0	)
+variantselectioncount	[ 0	locks=0 ]	(	0	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/mute_layers.userdata"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.order"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+3
+output0
+get_layers
+mute_layers
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.net"
+Content-Modified-Time: 1722286048
+Content-Type: text/plain
+
+1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY--
