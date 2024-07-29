@@ -90,11 +90,11 @@ outputsNamed3
 }
 inputsNamed3
 {
-0 	sublayer1 1 1 "input1"
+0 	sublayer 1 1 "input1"
 }
 inputs
 {
-0 	sublayer1 0 1
+0 	sublayer 0 1
 }
 stat
 {
@@ -206,14 +206,14 @@ Content-Type: text/plain
 }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/sublayer1.init"
+Content-Disposition: attachment; filename="hdaroot/sublayer.init"
 Content-Type: text/plain
 
 type = sublayer
 matchesdef = 1
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/sublayer1.def"
+Content-Disposition: attachment; filename="hdaroot/sublayer.def"
 Content-Type: text/plain
 
 comment ""
@@ -245,7 +245,7 @@ exprlanguage hscript
 end
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/sublayer1.chn"
+Content-Disposition: attachment; filename="hdaroot/sublayer.chn"
 Content-Type: text/plain
 
 {
@@ -281,7 +281,7 @@ Content-Type: text/plain
   }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/sublayer1.parm"
+Content-Disposition: attachment; filename="hdaroot/sublayer.parm"
 Content-Type: text/plain
 
 {
@@ -311,7 +311,7 @@ timescale1	[ 0	locks=0 ]	(	[ timescale1	1 ] 	)
 }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/sublayer1.userdata"
+Content-Disposition: attachment; filename="hdaroot/sublayer.userdata"
 Content-Type: text/plain
 
 {
@@ -328,7 +328,7 @@ Content-Type: text/plain
 3
 output0
 warn_no_representation_set
-sublayer1
+sublayer
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.net"
