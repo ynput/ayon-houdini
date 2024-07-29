@@ -1,5 +1,7 @@
 = AYON Load Shot =
 
+#icon: opdef:/ayon::Lop/load_shot::1.0?AYON_icon.png
+
 """Sublayers a USD file, usually a shot."""
 
 == Overview ==
