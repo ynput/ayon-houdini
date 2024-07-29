@@ -1,0 +1,16 @@
+= AYON Load Asset =
+
+#icon: path/to/icon
+
+"""References a USD file, usually an asset."""
+
+== Overview ==
+
+*References* or *Payloads* a USD file into the current USD layer.
+
+In USD, when referencing, it's good to understand that you load a *single root prim* from the USD file. You will not get the full contents of the USD file if the USD file's content do not live within that single root primitive. By default, it will load a USD file's *default prim* but can be customized using the Load Options on this LOP node. 
+
+
+@related
+
+* [Node:lop/reference]
