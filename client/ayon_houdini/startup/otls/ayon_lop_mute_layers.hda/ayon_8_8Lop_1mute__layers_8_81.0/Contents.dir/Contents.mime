@@ -168,7 +168,6 @@ Content-Type: text/plain
 {
 version 0.8
 python	[ 0	locks=0 ]	(	"import os
-from pxr import Sdf
 from typing import List
 
 
