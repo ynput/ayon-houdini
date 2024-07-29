@@ -93,7 +93,7 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
-            name    "unutepaths"
+            name    "unmutepaths"
             label   "Unmuted Paths"
             type    string
             default { "" }

@@ -3,14 +3,12 @@ Content-Type: multipart/mixed; boundary="HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F4
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="node_type"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 Lop
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.init"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 type = ayon::mute_layers::1.0
@@ -18,23 +16,22 @@ matchesdef = 0
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.def"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 comment ""
-position -3.49676 -0.462294
+position -3.1669 0.213108
 connectornextid 1
-flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
 inputsNamed3
 {
-0 	load_shot1 0 1 "input1"
+0 	mute_layers1 1 1 "input1"
 }
 inputs
 {
-0 	load_shot1 0 1
+0 	mute_layers1 0 1
 }
 stat
 {
@@ -50,7 +47,6 @@ end
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.userdata"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 {
@@ -62,7 +58,6 @@ Content-Type: text/plain
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.inp"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 1
@@ -70,7 +65,6 @@ Content-Type: text/plain
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/output0.init"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 type = output
@@ -78,13 +72,12 @@ matchesdef = 1
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/output0.def"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 comment ""
-position -1.11759e-08 2.91502
+position -1.11759e-08 1.39456
 connectornextid 1
-flags =  lock off model off template off footprint off xray off bypass off display off render on highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
@@ -110,7 +103,6 @@ end
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/output0.parm"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 {
@@ -121,7 +113,6 @@ modifiedprims	[ 0	locks=0 ]	(	"`lopinputprims(\".\", 0)`"	)
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/output0.userdata"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 {
@@ -133,7 +124,6 @@ Content-Type: text/plain
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/get_layers.init"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 type = pythonscript
@@ -141,13 +131,12 @@ matchesdef = 1
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/get_layers.def"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 comment ""
 position -1.11759e-08 4.9334
 connectornextid 2
-flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 1 "output1"
@@ -173,87 +162,28 @@ exprlanguage hscript
 end
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/get_layers.spareparmdef"
-Content-Modified-Time: 1722286048
-Content-Type: text/plain
-
-    parm {
-        name    "pattern"
-        label   "Pattern"
-        type    string
-        default { "" }
-        menureplace {
-            ""  "*usdAsset_look*"
-            ""  "*usdAsset_model*"
-            ""  "*usdShot_fx*"
-            ""  "*usdShot_lighting*"
-        }
-        parmtag { "script_callback_language" "python" }
-    }
-    parm {
-        name    "casesensitive"
-        label   "Case Sensitive"
-        type    toggle
-        default { "0" }
-        parmtag { "script_callback_language" "python" }
-    }
-    parm {
-        name    "python"
-        baseparm
-        label   "Python Code"
-        export  none
-    }
-    parm {
-        name    "maintainstate"
-        baseparm
-        label   "Maintain State"
-        export  none
-    }
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/get_layers.chn"
-Content-Modified-Time: 1722286048
-Content-Type: text/plain
-
-{
-    channel pattern {
-      lefttype = extend
-      righttype = extend
-      defaultString = chs(\"../mute_pattern\")
-      flags = 0
-      start = 40
-      segment { length = 0 expr = chs(\"../mute_pattern\") }
-    }
-    channel casesensitive {
-      lefttype = extend
-      righttype = extend
-      flags = 0
-      start = 40
-      segment { length = 0 expr = ch(\"../casesensitive\") }
-    }
-  }
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/get_layers.parm"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 {
 version 0.8
 python	[ 0	locks=0 ]	(	"import os
-from pxr import Usd
+from pxr import Sdf
+from typing import List
 
 
-def get_paths(stage: Usd.Stage, pattern: str, case_sensitive: bool) -> list[str]:
+def get_paths(
+    layers: List[str], 
+    pattern: str,
+    case_sensitive: bool) -> list[str]:
     \"\"\"Return matching filepaths used by composed Usd.Stage that match the `pattern`.\"\"\"
 
-    if not pattern:
+    if not pattern or not layers:
         return []
     
     paths = []
-    layers = stage.GetUsedLayers()
-    for layer in layers:
-        identifier = layer.identifier
+    for layer_identifier in layers:
+        identifier = layer_identifier
         
         # Ignore identifiers that are not a file
         path = identifier.split(\":SDF_FORMAT_ARGS:\")[0]
@@ -271,27 +201,39 @@ def get_paths(stage: Usd.Stage, pattern: str, case_sensitive: bool) -> list[str]
         paths.append(identifier)
         
     return paths
-            
-    
-node = hou.pwd()
-stage = node.editableStage()
-pattern = node.evalParm(\"pattern\")
-case_sensitive = node.evalParm(\"casesensitive\")
-paths = get_paths(stage, pattern, case_sensitive)
 
-# Update mute layers value on next node
-parm = node.parent().parm(\"mutepaths\")
-parm.lock(False)
-parm.set(\"\\n\".join(paths))
-parm.lock(True)"	)
+node = hou.pwd()
+parent_node = node.parent()
+stage = node.editableStage()
+layers = [layer.identifier for layer in stage.GetUsedLayers()]
+pattern = parent_node.evalParm(\"mute_pattern\")
+case_sensitive = parent_node.evalParm(\"casesensitive\")
+
+# Get mute paths
+mute_paths = get_paths(layers, pattern, case_sensitive)
+
+# Get unmute paths (only if needed)
+unmute_paths = []
+if parent_node.evalParm(\"editmute\") == \"addremove\":
+    muted_layers = stage.GetMutedLayers()
+    unmute_pattern = parent_node.evalParm(\"unmute_pattern\")
+    unmute_paths = get_paths(muted_layers, unmute_pattern, case_sensitive)
+    
+for parm_name, parm_paths in {
+    \"mutepaths\": mute_paths,
+    \"unmutepaths\": unmute_paths
+}.items():
+
+    # Update mute layers value on next node
+    parm = parent_node.parm(parm_name)
+    parm.lock(False)
+    parm.set(\"\\n\".join(parm_paths))
+    parm.lock(True)"	)
 maintainstate	[ 0	locks=0 ]	(	"off"	)
-pattern	[ 0	locks=0 ]	(	[ pattern	"" ] 	)
-casesensitive	[ 0	locks=0 ]	(	[ casesensitive	0 ] 	)
 }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/get_layers.userdata"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 {
@@ -303,7 +245,6 @@ Content-Type: text/plain
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/mute_layers.init"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 type = configurestage
@@ -311,11 +252,10 @@ matchesdef = 1
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/mute_layers.def"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 comment ""
-position -1.11759e-08 3.99421
+position -1.11759e-08 2.47375
 connectornextid 2
 flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
@@ -344,7 +284,6 @@ end
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/mute_layers.chn"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 {
@@ -360,7 +299,6 @@ Content-Type: text/plain
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/mute_layers.parm"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 {
@@ -379,7 +317,7 @@ unloadpaths	[ 0	locks=0 ]	(	""	)
 separator_mute	[ 0	locks=0 ]	(	)
 editmute	[ 0	locks=0 ]	(	[ editmute	nochange ] 	)
 mutepaths	[ 8	locks=0 ]	(	`chs(\"../mutepaths\")`	)
-unmutepaths	[ 0	locks=0 ]	(	""	)
+unmutepaths	[ 0	locks=0 ]	(	`chs(\"../unmutepaths\")`	)
 separator_resolver	[ 0	locks=0 ]	(	)
 resolvercontextassetpath	[ 0	locks=0 ]	(	""	)
 resolvercontextstringcount	[ 0	locks=0 ]	(	0	)
@@ -388,7 +326,6 @@ variantselectioncount	[ 0	locks=0 ]	(	0	)
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/mute_layers.userdata"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 {
@@ -400,7 +337,6 @@ Content-Type: text/plain
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.order"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 3
@@ -410,7 +346,6 @@ mute_layers
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.net"
-Content-Modified-Time: 1722286048
 Content-Type: text/plain
 
 1
