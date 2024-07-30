@@ -641,7 +641,11 @@ class SelectProductDialog(QtWidgets.QDialog):
         return list(sorted(product["name"] for product in products))
 
 
-def select_a_product(node):
+def select_product_name(node):
+    """Show a modal pop-up dialog to allow user to select a product name
+    under the current folder entity as defined on the node's parameters.
+
+    Applies the chosen value to the `product_name` parm on the node."""
 
     cursor_pos = QtGui.QCursor.pos()
 

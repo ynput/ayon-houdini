@@ -52,7 +52,7 @@
             label   "Product"
             type    string
             default { "usdAsset" }
-            parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_a_product;select_a_product(kwargs['node'])" }
+            parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_product_name;select_product_name(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
             parmtag { "script_callback" "hou.phm().set_to_latest_version(kwargs['node'])\nhou.phm().on_representation_parms_changed(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
