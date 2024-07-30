@@ -50,10 +50,8 @@
         parm {
             name    "folder_name"
             label   "Folder Name"
-            type    string
-            invisible
+            type    label
             default { "`strsplit(chs(\"folder_path\"), \"/\", -1)`" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "product_name"
