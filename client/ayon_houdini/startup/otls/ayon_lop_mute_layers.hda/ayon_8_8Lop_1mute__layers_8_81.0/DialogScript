@@ -1,0 +1,108 @@
+# Dialog script for ayon::mute_layers::1.0 automatically generated
+
+{
+    name	ayon::mute_layers::1.0
+    script	cb::mute_layers::1.0
+    label	"AYON Mute Layers"
+
+    help {
+	""
+    }
+
+    inputlabel	1	"Input Stage"
+    inputlabel	2	"Input 2"
+    inputlabel	3	"Input 3"
+    inputlabel	4	"Input 4"
+
+    parm {
+        name    "editmute"
+        label   "Mute Layers"
+        type    string
+        default { "set" }
+        menu {
+            "addremove" "Add and remove layers to mute"
+            "set"       "Set layers to mute"
+            "setnone"   "Unmute all layers"
+        }
+        parmtag { "autoscope" "0000000000000000" }
+        parmtag { "script_action" "from scenegraphlayers import panelutils\npanelutils.openPanelForConfigureStageNode(kwargs['node'])" }
+        parmtag { "script_action_help" "Select layers to mute." }
+        parmtag { "script_action_icon" "BUTTONS_reselect" }
+        parmtag { "sidefx::usdpathtype" "primlist" }
+    }
+    parm {
+        name    "mute_pattern"
+        label   "Mute Pattern"
+        type    string
+        default { "" }
+        help    "Match any pattern within a filepath using wildcards to mute for."
+        hidewhen "{ editmute == setnone }"
+        menutoggle {
+            "*usdAsset_model*"      "Asset Model Layer"
+            "*usdAsset_look*"       "Asset Look Layer"
+            "*usdAsset_groom*"      "Asset Groom Layer"
+            "*usdShot_animation*"   "Shot Animation Layer"
+            "*usdShot_fx*"          "Shot FX Layer"
+            "*usdShot_lighting*"    "Shot Lighting Layer"
+        }
+        parmtag { "autoscope" "0000000000000000" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "unmute_pattern"
+        label   "Unmute Pattern"
+        type    string
+        default { "" }
+        help    "Match any pattern within a filepath using wildcards to mute for."
+        hidewhen "{ editmute != addremove }"
+        menutoggle {
+            "*usdAsset_model*"      "Asset Model Layer"
+            "*usdAsset_look*"       "Asset Look Layer"
+            "*usdAsset_groom*"      "Asset Groom Layer"
+            "*usdShot_animation*"   "Shot Animation Layer"
+            "*usdShot_fx*"          "Shot FX Layer"
+            "*usdShot_lighting*"    "Shot Lighting Layer"
+        }
+        parmtag { "autoscope" "0000000000000000" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "casesensitive"
+        label   "Case Sensitive"
+        type    toggle
+        default { "off" }
+        help    "Whether the pattern should match case-sensitive or not"
+        hidewhen "{ editmute == setnone }"
+        parmtag { "autoscope" "0000000000000000" }
+        parmtag { "script_callback_language" "python" }
+    }
+    groupcollapsible {
+        name    "muted_results"
+        label   "Muted Results"
+        hidewhen "{ editmute == setnone }"
+
+        parm {
+            name    "mutepaths"
+            label   "Muted Paths"
+            type    string
+            default { "" }
+            help    "The filepaths/layers that were targeted by the pattern"
+            hidewhen "{ editmute == setnone }"
+            parmtag { "editor" "1" }
+            parmtag { "editorlines" "5-10" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "unmutepaths"
+            label   "Unmuted Paths"
+            type    string
+            default { "" }
+            help    "The filepaths/layers that were targeted by the pattern"
+            hidewhen "{ editmute != addremove }"
+            parmtag { "editor" "1" }
+            parmtag { "editorlines" "5-10" }
+            parmtag { "script_callback_language" "python" }
+        }
+    }
+
+}
