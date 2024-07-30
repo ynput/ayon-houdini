@@ -28,7 +28,7 @@ from ayon_core.style import load_stylesheet
 
 from ayon_houdini.api import lib
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtWidgets, QtGui
 import hou
 
 
@@ -561,9 +561,10 @@ class SelectProductDialog(QtWidgets.QDialog):
         # Create widgets and layout
         product_types_widget = QtWidgets.QComboBox()
         products_widget = QtWidgets.QListWidget()
-        accept_button = QtWidgets.QPushButton("Accept")
+        accept_button = QtWidgets.QPushButton("Set product name")
 
         main_layout = QtWidgets.QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.addWidget(product_types_widget, 0)
         main_layout.addWidget(products_widget, 1)
         main_layout.addWidget(accept_button, 0)
@@ -579,7 +580,7 @@ class SelectProductDialog(QtWidgets.QDialog):
         # Initialize widgets contents
         product_types_widget.addItems(self.get_product_types())
         product_type = self.get_selected_product_type()
-        self.set_product_name(product_type)
+        self.set_product_type(product_type)
 
     def get_selected_product(self) -> str:
         if self.products_widget.currentItem():
@@ -603,9 +604,9 @@ class SelectProductDialog(QtWidgets.QDialog):
         ]
 
     def on_product_type_changed(self, product_type: str):  
-        self.set_product_name(product_type)
+        self.set_product_type(product_type)
 
-    def set_product_name(self, product_type: str):
+    def set_product_type(self, product_type: str):
         self.product_types_widget.setCurrentText(product_type)
 
         if self.product_types_widget.currentText() != product_type:
@@ -617,6 +618,12 @@ class SelectProductDialog(QtWidgets.QDialog):
         self.products_widget.clear()
         if products:
             self.products_widget.addItems(products)
+
+    def set_selected_product_name(self, product_name: str):
+        matching_items = self.products_widget.findItems(
+            product_name, QtCore.Qt.MatchFixedString)
+        if matching_items:
+            self.products_widget.setCurrentItem(matching_items[0])
 
     def get_available_products(self, product_type):
         
@@ -636,9 +643,11 @@ class SelectProductDialog(QtWidgets.QDialog):
 
 def select_a_product(node):
 
+    cursor_pos = QtGui.QCursor.pos()
+
     project_name = node.evalParm("project_name")
     folder_path = node.evalParm("folder_path")
-    product_parm =  node.parm("product_name")
+    product_parm = node.parm("product_name")
 
     folder_entity = ayon_api.get_folder_by_path(project_name,
                                                 folder_path,
@@ -650,7 +659,13 @@ def select_a_product(node):
         project_name,
         folder_entity["id"],
         parent=lib.get_main_window() 
-    )   
+    )
+    dialog.set_selected_product_name(product_parm.eval())
+
+    dialog.resize(300, 600)
+    dialog.setWindowFlags(QtCore.Qt.Popup)
+    pos = dialog.mapToGlobal(cursor_pos - QtCore.QPoint(300, 0))
+    dialog.move(pos)
     result = dialog.exec_()
 
     if result != QtWidgets.QDialog.Accepted:
