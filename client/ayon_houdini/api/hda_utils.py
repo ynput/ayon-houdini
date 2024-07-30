@@ -446,7 +446,7 @@ class SelectFolderPathDialog(QtWidgets.QDialog):
 
         folder_widget = SimpleFoldersWidget(parent=self)
 
-        accept_button = QtWidgets.QPushButton("Accept")
+        accept_button = QtWidgets.QPushButton("Set folder path")
 
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.addWidget(project_widget, 0)
@@ -502,6 +502,8 @@ def select_folder_path(node):
     Args:
         node (hou.OpNode): The HDA node.
     """
+    cursor_pos = QtGui.QCursor.pos()
+
     main_window = lib.get_main_window()
 
     project_name = node.evalParm("project_name")
@@ -519,6 +521,12 @@ def select_folder_path(node):
         QtCore.QTimer.singleShot(100, _select_folder_path)
 
     dialog.setStyleSheet(load_stylesheet())
+
+    # Make it appear like a pop-up near cursor
+    dialog.resize(300, 600)
+    dialog.setWindowFlags(QtCore.Qt.Popup)
+    pos = dialog.mapToGlobal(cursor_pos - QtCore.QPoint(300, 0))
+    dialog.move(pos)
 
     result = dialog.exec_()
     if result != QtWidgets.QDialog.Accepted:
