@@ -1,0 +1,14 @@
+Operator:     ayon::mute_layers::1.0
+Label:        AYON Mute Layers
+Path:         oplib:/ayon::Lop/mute_layers::1.0?ayon::Lop/mute_layers::1.0
+Icon:         opdef:/ayon::Lop/mute_layers::1.0?IconImage
+Table:        Lop
+License:      
+Extra:        
+User:         
+Inputs:       1 to 1
+Subnet:       true
+Python:       false
+Empty:        false
+Modified:     Mon Jul 29 22:47:28 2024
+
