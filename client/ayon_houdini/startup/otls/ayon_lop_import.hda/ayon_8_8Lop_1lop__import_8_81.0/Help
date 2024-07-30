@@ -16,10 +16,10 @@ Project:
     The name of the AYON project from which to load products.
 Folder Path:
     The path to the AYON folder (entity) within the project's hierarchy.
-Product Type: 
-    The type of AYON product to load (e.g., USD, point cache, camera, etc.).
+Product : 
+    The name of the AYON product you want to load.
     :note:
-        Product type can have multiple representations.
+        Products can have multiple representations.
 Version:
     The specific version of the product you want to load.
 Representation:
