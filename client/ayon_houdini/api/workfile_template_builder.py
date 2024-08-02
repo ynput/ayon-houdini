@@ -183,7 +183,8 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         Feel free to override it in different workfile build plugins.
         """
  
-        node = hou.node("/out").createNode("null", node_name)
+        node = hou.node("/out").createNode(
+            "null", node_name, force_valid_node_name=True)
         node.moveToGoodPosition()
         parms = node.parmTemplateGroup()
         for parm in {"execute", "renderdialog"}:
