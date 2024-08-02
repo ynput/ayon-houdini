@@ -114,7 +114,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
 
             project_name = context.data["projectName"]
             variant_base = instance.data["variant"]
-            subset = get_product_name(
+            product_name = get_product_name(
                 project_name=project_name,
                 # TODO: This should use task from `instance`
                 task_name=context.data["anatomyData"]["task"]["name"],
@@ -125,17 +125,20 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                 project_settings=context.data["project_settings"]
             )
 
-            label = "{0} -> {1}".format(instance.data["name"], subset)
+            label = "{0} -> {1}".format(instance.data["name"], product_name)
             family = "usd"
             layer_inst.data["family"] = family
             layer_inst.data["families"] = [family]
-            layer_inst.data["subset"] = subset
+            layer_inst.data["productName"] = product_name
+            layer_inst.data["productType"] = instance.data["productType"]
             layer_inst.data["label"] = label
-            layer_inst.data["asset"] = instance.data["asset"]
+            layer_inst.data["folderPath"] = instance.data["folderPath"]
             layer_inst.data["task"] = instance.data.get("task")
             layer_inst.data["instance_node"] = instance.data["instance_node"]
             layer_inst.data["render"] = False
             layer_inst.data["output_node"] = creator_node
+            if instance.data.get("productGroup"):
+                layer_inst.data["productGroup"] = instance.data["productGroup"]
 
             # Inherit "use handles" from the source instance
             # TODO: Do we want to maybe copy full `publish_attributes` instead?
