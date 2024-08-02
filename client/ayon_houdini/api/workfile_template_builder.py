@@ -231,6 +231,7 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         
         # Update node name
         node_name = self.get_placeholder_node_name(placeholder_data)
+        node_name = hou.text.variableName(node_name)
         placeholder_node.setName(node_name, unique_name=True)
 
     def delete_placeholder(self, placeholder):
