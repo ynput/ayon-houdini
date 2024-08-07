@@ -36,9 +36,6 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
         last_published_and_frames = collect_frames(last_published)
         
         if not all(last_published_and_frames.values()):
-            # Reset last_version_published_files.
-            # This is needed for later extractors.
-            instance.data["last_version_published_files"] = None
             self.log.debug("Skipping, No file sequence found in the "
                            "last version published files.")
             return
