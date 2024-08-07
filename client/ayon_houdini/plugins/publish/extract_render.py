@@ -1,5 +1,6 @@
 import os
 import hou
+import clique 
 
 import pyblish.api
 
@@ -58,8 +59,25 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             return
 
         if creator_attribute.get("render_target") == "local":
-            ropnode = hou.node(instance.data.get("instance_node"))
-            render_rop(ropnode)
+            rop_node = hou.node(instance.data.get("instance_node"))
+            frames_to_fix = clique.parse(instance.data["frames_to_fix"], "{ranges}")
+
+            if len(set(frames_to_fix)) > 1:
+                # Render only frames to fix
+                for frame_range in frames_to_fix.separate():
+                    frame_range = list(frame_range)
+                    self.log.debug(
+                        "Rendering frames to fix [{f1}, {f2}]".format(
+                            f1=frame_range[0],
+                            f2=frame_range[-1]
+                        )
+                    )
+                    frame_range = (
+                        int(frame_range[0]), int(frame_range[-1]), instance.data["byFrameStep"]
+                    )
+                    render_rop(rop_node, frame_range=frame_range)
+            else:
+                render_rop(rop_node)
 
         # `ExpectedFiles` is a list that includes one dict.
         expected_files = instance.data["expectedFiles"][0]
