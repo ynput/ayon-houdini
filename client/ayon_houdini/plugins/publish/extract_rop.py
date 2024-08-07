@@ -34,17 +34,16 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        last_published = instance.data.get("last_version_published_files")
-
         self.log.debug(
             "Rendering {node_path} to {location}".format(
                 node_path=rop_node.path(),
                 location=instance.data['stagingDir'] if isinstance(files, (list, tuple)) else files
             )
         )
-        if last_published and len(last_published) > 1:
+        frames_to_fix = clique.parse(instance.data["frames_to_fix"], "{ranges}")
+
+        if len(set(frames_to_fix)) > 1:
             # Render only frames to fix
-            frames_to_fix = clique.parse(instance.data["frames_to_fix"], "{ranges}")
             for frame_range in frames_to_fix.separate():
                 frame_range = list(frame_range)
                 self.log.debug(
