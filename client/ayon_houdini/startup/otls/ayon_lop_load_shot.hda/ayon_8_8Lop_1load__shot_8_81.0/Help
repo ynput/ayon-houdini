@@ -1,0 +1,13 @@
+= AYON Load Shot =
+
+#icon: opdef:/ayon::Lop/load_shot::1.0?AYON_icon.png
+
+"""Sublayers a USD file, usually a shot."""
+
+== Overview ==
+
+*Sublayers* a USD file into the current stage, by default targeting the root layer stack.
+
+@related
+
+* [Node:lop/sublayer]
