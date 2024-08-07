@@ -60,7 +60,7 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
 
         if creator_attribute.get("render_target") == "local":
             # FIXME Render the entire frame range if any of the AOVs does not have a
-            # previously rendered version. This situation breaks the frames to fix feature 
+            # previously rendered version. This situation breaks the publishing.
             # because There will be missing frames as ROP nodes typically cannot render different
             #  frame ranges for each AOV; they always use the same frame range for all AOVs.
             rop_node = hou.node(instance.data.get("instance_node"))
