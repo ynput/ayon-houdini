@@ -32,7 +32,7 @@ class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
             # Ignore instances without an instance node
             # e.g. in memory bootstrap instances
             self.log.debug(
-                "Skipping instance without instance node: {}".format(instance)
+                f"Skipping instance without instance node: {instance}"
             )
             return
         
