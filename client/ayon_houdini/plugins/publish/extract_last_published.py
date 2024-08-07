@@ -21,6 +21,7 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
 
     order = pyblish.api.ExtractorOrder - 0.1
     label = "Extract Last Published"
+    targets = ["local"]  # Same target as `CollectFramesFixDef`
     families = ["*"]
 
     def process(self, instance):
@@ -32,6 +33,14 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
         if not frames_to_fix :
             self.log.debug("Skipping, No frames to fix.")
             return
+        last_published_and_frames = collect_frames(last_published)
+        
+        if not all(last_published_and_frames.values()):
+            # Reset last_version_published_files.
+            # This is needed for later extractors.
+            instance.data["last_version_published_files"] = None
+            self.log.debug("Skipping, No file sequence found in the "
+                           "last version published files.")
 
         expected_filenames = []
         staging_dir = instance.data.get("stagingDir")
@@ -58,14 +67,15 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
 
         os.makedirs(staging_dir, exist_ok=True)
 
-        anatomy = instance.context.data["anatomy"]
-        last_published_and_frames = collect_frames(last_published)
-
         expected_and_frames = collect_frames(expected_filenames)
         frames_and_expected = {v: k for k, v in expected_and_frames.items()}
         frames_to_fix = clique.parse(frames_to_fix, "{ranges}")
         
+        anatomy = instance.context.data["anatomy"]
+
         for file_path, frame in last_published_and_frames.items():
+            if frame is None:
+                continue
             file_path = anatomy.fill_root(file_path)
             if not os.path.exists(file_path):
                 continue
