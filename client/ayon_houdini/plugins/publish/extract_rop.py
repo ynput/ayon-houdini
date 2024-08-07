@@ -40,7 +40,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
                 location=instance.data['stagingDir'] if isinstance(files, (list, tuple)) else files
             )
         )
-        frames_to_fix = clique.parse(instance.data["frames_to_fix"], "{ranges}")
+        frames_to_fix = clique.parse(instance.data.get("frames_to_fix", ""), "{ranges}")
 
         if len(set(frames_to_fix)) > 1:
             # Render only frames to fix

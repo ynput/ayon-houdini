@@ -64,7 +64,7 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             # because There will be missing frames as ROP nodes typically cannot render different
             #  frame ranges for each AOV; they always use the same frame range for all AOVs.
             rop_node = hou.node(instance.data.get("instance_node"))
-            frames_to_fix = clique.parse(instance.data["frames_to_fix"], "{ranges}")
+            frames_to_fix = clique.parse(instance.data.get("frames_to_fix", ""), "{ranges}")
 
             if len(set(frames_to_fix)) > 1:
                 # Render only frames to fix
