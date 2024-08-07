@@ -8,11 +8,6 @@ from ayon_core.pipeline.publish import RepairAction
 from ayon_houdini.api import plugin
 
 
-class EnableWaitForRender(RepairAction):
-    label = "Enable WaitForRendertoComplete"
-    icon = "mdi.pencil-plus-outline"
-
-
 class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
     """Validate `WaitForRendertoComplete` is enabled.
 
@@ -24,7 +19,7 @@ class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
     order = pyblish.api.ValidatorOrder
     families = ["usdrender"]
     label = "Validate Wait For Render to Complete"
-    actions = [EnableWaitForRender]
+    actions = [RepairAction]
 
     def process(self, instance):
 
