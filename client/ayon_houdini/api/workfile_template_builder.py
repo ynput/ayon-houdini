@@ -183,7 +183,8 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         Feel free to override it in different workfile build plugins.
         """
  
-        node = hou.node("/out").createNode("null", node_name)
+        node = hou.node("/out").createNode(
+            "null", node_name, force_valid_node_name=True)
         node.moveToGoodPosition()
         parms = node.parmTemplateGroup()
         for parm in {"execute", "renderdialog"}:
@@ -230,6 +231,7 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         
         # Update node name
         node_name = self.get_placeholder_node_name(placeholder_data)
+        node_name = hou.text.variableName(node_name)
         placeholder_node.setName(node_name, unique_name=True)
 
     def delete_placeholder(self, placeholder):

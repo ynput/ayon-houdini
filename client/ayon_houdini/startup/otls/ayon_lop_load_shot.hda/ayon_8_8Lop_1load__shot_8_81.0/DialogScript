@@ -1,9 +1,9 @@
-# Dialog script for ayon::lop_import::1.0 automatically generated
+# Dialog script for ayon::load_shot::1.0 automatically generated
 
 {
-    name	ayon::lop_import::1.0
+    name	ayon::load_shot::1.0
     script	load_asset::1.0
-    label	"AYON Load Asset"
+    label	"AYON Load Shot"
 
     help {
 	""
@@ -48,16 +48,10 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
-            name    "folder_name"
-            label   "Folder Name"
-            type    label
-            default { "`strsplit(chs(\"folder_path\"), \"/\", -1)`" }
-        }
-        parm {
             name    "product_name"
             label   "Product"
             type    string
-            default { "usdAsset" }
+            default { "usdShot" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_product_name;select_product_name(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
             parmtag { "script_callback" "hou.phm().set_to_latest_version(kwargs['node'])\nhou.phm().on_representation_parms_changed(kwargs['node'])" }
@@ -131,84 +125,17 @@
             default { "" }
             parmtag { "script_callback_language" "python" }
         }
-        parm {
-            name    "primpath1"
-            label   "Primitive Root"
-            type    string
-            joinnext
-            default { "`chs(\"folder_path\")`/$OS" }
-            menureplace {
-                [ "opmenu -l -a reference_character primpath1" ]
-            }
-            parmtag { "autoscope" "0000000000000000" }
-            parmtag { "script_action" "import loputils\nloputils.selectPrimsInParm(kwargs, False)" }
-            parmtag { "script_action_help" "Select a primitive in the Scene Viewer or Scene Graph Tree pane.\nCtrl-click to select using the primitive picker dialog.\nAlt-click to toggle movement of the display flag." }
-            parmtag { "script_action_icon" "BUTTONS_reselect" }
-            parmtag { "sidefx::usdpathtype" "prim" }
-        }
-        parm {
-            name    "primpath_presets"
-            label   "Presets"
-            type    button
-            nolabel
-            default { "0" }
-            menu {
-                "`chs(\"folder_name\")`"        "Folder Name\n    (Use for \"Asset Build\" workflow)"
-                "`chs(\"folder_path\")`/$OS"    "Folder Path with Node Name\n    (Use for \"Shot\" or \"Scene Assembly\" workflow)"
-            }
-            parmtag { "script_callback" "parm = kwargs[\"node\"].parm(\"primpath1\"); parm.revertToDefaults(); parm.set(kwargs[\"script_value0\"])" }
-            parmtag { "script_callback_language" "python" }
-        }
         groupcollapsible {
             name    "extra_options"
             label   "Load Options"
 
             parm {
-                name    "reftype1"
-                label   "Reference Type"
-                type    string
-                default { "file" }
-                menu {
-                    "file"      "Reference File"
-                    "payload"   "Payload File"
-                }
-                parmtag { "autoscope" "0000000000000000" }
-                parmtag { "script_callback_language" "python" }
-            }
-            parm {
-                name    "instanceable1"
-                label   "Make Instanceable"
+                name    "mute1"
+                label   "Mute Layer"
                 type    toggle
                 default { "off" }
                 parmtag { "autoscope" "0000000000000000" }
                 parmtag { "script_callback_language" "python" }
-            }
-            parm {
-                name    "filerefprim1"
-                label   "Reference Primitive"
-                type    string
-                default { "automaticPrim" }
-                hidewhen "{ reftype1 == prim } { reftype1 == inherit } { reftype1 == specialize }"
-                menu {
-                    "automaticPrim" "Reference Automatically Chosen Primitive"
-                    "defaultPrim"   "Reference Default Primitive"
-                    ""              "Reference Specific Primitive"
-                }
-                parmtag { "autoscope" "0000000000000000" }
-                parmtag { "script_callback_language" "python" }
-            }
-            parm {
-                name    "filerefprimpath1"
-                label   "Reference Primitive Path"
-                type    string
-                default { "" }
-                disablewhen "{ filerefprim1 != \"\" reftype1 != prim reftype1 != inherit reftype1 != specialize }"
-                parmtag { "autoscope" "0000000000000000" }
-                parmtag { "script_action" "import loputils\nnode = kwargs['node']\nparm = kwargs['parmtuple'][0]\nreftype = node.evalParm(parm.name().replace(\n    'filerefprimpath', 'reftype'))\nif reftype in ('prim', 'inherit', 'specialize'):\n    prims = loputils.selectPrimsInParm(kwargs, True)\nelse:\n    parm = node.parm(parm.name().replace(\n       'filerefprimpath', 'filepath'))\n    prims = loputils.selectPrimsInParmFromFile(kwargs, False,\n        parm.evalAsString().strip('\\'\"'))" }
-                parmtag { "script_action_help" "Select a primitive from a primitive picker dialog." }
-                parmtag { "script_action_icon" "BUTTONS_reselect" }
-                parmtag { "sidefx::usdpathinput" "if(index(\"prim inherit specialize\", chs(\"reftype#\")) >= 0, 0, -1)" }
-                parmtag { "sidefx::usdpathtype" "prim" }
             }
             parm {
                 name    "timeoffset1"
@@ -315,7 +242,7 @@
             name    "loader"
             label   "Loader"
             type    label
-            default { "LOPLoadAssetLoader" }
+            default { "LOPLoadShotLoader" }
         }
         parm {
             name    "id"
