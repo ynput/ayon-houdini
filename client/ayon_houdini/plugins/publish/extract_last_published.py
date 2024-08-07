@@ -41,6 +41,7 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             instance.data["last_version_published_files"] = None
             self.log.debug("Skipping, No file sequence found in the "
                            "last version published files.")
+            return
 
         expected_filenames = []
         staging_dir = instance.data.get("stagingDir")
