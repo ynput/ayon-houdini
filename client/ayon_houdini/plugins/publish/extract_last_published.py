@@ -84,7 +84,6 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             if not target_file_name:
                 continue
             
-            # FIXME This won't work with render products.
             out_path = os.path.join(staging_dir, target_file_name)
 
             # Copy only the frames that we won't render.
