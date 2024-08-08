@@ -1,7 +1,6 @@
 import os
 
 import pyblish.api
-from ayon_core.pipeline.create import get_product_name
 from ayon_core.pipeline.farm.patterning import match_aov_pattern
 from ayon_core.pipeline.farm.pyblish_functions import (
     get_product_name_and_group_from_template
