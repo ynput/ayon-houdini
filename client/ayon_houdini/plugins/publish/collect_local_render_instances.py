@@ -1,10 +1,14 @@
 import os
+
 import pyblish.api
 from ayon_core.pipeline.create import get_product_name
 from ayon_core.pipeline.farm.patterning import match_aov_pattern
+from ayon_core.pipeline.farm.pyblish_functions import (
+    get_product_name_and_group_from_template
+)
 from ayon_core.pipeline.publish import (
+    apply_plugin_settings_automatically,
     get_plugin_settings,
-    apply_plugin_settings_automatically
 )
 from ayon_houdini.api import plugin
 
@@ -62,23 +66,23 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin):
 
         # Create Instance for each AOV.
         context = instance.context
-        expectedFiles = next(iter(instance.data["expectedFiles"]), {})
+        expected_files = next(iter(instance.data["expectedFiles"]), {})
 
         product_type = "render"  # is always render
-        product_group = get_product_name(
-            context.data["projectName"],
-            context.data["taskEntity"]["name"],
-            context.data["taskEntity"]["taskType"],
-            context.data["hostName"],
-            product_type,
-            instance.data["productName"]
-        )
 
-        for aov_name, aov_filepaths in expectedFiles.items():
-            product_name = product_group
-
+        for aov_name, aov_filepaths in expected_files.items():
+            dynamic_data = {}
             if aov_name:
-                product_name = "{}_{}".format(product_name, aov_name)
+                dynamic_data["aov"] = aov_name
+
+            product_name, product_group = get_product_name_and_group_from_template(
+                project_name=context.data["projectName"],
+                task_entity=context.data["taskEntity"],
+                host_name=context.data["hostName"],
+                product_type=product_type,
+                variant=instance.data["productName"],
+                dynamic_data = dynamic_data,
+            )
 
             # Create instance for each AOV
             aov_instance = context.create_instance(product_name)
