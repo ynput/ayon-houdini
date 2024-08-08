@@ -120,6 +120,11 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin):
                 "productGroup": product_group,
                 "families": ["render.local.hou", "review"],
                 "instance_node": instance.data["instance_node"],
+                # The following three items are necessary for `ExtractLastPublished`
+                "publish_attributes": instance.data["publish_attributes"],
+                "stagingDir": staging_dir,
+                "frames": aov_filenames,
+
                 "representations": [
                     {
                         "stagingDir": staging_dir,
