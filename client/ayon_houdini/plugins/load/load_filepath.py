@@ -25,6 +25,10 @@ class FilePathLoader(plugin.HoudiniLoader):
     product_types = {"*"}
     representations = {"*"}
 
+    def _add_more_node_params(self, attr_folder, node):
+        # allow subclasses to add more params.
+        pass
+
     def load(self, context, name=None, namespace=None, data=None):
 
         # Get the root node
@@ -53,6 +57,10 @@ class FilePathLoader(plugin.HoudiniLoader):
                                       num_components=1,
                                       default_value=(filepath,))
         attr_folder.addParmTemplate(parm)
+
+        # Call add more node params.
+        self._add_more_node_params(attr_folder, container)
+
         parm_template_group.append(attr_folder)
 
         # Hide some default labels
@@ -128,3 +136,111 @@ class FilePathLoader(plugin.HoudiniLoader):
             path = re.sub(pattern, ".{}.{}".format(token, ext), path)
 
         return os.path.normpath(path).replace("\\", "/")
+
+
+class NodePresetLoader(FilePathLoader):
+    """Load node presets.
+
+    It works the same as FilePathLoader, except its extra parameters,
+        2 buttons and target node field.
+        Buttons are used apply the node preset to the target node.
+    """
+
+    label = "Load Node Preset"
+    order = 9
+    icon = "link"
+    color = "white"
+    product_types = {"node_preset"}
+    representations = {"json"}
+
+    # TODO: 
+    #  1. Find a way to cache the node preset, instead of reading the file every time.
+    #  2. Notify the user with the results of Apply button (succeeded, failed and why).
+    #  Note:
+    #    So far we manage the node preset, but we don't manage setting the node preset.
+    def _add_more_node_params(self, attr_folder, node):
+        # allow subclasses to add more params.
+
+        operatore_template = hou.StringParmTemplate(
+            name="target_node",
+            label="Target Node",
+            num_components=1,
+            default_value=("",),
+            string_type=hou.stringParmType.NodeReference,
+            tags= { 
+                "oprelative" : ".",
+                "script_callback" : """
+import json
+from ayon_houdini.api.lib import load_node_preset
+
+json_path = hou.parm("./filepath").eval()
+target_node = hou.parm("./target_node").evalAsNode()
+node_preset = {}
+with open(json_path, "r") as f:
+    node_preset = json.load(f)
+
+node_type = node_preset["metadata"]["type"]
+
+hou.pwd().setColor(hou.Color(0.7, 0.8, 0.87))
+hou.pwd().setComment("")
+hou.pwd().setGenericFlag(hou.nodeFlag.DisplayComment, True)
+if target_node and target_node.type().name() != node_type:
+    hou.pwd().setColor(hou.Color(0.8, 0.45, 0.1))
+    hou.pwd().setComment(
+        f"Target Node type '{target_node.type().name()}' doesn't match the loaded preset type '{node_type}'."
+        "Please note, Applying the preset skips parameters that doesn't exist"
+    )
+""",
+            "script_callback_language" : "python",
+            }
+        )
+
+        apply_template = hou.ButtonParmTemplate(
+            name="apply_preset",
+            label="Apply Preset",
+            tags= { 
+                "script_callback" : """
+import json
+from ayon_houdini.api.lib import load_node_preset
+
+json_path = hou.parm("./filepath").eval()
+target_node = hou.parm("./target_node").evalAsNode()
+if target_node:
+    node_preset = {}
+    with open(json_path, "r") as f:
+        node_preset = json.load(f)
+
+    load_node_preset(target_node, node_preset)
+""",
+                "script_callback_language" : "python",
+            },
+            help=("Apply render preset to the target node."
+                  "Skip updating locked parameters.")
+        )
+
+        force_apply_template = hou.ButtonParmTemplate(
+            name="force_apply_preset",
+            label="Force Apply Preset",
+            tags= { 
+                "script_callback" : """
+import json
+from ayon_houdini.api.lib import load_node_preset
+
+json_path = hou.parm("./filepath").eval()
+target_node = hou.parm("./target_node").evalAsNode()
+if target_node:
+    node_preset = {}
+    with open(json_path, "r") as f:
+        node_preset = json.load(f)
+
+    load_node_preset(target_node, node_preset, update_locked=True)
+""",
+                "script_callback_language" : "python",
+            },
+            help=("Apply render preset to the target node."
+                  "Update also locked parameters.")
+        )
+
+        attr_folder.addParmTemplate(operatore_template)
+        attr_folder.addParmTemplate(apply_template)
+        attr_folder.addParmTemplate(force_apply_template)
