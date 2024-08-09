@@ -14,7 +14,7 @@ from ayon_houdini.api import plugin
 
 class CollectRendelayerFromROP(plugin.HoudiniInstancePlugin):
     label = "Collect Render layer name from ROP"
-    order = pyblish.api.CollectorOrder
+    order = pyblish.api.CollectorOrder - 0.499
     families = ["mantra_rop",
                 "karma_rop",
                 "redshift_rop",
