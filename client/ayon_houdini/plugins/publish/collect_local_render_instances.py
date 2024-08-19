@@ -73,6 +73,9 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin):
             dynamic_data = {}
             if aov_name:
                 dynamic_data["aov"] = aov_name
+                
+            if instance.data.get("renderlayer"):
+                dynamic_data["renderlayer"] = instance.data["renderlayer"]
 
             product_name, product_group = get_product_name_and_group_from_template(
                 project_name=context.data["projectName"],
