@@ -80,7 +80,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin):
                 host_name=context.data["hostName"],
                 product_type=product_type,
                 variant=instance.data["productName"],
-                dynamic_data = dynamic_data,
+                dynamic_data=dynamic_data,
             )
 
             # Create instance for each AOV
