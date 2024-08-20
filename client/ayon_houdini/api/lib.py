@@ -146,14 +146,14 @@ def validate_fps():
     return True
 
 
-def render_rop(ropnode, frame_range=None):
+def render_rop(ropnode, frame_range=tuple()):
     """Render ROP node utility for Publishing.
 
     This renders a ROP node with the settings we want during Publishing.
 
     Args:
         ropnode (hou.RopNode): Node to render
-        frame_range (set): Copied from Houdini's help..
+        frame_range (tuple): Copied from Houdini's help..
             Sequence of 2 or 3 values, overrides the frame range and frame
             increment to render. The first two values specify the start and
             end frames, and the third value (if given) specifies the frame
@@ -162,9 +162,6 @@ def render_rop(ropnode, frame_range=None):
             used. If no frame range is given, and the ROP node doesn't
             specify a frame range, then the current frame will be rendered.
     """
-    if frame_range is None:
-        # Empty set to fall to default. i.e. Don't override ROP's frame range.
-        frame_range = ()
 
     # Print verbose when in batch mode without UI
     verbose = not hou.isUIAvailable()
