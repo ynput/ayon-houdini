@@ -239,10 +239,10 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         placeholder_node.destroy()
 
 
-def build_workfile_template(*args):
+def build_workfile_template(*args, **kwargs):
     # NOTE Should we inform users that they'll lose unsaved changes ?
     builder = HoudiniTemplateBuilder(registered_host())
-    builder.build_template()
+    builder.build_template(*args, **kwargs)
 
 
 def update_workfile_template(*args):

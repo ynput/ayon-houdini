@@ -21,6 +21,9 @@ from ayon_core.pipeline import (
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.template_data import get_template_data
 from ayon_core.pipeline.context_tools import get_current_task_entity
+from ayon_core.pipeline.workfile.workfile_template_builder import (
+    TemplateProfileNotFound
+)
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
 
@@ -1360,3 +1363,15 @@ def prompt_reset_context():
         update_content_on_context_change()
 
     dialog.deleteLater()
+
+
+def start_workfile_template_builder():
+    from .workfile_template_builder import (
+        build_workfile_template
+    )
+
+    log.info("Starting workfile template builder...")
+    try:
+        build_workfile_template(workfile_creation_enabled=True)
+    except TemplateProfileNotFound:
+        log.warning("Template profile not found. Skipping...")
