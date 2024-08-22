@@ -579,11 +579,32 @@ def evalParmNoFrame(node, parm, pad_character="#"):
 
 def get_color_management_preferences():
     """Get default OCIO preferences"""
-    return {
+
+    preferences = {
         "config": hou.Color.ocio_configPath(),
         "display": hou.Color.ocio_defaultDisplay(),
         "view": hou.Color.ocio_defaultView()
     }
+
+    # Note: For whatever reason they are cases where `view` may be an empty
+    #  string even though a valid default display is set where `PyOpenColorIO`
+    #  does correctly return the values.
+    # Workaround to get the correct default view
+    if preferences["config"] and not preferences["view"]:
+        log.debug(
+            "Houdini `hou.Color.ocio_defaultView()` returned empty value."
+            " Falling back to `PyOpenColorIO` to get the default view.")
+        import PyOpenColorIO
+        config_path = preferences["config"]
+        config = PyOpenColorIO.Config.CreateFromFile(config_path)
+        display = config.getDefaultDisplay()
+        assert display == preferences["display"], \
+            "Houdini default OCIO display must match config default display"
+        view = config.getDefaultView(display)
+        preferences["display"] = display
+        preferences["view"] = view
+
+    return preferences
 
 
 def get_obj_node_output(obj_node):
