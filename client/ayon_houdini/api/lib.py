@@ -594,7 +594,15 @@ def get_color_management_preferences():
         log.debug(
             "Houdini `hou.Color.ocio_defaultView()` returned empty value."
             " Falling back to `PyOpenColorIO` to get the default view.")
-        import PyOpenColorIO
+        try:
+            import PyOpenColorIO
+        except ImportError:
+            log.warning(
+                "Unable to workaround empty return value of "
+                "`hou.Color.ocio_defaultView()` because `PyOpenColorIO` is "
+                "not available.")
+            return preferences
+
         config_path = preferences["config"]
         config = PyOpenColorIO.Config.CreateFromFile(config_path)
         display = config.getDefaultDisplay()
