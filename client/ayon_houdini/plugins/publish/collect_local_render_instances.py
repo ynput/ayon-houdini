@@ -133,6 +133,11 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             self.set_representation_colorspace(representation,
                                                context,
                                                colorspace=colorspace)
+            
+            if instance.data['review']:
+                families= ["render.local.hou", "review"]
+            else:
+                families= ["render.local.hou"]
 
             aov_instance.data.update({
                 # 'label': label,
@@ -144,7 +149,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 "family": product_type,
                 "productName": product_name,
                 "productGroup": product_group,
-                "families": ["render.local.hou", "review"],
+                "families": families,
                 "instance_node": instance.data["instance_node"],
                 "representations": [representation],
                 "frameStartHandle": instance.data["frameStartHandle"],
@@ -154,3 +159,5 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         # Skip integrating original render instance.
         # We are not removing it because it's used to trigger the render.
         instance.data["integrate"] = False
+        self.log.debug( aov_instance.data)
+        #self.log.debug( instance.data)
