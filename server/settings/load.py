@@ -15,6 +15,12 @@ class LoadUseAYONEntityURIModel(BaseSettingsModel):
 
 
 class LoadPluginsModel(BaseSettingsModel):
+    LOPLoadAssetLoader: LoadUseAYONEntityURIModel = SettingsField(
+        default_factory=LoadUseAYONEntityURIModel,
+        title="LOP Load Asset")
+    LOPLoadShotLoader: LoadUseAYONEntityURIModel = SettingsField(
+        default_factory=LoadUseAYONEntityURIModel,
+        title="LOP Load Shot")
     USDSublayerLoader: LoadUseAYONEntityURIModel = SettingsField(
         default_factory=LoadUseAYONEntityURIModel,
         title="USD Sublayer Loader")
