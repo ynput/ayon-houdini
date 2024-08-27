@@ -159,5 +159,3 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         # Skip integrating original render instance.
         # We are not removing it because it's used to trigger the render.
         instance.data["integrate"] = False
-        self.log.debug( aov_instance.data)
-        #self.log.debug( instance.data)
