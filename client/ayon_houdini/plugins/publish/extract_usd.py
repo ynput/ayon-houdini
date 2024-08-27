@@ -18,7 +18,7 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
     label = "Extract USD"
     families = ["usdrop"]
 
-    use_ayon_entity_uri = True
+    use_ayon_entity_uri = False
 
     def process(self, instance):
 
