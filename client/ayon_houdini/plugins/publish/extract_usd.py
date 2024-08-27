@@ -3,11 +3,11 @@ from typing import List, AnyStr
 
 import pyblish.api
 
+from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 from ayon_core.pipeline.publish.lib import get_instance_expected_output_path
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import render_rop
 from ayon_houdini.api.usd import remap_paths
-from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 
 import hou
 
