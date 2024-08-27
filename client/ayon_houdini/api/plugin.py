@@ -320,7 +320,7 @@ class HoudiniLoader(load.LoaderPlugin):
     use_ayon_entity_uri = False
 
     def filepath_from_context(cls, context):
-        if cls.use_ayon_entity_uri or True:
+        if cls.use_ayon_entity_uri:
             project_name = context["project"]["name"]
             representation_id = context["representation"]["id"]
             response = ayon_api.post(
