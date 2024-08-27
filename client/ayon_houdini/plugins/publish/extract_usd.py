@@ -3,19 +3,25 @@ from typing import List, AnyStr
 
 import pyblish.api
 
+from ayon_core.lib import BoolDef
+from ayon_core.pipeline import AYONPyblishPluginMixin
 from ayon_core.pipeline.publish.lib import get_instance_expected_output_path
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import render_rop
 from ayon_houdini.api.usd import remap_paths
+from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 
 import hou
 
 
-class ExtractUSD(plugin.HoudiniExtractorPlugin):
+class ExtractUSD(plugin.HoudiniExtractorPlugin, AYONPyblishPluginMixin):
 
     order = pyblish.api.ExtractorOrder
     label = "Extract USD"
     families = ["usdrop"]
+
+    use_ayon_entity_uri = False
+    use_ayon_entity_uri_optional = True
 
     def process(self, instance):
 
@@ -29,7 +35,11 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
 
         self.log.info("Writing USD '%s' to '%s'" % (file_name, staging_dir))
 
-        mapping = self.get_source_to_publish_paths(instance.context)
+        attr_values = self.get_attr_values_from_data(instance.data)
+        use_ayon_entity_uri: bool = attr_values.get(
+            "use_ayon_entity_uri", self.use_ayon_entity_uri)
+        mapping = self.get_source_to_publish_paths(
+            instance.context, use_ayon_entity_uri)
 
         # Allow instance-specific path remapping overrides, e.g. changing
         # paths on used resources/textures for looks
@@ -55,10 +65,22 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
         }
         instance.data["representations"].append(representation)
 
-    def get_source_to_publish_paths(self, context):
+    def get_source_to_publish_paths(self,
+                                    context,
+                                    use_ayon_entity_uri):
         """Define a mapping of all current instances in context from source
         file to publish file so this can be used on the USD save to remap
-        asset layer paths on publish via AyonRemapPaths output processor"""
+        asset layer paths on publish via AyonRemapPaths output processor
+
+        Arguments:
+            context (pyblish.api.Context): Publish context.
+            use_ayon_entity_uri (bool): Whether to remap to AYON Entity URI
+                or to a resolved publish filepath.
+
+        Returns:
+            dict[str, str]: Mapping from source path to remapped path.
+
+        """
 
         mapping = {}
         for instance in context:
@@ -76,14 +98,46 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
                 #   asset paths that are set use e.g. $F
                 # TODO: If the representation has multiple files we might need
                 #   to define the path remapping per file of the sequence
-                path = get_instance_expected_output_path(
-                    instance, representation_name=name, ext=ext
-                )
+                if use_ayon_entity_uri:
+                    # Construct AYON entity URI
+                    # Note: entity does not exist yet
+                    path = construct_ayon_entity_uri(
+                        project_name=context.data["projectName"],
+                        folder_path=instance.data["folderPath"],
+                        product=instance.data["productName"],
+                        version=instance.data["version"],
+                        representation_name=name
+                    )
+                else:
+                    # Resolved publish filepath
+                    path = get_instance_expected_output_path(
+                        instance, representation_name=name, ext=ext
+                    )
+
                 for source_path in get_source_paths(instance, repre):
                     source_path = os.path.normpath(source_path)
                     mapping[source_path] = path
 
         return mapping
+
+    @classmethod
+    def get_attribute_defs(cls):
+
+        attributes = []
+        if cls.use_ayon_entity_uri_optional:
+            attributes.append(
+                BoolDef(
+                    "use_ayon_entity_uri",
+                    label="Use AYON Entity URI",
+                    tooltip=(
+                        "Remap explicit save layers to AYON Entity URI on "
+                        "publish instead of the resolved publish filepaths."
+                    ),
+                    default=cls.use_ayon_entity_uri
+                )
+            )
+
+        return attributes
 
 
 def get_source_paths(
