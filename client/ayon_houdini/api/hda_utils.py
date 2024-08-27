@@ -264,7 +264,7 @@ def on_representation_id_changed(node):
     set_representation(node, repre_id)
 
 
-def on_representation_parms_changed(node):
+def on_representation_parms_changed(node, force=False):
     """
     Usually used as callback to the project, folder, product, version and
     representation parms which on change - would result in a different
@@ -272,6 +272,9 @@ def on_representation_parms_changed(node):
 
     Args:
         node (hou.Node): Node to update.
+        force (Optional[bool]): Whether to force the callback to retrigger
+            even if the representation id already matches. For example, when
+            needing to resolve the filepath in a different way.
     """
     project_name = node.evalParm("project_name") or get_current_project_name()
     representation_id = get_representation_id(
@@ -287,7 +290,7 @@ def on_representation_parms_changed(node):
     else:
         representation_id = str(representation_id)
 
-    if node.evalParm("representation") != representation_id:
+    if force or node.evalParm("representation") != representation_id:
         node.parm("representation").set(representation_id)
         node.parm("representation").pressButton()  # trigger callback
 

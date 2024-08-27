@@ -125,6 +125,15 @@
             default { "" }
             parmtag { "script_callback_language" "python" }
         }
+        parm {
+            name    "use_ayon_entity_uri"
+            label   "Use AYON Entity URI"
+            help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
+            type    toggle
+            default { "0" }
+            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'], force=True)" }
+            parmtag { "script_callback_language" "python" }
+        }
         groupcollapsible {
             name    "extra_options"
             label   "Load Options"
