@@ -106,14 +106,6 @@ class ExtractUsdModel(BaseSettingsModel):
             "instead of the resolved publish filepaths."
         )
     )
-    use_ayon_entity_uri_optional: bool = SettingsField(
-        True,
-        title="Make remap save layers to AYON Entity URI optional",
-        description=(
-            "When optional a toggle for 'Use AYON Entity URI' will be "
-            "available for the instance in the publisher UI."
-        )
-    )
 
 
 class PublishPluginsModel(BaseSettingsModel):
