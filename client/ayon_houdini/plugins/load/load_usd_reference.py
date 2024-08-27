@@ -21,7 +21,7 @@ class USDReferenceLoader(plugin.HoudiniLoader):
     icon = "code-fork"
     color = "orange"
 
-    use_ayon_entity_uri = True
+    use_ayon_entity_uri = False
 
     def load(self, context, name=None, namespace=None, data=None):
 
