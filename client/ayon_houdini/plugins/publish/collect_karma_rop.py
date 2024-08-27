@@ -4,14 +4,8 @@ import os
 import hou
 import pyblish.api
 
-from ayon_houdini.api.lib import (
-    evalParmNoFrame,
-    get_color_management_preferences
-)
-from ayon_houdini.api import (
-    colorspace,
-    plugin
-)
+from ayon_houdini.api.lib import evalParmNoFrame
+from ayon_houdini.api import plugin
 
 
 class CollectKarmaROPRenderProducts(plugin.HoudiniInstancePlugin):
@@ -63,7 +57,6 @@ class CollectKarmaROPRenderProducts(plugin.HoudiniInstancePlugin):
 
         filenames = list(render_products)
         instance.data["files"] = filenames
-        instance.data["renderProducts"] = colorspace.ARenderProduct()
 
         for product in render_products:
             self.log.debug("Found render product: %s" % product)
@@ -71,12 +64,6 @@ class CollectKarmaROPRenderProducts(plugin.HoudiniInstancePlugin):
         if "expectedFiles" not in instance.data:
             instance.data["expectedFiles"] = list()
         instance.data["expectedFiles"].append(files_by_aov)
-
-        # update the colorspace data
-        colorspace_data = get_color_management_preferences()
-        instance.data["colorspaceConfig"] = colorspace_data["config"]
-        instance.data["colorspaceDisplay"] = colorspace_data["display"]
-        instance.data["colorspaceView"] = colorspace_data["view"]
 
     def get_render_product_name(self, prefix, suffix):
         product_name = prefix

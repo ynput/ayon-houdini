@@ -28,7 +28,7 @@ from ayon_core.style import load_stylesheet
 
 from ayon_houdini.api import lib
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtWidgets, QtGui
 import hou
 
 
@@ -128,14 +128,6 @@ def update_info(node, context):
     parms = {key: value for key, value in parms.items()
              if node.evalParm(key) != value}
     parms["load_message"] = ""  # clear any warnings/errors
-
-    # Update the product type filter to match the type
-    current = node.evalParm("product_type")
-    product_type = context["product"]["productType"]
-    if current and current != product_type:
-        # If current is empty we consider no filtering applied and we allow
-        # that to be a state that needs no switching
-        parms["product_type"] = product_type
 
     # Note that these never trigger any parm callbacks since we do not
     # trigger the `parm.pressButton` and programmatically setting values
@@ -454,7 +446,7 @@ class SelectFolderPathDialog(QtWidgets.QDialog):
 
         folder_widget = SimpleFoldersWidget(parent=self)
 
-        accept_button = QtWidgets.QPushButton("Accept")
+        accept_button = QtWidgets.QPushButton("Set folder path")
 
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.addWidget(project_widget, 0)
@@ -510,6 +502,8 @@ def select_folder_path(node):
     Args:
         node (hou.OpNode): The HDA node.
     """
+    cursor_pos = QtGui.QCursor.pos()
+
     main_window = lib.get_main_window()
 
     project_name = node.evalParm("project_name")
@@ -527,6 +521,12 @@ def select_folder_path(node):
         QtCore.QTimer.singleShot(100, _select_folder_path)
 
     dialog.setStyleSheet(load_stylesheet())
+
+    # Make it appear like a pop-up near cursor
+    dialog.resize(300, 600)
+    dialog.setWindowFlags(QtCore.Qt.Popup)
+    pos = dialog.mapToGlobal(cursor_pos - QtCore.QPoint(300, 0))
+    dialog.move(pos)
 
     result = dialog.exec_()
     if result != QtWidgets.QDialog.Accepted:
@@ -555,38 +555,138 @@ def select_folder_path(node):
     folder_parm.pressButton()  # allow any callbacks to trigger
 
 
-def get_available_products(node):
-    """Return products menu items
-    It gets a list of available products of the specified product types
-      within the specified folder path with in the specified project.
-    Users can specify those in the HDA parameters.
+class SelectProductDialog(QtWidgets.QDialog):
+    """Simple dialog to allow a user to select a product."""
 
-    Args:
-        node (hou.OpNode): The HDA node.
+    def __init__(self, project_name, folder_id, parent=None):
+        super(SelectProductDialog, self).__init__(parent)
+        self.setWindowTitle("Select a Product")
+        self.setStyleSheet(load_stylesheet())
 
-    Returns:
-        list[str]: Product names for Products menu.
-    """
+        self.project_name = project_name
+        self.folder_id = folder_id
+
+        # Create widgets and layout
+        product_types_widget = QtWidgets.QComboBox()
+        products_widget = QtWidgets.QListWidget()
+        accept_button = QtWidgets.QPushButton("Set product name")
+
+        main_layout = QtWidgets.QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.addWidget(product_types_widget, 0)
+        main_layout.addWidget(products_widget, 1)
+        main_layout.addWidget(accept_button, 0)
+
+        self.product_types_widget = product_types_widget
+        self.products_widget = products_widget
+
+        # Connect Signals
+        product_types_widget.currentTextChanged.connect(self.on_product_type_changed)
+        products_widget.itemDoubleClicked.connect(self.accept)
+        accept_button.clicked.connect(self.accept)
+
+        # Initialize widgets contents
+        product_types_widget.addItems(self.get_product_types())
+        product_type = self.get_selected_product_type()
+        self.set_product_type(product_type)
+
+    def get_selected_product(self) -> str:
+        if self.products_widget.currentItem():
+            return self.products_widget.currentItem().text()
+        return ""
+
+    def get_selected_product_type(self) -> str:
+        return self.product_types_widget.currentText()
+
+    def get_product_types(self) -> List[str]:
+        """return default product types.
+        """
+
+        return [
+            "*",
+            "animation",
+            "camera",
+            "model",
+            "pointcache",
+            "usd",
+        ]
+
+    def on_product_type_changed(self, product_type: str):  
+        self.set_product_type(product_type)
+
+    def set_product_type(self, product_type: str):
+        self.product_types_widget.setCurrentText(product_type)
+
+        if self.product_types_widget.currentText() != product_type:
+            # Product type does not exist
+            return
+
+        # Populate products list
+        products = self.get_available_products(product_type)
+        self.products_widget.clear()
+        if products:
+            self.products_widget.addItems(products)
+
+    def set_selected_product_name(self, product_name: str):
+        matching_items = self.products_widget.findItems(
+            product_name, QtCore.Qt.MatchFixedString)
+        if matching_items:
+            self.products_widget.setCurrentItem(matching_items[0])
+
+    def get_available_products(self, product_type):
+        
+        if product_type == "*":
+            product_type = ""
+
+        product_types = [product_type] if product_type else None
+
+        products = ayon_api.get_products(
+            self.project_name,
+            folder_ids=[self.folder_id],
+            product_types=product_types
+        )
+
+        return list(sorted(product["name"] for product in products))
+
+
+def select_product_name(node):
+    """Show a modal pop-up dialog to allow user to select a product name
+    under the current folder entity as defined on the node's parameters.
+
+    Applies the chosen value to the `product_name` parm on the node."""
+
+    cursor_pos = QtGui.QCursor.pos()
+
     project_name = node.evalParm("project_name")
     folder_path = node.evalParm("folder_path")
-    product_type = node.evalParm("product_type")
+    product_parm = node.parm("product_name")
 
     folder_entity = ayon_api.get_folder_by_path(project_name,
                                                 folder_path,
                                                 fields={"id"})
     if not folder_entity:
-        return []
-
-    # Apply filter only if any value is set
-    product_types = [product_type] if product_type else None
-
-    products = ayon_api.get_products(
+        return
+          
+    dialog = SelectProductDialog(
         project_name,
-        folder_ids=[folder_entity["id"]],
-        product_types=product_types
+        folder_entity["id"],
+        parent=lib.get_main_window() 
     )
+    dialog.set_selected_product_name(product_parm.eval())
 
-    return list(sorted(product["name"] for product in products))
+    dialog.resize(300, 600)
+    dialog.setWindowFlags(QtCore.Qt.Popup)
+    pos = dialog.mapToGlobal(cursor_pos - QtCore.QPoint(300, 0))
+    dialog.move(pos)
+    result = dialog.exec_()
+
+    if result != QtWidgets.QDialog.Accepted:
+        return
+    selected_product = dialog.get_selected_product()
+
+    if selected_product:
+        product_parm.set(selected_product)
+        product_parm.pressButton()  # allow any callbacks to trigger
 
 
 def set_to_latest_version(node):

@@ -4,14 +4,8 @@ import os
 import hou
 import pyblish.api
 
-from ayon_houdini.api.lib import (
-    evalParmNoFrame,
-    get_color_management_preferences
-)
-from ayon_houdini.api import (
-    colorspace,
-    plugin
-)
+from ayon_houdini.api.lib import evalParmNoFrame
+from ayon_houdini.api import plugin
 
 
 class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
@@ -119,7 +113,6 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
 
         filenames = list(render_products)
         instance.data["files"] = filenames
-        instance.data["renderProducts"] = colorspace.ARenderProduct()
 
         # For now by default do NOT try to publish the rendered output
         instance.data["publishJobState"] = "Suspended"
@@ -128,12 +121,6 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
         if "expectedFiles" not in instance.data:
             instance.data["expectedFiles"] = []
         instance.data["expectedFiles"].append(files_by_aov)
-
-        # update the colorspace data
-        colorspace_data = get_color_management_preferences()
-        instance.data["colorspaceConfig"] = colorspace_data["config"]
-        instance.data["colorspaceDisplay"] = colorspace_data["display"]
-        instance.data["colorspaceView"] = colorspace_data["view"]
 
     def get_render_product_name(self, prefix, suffix):
         """Return the output filename using the AOV prefix and suffix"""
