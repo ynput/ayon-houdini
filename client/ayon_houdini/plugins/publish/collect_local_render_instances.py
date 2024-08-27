@@ -133,11 +133,10 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             self.set_representation_colorspace(representation,
                                                context,
                                                colorspace=colorspace)
-            
-            if instance.data['review']:
-                families= ["render.local.hou", "review"]
-            else:
-                families= ["render.local.hou"]
+
+            families = ["render.local.hou"]
+            if instance.data.get('review'):
+                families.append("review")
 
             aov_instance.data.update({
                 # 'label': label,
