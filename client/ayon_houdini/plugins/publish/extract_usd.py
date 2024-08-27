@@ -33,6 +33,8 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
         self.log.info("Writing USD '%s' to '%s'" % (file_name, staging_dir))
 
         mapping = self.get_source_to_publish_paths(instance.context)
+        if mapping:
+            self.log.debug(f"Remapping paths: {mapping}")
 
         # Allow instance-specific path remapping overrides, e.g. changing
         # paths on used resources/textures for looks
