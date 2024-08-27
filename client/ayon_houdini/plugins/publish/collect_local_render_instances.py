@@ -147,15 +147,15 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 "folderPath": instance.data["folderPath"],
                 "frameStart": instance.data["frameStartHandle"],
                 "frameEnd": instance.data["frameEndHandle"],
+                "frameStartHandle": instance.data["frameStartHandle"],
+                "frameEndHandle": instance.data["frameEndHandle"],
                 "productType": product_type,
                 "family": product_type,
                 "productName": product_name,
                 "productGroup": product_group,
                 "families": ["render.local.hou", "review"],
                 "instance_node": instance.data["instance_node"],
-                "representations": [representation],
-                "frameStartHandle": instance.data["frameStartHandle"],
-                "frameEndHandle": instance.data["frameEndHandle"]
+                "representations": [representation]
             })
 
         # Skip integrating original render instance.
