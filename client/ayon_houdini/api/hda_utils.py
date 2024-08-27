@@ -27,6 +27,7 @@ from ayon_core.tools.utils import SimpleFoldersWidget
 from ayon_core.style import load_stylesheet
 
 from ayon_houdini.api import lib
+from .usd import get_ayon_entity_uri_from_representation_context
 
 from qtpy import QtCore, QtWidgets, QtGui
 import hou
@@ -179,11 +180,19 @@ def set_representation(node, representation_id: str):
 
     context = get_representation_context(project_name, repre_entity)
     update_info(node, context)
-    path = get_representation_path_from_context(context)
-    # Load fails on UNC paths with backslashes and also
-    # fails to resolve @sourcename var with backslashed
-    # paths correctly. So we force forward slashes
-    path = path.replace("\\", "/")
+
+    if node.parm("use_ayon_entity_uri"):
+        use_ayon_entity_uri = node.evalParm("use_ayon_entity_uri")
+    else:
+        use_ayon_entity_uri = False
+    if use_ayon_entity_uri:
+        path = get_ayon_entity_uri_from_representation_context(context)
+    else:
+        path = get_representation_path_from_context(context)
+        # Load fails on UNC paths with backslashes and also
+        # fails to resolve @sourcename var with backslashed
+        # paths correctly. So we force forward slashes
+        path = path.replace("\\", "/")
     with _unlocked_parm(file_parm):
         file_parm.set(path)
 

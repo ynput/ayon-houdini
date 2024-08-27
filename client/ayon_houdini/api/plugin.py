@@ -8,7 +8,6 @@ import six
 import hou
 
 import pyblish.api
-import ayon_api
 from ayon_core.pipeline import (
     CreatorError,
     Creator,
@@ -21,6 +20,7 @@ from ayon_core.pipeline import (
 from ayon_core.lib import BoolDef
 
 from .lib import imprint, read, lsattr, add_self_publish_button
+from .usd import get_ayon_entity_uri_from_representation_context
 
 
 SETTINGS_CATEGORY = "houdini"
@@ -321,25 +321,7 @@ class HoudiniLoader(load.LoaderPlugin):
 
     def filepath_from_context(cls, context):
         if cls.use_ayon_entity_uri:
-            project_name = context["project"]["name"]
-            representation_id = context["representation"]["id"]
-            response = ayon_api.post(
-                f"projects/{project_name}/uris",
-                entityType="representation",
-                ids=[representation_id])
-            if response.status_code != 200:
-                raise RuntimeError(
-                    f"Unable to resolve AYON entity URI for '{project_name}' "
-                    f"representation id '{representation_id}': {response.text}"
-                )
-            uris = response.data["uris"]
-            if len(uris) != 1:
-                raise RuntimeError(
-                    f"Unable to resolve AYON entity URI for '{project_name}' "
-                    f"representation id '{representation_id}' to single URI. "
-                    f"Received data: {response.data}"
-                )
-            return uris[0]["uri"]
+            return get_ayon_entity_uri_from_representation_context(context)
 
         return super(HoudiniLoader, cls).filepath_from_context(context)
 
