@@ -38,6 +38,14 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
 
         node_path = instance.data["instance_node"]
         if not instance.data.get("output_node"):
+
+            # Report LOP path parm for better logs
+            lop_path_parm = hou.node(node_path).parm("loppath")
+            if lop_path_parm:
+                value = lop_path_parm.evalAsString()
+                self.log.warning(
+                    f"ROP node 'loppath' parm is set to: '{value}'")
+
             raise PublishValidationError(
                 f"No valid LOP path configured on ROP "
                 f"'{node_path}'.",
