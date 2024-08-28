@@ -15,13 +15,15 @@ class CollectHoudiniCurrentFile(plugin.HoudiniContextPlugin):
         """Inject the current working file"""
 
         current_file = hou.hipFile.path()
-        if not os.path.exists(current_file):
+        if (
+                hou.hipFile.isNewFile()
+                or not os.path.exists(current_file)
+        ):
             # By default, Houdini will even point a new scene to a path.
             # However if the file is not saved at all and does not exist,
             # we assume the user never set it.
             current_file = ""
-
-        elif os.path.basename(current_file) == "untitled.hip":
+        else:
             # Due to even a new file being called 'untitled.hip' we are unable
             # to confirm the current scene was ever saved because the file
             # could have existed already. We will allow it if the file exists,
