@@ -5,6 +5,9 @@ import hou
 from husd.outputprocessor import OutputProcessor
 
 
+_COMPATIBILITY_PLACEHOLDER = object()
+
+
 class AYONRemapPaths(OutputProcessor):
     """Remap paths based on a mapping dict on rop node."""
 
@@ -38,11 +41,18 @@ class AYONRemapPaths(OutputProcessor):
 
         return group.asDialogScript()
 
-    def beginSave(self, config_node, config_overrides, lop_node, t):
-        super(AYONRemapPaths, self).beginSave(config_node,
-                                              config_overrides,
-                                              lop_node,
-                                              t)
+    def beginSave(self,
+                  config_node,
+                  config_overrides,
+                  lop_node,
+                  t,
+                  # Added in Houdini 20.5.182
+                  stage_variables=_COMPATIBILITY_PLACEHOLDER):
+
+        args = [config_node, config_overrides, lop_node, t]
+        if stage_variables is not _COMPATIBILITY_PLACEHOLDER:
+            args.append(stage_variables)
+        super(AYONRemapPaths, self).beginSave(*args)
 
         value = config_node.evalParm("ayon_remap_paths_remap_json")
         mapping = json.loads(value)
