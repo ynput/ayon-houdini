@@ -6,8 +6,6 @@ from ayon_houdini.api import (
     lib
 )
 
-AYON_ENTITY_URI_PREFIXES = ("ayon://", "ayon+entity://")
-
 
 class USDReferenceLoader(plugin.HoudiniLoader):
     """Reference USD file in Solaris"""
@@ -26,15 +24,11 @@ class USDReferenceLoader(plugin.HoudiniLoader):
     use_ayon_entity_uri = False
 
     def load(self, context, name=None, namespace=None, data=None):
-
-        import os
         import hou
 
         # Format file name, Houdini only wants forward slashes
         file_path = self.filepath_from_context(context)
-        if not file_path.startswith(AYON_ENTITY_URI_PREFIXES):
-            file_path = os.path.normpath(file_path)
-            file_path = file_path.replace("\\", "/")
+        file_path = file_path.replace("\\", "/")
 
         # Get the root node
         stage = hou.node("/stage")
