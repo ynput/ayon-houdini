@@ -40,28 +40,7 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
                            "last version published files.")
             return
 
-        expected_filenames = []
-        staging_dir = instance.data.get("stagingDir")
-        expectedFiles = instance.data.get("expectedFiles", [])
-
-        # 'expectedFiles' are preferred over 'frames'
-        if expectedFiles:
-            # Products with expected files
-            # This can be Render products or submitted cache to farm.
-            for expected in expectedFiles:
-                # expected.values() is a list of lists
-                expected_filenames.extend(sum(expected.values(), []))
-        else:
-            # Products with frames or single file.
-            frames = instance.data.get("frames", "")
-            if isinstance(frames, str):
-                # single file.
-                expected_filenames.append("{}/{}".format(staging_dir, frames))
-            else:
-                # list of frame.
-                expected_filenames.extend(
-                    ["{}/{}".format(staging_dir, f) for f in frames]
-                )
+        staging_dir, expected_filenames = self.get_expected_files_and_staging_dir(instance)
 
         os.makedirs(staging_dir, exist_ok=True)
 
@@ -87,3 +66,34 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             if frame and frame not in frames_to_fix:
                 self.log.debug("Copying '{}' -> '{}'".format(file_path, out_path))
                 shutil.copy(file_path, out_path)
+
+
+    def get_expected_files_and_staging_dir(self, instance):
+        """ Get expected file names or frames.
+
+        This method includes Houdini specific code.
+        """
+        expected_filenames = []
+        staging_dir = instance.data.get("stagingDir")
+        expectedFiles = instance.data.get("expectedFiles", [])
+
+        # 'expectedFiles' are preferred over 'frames'
+        if expectedFiles:
+            # Products with expected files
+            # This can be Render products or submitted cache to farm.
+            for expected in expectedFiles:
+                # expected.values() is a list of lists
+                expected_filenames.extend(sum(expected.values(), []))
+        else:
+            # Products with frames or single file.
+            frames = instance.data.get("frames", "")
+            if isinstance(frames, str):
+                # single file.
+                expected_filenames.append("{}/{}".format(staging_dir, frames))
+            else:
+                # list of frame.
+                expected_filenames.extend(
+                    ["{}/{}".format(staging_dir, f) for f in frames]
+                )
+
+        return staging_dir, expected_filenames
