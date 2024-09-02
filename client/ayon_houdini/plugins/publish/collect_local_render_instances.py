@@ -4,12 +4,15 @@ from ayon_core.pipeline.create import get_product_name
 from ayon_core.pipeline.farm.patterning import match_aov_pattern
 from ayon_core.pipeline.publish import (
     get_plugin_settings,
-    apply_plugin_settings_automatically
+    apply_plugin_settings_automatically,
+    ColormanagedPyblishPluginMixin
 )
 from ayon_houdini.api import plugin
+from ayon_houdini.api.colorspace import get_scene_linear_colorspace
 
 
-class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin):
+class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
+                                  ColormanagedPyblishPluginMixin):
     """Collect instances for local render.
 
     Agnostic Local Render Collector.
@@ -49,9 +52,9 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin):
             # get aov_filter from deadline settings
             cls.aov_filter = project_settings["deadline"]["publish"]["ProcessSubmittedJobOnFarm"]["aov_filter"]
             cls.aov_filter = {
-            item["name"]: item["value"]
-            for item in cls.aov_filter
-        }
+                item["name"]: item["value"]
+                for item in cls.aov_filter
+            }
 
     def process(self, instance):
 
@@ -74,6 +77,14 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin):
             instance.data["productName"]
         )
 
+        # NOTE: The assumption that the output image's colorspace is the
+        #   scene linear role may be incorrect. Certain renderers, like
+        #   Karma allow overriding explicitly the output colorspace of the
+        #   image. Such override are currently not considered since these
+        #   would need to be detected in a renderer-specific way and the
+        #   majority of production scenarios these would not be overridden.
+        # TODO: Support renderer-specific explicit colorspace overrides
+        colorspace = get_scene_linear_colorspace()
         for aov_name, aov_filepaths in expectedFiles.items():
             product_name = product_group
 
@@ -108,6 +119,21 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin):
             if len(aov_filenames) == 1:
                 aov_filenames = aov_filenames[0]
 
+            representation = {
+                "stagingDir": staging_dir,
+                "ext": ext,
+                "name": ext,
+                "tags": ["review"] if preview else [],
+                "files": aov_filenames,
+                "frameStart": instance.data["frameStartHandle"],
+                "frameEnd": instance.data["frameEndHandle"]
+            }
+
+            # Set the colorspace for the representation
+            self.set_representation_colorspace(representation,
+                                               context,
+                                               colorspace=colorspace)
+
             aov_instance.data.update({
                 # 'label': label,
                 "task": instance.data["task"],
@@ -124,18 +150,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin):
                 "publish_attributes": instance.data["publish_attributes"],
                 "stagingDir": staging_dir,
                 "frames": aov_filenames,
-
-                "representations": [
-                    {
-                        "stagingDir": staging_dir,
-                        "ext": ext,
-                        "name": ext,
-                        "tags": ["review"] if preview else [],
-                        "files": aov_filenames,
-                        "frameStart": instance.data["frameStartHandle"],
-                        "frameEnd": instance.data["frameEndHandle"]
-                    }
-                ]
+                "representations": [representation]
             })
 
         # Skip integrating original render instance.
