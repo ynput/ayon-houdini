@@ -7,6 +7,7 @@ import itertools
 from typing import List
 
 import hou
+import ayon_api
 from pxr import Usd, Sdf, Tf, Vt, UsdRender
 
 log = logging.getLogger(__name__)
@@ -377,3 +378,42 @@ def get_schema_type_names(type_name: str) -> List[str]:
             results.append(schema_type_name)
 
     return results
+
+
+def get_ayon_entity_uri_from_representation_context(context: dict) -> str:
+    """Resolve AYON Entity URI from representation context.
+
+    Note:
+        The representation context is the `get_representation_context` dict
+        containing the `project`, `folder, `representation` and so forth.
+        It is not the representation entity `context` key.
+
+    Arguments:
+        context (dict): The representation context.
+
+    Raises:
+        RuntimeError: Unable to resolve to a single valid URI.
+
+    Returns:
+        str: The AYON entity URI.
+
+    """
+    project_name = context["project"]["name"]
+    representation_id = context["representation"]["id"]
+    response = ayon_api.post(
+        f"projects/{project_name}/uris",
+        entityType="representation",
+        ids=[representation_id])
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"Unable to resolve AYON entity URI for '{project_name}' "
+            f"representation id '{representation_id}': {response.text}"
+        )
+    uris = response.data["uris"]
+    if len(uris) != 1:
+        raise RuntimeError(
+            f"Unable to resolve AYON entity URI for '{project_name}' "
+            f"representation id '{representation_id}' to single URI. "
+            f"Received data: {response.data}"
+        )
+    return uris[0]["uri"]
