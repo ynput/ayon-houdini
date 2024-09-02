@@ -73,7 +73,7 @@ class CollectFramesFixDef(
                 published_files.append(file_info["path"])
 
         instance.data["last_version_published_files"] = published_files
-        self.log.debug("last_version_published_files::{}".format(
+        self.log.debug("last_version_published_files: {}".format(
             instance.data["last_version_published_files"]))
 
         if self.rewrite_version_enable and rewrite_version:
