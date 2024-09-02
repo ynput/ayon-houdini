@@ -170,26 +170,8 @@ class NodePresetLoader(FilePathLoader):
             tags= { 
                 "oprelative" : ".",
                 "script_callback" : """
-import json
-from ayon_houdini.api.lib import load_node_preset
-
-json_path = hou.parm("./filepath").eval()
-target_node = hou.parm("./target_node").evalAsNode()
-node_preset = {}
-with open(json_path, "r") as f:
-    node_preset = json.load(f)
-
-node_type = node_preset["metadata"]["type"]
-
-hou.pwd().setColor(hou.Color(0.7, 0.8, 0.87))
-hou.pwd().setComment("")
-hou.pwd().setGenericFlag(hou.nodeFlag.DisplayComment, True)
-if target_node and target_node.type().name() != node_type:
-    hou.pwd().setColor(hou.Color(0.8, 0.45, 0.1))
-    hou.pwd().setComment(
-        f"Target Node type '{target_node.type().name()}' doesn't match the loaded preset type '{node_type}'."
-        "Please note, Applying the preset skips parameters that doesn't exist"
-    )
+from ayon_houdini.api.lib import node_preset_validate_target
+node_preset_validate_target(hou.pwd())
 """,
             "script_callback_language" : "python",
             }
@@ -200,17 +182,8 @@ if target_node and target_node.type().name() != node_type:
             label="Apply Preset",
             tags= { 
                 "script_callback" : """
-import json
-from ayon_houdini.api.lib import load_node_preset
-
-json_path = hou.parm("./filepath").eval()
-target_node = hou.parm("./target_node").evalAsNode()
-if target_node:
-    node_preset = {}
-    with open(json_path, "r") as f:
-        node_preset = json.load(f)
-
-    load_node_preset(target_node, node_preset)
+from ayon_houdini.api.lib import read_and_apply_preset
+read_and_apply_preset(hou.pwd())
 """,
                 "script_callback_language" : "python",
             },
@@ -223,17 +196,8 @@ if target_node:
             label="Force Apply Preset",
             tags= { 
                 "script_callback" : """
-import json
-from ayon_houdini.api.lib import load_node_preset
-
-json_path = hou.parm("./filepath").eval()
-target_node = hou.parm("./target_node").evalAsNode()
-if target_node:
-    node_preset = {}
-    with open(json_path, "r") as f:
-        node_preset = json.load(f)
-
-    load_node_preset(target_node, node_preset, update_locked=True)
+from ayon_houdini.api.lib import read_and_apply_preset
+read_and_apply_preset(hou.pwd(), update_locked=True)
 """,
                 "script_callback_language" : "python",
             },

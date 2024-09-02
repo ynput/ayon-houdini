@@ -1430,3 +1430,59 @@ def load_node_preset(target_node, node_preset, update_locked=False, log=None):
         
         if update_locked and parm_locked:
             param.lock(True)
+
+
+def read_and_apply_preset(node, update_locked=False):
+    """Read and apply a node preset.
+
+    This function expects the following parameters to be present on the node:
+        1. filepath: Path to the preset file node.
+        2. target_node: The node that will receive the preset settings.
+    
+    Args:
+        node(hou.Node): file path node
+        update_locked (bool, optional): if set, it will update locked parameters.
+
+    Returns:
+        None
+    """
+
+    json_path = node.parm("filepath").eval()
+    target_node = node.parm("target_node").evalAsNode()
+    if target_node:
+        node_preset = {}
+        with open(json_path, "r") as f:
+            node_preset = json.load(f)
+
+        load_node_preset(target_node, node_preset, update_locked=update_locked)
+
+
+def node_preset_validate_target(node):
+    """Validates the type of the target node.
+
+    This function provides visual confirmation when the target node's type
+      aligns with the type used to create the node preset.
+
+    This function expects the following parameters to be present on the node:
+        1. filepath: Path to the preset file node.
+        2. target_node: The node that will receive the preset settings.
+    
+    """
+
+    json_path = node.parm("filepath").eval()
+    target_node = node.parm("target_node").evalAsNode()
+    node_preset = {}
+    with open(json_path, "r") as f:
+        node_preset = json.load(f)
+
+    node_type = node_preset["metadata"]["type"]
+
+    node.setColor(hou.Color(0.7, 0.8, 0.87))
+    node.setComment("")
+    node.setGenericFlag(hou.nodeFlag.DisplayComment, True)
+    if target_node and target_node.type().name() != node_type:
+        node.setColor(hou.Color(0.8, 0.45, 0.1))
+        node.setComment(
+            f"Target Node type '{target_node.type().name()}' doesn't match the loaded preset type '{node_type}'."
+            "Please note, Applying the preset skips parameters that doesn't exist"
+        )
