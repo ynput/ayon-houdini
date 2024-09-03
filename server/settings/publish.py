@@ -78,6 +78,18 @@ class CollectFilesForCleaningUpModel(BaseSettingsModel):
     )
 
 
+class CollectFramesFixDefModel(BaseSettingsModel):
+    enabled: bool = SettingsField(True)
+    rewrite_version_enable: bool = SettingsField(
+        False,
+        title="Show 'Rewrite latest version' toggle"
+    )
+    families: list[str] = SettingsField(
+        default_factory=list,
+        title="Families"
+    )
+
+
 class ValidateWorkfilePathsModel(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
     optional: bool = SettingsField(title="Optional")
@@ -110,6 +122,10 @@ class PublishPluginsModel(BaseSettingsModel):
     CollectFilesForCleaningUp: CollectFilesForCleaningUpModel = SettingsField(
         default_factory=CollectFilesForCleaningUpModel,
         title="Collect Files For Cleaning Up."
+    )
+    CollectFramesFixDef: CollectFramesFixDefModel = SettingsField(
+        default_factory=CollectFramesFixDefModel,
+        title="Collect Frames to Fix",
     )
     CollectLocalRenderInstances: CollectLocalRenderInstancesModel = SettingsField(
         default_factory=CollectLocalRenderInstancesModel,
@@ -158,6 +174,15 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "optional": True,
         "active": True,
         "families" : []
+    },
+    "CollectFramesFixDef": {
+        "enabled": True,
+        "optional": True,
+        "active": True,
+        "rewrite_version_enable": False,
+        "families" : [
+            "*"
+        ]
     },
     "CollectLocalRenderInstances": {
         "use_deadline_aov_filter": False,
