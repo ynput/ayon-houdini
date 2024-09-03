@@ -5,7 +5,6 @@ import errno
 import re
 import logging
 import json
-import time
 from contextlib import contextmanager
 
 import six
