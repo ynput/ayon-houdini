@@ -4,11 +4,8 @@ import re
 import hou
 import pyblish.api
 
-from ayon_houdini.api import colorspace, plugin
-from ayon_houdini.api.lib import (
-    get_color_management_preferences,
-    evalParmNoFrame
-)
+from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import evalParmNoFrame
 
 
 class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
@@ -111,7 +108,6 @@ class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
             self.log.debug("Found render product: {}".format(product))
 
         instance.data["files"] = list(render_products)
-        instance.data["renderProducts"] = colorspace.ARenderProduct()
 
         # For now by default do NOT try to publish the rendered output
         instance.data["publishJobState"] = "Suspended"
@@ -120,12 +116,6 @@ class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
         if "expectedFiles" not in instance.data:
             instance.data["expectedFiles"] = list()
         instance.data["expectedFiles"].append(files_by_aov)
-
-        # update the colorspace data
-        colorspace_data = get_color_management_preferences()
-        instance.data["colorspaceConfig"] = colorspace_data["config"]
-        instance.data["colorspaceDisplay"] = colorspace_data["display"]
-        instance.data["colorspaceView"] = colorspace_data["view"]
 
     def get_render_product_name(self, prefix, suffix):
         """Return the output filename using the AOV prefix and suffix"""

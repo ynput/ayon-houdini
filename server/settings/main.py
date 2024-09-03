@@ -16,6 +16,9 @@ from .publish import (
     PublishPluginsModel,
     DEFAULT_HOUDINI_PUBLISH_SETTINGS,
 )
+from .load import (
+    LoadPluginsModel,
+)
 from .templated_workfile_build import (
     TemplatedWorkfileBuildModel
 )
@@ -41,6 +44,10 @@ class HoudiniSettings(BaseSettingsModel):
     publish: PublishPluginsModel = SettingsField(
         default_factory=PublishPluginsModel,
         title="Publish Plugins",
+    )
+    load: LoadPluginsModel = SettingsField(
+        default_factory=LoadPluginsModel,
+        title="Loader Plugins",
     )
     templated_workfile_build: TemplatedWorkfileBuildModel = SettingsField(
         title="Templated Workfile Build",

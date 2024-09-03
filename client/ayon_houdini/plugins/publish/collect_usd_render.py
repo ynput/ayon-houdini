@@ -4,14 +4,8 @@ import re
 import hou
 import pyblish.api
 
-from ayon_houdini.api import (
-    colorspace,
-    plugin
-)
-from ayon_houdini.api.lib import (
-    evalParmNoFrame,
-    get_color_management_preferences
-)
+from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import evalParmNoFrame
 
 
 class CollectUsdRender(plugin.HoudiniInstancePlugin):
@@ -23,9 +17,6 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
 
     Provides:
         instance    -> ifdFile
-        instance    -> colorspaceConfig
-        instance    -> colorspaceDisplay
-        instance    -> colorspaceView
 
     """
 
@@ -75,12 +66,5 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
             if "$F" not in export_file:
                 instance.data["splitRenderFrameDependent"] = False
 
-        # update the colorspace data
-        colorspace_data = get_color_management_preferences()
-        instance.data["colorspaceConfig"] = colorspace_data["config"]
-        instance.data["colorspaceDisplay"] = colorspace_data["display"]
-        instance.data["colorspaceView"] = colorspace_data["view"]
-
         # stub required data for Submit Publish Job publish plug-in
         instance.data["attachTo"] = []
-        instance.data["renderProducts"] = colorspace.ARenderProduct()

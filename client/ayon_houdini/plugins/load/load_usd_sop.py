@@ -1,5 +1,3 @@
-import os
-
 from ayon_houdini.api import (
     pipeline,
     plugin
@@ -16,12 +14,13 @@ class SopUsdImportLoader(plugin.HoudiniLoader):
     icon = "code-fork"
     color = "orange"
 
+    use_ayon_entity_uri = False
+
     def load(self, context, name=None, namespace=None, data=None):
         import hou
 
         # Format file name, Houdini only wants forward slashes
         file_path = self.filepath_from_context(context)
-        file_path = os.path.normpath(file_path)
         file_path = file_path.replace("\\", "/")
 
         # Get the root node
