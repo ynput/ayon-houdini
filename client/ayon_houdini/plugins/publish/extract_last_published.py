@@ -10,13 +10,21 @@ from ayon_houdini.api import plugin
 
 class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
     """
-    Generic Extractor that copies files from last published
+    Extractor that copies files from last published
     to staging directory.
     It works only if instance data includes "last_version_published_files"
     and there are frames to fix.
 
     The files from last published are base of files which will be extended/fixed for specific
     frames.
+
+    NOTE: 
+        This plugin is closely taken from ayon-nuke.
+        It contains some Houdini addon specific logic as various addons may
+          have unique methods for managing `staging_dir`, `expectedFiles`, and `frames`.
+    TODO:
+        It's preferable to to generalize this plugin for broader use and
+          integrate it into ayon-core.
     """
 
     order = pyblish.api.ExtractorOrder - 0.1
