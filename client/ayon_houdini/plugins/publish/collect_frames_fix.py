@@ -10,7 +10,7 @@ from ayon_core.pipeline.publish import AYONPyblishPluginMixin
 from ayon_houdini.api import plugin
 
 
-class CollectFramesFixDef(
+class CollectFramesFixDefHou(
     plugin.HoudiniInstancePlugin,
     AYONPyblishPluginMixin
 ):

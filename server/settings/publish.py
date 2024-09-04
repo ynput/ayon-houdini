@@ -78,7 +78,7 @@ class CollectFilesForCleaningUpModel(BaseSettingsModel):
     )
 
 
-class CollectFramesFixDefModel(BaseSettingsModel):
+class CollectFramesFixDefHouModel(BaseSettingsModel):
     enabled: bool = SettingsField(True)
     rewrite_version_enable: bool = SettingsField(
         False,
@@ -123,8 +123,8 @@ class PublishPluginsModel(BaseSettingsModel):
         default_factory=CollectFilesForCleaningUpModel,
         title="Collect Files For Cleaning Up."
     )
-    CollectFramesFixDef: CollectFramesFixDefModel = SettingsField(
-        default_factory=CollectFramesFixDefModel,
+    CollectFramesFixDefHou: CollectFramesFixDefHouModel = SettingsField(
+        default_factory=CollectFramesFixDefHouModel,
         title="Collect Frames to Fix",
     )
     CollectLocalRenderInstances: CollectLocalRenderInstancesModel = SettingsField(
@@ -175,7 +175,7 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "active": True,
         "families" : []
     },
-    "CollectFramesFixDef": {
+    "CollectFramesFixDefHou": {
         "enabled": True,
         "optional": True,
         "active": True,
