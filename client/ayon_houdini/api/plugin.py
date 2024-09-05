@@ -319,6 +319,7 @@ class HoudiniLoader(load.LoaderPlugin):
     settings_category = SETTINGS_CATEGORY
     use_ayon_entity_uri = False
 
+    @classmethod
     def filepath_from_context(cls, context):
         if cls.use_ayon_entity_uri:
             return get_ayon_entity_uri_from_representation_context(context)
