@@ -26,7 +26,11 @@ class CollectHoudiniRenderColorspace(plugin.HoudiniInstancePlugin):
         # Define render products for `create_instances_for_aov`
         # which uses it in `_create_instances_for_aov()` to match the render
         # product's name to aovs to define the colorspace.
-        expected_files = instance.data["expectedFiles"]
+        expected_files = instance.data.get("expectedFiles")
+        if not expected_files:
+            self.log.debug("No expected files found. "
+                           "Skipping collecting of render colorspace.")
+            return
         aov_name = list(expected_files[0].keys())
         render_products_data = colorspace.ARenderProduct(aov_name)
         instance.data["renderProducts"] = render_products_data
