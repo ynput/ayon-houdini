@@ -20,6 +20,7 @@ from ayon_core.pipeline import (
 from ayon_core.lib import BoolDef
 
 from .lib import imprint, read, lsattr, add_self_publish_button
+from .usd import get_ayon_entity_uri_from_representation_context
 
 
 SETTINGS_CATEGORY = "houdini"
@@ -316,6 +317,14 @@ class HoudiniLoader(load.LoaderPlugin):
 
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
+    use_ayon_entity_uri = False
+
+    @classmethod
+    def filepath_from_context(cls, context):
+        if cls.use_ayon_entity_uri:
+            return get_ayon_entity_uri_from_representation_context(context)
+
+        return super(HoudiniLoader, cls).filepath_from_context(context)
 
 
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
