@@ -79,13 +79,6 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
 
         self._has_been_setup = True
 
-        # Set folder settings for the empty scene directly after launch of
-        # Houdini so it initializes into the correct scene FPS,
-        # Frame Range, etc.
-        # TODO: make sure this doesn't trigger when
-        #       opening with last workfile.
-        _set_context_settings()
-
         # Manually call on_new callback as it doesn't get called when AYON
         # launches for the first time on a context, only when going to
         # File -> New
