@@ -4,14 +4,9 @@ import clique
 
 import pyblish.api
 from ayon_core.pipeline import PublishValidationError
-from ayon_core.pipeline.publish import RepairAction
 
 from ayon_houdini.api.action import SelectInvalidAction
 from ayon_houdini.api import plugin
-
-
-class UpdateSceneFrameRangeAction(RepairAction):
-    label = "Update scene frame range by frames to fix"
 
 
 class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
@@ -24,7 +19,7 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
 
     order = pyblish.api.ValidatorOrder
     label = "Validate Frame Range Frames to Fix"
-    actions = [UpdateSceneFrameRangeAction, SelectInvalidAction]
+    actions = [SelectInvalidAction]
 
     def process(self, instance):
 
@@ -74,27 +69,3 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
                 f"Setting the end frame to the last frame to fix {int(frame_range[-1])}."
             )
             return rop_node.path()
-
-    @classmethod
-    def repair(cls, instance):
-
-        if not cls.get_invalid(instance):
-            # Already fixed
-            return
-        frames_to_fix = instance.data.get("frames_to_fix", "")
-        frames_to_fix = clique.parse(frames_to_fix, "{ranges}")
-        frame_range = list(frames_to_fix)
-
-        frame_start, frame_end = hou.playbar.frameRange()
-        if not frame_start <= int(frame_range[0]):
-            frame_start = int(frame_range[0])
-        if not frame_end >= int(frame_range[-1]):
-            frame_end = frame_range[-1]
-
-        frame_start = int(frame_start)
-        frame_end = int(frame_end)
-
-        # Set frame range
-        hou.playbar.setFrameRange(frame_start, frame_end)
-        hou.playbar.setPlaybackRange(frame_start, frame_end)
-        hou.setFrame(frame_start)
