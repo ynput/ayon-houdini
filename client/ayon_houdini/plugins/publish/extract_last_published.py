@@ -80,6 +80,14 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
         """ Get expected file names or frames.
 
         This method includes Houdini specific code.
+
+        Args: 
+            instance (pyblish.api.Instance): The instance to publish.
+
+        Returns: 
+            (staging_dir, expected_filenames) -> tuple (str, list(str)):
+                staging_dir: Staging directory for the output files.
+                expected_filenames: A list of the collected frames from the publish instance.
         """
         expected_filenames = []
         staging_dir = instance.data.get("stagingDir")
@@ -104,4 +112,4 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
                     ["{}/{}".format(staging_dir, f) for f in frames]
                 )
 
-        return staging_dir, expected_filenames
+        return (staging_dir, expected_filenames)
