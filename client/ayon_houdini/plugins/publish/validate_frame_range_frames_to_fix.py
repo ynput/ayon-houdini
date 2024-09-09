@@ -50,6 +50,7 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
         frame_start = instance.data["frameStartHandle"]
         frame_end = instance.data["frameEndHandle"]
 
+        # Get the frame range from 'frames to fix'
         frames_to_fix = clique.parse(frames_to_fix, "{ranges}")
         fix_frame_start = int(frames_to_fix[0])
         fix_frame_end = int(frames_to_fix[-1])
