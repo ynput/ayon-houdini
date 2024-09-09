@@ -14,10 +14,10 @@ class CollectFramesFixDefHou(
     plugin.HoudiniInstancePlugin,
     AYONPyblishPluginMixin
 ):
-    """Provides text field to insert frame(s) to be rerendered.
+    """Provides text field to insert frame(s) to be re-rendered.
 
     Published files of last version of an instance product are collected into
-    instance.data["last_version_published_files"]. All these but frames
+    `instance.data["last_version_published_files"]`. All these but frames
     mentioned in text field will be reused for new version.
     """
     order = pyblish.api.CollectorOrder + 0.495
