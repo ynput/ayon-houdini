@@ -28,12 +28,6 @@ class CollectFramesFixDefHou(
     rewrite_version_enable = False
 
     def process(self, instance):
-        # Skip instances that are set to not be integrated so we ignore
-        # the original `render` instance from which local AOV instances are
-        # spawned off.
-        if not instance.data.get("integrate", True):
-            return
-
         attribute_values = self.get_attr_values_from_data(instance.data)
         frames_to_fix: str = attribute_values.get("frames_to_fix", "")
         rewrite_version: bool = attribute_values.get("rewrite_version", False)
@@ -42,6 +36,14 @@ class CollectFramesFixDefHou(
 
         self.log.info(f"Frames to fix: {frames_to_fix}")
         instance.data["frames_to_fix"] = frames_to_fix
+
+        # Skip instances that are set to not be integrated so we ignore
+        # the original `render` instance from which local AOV instances are
+        # spawned off.
+        if not instance.data.get("integrate", True):
+            self.log.debug("Skipping collecting frames to fix data for "
+                           "instance because instance is set to not integrate")
+            return
 
         product_name: str = instance.data["productName"]
         folder_entity: dict = instance.data["folderEntity"]

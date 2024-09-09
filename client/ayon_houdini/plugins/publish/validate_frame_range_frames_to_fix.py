@@ -31,6 +31,12 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
             self.log.debug("Skipping Validation, no frames to fix.")
             return
 
+        # Skip instances that are set to not be integrated so we ignore
+        # the original `render` instance from which local AOV instances are
+        # spawned off.
+        if not instance.data.get("integrate", True):
+            return
+
         rop_node = hou.node(instance.data["instance_node"])
         frame_start = instance.data["frameStartHandle"]
         frame_end = instance.data["frameEndHandle"]
