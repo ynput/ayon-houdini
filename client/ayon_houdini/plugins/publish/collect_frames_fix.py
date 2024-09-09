@@ -95,7 +95,7 @@ class CollectFramesFixDefHou(
                         "When specified, only these frames will be rendered.\n"
                         "The remainder of the frame range for the instance "
                         "will be copied from the previous published version.\n"
-                        "This allow re-rendering only certain frames or "
+                        "This allows re-rendering only certain frames or "
                         "extending the frame range of the previous version."
                     ))
         ]
