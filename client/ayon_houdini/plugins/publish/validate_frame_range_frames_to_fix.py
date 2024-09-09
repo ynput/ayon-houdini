@@ -5,7 +5,7 @@ import clique
 import pyblish.api
 from ayon_core.pipeline import PublishValidationError
 
-from ayon_houdini.api.action import SelectInvalidAction
+from ayon_houdini.api.action import SelectROPAction
 from ayon_houdini.api import plugin
 
 
@@ -19,7 +19,7 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
 
     order = pyblish.api.ValidatorOrder
     label = "Validate Frame Range Frames to Fix"
-    actions = [SelectInvalidAction]
+    actions = [SelectROPAction]
 
     def process(self, instance):
 
@@ -51,9 +51,25 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
         frame_end = instance.data["frameEndHandle"]
 
         # Get the frame range from 'frames to fix'
-        frames_to_fix = clique.parse(frames_to_fix, "{ranges}")
-        fix_frame_start = int(frames_to_fix[0])
-        fix_frame_end = int(frames_to_fix[-1])
+        try:
+            collection = clique.parse(frames_to_fix, "{ranges}")
+        except ValueError:
+            # Invalid frame pattern entered
+            raise PublishValidationError(
+                f"Invalid frames to fix pattern: '{frames_to_fix}'",
+                description=(
+                    "The frames to fix pattern specified is invalid. It must "
+                    "be of the form `5,10-15`.\n\n"
+                    "The pattern must be a comma-separated list of frames or "
+                    "frame ranges. A frame is a whole number, like `5`, and a "
+                    "frame range is two whole numbers separated by a hyphen, "
+                    "like `5-10` indicating the frames `5,6,7,8,9,10`."
+                )
+            )
+
+        fix_frames: "list[int]" = list(collection)
+        fix_frame_start = int(fix_frames[0])
+        fix_frame_end = int(fix_frames[-1])
 
         # Check if ROP frame range covers the frames to fix.
         # Title and message are the same for the next two checks.
