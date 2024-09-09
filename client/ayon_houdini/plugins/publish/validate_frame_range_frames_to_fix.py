@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import hou
-import clique 
+import clique
 
 import pyblish.api
 from ayon_core.pipeline import PublishValidationError
@@ -37,7 +36,6 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
         if not instance.data.get("integrate", True):
             return
 
-        rop_node = hou.node(instance.data["instance_node"])
         frame_start = instance.data["frameStartHandle"]
         frame_end = instance.data["frameEndHandle"]
 
