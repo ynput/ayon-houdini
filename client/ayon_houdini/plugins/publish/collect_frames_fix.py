@@ -35,10 +35,8 @@ class CollectFramesFixDefHou(
             return
 
         attribute_values = self.get_attr_values_from_data(instance.data)
-        frames_to_fix = attribute_values.get("frames_to_fix")
-
-        rewrite_version = attribute_values.get("rewrite_version")
-
+        frames_to_fix: str = attribute_values.get("frames_to_fix", "")
+        rewrite_version: bool = attribute_values.get("rewrite_version", False)
         if not frames_to_fix:
             return
 
