@@ -42,11 +42,10 @@ class CollectFramesFixDefHou(
 
         instance.data["frames_to_fix"] = frames_to_fix
 
-        product_name = instance.data["productName"]
-        folder_entity = instance.data["folderEntity"]
-
-        project_entity = instance.data["projectEntity"]
-        project_name = project_entity["name"]
+        product_name: str = instance.data["productName"]
+        folder_entity: dict = instance.data["folderEntity"]
+        project_entity: dict = instance.data["projectEntity"]
+        project_name: str = project_entity["name"]
 
         version_entity = ayon_api.get_last_version_by_product_name(
             project_name,
@@ -62,7 +61,7 @@ class CollectFramesFixDefHou(
         representations = ayon_api.get_representations(
             project_name, version_ids={version_entity["id"]}
         )
-        published_files = []
+        published_files: "list[str]" = []
         for repre in representations:
             # TODO get product type from product entity instead of
             #   representation 'context' data.
@@ -77,8 +76,7 @@ class CollectFramesFixDefHou(
                 published_files.append(file_info["path"])
 
         instance.data["last_version_published_files"] = published_files
-        self.log.debug("last_version_published_files: {}".format(
-            instance.data["last_version_published_files"]))
+        self.log.debug(f"last_version_published_files: {published_files}")
 
         if self.rewrite_version_enable and rewrite_version:
             instance.data["version"] = version_entity["version"]
