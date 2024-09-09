@@ -1,11 +1,9 @@
 import os
 import hou
-import clique 
 
 import pyblish.api
 
 from ayon_houdini.api import plugin
-from ayon_houdini.api.lib import render_rop
 
 
 class ExtractRender(plugin.HoudiniExtractorPlugin):
@@ -63,26 +61,7 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             # previously rendered version. This situation breaks the publishing.
             # because There will be missing frames as ROP nodes typically cannot render different
             #  frame ranges for each AOV; they always use the same frame range for all AOVs.
-            rop_node = hou.node(instance.data.get("instance_node"))
-            frames_to_fix = clique.parse(instance.data.get("frames_to_fix", ""), "{ranges}")
-
-            if len(set(frames_to_fix)) > 1:
-                # Render only frames to fix
-                for frame_range in frames_to_fix.separate():
-                    frame_range = list(frame_range)
-                    self.log.debug(
-                        "Rendering frames to fix [{f1}, {f2}]".format(
-                            f1=frame_range[0],
-                            f2=frame_range[-1]
-                        )
-                    )
-                    # for step to be 1 since clique doesn't support steps.
-                    frame_range = (
-                        int(frame_range[0]), int(frame_range[-1]), 1
-                    )
-                    render_rop(rop_node, frame_range=frame_range)
-            else:
-                render_rop(rop_node)
+            self.render_rop(instance)
 
         # `ExpectedFiles` is a list that includes one dict.
         expected_files = instance.data["expectedFiles"][0]

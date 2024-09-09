@@ -1,12 +1,11 @@
 import os
 import hou
-import clique 
 
 import pyblish.api
 
 from ayon_core.pipeline import publish
 from ayon_houdini.api import plugin
-from ayon_houdini.api.lib import render_rop, splitext
+from ayon_houdini.api.lib import splitext
 
 
 class ExtractROP(plugin.HoudiniExtractorPlugin):
@@ -40,26 +39,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
                 location=instance.data['stagingDir'] if isinstance(files, (list, tuple)) else files
             )
         )
-        frames_to_fix = clique.parse(instance.data.get("frames_to_fix", ""), "{ranges}")
-
-        if len(set(frames_to_fix)) > 1:
-            # Render only frames to fix
-            for frame_range in frames_to_fix.separate():
-                frame_range = list(frame_range)
-                self.log.debug(
-                    "Rendering frames to fix [{f1}, {f2}]".format(
-                        f1=frame_range[0],
-                        f2=frame_range[-1]
-                    )
-                )
-                # for step to be 1 since clique doesn't support steps.
-                frame_range = (
-                    int(frame_range[0]), int(frame_range[-1]), 1
-                )
-                render_rop(rop_node, frame_range=frame_range)
-                        
-        else:
-            render_rop(rop_node)
+        self.render_rop(instance)
         self.validate_expected_frames(instance)
 
         # In some cases representation name is not the the extension

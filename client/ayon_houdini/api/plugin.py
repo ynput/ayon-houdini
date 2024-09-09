@@ -19,7 +19,7 @@ from ayon_core.pipeline import (
 )
 from ayon_core.lib import BoolDef
 
-from .lib import imprint, read, lsattr, add_self_publish_button
+from .lib import imprint, read, lsattr, add_self_publish_button, render_rop
 from .usd import get_ayon_entity_uri_from_representation_context
 
 
@@ -354,3 +354,34 @@ class HoudiniExtractorPlugin(publish.Extractor):
 
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
+
+    def render_rop(self, instance: pyblish.api.Instance):
+        """Render the ROP node of the instance.
+
+        If `instance.data["frames_to_fix"]` is set and is not empty it will
+        be interpreted as a set of frames that will be rendered instead of the
+        full rop nodes frame range.
+
+        Only `instance.data["instance_node"]` is required.
+        """
+        rop_node = hou.node(instance.data["instance_node"])
+        frames_to_fix = clique.parse(instance.data.get("frames_to_fix", ""),
+                                     "{ranges}")
+
+        if len(set(frames_to_fix)) > 1:
+            # Render only frames to fix
+            for frame_range in frames_to_fix.separate():
+                frame_range = list(frame_range)
+                self.log.debug(
+                    "Rendering frames to fix [{f1}, {f2}]".format(
+                        f1=frame_range[0],
+                        f2=frame_range[-1]
+                    )
+                )
+                # for step to be 1 since clique doesn't support steps.
+                frame_range = (
+                    int(frame_range[0]), int(frame_range[-1]), 1
+                )
+                render_rop(rop_node, frame_range=frame_range)
+        else:
+            render_rop(rop_node)
