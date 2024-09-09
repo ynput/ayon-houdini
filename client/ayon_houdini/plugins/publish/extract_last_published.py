@@ -59,6 +59,11 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
         
         anatomy = instance.context.data["anatomy"]
 
+        # TODO: This currently copies ALL frames from the last version instead
+        #  of only those within the frame range we're currently looking to
+        #  publish. It should instead, iterate over all expected frames for
+        #  current instance, exclude all "to fix" frames and copy the
+        #  other existing ones.
         for file_path, frame in last_published_and_frames.items():
             if frame is None:
                 continue
