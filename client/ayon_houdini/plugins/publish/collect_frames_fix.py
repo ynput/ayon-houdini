@@ -92,7 +92,14 @@ class CollectFramesFixDefHou(
         attributes = [
             TextDef("frames_to_fix", label="Frames to fix",
                     placeholder="5,10-15",
-                    regex="[0-9,-]+")
+                    regex="[0-9,-]+",
+                    tooltip=(
+                        "When specified, only these frames will be rendered.\n"
+                        "The remainder of the frame range for the instance "
+                        "will be copied from the previous published version.\n"
+                        "This allow re-rendering only certain frames or "
+                        "extending the frame range of the previous version."
+                    ))
         ]
 
         if cls.rewrite_version_enable:
@@ -100,7 +107,14 @@ class CollectFramesFixDefHou(
                 BoolDef(
                     "rewrite_version",
                     label="Rewrite latest version",
-                    default=False
+                    default=False,
+                    tooltip=(
+                        "When enabled the new version will be published into"
+                        "the previous version and apply only the 'fixed "
+                        "frames'.\n"
+                        "**Note:** This does nothing if no Frames to Fix are "
+                        "specified."
+                    )
                 )
             )
 
