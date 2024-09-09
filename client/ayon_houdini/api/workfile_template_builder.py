@@ -21,13 +21,16 @@ from .plugin import HoudiniCreator
 class HoudiniTemplateBuilder(AbstractTemplateBuilder):
     """Concrete implementation of AbstractTemplateBuilder for Houdini"""
 
-    def resolve_template_path(self, path: str) -> str:
+    def resolve_template_path(self, path, fill_data):
         """Allows additional resolving over the template path using custom
         integration methods, like Houdini's expand string functionality.
 
         This only works with ayon-core 0.4.5+
         """
-        # escape backslashes for `expandString`
+        # use default template data formatting
+        path = super().resolve_template_path(path, fill_data)
+
+        # escape backslashes for `expandString` and expand houdini vars
         path = path.replace("\\", "\\\\")
         path = hou.text.expandString(path)
         return path
