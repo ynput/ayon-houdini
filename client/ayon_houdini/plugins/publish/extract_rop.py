@@ -22,8 +22,6 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
             self.log.debug("Should be processed on farm, skipping.")
             return
 
-        rop_node = hou.node(instance.data["instance_node"])
-
         files = instance.data["frames"]
         first_file = files[0] if isinstance(files, (list, tuple)) else files
         _, ext = splitext(
@@ -33,12 +31,6 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        self.log.debug(
-            "Rendering {node_path} to {location}".format(
-                node_path=rop_node.path(),
-                location=instance.data['stagingDir'] if isinstance(files, (list, tuple)) else files
-            )
-        )
         self.render_rop(instance)
         self.validate_expected_frames(instance)
 

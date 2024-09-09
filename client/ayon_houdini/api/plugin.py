@@ -365,10 +365,12 @@ class HoudiniExtractorPlugin(publish.Extractor):
 
         Only `instance.data["instance_node"]` is required.
         """
+        # Log the start of the render
         rop_node = hou.node(instance.data["instance_node"])
+        self.log.debug(f"Rendering {rop_node.path()}")
+
         frames_to_fix = clique.parse(instance.data.get("frames_to_fix", ""),
                                      "{ranges}")
-
         if len(set(frames_to_fix)) > 1:
             # Render only frames to fix
             for frame_range in frames_to_fix.separate():
