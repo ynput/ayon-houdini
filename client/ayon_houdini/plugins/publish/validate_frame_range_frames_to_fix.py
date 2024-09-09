@@ -23,27 +23,12 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
 
     def process(self, instance):
 
-        invalid_nodes = self.get_invalid(instance)
-        if invalid_nodes:
-            raise PublishValidationError(
-                "Invalid Rop Frame Range",
-                description=(
-                    "## Invalid Rop Frame Range\n"
-                    "Invalid frame range because the instance frame range "
-                    "[{0[frameStart]} - {0[frameEnd]}] doesn't cover "
-                    "the frames to fix [{0[frames_to_fix]}]."
-                    .format(instance.data)
-                )
-            )
-    
-    @classmethod
-    def get_invalid(cls, instance):
         if not instance.data.get("instance_node"):
             return
 
         frames_to_fix: str = instance.data.get("frames_to_fix", "")
         if not frames_to_fix:
-            cls.log.debug("Skipping Validation, no frames to fix.")
+            self.log.debug("Skipping Validation, no frames to fix.")
             return
 
         rop_node = hou.node(instance.data["instance_node"])
@@ -73,18 +58,31 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
 
         # Check if ROP frame range covers the frames to fix.
         # Title and message are the same for the next two checks.
+        invalid_range = False
         if frame_start > fix_frame_start:
-            cls.log.error(
+            self.log.error(
                 "Start frame should be smaller than or equal to the first "
                 "frame to fix. Set the start frame to the first frame to fix: "
                 f"{fix_frame_start}."
             )
-            return rop_node.path()
+            invalid_range = True
 
         if frame_end < fix_frame_end:
-            cls.log.error(
+            self.log.error(
                 "End frame should be greater than or equal to the last frame "
                 "to fix. Set the end frame to the last frame to fix: "
                 f"{fix_frame_end}."
             )
-            return rop_node.path()
+            invalid_range = True
+            
+        if invalid_range:
+            raise PublishValidationError(
+                "Invalid Rop Frame Range",
+                description=(
+                    "## Invalid Rop Frame Range\n"
+                    "Invalid frame range because the instance frame range "
+                    "[{0[frameStart]} - {0[frameEnd]}] doesn't cover "
+                    "the frames to fix [{0[frames_to_fix]}]."
+                    .format(instance.data)
+                )
+            )
