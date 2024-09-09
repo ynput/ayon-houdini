@@ -7,6 +7,7 @@ from abc import (
 import six
 import hou
 
+import clique
 import pyblish.api
 from ayon_core.pipeline import (
     CreatorError,
