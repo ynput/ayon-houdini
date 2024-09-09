@@ -28,6 +28,12 @@ class CollectFramesFixDefHou(
     rewrite_version_enable = False
 
     def process(self, instance):
+        # Skip instances that are set to not be integrated so we ignore
+        # the original `render` instance from which local AOV instances are
+        # spawned off.
+        if not instance.data.get("integrate", True):
+            return
+
         attribute_values = self.get_attr_values_from_data(instance.data)
         frames_to_fix = attribute_values.get("frames_to_fix")
 
