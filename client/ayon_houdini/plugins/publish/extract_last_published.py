@@ -9,19 +9,19 @@ from ayon_houdini.api import plugin
 
 
 class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
-    """
-    Extractor that copies files from last published
-    to staging directory.
+    """Extractor copying files from last published to staging directory.
+
     It works only if instance data includes "last_version_published_files"
     and there are frames to fix.
 
-    The files from last published are base of files which will be extended/fixed for specific
-    frames.
+    The files from last published are based on files which will be
+    extended/fixed for specific frames.
 
     NOTE: 
         This plugin is closely taken from ayon-nuke.
         It contains some Houdini addon specific logic as various addons may
-          have unique methods for managing `staging_dir`, `expectedFiles`, and `frames`.
+          have unique methods for managing `staging_dir`, `expectedFiles`
+          and `frames`.
     TODO:
         It's preferable to to generalize this plugin for broader use and
           integrate it into ayon-core.
@@ -34,15 +34,16 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
 
     def process(self, instance):
         frames_to_fix = instance.data.get("frames_to_fix")
+        if not frames_to_fix:
+            self.log.debug("Skipping, No frames to fix.")
+            return
+
         last_published = instance.data.get("last_version_published_files")
         if not last_published:
             self.log.debug("Skipping, No last publish found.")
-            return 
-        if not frames_to_fix :
-            self.log.debug("Skipping, No frames to fix.")
             return
+
         last_published_and_frames = collect_frames(last_published)
-        
         if not all(last_published_and_frames.values()):
             self.log.debug("Skipping, No file sequence found in the "
                            "last version published files.")
@@ -72,9 +73,8 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
 
             # Copy only the frames that we won't render.
             if frame and frame not in frames_to_fix:
-                self.log.debug("Copying '{}' -> '{}'".format(file_path, out_path))
+                self.log.debug(f"Copying '{file_path}' -> '{out_path}'")
                 shutil.copy(file_path, out_path)
-
 
     def get_expected_files_and_staging_dir(self, instance):
         """ Get expected file names or frames.
@@ -83,13 +83,13 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
         """
         expected_filenames = []
         staging_dir = instance.data.get("stagingDir")
-        expectedFiles = instance.data.get("expectedFiles", [])
+        expected_files = instance.data.get("expectedFiles", [])
 
         # 'expectedFiles' are preferred over 'frames'
-        if expectedFiles:
+        if expected_files:
             # Products with expected files
             # This can be Render products or submitted cache to farm.
-            for expected in expectedFiles:
+            for expected in expected_files:
                 # expected.values() is a list of lists
                 expected_filenames.extend(sum(expected.values(), []))
         else:
