@@ -76,8 +76,9 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
                             f2=frame_range[-1]
                         )
                     )
+                    # for step to be 1 since clique doesn't support steps.
                     frame_range = (
-                        int(frame_range[0]), int(frame_range[-1]), instance.data["byFrameStep"]
+                        int(frame_range[0]), int(frame_range[-1]), 1
                     )
                     render_rop(rop_node, frame_range=frame_range)
             else:

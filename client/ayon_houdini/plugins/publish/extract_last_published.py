@@ -77,9 +77,16 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
                 shutil.copy(file_path, out_path)
 
     def get_expected_files_and_staging_dir(self, instance):
-        """ Get expected file names or frames.
+        """Get expected file names or frames.
 
         This method includes Houdini specific code.
+
+        Args:
+            instance (pyblish.api.Instance): The instance to publish.
+
+        Returns:
+            tuple[str, list[str]]: A 2-tuple of staging dir and the list of
+                expected frames for the current publish instance.
         """
         expected_filenames = []
         staging_dir = instance.data.get("stagingDir")
