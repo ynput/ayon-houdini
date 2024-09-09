@@ -47,31 +47,44 @@ class CollectFramesFixDefHou(
         project_entity: dict = instance.data["projectEntity"]
         project_name: str = project_entity["name"]
 
-        version_entity = ayon_api.get_last_version_by_product_name(
+        product_entity = ayon_api.get_product_by_name(
             project_name,
             product_name,
-            folder_entity["id"]
+            folder_id=folder_entity["id"])
+        if not product_entity:
+            self.log.warning(
+                f"No existing product found for '{product_name}'. "
+                "Re-render not possible."
+            )
+            return
+
+        product_type = product_entity["productType"]
+        instance_product_type = instance.data["productType"]
+        if product_type != instance_product_type:
+            self.log.error(
+                f"Existing product '{product_name}' product type "
+                f"'{product_type}' is not the same as instance product type "
+                f"'{instance_product_type}'. Re-render may have unintended "
+                f"side effects.")
+
+        version_entity = ayon_api.get_last_version_by_product_id(
+            project_name,
+            product_id=product_entity["id"],
         )
         if not version_entity:
             self.log.warning(
-                "No last version found, re-render not possible"
+                f"No last version found for product '{product_name}', "
+                "re-render not possible."
             )
             return
 
         representations = ayon_api.get_representations(
             project_name, version_ids={version_entity["id"]}
         )
+
+        # Get all published files for the representation
         published_files: "list[str]" = []
         for repre in representations:
-            # TODO get product type from product entity instead of
-            #   representation 'context' data.
-            repre_context = repre["context"]
-            product_type = repre_context.get("product", {}).get("type")
-            if not product_type:
-                product_type = repre_context.get("family")
-            if "*" not in self.families and product_type not in self.families:
-                continue
-
             for file_info in repre.get("files"):
                 published_files.append(file_info["path"])
 
