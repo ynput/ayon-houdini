@@ -40,6 +40,7 @@ class CollectFramesFixDefHou(
         if not frames_to_fix:
             return
 
+        self.log.info(f"Frames to fix: {frames_to_fix}")
         instance.data["frames_to_fix"] = frames_to_fix
 
         product_name: str = instance.data["productName"]
