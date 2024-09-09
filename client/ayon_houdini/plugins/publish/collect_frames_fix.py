@@ -96,7 +96,9 @@ class CollectFramesFixDefHou(
                         "The remainder of the frame range for the instance "
                         "will be copied from the previous published version.\n"
                         "This allows re-rendering only certain frames or "
-                        "extending the frame range of the previous version."
+                        "extending the frame range of the previous version.\n"
+                        "The frames to fix must be inside the instance's "
+                        "frame range."
                     ))
         ]
 
