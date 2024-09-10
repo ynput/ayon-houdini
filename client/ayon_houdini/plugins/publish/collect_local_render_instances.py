@@ -145,14 +145,15 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 # 'label': label,
                 "task": instance.data["task"],
                 "folderPath": instance.data["folderPath"],
-                "frameStart": instance.data["frameStartHandle"],
-                "frameEnd": instance.data["frameEndHandle"],
+                "frameStartHandle": instance.data["frameStartHandle"],
+                "frameEndHandle": instance.data["frameEndHandle"],
                 "productType": product_type,
                 "family": product_type,
                 "productName": product_name,
                 "productGroup": product_group,
                 "families": ["render.local.hou", "review"],
                 "instance_node": instance.data["instance_node"],
+                "publish_attributes": instance.data["publish_attributes"],
                 "representations": [representation]
             })
 
