@@ -153,6 +153,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 "productGroup": product_group,
                 "families": ["render.local.hou", "review"],
                 "instance_node": instance.data["instance_node"],
+                "publish_attributes": instance.data["publish_attributes"],
                 "representations": [representation]
             })
 
