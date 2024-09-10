@@ -5,14 +5,14 @@ from ayon_server.settings import (
 
 
 # Publish Plugins
-class CollectAssetHandlesModel(BaseSettingsModel):
+class CollectTaskHandlesModel(BaseSettingsModel):
     """Collect Frame Range
     Disable this if you want the publisher to
     ignore start and end handles specified in the
-    asset data for publish instances
+    task attributes for publish instances
     """
-    use_asset_handles: bool = SettingsField(
-        title="Use asset handles")
+    use_task_handles: bool = SettingsField(
+        title="Use task handles")
 
 
 class CollectChunkSizeModel(BaseSettingsModel):
@@ -98,9 +98,9 @@ class BasicEnabledStatesModel(BaseSettingsModel):
 
 
 class PublishPluginsModel(BaseSettingsModel):
-    CollectAssetHandles: CollectAssetHandlesModel = SettingsField(
-        default_factory=CollectAssetHandlesModel,
-        title="Collect Asset Handles",
+    CollectTaskHandles: CollectTaskHandlesModel = SettingsField(
+        default_factory=CollectTaskHandlesModel,
+        title="Collect Task Handles",
         section="Collectors"
     )
     CollectChunkSize: CollectChunkSizeModel = SettingsField(
@@ -145,8 +145,8 @@ class PublishPluginsModel(BaseSettingsModel):
 
 
 DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
-    "CollectAssetHandles": {
-        "use_asset_handles": True
+    "CollectTaskHandles": {
+        "use_task_handles": True
     },
     "CollectChunkSize": {
         "enabled": True,
