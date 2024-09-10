@@ -120,5 +120,5 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
                     " ignore start and end handles specified in the"
                     " task attributes for this publish instance",
                     default=cls.use_asset_handles,
-                    label="Use asset handles")
+                    label="Use task handles")
         ]
