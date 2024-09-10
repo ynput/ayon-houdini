@@ -6,7 +6,7 @@ from ayon_core.pipeline import AYONPyblishPluginMixin
 from ayon_houdini.api import plugin
 
 
-class CollectAssetHandles(plugin.HoudiniInstancePlugin,
+class CollectTaskHandles(plugin.HoudiniInstancePlugin,
                           AYONPyblishPluginMixin):
     """Apply instance's task entity handles.
 
@@ -28,7 +28,7 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
     order = pyblish.api.CollectorOrder + 0.499
 
     label = "Collect Task Handles"
-    use_asset_handles = True
+    use_task_handles = True
 
     def process(self, instance):
         # Only process instances without already existing handles data
@@ -49,7 +49,7 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
             return
 
         attr_values = self.get_attr_values_from_data(instance.data)
-        if attr_values.get("use_handles", self.use_asset_handles):
+        if attr_values.get("use_handles", self.use_task_handles):
             # Get from task (if task is set), otherwise from folder
             entity = instance.data.get("taskEntity",
                                        instance.data["folderEntity"])
@@ -70,7 +70,7 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
         })
 
         # Log debug message about the collected frame range
-        if attr_values.get("use_handles", self.use_asset_handles):
+        if attr_values.get("use_handles", self.use_task_handles):
             self.log.debug(
                 "Full Frame range with Handles "
                 "[{frame_start_handle} - {frame_end_handle}]"
@@ -119,6 +119,6 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
                     tooltip="Disable this if you want the publisher to"
                     " ignore start and end handles specified in the"
                     " task attributes for this publish instance",
-                    default=cls.use_asset_handles,
+                    default=cls.use_task_handles,
                     label="Use task handles")
         ]
