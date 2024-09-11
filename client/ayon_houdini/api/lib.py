@@ -149,7 +149,7 @@ def validate_fps():
     return True
 
 
-def render_rop(ropnode, frame_range=tuple()):
+def render_rop(ropnode, frame_range=None):
     """Render ROP node utility for Publishing.
 
     This renders a ROP node with the settings we want during Publishing.
@@ -165,6 +165,9 @@ def render_rop(ropnode, frame_range=tuple()):
             used. If no frame range is given, and the ROP node doesn't
             specify a frame range, then the current frame will be rendered.
     """
+
+    if frame_range is None:
+        frame_range = ()
 
     # Print verbose when in batch mode without UI
     verbose = not hou.isUIAvailable()
