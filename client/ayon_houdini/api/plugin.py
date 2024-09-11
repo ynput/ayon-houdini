@@ -371,20 +371,19 @@ class HoudiniExtractorPlugin(publish.Extractor):
 
         frames_to_fix = clique.parse(instance.data.get("frames_to_fix", ""),
                                      "{ranges}")
-        if len(set(frames_to_fix)) > 1:
-            # Render only frames to fix
-            for frame_range in frames_to_fix.separate():
-                frame_range = list(frame_range)
-                self.log.debug(
-                    "Rendering frames to fix [{f1}, {f2}]".format(
-                        f1=frame_range[0],
-                        f2=frame_range[-1]
-                    )
-                )
-                # for step to be 1 since clique doesn't support steps.
-                frame_range = (
-                    int(frame_range[0]), int(frame_range[-1]), 1
-                )
-                render_rop(rop_node, frame_range=frame_range)
-        else:
+        if len(set(frames_to_fix)) < 2:
             render_rop(rop_node)
+            return
+
+        # Render only frames to fix
+        for frame_range in frames_to_fix.separate():
+            frame_range = list(frame_range)
+            frame_range.sort()
+            first_frame = int(frame_range[0])
+            last_frame = int(frame_range[-1])
+            self.log.debug(
+                f"Rendering frames to fix [{first_frame}, {last_frame}]"
+            )
+            # for step to be 1 since clique doesn't support steps.
+            frame_range = (first_frame, last_frame, 1)
+            render_rop(rop_node, frame_range=frame_range)
