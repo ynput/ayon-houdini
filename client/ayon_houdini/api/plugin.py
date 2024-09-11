@@ -378,7 +378,6 @@ class HoudiniExtractorPlugin(publish.Extractor):
         # Render only frames to fix
         for frame_range in frames_to_fix.separate():
             frame_range = list(frame_range)
-            frame_range.sort()
             first_frame = int(frame_range[0])
             last_frame = int(frame_range[-1])
             self.log.debug(
