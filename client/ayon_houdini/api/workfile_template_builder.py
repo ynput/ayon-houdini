@@ -1,18 +1,9 @@
-import os 
-
 import hou
 
-from ayon_core.lib import (
-    StringTemplate,
-    filter_profiles,
-)
-from ayon_core.pipeline import registered_host, Anatomy
+from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.workfile.workfile_template_builder import (
     AbstractTemplateBuilder,
-    PlaceholderPlugin,
-    TemplateProfileNotFound,
-    TemplateLoadFailed,
-    TemplateNotFound
+    PlaceholderPlugin
 )
 from ayon_core.tools.workfile_template_build import (
     WorkfileBuildPlaceholderDialog,
@@ -29,121 +20,20 @@ from .plugin import HoudiniCreator
 
 class HoudiniTemplateBuilder(AbstractTemplateBuilder):
     """Concrete implementation of AbstractTemplateBuilder for Houdini"""
-    
-    def get_template_preset(self):
-        """Unified way how template preset is received using settings.
 
-        Method is dependent on '_get_build_profiles' which should return filter
-        profiles to resolve path to a template. Default implementation looks
-        into host settings:
-        - 'project_settings/{host name}/templated_workfile_build/profiles'
+    def resolve_template_path(self, path, fill_data):
+        """Allows additional resolving over the template path using custom
+        integration methods, like Houdini's expand string functionality.
 
-        Returns:
-            dict: Dictionary with `path`, `keep_placeholder` and
-                `create_first_version` settings from the template preset
-                for current context.
-
-        Raises:
-            TemplateProfileNotFound: When profiles are not filled.
-            TemplateLoadFailed: Profile was found but path is not set.
-            TemplateNotFound: Path was set but file does not exist.
+        This only works with ayon-core 0.4.5+
         """
+        # use default template data formatting
+        path = super().resolve_template_path(path, fill_data)
 
-        host_name = self.host_name
-        project_name = self.project_name
-        task_name = self.current_task_name
-        task_type = self.current_task_type
-
-        build_profiles = self._get_build_profiles()
-        profile = filter_profiles(
-            build_profiles,
-            {
-                "task_types": task_type,
-                "task_names": task_name
-            }
-        )
-
-        if not profile:
-            raise TemplateProfileNotFound((
-                "No matching profile found for task '{}' of type '{}' "
-                "with host '{}'"
-            ).format(task_name, task_type, host_name))
-
-        path = profile["path"]
-
-        # switch to remove placeholders after they are used
-        keep_placeholder = profile.get("keep_placeholder")
-        create_first_version = profile.get("create_first_version")
-
-        # backward compatibility, since default is True
-        if keep_placeholder is None:
-            keep_placeholder = True
-
-        if not path:
-            raise TemplateLoadFailed((
-                "Template path is not set.\n"
-                "Path need to be set in {}\\Template Workfile Build "
-                "Settings\\Profiles"
-            ).format(host_name.title()))
-
-        # Try fill path with environments and anatomy roots
-        anatomy = Anatomy(project_name)
-        fill_data = {
-            key: value
-            for key, value in os.environ.items()
-        }
-
-        fill_data["root"] = anatomy.roots
-        fill_data["project"] = {
-            "name": project_name,
-            "code": anatomy.project_code,
-        }
-
-        result = StringTemplate.format_template(path, fill_data)
-        if result.solved:
-            path = result.normalized()
-
-        # I copied the whole thing because I wanted to add some
-        # Houdini specific code here
+        # escape backslashes for `expandString` and expand houdini vars
+        path = path.replace("\\", "\\\\")
         path = hou.text.expandString(path)
-
-        if path and os.path.exists(path):
-            self.log.info("Found template at: '{}'".format(path))
-            return {
-                "path": path,
-                "keep_placeholder": keep_placeholder,
-                "create_first_version": create_first_version
-            }
-
-        solved_path = None
-        while True:
-            try:
-                solved_path = anatomy.path_remapper(path)
-            except KeyError as missing_key:
-                raise KeyError(
-                    "Could not solve key '{}' in template path '{}'".format(
-                        missing_key, path))
-
-            if solved_path is None:
-                solved_path = path
-            if solved_path == path:
-                break
-            path = solved_path
-
-        solved_path = os.path.normpath(solved_path)
-        if not os.path.exists(solved_path):
-            raise TemplateNotFound(
-                "Template found in AYON settings for task '{}' with host "
-                "'{}' does not exists. (Not found : {})".format(
-                    task_name, host_name, solved_path))
-
-        self.log.info("Found template at: '{}'".format(solved_path))
-
-        return {
-            "path": solved_path,
-            "keep_placeholder": keep_placeholder,
-            "create_first_version": create_first_version
-        }
+        return path
 
     def import_template(self, path):
         """Import template into current scene.
@@ -239,10 +129,10 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         placeholder_node.destroy()
 
 
-def build_workfile_template(*args):
+def build_workfile_template(*args, **kwargs):
     # NOTE Should we inform users that they'll lose unsaved changes ?
     builder = HoudiniTemplateBuilder(registered_host())
-    builder.build_template()
+    builder.build_template(*args, **kwargs)
 
 
 def update_workfile_template(*args):
