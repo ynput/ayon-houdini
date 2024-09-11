@@ -37,6 +37,11 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
         if not frames_to_fix:
             self.log.debug("Skipping, No frames to fix.")
             return
+        
+        if not instance.data.get("integrate", True):
+            self.log.debug("Skipping collecting frames to fix data for "
+                           "instance because instance is set to not integrate")
+            return
 
         last_published = instance.data.get("last_version_published_files")
         if not last_published:
