@@ -82,7 +82,13 @@ class CollectFramesFixDefHouModel(BaseSettingsModel):
     enabled: bool = SettingsField(True)
     rewrite_version_enable: bool = SettingsField(
         False,
-        title="Show 'Rewrite latest version' toggle"
+        title="Show 'Rewrite latest version' toggle",
+        description=(
+            "When enabled the artist can enable 'rewrite latest version' in "
+            "the publisher. When doing so the new frames to fix publish will "
+            "update the frames in last version instead of creating a new "
+            "version."
+        )
     )
     families: list[str] = SettingsField(
         default_factory=list,
