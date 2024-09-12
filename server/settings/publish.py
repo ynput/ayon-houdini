@@ -177,8 +177,6 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     },
     "CollectFramesFixDefHou": {
         "enabled": True,
-        "optional": True,
-        "active": True,
         "rewrite_version_enable": False,
         "families" : [
             "*"
