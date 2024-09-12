@@ -173,12 +173,12 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "enabled": False,
         "optional": True,
         "active": True,
-        "families" : []
+        "families": []
     },
     "CollectFramesFixDefHou": {
         "enabled": True,
         "rewrite_version_enable": False,
-        "families" : [
+        "families": [
             "*"
         ]
     },
