@@ -30,8 +30,15 @@ class CollectFramesFixDefHou(
     def process(self, instance):
         attribute_values = self.get_attr_values_from_data(instance.data)
         frames_to_fix: str = attribute_values.get("frames_to_fix", "")
-        rewrite_version: bool = attribute_values.get("rewrite_version", False)
+        rewrite_version: bool = (
+            self.rewrite_version_enable
+            and attribute_values.get("rewrite_version", False)
+        )
         if not frames_to_fix:
+            if rewrite_version:
+                self.log.warning(
+                    "Rewrite version is enabled but no frames to fix are "
+                    "specified. Rewriting last version will be skipped.")
             return
 
         self.log.info(f"Frames to fix: {frames_to_fix}")
@@ -94,7 +101,7 @@ class CollectFramesFixDefHou(
         instance.data["last_version_published_files"] = published_files
         self.log.debug(f"last_version_published_files: {published_files}")
 
-        if self.rewrite_version_enable and rewrite_version:
+        if rewrite_version:
             instance.data["version"] = version_entity["version"]
             # limits triggering version validator
             instance.data.pop("latestVersion")
