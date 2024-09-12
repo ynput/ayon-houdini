@@ -127,7 +127,7 @@ class PublishPluginsModel(BaseSettingsModel):
         default_factory=CollectFramesFixDefHouModel,
         title="Collect Frames to Fix",
     )
-    CollectLocalRenderInstances: CollectLocalRenderInstancesModel = SettingsField(
+    CollectLocalRenderInstances: CollectLocalRenderInstancesModel = SettingsField(  # noqa: E501
         default_factory=CollectLocalRenderInstancesModel,
         title="Collect Local Render Instances"
     )
