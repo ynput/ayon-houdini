@@ -1,9 +1,10 @@
 import os
-
+import warnings
 import pyblish.api
 from ayon_core.pipeline.farm.patterning import match_aov_pattern
 from ayon_core.pipeline.farm.pyblish_functions import (
-    get_product_name_and_group_from_template
+    get_product_name_and_group_from_template,
+    _get_legacy_product_name_and_group
 )
 from ayon_core.pipeline.publish import (
     get_plugin_settings,
@@ -96,13 +97,10 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             if instance.data.get("renderlayer"):
                 dynamic_data["renderlayer"] = instance.data["renderlayer"]
 
-            product_name, product_group = get_product_name_and_group_from_template(
-                project_name=context.data["projectName"],
-                task_entity=context.data["taskEntity"],
-                host_name=context.data["hostName"],
-                product_type=product_type,
-                variant=instance.data["productName"],
-                dynamic_data=dynamic_data,
+            product_name, product_group = self._get_product_name_and_group(
+                instance,
+                product_type,
+                dynamic_data
             )
 
             # Create instance for each AOV
@@ -171,3 +169,51 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         # Skip integrating original render instance.
         # We are not removing it because it's used to trigger the render.
         instance.data["integrate"] = False
+
+    def _get_product_name_and_group(self, instance, product_type, dynamic_data):
+        """Get product name and group
+        
+        This method matches the logic in farm that gets
+         `product_name` and `group_name` respecting
+         `use_legacy_product_names_for_renders` logic in core settings.
+
+        Args:
+            instance (pyblish.api.Instance): The instance to publish.
+            product_type (str): Product type.
+            dynamic_data (dict): Dynamic data (camera, aov, ...)
+
+        Returns:
+            tuple (str, str): product name and group name
+
+        """
+
+        project_settings = instance.context.data.get("project_settings")
+
+        use_legacy_product_name = True
+        try:
+            use_legacy_product_name = project_settings["core"]["tools"]["creator"]["use_legacy_product_names_for_renders"]  # noqa: E501
+        except KeyError:
+            warnings.warn(
+                ("use_legacy_for_renders not found in project settings. "
+                 "Using legacy product name for renders. Please update "
+                 "your ayon-core version."), DeprecationWarning)
+            use_legacy_product_name = True
+
+        if use_legacy_product_name:
+            product_name, group_name = _get_legacy_product_name_and_group(
+                product_type=product_type,
+                source_product_name=instance.data["productName"],
+                task_name=instance.data["task"],
+                dynamic_data=dynamic_data)
+
+        else:
+            product_name, group_name = get_product_name_and_group_from_template(
+                project_name=instance.context.data["projectName"],
+                task_entity=instance.context.data["taskEntity"],
+                host_name=instance.context.data["hostName"],
+                product_type=product_type,
+                variant=instance.data["productName"],
+                dynamic_data=dynamic_data
+            )
+
+        return product_name, group_name
