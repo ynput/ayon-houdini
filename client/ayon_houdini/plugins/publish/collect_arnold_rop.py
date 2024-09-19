@@ -4,11 +4,8 @@ import re
 import hou
 import pyblish.api
 
-from ayon_houdini.api import colorspace, plugin
-from ayon_houdini.api.lib import (
-    get_color_management_preferences,
-    evalParmNoFrame
-)
+from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import evalParmNoFrame
 
 
 class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
@@ -70,11 +67,15 @@ class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
         multipartExr = True
 
         num_aovs = rop.evalParm("ar_aovs")
-        # TODO: Check the following logic.
-        #       as it always assumes that all AOV are not merged.
+
         for index in range(1, num_aovs + 1):
-            # Skip disabled AOVs
-            if not rop.evalParm("ar_enable_aov{}".format(index)):
+            
+            aov_enabled = rop.evalParm("ar_enable_aov{}".format(index)) 
+            aov_sep = rop.evalParm("ar_aov_separate{}".format(index))
+            aov_path = rop.evalParm("ar_aov_separate_file{}".format(index))
+            
+            # Skip disabled AOVs or AOVs with no separate aov file path
+            if not all((aov_enabled, aov_path, aov_sep)):
                 continue
 
             if rop.evalParm("ar_aov_exr_enable_layer_name{}".format(index)):
@@ -82,8 +83,15 @@ class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
             else:
                 label = evalParmNoFrame(rop, "ar_aov_label{}".format(index))
 
-            aov_product = self.get_render_product_name(default_prefix,
-                                                       suffix=label)
+            # NOTE:
+            #  we don't collect the actual AOV path but rather assume 
+            #    the user has used the default beauty path (collected above)
+            #    with the AOV name before the extension.
+            #  Also, Note that Ayon Publishing does not require a specific file name,
+            #    as it will be renamed according to the naming conventions set in the publish template.
+            aov_product = self.get_render_product_name(
+                prefix=default_prefix, suffix=label
+            )
             render_products.append(aov_product)
             files_by_aov[label] = self.generate_expected_files(instance,
                                                                aov_product)
@@ -100,7 +108,6 @@ class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
             self.log.debug("Found render product: {}".format(product))
 
         instance.data["files"] = list(render_products)
-        instance.data["renderProducts"] = colorspace.ARenderProduct()
 
         # For now by default do NOT try to publish the rendered output
         instance.data["publishJobState"] = "Suspended"
@@ -109,12 +116,6 @@ class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
         if "expectedFiles" not in instance.data:
             instance.data["expectedFiles"] = list()
         instance.data["expectedFiles"].append(files_by_aov)
-
-        # update the colorspace data
-        colorspace_data = get_color_management_preferences()
-        instance.data["colorspaceConfig"] = colorspace_data["config"]
-        instance.data["colorspaceDisplay"] = colorspace_data["display"]
-        instance.data["colorspaceView"] = colorspace_data["view"]
 
     def get_render_product_name(self, prefix, suffix):
         """Return the output filename using the AOV prefix and suffix"""

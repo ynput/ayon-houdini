@@ -21,6 +21,9 @@ from ayon_core.pipeline import (
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.template_data import get_template_data
 from ayon_core.pipeline.context_tools import get_current_task_entity
+from ayon_core.pipeline.workfile.workfile_template_builder import (
+    TemplateProfileNotFound
+)
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
 
@@ -146,11 +149,26 @@ def validate_fps():
     return True
 
 
-def render_rop(ropnode):
+def render_rop(ropnode, frame_range=None):
     """Render ROP node utility for Publishing.
 
     This renders a ROP node with the settings we want during Publishing.
+
+    Args:
+        ropnode (hou.RopNode): Node to render
+        frame_range (tuple): Copied from Houdini's help..
+            Sequence of 2 or 3 values, overrides the frame range and frame
+            increment to render. The first two values specify the start and
+            end frames, and the third value (if given) specifies the frame
+            increment. If no frame increment is given and the ROP node
+            doesn't specify a frame increment, then a value of 1 will be
+            used. If no frame range is given, and the ROP node doesn't
+            specify a frame range, then the current frame will be rendered.
     """
+
+    if frame_range is None:
+        frame_range = ()
+
     # Print verbose when in batch mode without UI
     verbose = not hou.isUIAvailable()
 
@@ -161,7 +179,8 @@ def render_rop(ropnode):
                        output_progress=verbose,
                        # Render only this node
                        # (do not render any of its dependencies)
-                       ignore_inputs=True)
+                       ignore_inputs=True,
+                       frame_range=frame_range)
     except hou.Error as exc:
         # The hou.Error is not inherited from a Python Exception class,
         # so we explicitly capture the houdini error, otherwise pyblish
@@ -579,11 +598,40 @@ def evalParmNoFrame(node, parm, pad_character="#"):
 
 def get_color_management_preferences():
     """Get default OCIO preferences"""
-    return {
+
+    preferences = {
         "config": hou.Color.ocio_configPath(),
         "display": hou.Color.ocio_defaultDisplay(),
         "view": hou.Color.ocio_defaultView()
     }
+
+    # Note: For whatever reason they are cases where `view` may be an empty
+    #  string even though a valid default display is set where `PyOpenColorIO`
+    #  does correctly return the values.
+    # Workaround to get the correct default view
+    if preferences["config"] and not preferences["view"]:
+        log.debug(
+            "Houdini `hou.Color.ocio_defaultView()` returned empty value."
+            " Falling back to `PyOpenColorIO` to get the default view.")
+        try:
+            import PyOpenColorIO
+        except ImportError:
+            log.warning(
+                "Unable to workaround empty return value of "
+                "`hou.Color.ocio_defaultView()` because `PyOpenColorIO` is "
+                "not available.")
+            return preferences
+
+        config_path = preferences["config"]
+        config = PyOpenColorIO.Config.CreateFromFile(config_path)
+        display = config.getDefaultDisplay()
+        assert display == preferences["display"], \
+            "Houdini default OCIO display must match config default display"
+        view = config.getDefaultView(display)
+        preferences["display"] = display
+        preferences["view"] = view
+
+    return preferences
 
 
 def get_obj_node_output(obj_node):
@@ -1360,3 +1408,15 @@ def prompt_reset_context():
         update_content_on_context_change()
 
     dialog.deleteLater()
+
+
+def start_workfile_template_builder():
+    from .workfile_template_builder import (
+        build_workfile_template
+    )
+
+    log.info("Starting workfile template builder...")
+    try:
+        build_workfile_template(workfile_creation_enabled=True)
+    except TemplateProfileNotFound:
+        log.warning("Template profile not found. Skipping...")

@@ -79,12 +79,10 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
 
         self._has_been_setup = True
 
-        # Set folder settings for the empty scene directly after launch of
-        # Houdini so it initializes into the correct scene FPS,
-        # Frame Range, etc.
-        # TODO: make sure this doesn't trigger when
-        #       opening with last workfile.
-        _set_context_settings()
+        # Manually call on_new callback as it doesn't get called when AYON
+        # launches for the first time on a context, only when going to
+        # File -> New
+        on_new()
 
         if not IS_HEADLESS:
             import hdefereval  # noqa, hdefereval is only available in ui mode
@@ -414,6 +412,7 @@ def on_new():
 
     if hou.isUIAvailable():
         import hdefereval
+        hdefereval.executeDeferred(lib.start_workfile_template_builder)
         hdefereval.executeDeferred(_enforce_start_frame)
     else:
         # Run without execute deferred when no UI is available because

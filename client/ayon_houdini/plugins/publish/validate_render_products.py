@@ -36,12 +36,22 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
 
     def process(self, instance):
 
+        node_path = instance.data["instance_node"]
         if not instance.data.get("output_node"):
-            self.log.warning("No valid LOP node to render found.")
-            return
+
+            # Report LOP path parm for better logs
+            lop_path_parm = hou.node(node_path).parm("loppath")
+            if lop_path_parm:
+                value = lop_path_parm.evalAsString()
+                self.log.warning(
+                    f"ROP node 'loppath' parm is set to: '{value}'")
+
+            raise PublishValidationError(
+                f"No valid LOP path configured on ROP "
+                f"'{node_path}'.",
+                title="Invalid LOP path")
 
         if not instance.data.get("files", []):
-            node_path = instance.data["instance_node"]
             node = hou.node(node_path)
             rendersettings_path = (
                 node.evalParm("rendersettings") or "/Render/rendersettings"
