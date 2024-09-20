@@ -1020,7 +1020,7 @@ def self_publish():
 
 def add_self_publish_button(node):
     """Adds a self publish button to the rop node."""
-    
+
     parm_name = "ayon_self_publish"
 
     label = os.environ.get("AYON_MENU_LABEL") or "AYON"
