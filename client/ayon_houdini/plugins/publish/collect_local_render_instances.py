@@ -63,9 +63,16 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                            "Skipping local render collecting.")
             return
 
+        if not instance.data.get("expectedFiles"):
+            self.log.warning(
+                "Missing collected expected files. "
+                "This may be due to misconfiguration of the ROP node, "
+                "like pointing to an invalid LOP or SOP path")
+            return
+
         # Create Instance for each AOV.
         context = instance.context
-        expectedFiles = next(iter(instance.data["expectedFiles"]), {})
+        expected_files = next(iter(instance.data["expectedFiles"]), {})
 
         product_type = "render"  # is always render
         product_group = get_product_name(
@@ -85,7 +92,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         #   majority of production scenarios these would not be overridden.
         # TODO: Support renderer-specific explicit colorspace overrides
         colorspace = get_scene_linear_colorspace()
-        for aov_name, aov_filepaths in expectedFiles.items():
+        for aov_name, aov_filepaths in expected_files.items():
             product_name = product_group
 
             if aov_name:
@@ -138,14 +145,19 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 # 'label': label,
                 "task": instance.data["task"],
                 "folderPath": instance.data["folderPath"],
-                "frameStart": instance.data["frameStartHandle"],
-                "frameEnd": instance.data["frameEndHandle"],
+                "frameStartHandle": instance.data["frameStartHandle"],
+                "frameEndHandle": instance.data["frameEndHandle"],
                 "productType": product_type,
                 "family": product_type,
                 "productName": product_name,
                 "productGroup": product_group,
                 "families": ["render.local.hou", "review"],
                 "instance_node": instance.data["instance_node"],
+                # The following three items are necessary for
+                # `ExtractLastPublished`
+                "publish_attributes": instance.data["publish_attributes"],
+                "stagingDir": staging_dir,
+                "frames": aov_filenames,
                 "representations": [representation]
             })
 

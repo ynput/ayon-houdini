@@ -78,6 +78,24 @@ class CollectFilesForCleaningUpModel(BaseSettingsModel):
     )
 
 
+class CollectFramesFixDefHouModel(BaseSettingsModel):
+    enabled: bool = SettingsField(True)
+    rewrite_version_enable: bool = SettingsField(
+        False,
+        title="Show 'Rewrite latest version' toggle",
+        description=(
+            "When enabled the artist can enable 'rewrite latest version' in "
+            "the publisher. When doing so the new frames to fix publish will "
+            "update the frames in last version instead of creating a new "
+            "version."
+        )
+    )
+    families: list[str] = SettingsField(
+        default_factory=list,
+        title="Families"
+    )
+
+
 class ValidateWorkfilePathsModel(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
     optional: bool = SettingsField(title="Optional")
@@ -122,7 +140,11 @@ class PublishPluginsModel(BaseSettingsModel):
         default_factory=CollectFilesForCleaningUpModel,
         title="Collect Files For Cleaning Up."
     )
-    CollectLocalRenderInstances: CollectLocalRenderInstancesModel = SettingsField(
+    CollectFramesFixDefHou: CollectFramesFixDefHouModel = SettingsField(
+        default_factory=CollectFramesFixDefHouModel,
+        title="Collect Frames to Fix",
+    )
+    CollectLocalRenderInstances: CollectLocalRenderInstancesModel = SettingsField(  # noqa: E501
         default_factory=CollectLocalRenderInstancesModel,
         title="Collect Local Render Instances"
     )
@@ -173,6 +195,13 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "optional": True,
         "active": True,
         "families": []
+    },
+    "CollectFramesFixDefHou": {
+        "enabled": True,
+        "rewrite_version_enable": False,
+        "families": [
+            "*"
+        ]
     },
     "CollectLocalRenderInstances": {
         "use_deadline_aov_filter": False,

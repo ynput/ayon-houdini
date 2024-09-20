@@ -4,7 +4,6 @@ import hou
 import pyblish.api
 
 from ayon_houdini.api import plugin
-from ayon_houdini.api.lib import render_rop
 
 
 class ExtractRender(plugin.HoudiniExtractorPlugin):
@@ -58,8 +57,11 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             return
 
         if creator_attribute.get("render_target") == "local":
-            ropnode = hou.node(instance.data.get("instance_node"))
-            render_rop(ropnode)
+            # FIXME Render the entire frame range if any of the AOVs does not have a
+            # previously rendered version. This situation breaks the publishing.
+            # because There will be missing frames as ROP nodes typically cannot render different
+            #  frame ranges for each AOV; they always use the same frame range for all AOVs.
+            self.render_rop(instance)
 
         # `ExpectedFiles` is a list that includes one dict.
         expected_files = instance.data["expectedFiles"][0]
