@@ -61,6 +61,9 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateKarmaROP: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Karma ROP")
+    CreateUSDLook: CreatorModel = SettingsField(
+        default_factory=CreatorModel,
+        title="Create Look")
     CreateMantraROP: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Mantra ROP")
@@ -123,6 +126,10 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
         "default_variants": ["Main"]
     },
     "CreateKarmaROP": {
+        "enabled": True,
+        "default_variants": ["Main"]
+    },
+    "CreateUSDLook": {
         "enabled": True,
         "default_variants": ["Main"]
     },

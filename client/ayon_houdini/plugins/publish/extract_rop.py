@@ -5,7 +5,7 @@ import pyblish.api
 
 from ayon_core.pipeline import publish
 from ayon_houdini.api import plugin
-from ayon_houdini.api.lib import render_rop, splitext
+from ayon_houdini.api.lib import splitext
 
 
 class ExtractROP(plugin.HoudiniExtractorPlugin):
@@ -31,11 +31,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        creator_attributes = instance.data.get("creator_attributes", {})
-        if creator_attributes.get("render_target", "local") == "local":
-            rop_node = hou.node(instance.data.get("instance_node"))
-            self.log.debug(f"Rendering {rop_node.path()} to {first_file}..")
-            render_rop(rop_node)
+        self.render_rop(instance)
         self.validate_expected_frames(instance)
 
         # In some cases representation name is not the the extension

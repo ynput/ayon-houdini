@@ -3,3 +3,11 @@ hda_module = node.hdaModule()
 hda_module.setup_flag_changed_callback(node)
 
 node.parm("file").lock(True)
+
+# Get attribute defaults from settings
+# TODO: Clean this up and re-use more from HDA utils lib
+from ayon_core.settings import get_current_project_settings
+settings = get_current_project_settings()
+load_settings = settings["houdini"].get("load", {}).get("LOPLoadAssetLoader", {})
+use_ayon_entity_uri = load_settings.get("use_ayon_entity_uri", False)
+node.parm("use_ayon_entity_uri").set(use_ayon_entity_uri)
