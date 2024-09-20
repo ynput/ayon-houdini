@@ -15,5 +15,8 @@ class CollectNoProductTypeFamilyGeneric(pyblish.api.InstancePlugin):
         # so that e.g. any regular plug-ins for `pointcache` or alike do
         # not trigger.
         instance.data["family"] = "generic"
-        # TODO: Do not add the dynamic 'rop' family in the collector?
+        # TODO: Do not add the dynamic 'rop' family in the collector but
+        #  set it in th Creator? Unfortunately that's currently not possible
+        #  due to logic in the ayon-core `CollectFromCreateContext` that
+        #  sets `family` to `productType`.
         instance.data["families"] = ["generic", "rop"]
