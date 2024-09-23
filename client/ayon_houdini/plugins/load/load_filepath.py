@@ -124,7 +124,7 @@ class FilePathLoader(plugin.HoudiniLoader):
                 repre_context["frame"] = "$F{}".format(len(frame))   # e.g. $F4
 
             project_name: str = repre_context["project"]["name"]
-            anatomy = Anatomy(project_name)
+            anatomy = Anatomy(project_name, project_entity=context["project"])
             repre_context["root"] = anatomy.roots
             path = StringTemplate(template).format(repre_context)
         else:
