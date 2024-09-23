@@ -10,13 +10,22 @@ from ayon_houdini.api import (
 )
 
 
-def remove_format_spec_for_keys(template: str, keys: "list[str]") -> str:
+def remove_format_spec(template: str, key: str) -> str:
     """Remove format specifier from a format token in formatting string.
 
     For example, change `{frame:0>4d}` into `{frame}`
+
+    Examples:
+        >>> remove_format_spec_for_keys("{frame:0>4d}", "frame")
+        '{frame}'
+        >>> remove_format_spec_for_keys("{digit:04d}/{frame:0>4d}", "frame")
+        '{digit:04d}/{udim}_{frame}'
+        >>> remove_format_spec_for_keys("{a: >4}/{aa: >4}", "a")
+        '{a}/{aa: >4}'
+
     """
     # Find all {key:foobar} and remove the `:foobar`
-    pattern = "|".join(f"({{{key}):[^}}]+(}})" for key in keys)
+    pattern = f"({{{key}):[^}}]+(}})"
     return re.sub(pattern, r"\1\2", template)
 
 
@@ -130,12 +139,11 @@ class FilePathLoader(plugin.HoudiniLoader):
             repre_context: dict = representation["context"]
             if udim is not None:
                 repre_context["udim"] = "<UDIM>"
+                template = remove_format_spec(template, "udim")
             if frame is not None:
                 # Substitute frame number in sequence with $F with padding
                 repre_context["frame"] = "$F{}".format(len(frame))   # e.g. $F4
-
-            template = remove_format_spec_for_keys(template,
-                                                   keys=["frame", "udim"])
+                template = remove_format_spec(template, "frame")
 
             project_name: str = repre_context["project"]["name"]
             anatomy = Anatomy(project_name, project_entity=context["project"])
