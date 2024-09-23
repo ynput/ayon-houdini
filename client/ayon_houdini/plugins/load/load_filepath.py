@@ -43,10 +43,7 @@ class FilePathLoader(plugin.HoudiniLoader):
             node.destroy()
 
         # Add filepath attribute, set value as default value
-        filepath = self.format_path(
-            path=self.filepath_from_context(context),
-            representation=context["representation"]
-        )
+        filepath = self.filepath_from_context(context)
         parm_template_group = container.parmTemplateGroup()
         attr_folder = hou.FolderParmTemplate("attributes_folder", "Attributes")
         parm = hou.StringParmTemplate(name="filepath",
@@ -86,21 +83,18 @@ class FilePathLoader(plugin.HoudiniLoader):
 
         # Update the file path
         representation_entity = context["representation"]
-        file_path = self.format_path(
-            path=self.filepath_from_context(context),
-            representation=representation_entity
-        )
+        filepath = self.filepath_from_context(context)
 
         node = container["node"]
         node.setParms({
-            "filepath": file_path,
+            "filepath": filepath,
             "representation": str(representation_entity["id"])
         })
 
         # Update the parameter default value (cosmetics)
         parm_template_group = node.parmTemplateGroup()
         parm = parm_template_group.find("filepath")
-        parm.setDefaultValue((file_path,))
+        parm.setDefaultValue((filepath,))
         parm_template_group.replace(parm_template_group.find("filepath"),
                                     parm)
         node.setParmTemplateGroup(parm_template_group)
@@ -113,28 +107,27 @@ class FilePathLoader(plugin.HoudiniLoader):
         node = container["node"]
         node.destroy()
 
-    @staticmethod
-    def format_path(path: str, representation: dict) -> str:
-        """Format file path for sequence with $F."""
-        if not os.path.exists(path):
-            raise RuntimeError("Path does not exist: %s" % path)
-
+    def filepath_from_context(self, context: dict) -> str:
+        """Format file path for sequence with $F or <UDIM>."""
         # The path is either a single file or sequence in a folder.
         # Format frame as $F and udim as <UDIM>
+        representation = context["representation"]
         frame = representation["context"].get("frame")
         udim = representation["context"].get("udim")
         if frame is not None or udim is not None:
             template: str = representation["attrib"]["template"]
-            context: dict = representation["context"]
+            repre_context: dict = representation["context"]
             if udim is not None:
-                context["udim"] = "<UDIM>"
+                repre_context["udim"] = "<UDIM>"
             if frame is not None:
                 # Substitute frame number in sequence with $F with padding
-                context["frame"] = "$F{}".format(len(frame))   # e.g. $F4
+                repre_context["frame"] = "$F{}".format(len(frame))   # e.g. $F4
 
-            project_name: str = context["project"]["name"]
+            project_name: str = repre_context["project"]["name"]
             anatomy = Anatomy(project_name)
-            context["root"] = anatomy.roots
-            path = StringTemplate(template).format(context)
+            repre_context["root"] = anatomy.roots
+            path = StringTemplate(template).format(repre_context)
+        else:
+            path = super().filepath_from_context(context)
 
         return os.path.normpath(path).replace("\\", "/")
