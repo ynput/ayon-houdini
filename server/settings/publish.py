@@ -115,6 +115,17 @@ class BasicEnabledStatesModel(BaseSettingsModel):
     active: bool = SettingsField(title="Active")
 
 
+class ExtractUsdModel(BaseSettingsModel):
+    use_ayon_entity_uri: bool = SettingsField(
+        False,
+        title="Remap save layers to AYON Entity URI",
+        description=(
+            "Remap explicit save layers to AYON Entity URI on publish "
+            "instead of the resolved publish filepaths."
+        )
+    )
+
+
 class PublishPluginsModel(BaseSettingsModel):
     CollectAssetHandles: CollectAssetHandlesModel = SettingsField(
         default_factory=CollectAssetHandlesModel,
@@ -163,6 +174,10 @@ class PublishPluginsModel(BaseSettingsModel):
         default_factory=BasicEnabledStatesModel,
         title="Extract Active View Thumbnail",
         section="Extractors"
+    )
+    ExtractUSD: ExtractUsdModel = SettingsField(
+        default_factory=ExtractUsdModel,
+        title="Extract USD"
     )
 
 
@@ -243,5 +258,8 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "enabled": True,
         "optional": False,
         "active": True
+    },
+    "ExtractUSD": {
+        "use_ayon_entity_uri": False
     }
 }
