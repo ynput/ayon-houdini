@@ -1,4 +1,5 @@
 import os
+import re
 import hou
 
 from ayon_core.pipeline import Anatomy
@@ -7,6 +8,16 @@ from ayon_houdini.api import (
     pipeline,
     plugin
 )
+
+
+def remove_format_spec_for_keys(template: str, keys: "list[str]") -> str:
+    """Remove format specifier from a format token in formatting string.
+
+    For example, change `{frame:0>4d}` into `{frame}`
+    """
+    # Find all {key:foobar} and remove the `:foobar`
+    pattern = "|".join(f"({{{key}):[^}}]+(}})" for key in keys)
+    return re.sub(pattern, r"\1\2", template)
 
 
 class FilePathLoader(plugin.HoudiniLoader):
@@ -122,6 +133,9 @@ class FilePathLoader(plugin.HoudiniLoader):
             if frame is not None:
                 # Substitute frame number in sequence with $F with padding
                 repre_context["frame"] = "$F{}".format(len(frame))   # e.g. $F4
+
+            template = remove_format_spec_for_keys(template,
+                                                   keys=["frame", "udim"])
 
             project_name: str = repre_context["project"]["name"]
             anatomy = Anatomy(project_name, project_entity=context["project"])
