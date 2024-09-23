@@ -134,7 +134,7 @@ class FilePathLoader(plugin.HoudiniLoader):
 
             project_name: str = context["project"]["name"]
             anatomy = Anatomy(project_name)
-            context["roots"] = anatomy.roots
+            context["root"] = anatomy.roots
             path = StringTemplate(template).format(context)
 
         return os.path.normpath(path).replace("\\", "/")
