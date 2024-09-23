@@ -1,7 +1,8 @@
 import os
-import re
 import hou
 
+from ayon_core.pipeline import Anatomy
+from ayon_core.lib import StringTemplate
 from ayon_houdini.api import (
     pipeline,
     plugin
@@ -119,12 +120,21 @@ class FilePathLoader(plugin.HoudiniLoader):
             raise RuntimeError("Path does not exist: %s" % path)
 
         # The path is either a single file or sequence in a folder.
+        # Format frame as $F and udim as <UDIM>
         frame = representation["context"].get("frame")
-        if frame is not None:
-            # Substitute frame number in sequence with $F with padding
-            ext = representation.get("ext", representation["name"])
-            token = "$F{}".format(len(frame))   # e.g. $F4
-            pattern = r"\.(\d+)\.{ext}$".format(ext=re.escape(ext))
-            path = re.sub(pattern, ".{}.{}".format(token, ext), path)
+        udim = representation["context"].get("udim")
+        if frame is not None or udim is not None:
+            template: str = representation["attrib"]["template"]
+            context: dict = representation["context"]
+            if udim is not None:
+                context["udim"] = "<UDIM>"
+            if frame is not None:
+                # Substitute frame number in sequence with $F with padding
+                context["frame"] = "$F{}".format(len(frame))   # e.g. $F4
+
+            project_name: str = context["project"]["name"]
+            anatomy = Anatomy(project_name)
+            context["roots"] = anatomy.roots
+            path = StringTemplate(template).format(context)
 
         return os.path.normpath(path).replace("\\", "/")
