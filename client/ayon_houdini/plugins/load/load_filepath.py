@@ -16,11 +16,11 @@ def remove_format_spec(template: str, key: str) -> str:
     For example, change `{frame:0>4d}` into `{frame}`
 
     Examples:
-        >>> remove_format_spec_for_keys("{frame:0>4d}", "frame")
+        >>> remove_format_spec("{frame:0>4d}", "frame")
         '{frame}'
-        >>> remove_format_spec_for_keys("{digit:04d}/{frame:0>4d}", "frame")
+        >>> remove_format_spec("{digit:04d}/{frame:0>4d}", "frame")
         '{digit:04d}/{udim}_{frame}'
-        >>> remove_format_spec_for_keys("{a: >4}/{aa: >4}", "a")
+        >>> remove_format_spec("{a: >4}/{aa: >4}", "a")
         '{a}/{aa: >4}'
 
     """
