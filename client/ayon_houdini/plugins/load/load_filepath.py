@@ -25,6 +25,8 @@ def remove_format_spec(template: str, key: str) -> str:
 
     """
     # Find all {key:foobar} and remove the `:foobar`
+    # Pattern will be like `({key):[^}]+(})` where we use the captured groups
+    # to keep those parts in the resulting string
     pattern = f"({{{key}):[^}}]+(}})"
     return re.sub(pattern, r"\1\2", template)
 
