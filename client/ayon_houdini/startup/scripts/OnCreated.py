@@ -14,5 +14,5 @@ if is_dev_mode_enabled():
 
 
 if env_value_to_bool("AYON_HOUDINI_AUTOCREATE", default=True):
-    node = kwargs["node"]
+    node = kwargs["node"]  # noqa: F821
     node_wrap.autocreate_publishable(node)

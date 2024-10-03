@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TYPE_CHECKING
 
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import (
@@ -11,7 +11,6 @@ from ayon_core.pipeline.create import (
 )
 from ayon_api import get_folder_by_path, get_task_by_name
 from ayon_core.lib import (
-    AbstractAttrDef,
     BoolDef,
     NumberDef,
     EnumDef,
@@ -23,6 +22,9 @@ from ayon_core.lib import (
 
 import hou
 import json
+
+if TYPE_CHECKING:
+    from ayon_core.lib import AbstractAttrDef  # noqa: F401
 
 
 def attribute_def_to_parm_template(attribute_def, key=None):
