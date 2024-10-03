@@ -370,6 +370,9 @@ def read(node):
             except json.JSONDecodeError:
                 # not a json
                 pass
+        elif parameter.parmTemplate().type() == hou.parmTemplateType.Toggle:
+            # Toggles should be returned as boolean instead of int of 1 or 0
+            value = bool(value)
         data[parameter.name()] = value
 
     return data

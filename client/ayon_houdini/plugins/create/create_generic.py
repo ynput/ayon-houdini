@@ -280,10 +280,12 @@ class CreateHoudiniGeneric(plugin.HoudiniCreator):
             creator_attributes = {}
             for key, value in dict(node_data).items():
                 if key.startswith("publish_attributes_"):
-                    if value == 0 or value == 1:
-                        value = bool(value)
-                    plugin_name, plugin_key = key[len("publish_attributes_"):].split("_", 1)
-                    publish_attributes.setdefault(plugin_name, {})[plugin_key] = value
+                    # TODO: Technically this isn't entirely safe. We are
+                    #  splitting after the first `_` after
+                    #  `publish_attributes_` with the assumption that the
+                    #  plug-in class name never contains an underscore.
+                    plugin_name, plugin_key = key[len("publish_attributes_"):].split("_", 1)  # noqa: E501
+                    publish_attributes.setdefault(plugin_name, {})[plugin_key] = value  # noqa: E501
                     del node_data[key]  # remove from original
                 elif key.startswith("creator_attributes_"):
                     creator_key = key[len("creator_attributes_"):]
