@@ -33,6 +33,14 @@ from qtpy import QtCore, QtWidgets, QtGui
 import hou
 
 
+def get_session_cache() -> dict:
+    """Get a persistent `hou.session.ayon_cache` dict"""
+    cache = getattr(hou.session, "ayon_cache", None)
+    if cache is None:
+        hou.session.ayon_cache = cache = {}
+    return cache
+
+
 def is_valid_uuid(value) -> bool:
     """Return whether value is a valid UUID"""
     try:
@@ -155,36 +163,21 @@ def _get_thumbnail(project_name: str, version_id: str, thumbnail_dir: str):
         return path
 
 
-def set_representation(node, representation_id: str):
-    file_parm = node.parm("file")
-    if not representation_id:
-        # Clear filepath and thumbnail
-        with _unlocked_parm(file_parm):
-            file_parm.set("")
-        set_node_thumbnail(node, None)
-        return
-
-    project_name = (
-        node.evalParm("project_name")
-        or get_current_project_name()
-    )
-
+def get_representation_path(
+    project_name: str,
+    representation_id: str,
+    use_ayon_entity_uri: bool
+) -> str:
     # Ignore invalid representation ids silently
     # TODO remove - added for backwards compatibility with OpenPype scenes
     if not is_valid_uuid(representation_id):
-        return
+        return ""
 
     repre_entity = get_representation_by_id(project_name, representation_id)
     if not repre_entity:
-        return
+        return ""
 
     context = get_representation_context(project_name, repre_entity)
-    update_info(node, context)
-
-    if node.parm("use_ayon_entity_uri"):
-        use_ayon_entity_uri = node.evalParm("use_ayon_entity_uri")
-    else:
-        use_ayon_entity_uri = False
     if use_ayon_entity_uri:
         path = get_ayon_entity_uri_from_representation_context(context)
     else:
@@ -193,8 +186,22 @@ def set_representation(node, representation_id: str):
         # fails to resolve @sourcename var with backslashed
         # paths correctly. So we force forward slashes
         path = path.replace("\\", "/")
-    with _unlocked_parm(file_parm):
-        file_parm.set(path)
+    return path
+
+
+def set_representation(node, representation_id: str):
+    # TODO: Unused currently; add support again for thumbnail updates
+    if not representation_id:
+        set_node_thumbnail(node, None)
+        return
+
+    project_name = (
+        node.evalParm("project_name")
+        or get_current_project_name()
+    )
+    repre_entity = get_representation_by_id(project_name, representation_id)
+    context = get_representation_context(project_name, repre_entity)
+    update_info(node, context)
 
     if node.evalParm("show_thumbnail"):
         # Update thumbnail
@@ -264,19 +271,9 @@ def on_representation_id_changed(node):
     set_representation(node, repre_id)
 
 
-def on_representation_parms_changed(node, force=False):
-    """
-    Usually used as callback to the project, folder, product, version and
-    representation parms which on change - would result in a different
-    representation id to be resolved.
-
-    Args:
-        node (hou.Node): Node to update.
-        force (Optional[bool]): Whether to force the callback to retrigger
-            even if the representation id already matches. For example, when
-            needing to resolve the filepath in a different way.
-    """
-    project_name = node.evalParm("project_name") or get_current_project_name()
+def get_node_expected_representation_id(node) -> str:
+    project_name = node.evalParm(
+        "project_name") or get_current_project_name()
     representation_id = get_representation_id(
         project_name=project_name,
         folder_path=node.evalParm("folder_path"),
@@ -289,10 +286,7 @@ def on_representation_parms_changed(node, force=False):
         representation_id = ""
     else:
         representation_id = str(representation_id)
-
-    if force or node.evalParm("representation") != representation_id:
-        node.parm("representation").set(representation_id)
-        node.parm("representation").pressButton()  # trigger callback
+    return representation_id
 
 
 def get_representation_id(

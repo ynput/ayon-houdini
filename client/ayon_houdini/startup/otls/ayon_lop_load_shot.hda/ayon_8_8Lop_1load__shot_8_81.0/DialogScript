@@ -34,8 +34,6 @@
             default { "$AYON_PROJECT_NAME" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_folder_path;select_folder_path(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "folder_path"
@@ -44,8 +42,6 @@
             default { "$AYON_FOLDER_PATH" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_folder_path;select_folder_path(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "product_name"
@@ -54,7 +50,7 @@
             default { "usdShot" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_product_name;select_product_name(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
-            parmtag { "script_callback" "hou.phm().set_to_latest_version(kwargs['node'])\nhou.phm().on_representation_parms_changed(kwargs['node'])" }
+            parmtag { "script_callback" "hou.phm().set_to_latest_version(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
         }
         parm {
@@ -74,16 +70,12 @@
                 [ "return result" ]
                 language python
             }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "representation_name"
             label   "Representation"
             type    string
             default { "usd" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "load_refresh"
@@ -93,8 +85,6 @@
             default { "0" }
             help    "Click to refresh and retry applying the product load parameters to load the correct file"
             parmtag { "button_icon" "" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "load_message"
@@ -122,7 +112,7 @@
             name    "file"
             label   "File"
             type    string
-            default { "" }
+            default { [ "# This triggers very often, for whatever reason. So we need to\n# optimize and cache to avoid heavy querying for each call.\nimport datetime\nimport hou.session\n\nfrom ayon_houdini.api import hda_utils\nimport importlib\nimportlib.reload(hda_utils)\n\n\ncache = hda_utils.get_session_cache().setdefault(\"representation_path\", {})\n\n# Set up input dependencies (by calling these Houdini links\n# there attributes as input dependencies and will update the\n# expression if any of them changes)\nproject_name = hou.evalParm(\"project_name\")\nrepre_id = hou.evalParm(\"representation\")\nuse_entity_uri = hou.evalParm(\"use_ayon_entity_uri\")\nhash_value = project_name, repre_id, use_entity_uri\nif hash_value in cache:\n    return cache[hash_value]\n\n\nprint(\"Compute\")\npath = hda_utils.get_representation_path(project_name, repre_id, use_entity_uri)\ncache[hash_value] = path\nreturn path\n" python ] }
             parmtag { "script_callback_language" "python" }
         }
         parm {
@@ -131,8 +121,6 @@
             help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
             type    toggle
             default { "0" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'], force=True)" }
-            parmtag { "script_callback_language" "python" }
         }
         groupcollapsible {
             name    "extra_options"
@@ -263,9 +251,7 @@
             name    "representation"
             label   "Representation ID"
             type    string
-            default { "" }
-            parmtag { "script_callback" "hou.phm().on_representation_id_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
+            default { [ "# This triggers very often, for whatever reason. So we need to\n# optimize and cache to avoid heavy querying for each call.\nimport datetime\nimport hou.session\n\nfrom ayon_houdini.api import hda_utils\nimport importlib\nimportlib.reload(hda_utils)\n\ncache = hda_utils.get_session_cache().setdefault(\"representation_ids\", {})\n\n\n\n# Set up input dependencies (by calling these Houdini links\n# there attributes as input dependencies and will update the\n# expression if any of them changes)\nproject_name = hou.evalParm(\"project_name\")\nfolder_path = hou.evalParm(\"folder_path\")\nproduct_name = hou.evalParm(\"product_name\")\nversion = hou.evalParm(\"version\")\nrepresentation_name = hou.evalParm(\"representation_name\")\n\nnode = hou.pwd()\nhash_value = \">\".join([project_name, folder_path, product_name, version, representation_name])\nprint(f\"Expression: {node.path()} {datetime.datetime.now()} {hash_value}\")\nif hash_value in cache:\n    return cache[hash_value]\n\n\nprint(\"Compute\")\nrepre_id = hda_utils.get_node_expected_representation_id(node)\ncache[hash_value] = repre_id\n" python ] }
         }
         parm {
             name    "version_name"
