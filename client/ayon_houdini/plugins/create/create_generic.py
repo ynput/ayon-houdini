@@ -1,7 +1,6 @@
-import dataclasses
-from typing import Dict, List, Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, node_wrap
 from ayon_houdini.api.lib import (
     lsattr, read
 )
@@ -151,58 +150,6 @@ def set_values(node: "hou.OpNode", values: dict):
         parm.set(value)
 
 
-@dataclasses.dataclass
-class NodeTypeProductTypes:
-    """Product type settings for a node type.
-
-    Define the available product types the user can set on a ROP based on
-    node type.
-
-    When 'strict' an enum attribute is created and the user can not type a
-    custom product type, otherwise a string attribute is
-    created with a menu right hand side to help pick a type but allow custom
-    types.
-    """
-    product_types: List[str]
-    default: Optional[str] = None
-    strict: bool = True
-
-
-# Re-usable defaults
-GEO_PRODUCT_TYPES = NodeTypeProductTypes(
-    product_types=["pointcache", "model"],
-    default="pointcache"
-)
-FBX_PRODUCT_TYPES = NodeTypeProductTypes(
-    product_types=["fbx", "pointcache", "model"],
-    default="fbx"
-)
-FBX_ONLY_PRODUCT_TYPES = NodeTypeProductTypes(
-    product_types=["fbx"],
-    default="fbx"
-)
-USD_PRODUCT_TYPES = NodeTypeProductTypes(
-    product_types=["usd", "pointcache"],
-    default="usd"
-)
-COMP_PRODUCT_TYPES = NodeTypeProductTypes(
-    product_types=["imagesequence", "render"],
-    default="imagesequence"
-)
-REVIEW_PRODUCT_TYPES = NodeTypeProductTypes(
-    product_types=["review"],
-    default="review"
-)
-RENDER_PRODUCT_TYPES = NodeTypeProductTypes(
-    product_types=["render", "prerender"],
-    default="render"
-)
-GLTF_PRODUCT_TYPES = NodeTypeProductTypes(
-    product_types=["gltf"],
-    default="gltf"
-)
-
-
 class CreateHoudiniGeneric(plugin.HoudiniCreator):
     """Generic creator to ingest arbitrary products"""
 
@@ -222,40 +169,8 @@ class CreateHoudiniGeneric(plugin.HoudiniCreator):
     default_variants = ["Main", USE_DEFAULT_NODE_NAME]
 
     # TODO: Move this to project settings
-    node_type_product_types: Dict[str, NodeTypeProductTypes] = {
-        "alembic": GEO_PRODUCT_TYPES,
-        "rop_alembic": GEO_PRODUCT_TYPES,
-        "geometry": GEO_PRODUCT_TYPES,
-        "rop_geometry": GEO_PRODUCT_TYPES,
-        "filmboxfbx": FBX_PRODUCT_TYPES,
-        "rop_fbx": FBX_PRODUCT_TYPES,
-        "usd": USD_PRODUCT_TYPES,
-        "usd_rop": USD_PRODUCT_TYPES,
-        "usdexport": USD_PRODUCT_TYPES,
-        "comp": COMP_PRODUCT_TYPES,
-        "opengl": REVIEW_PRODUCT_TYPES,
-        "arnold": RENDER_PRODUCT_TYPES,
-        "karma": RENDER_PRODUCT_TYPES,
-        "ifd": RENDER_PRODUCT_TYPES,
-        "usdrender": RENDER_PRODUCT_TYPES,
-        "usdrender_rop": RENDER_PRODUCT_TYPES,
-        "vray_renderer": RENDER_PRODUCT_TYPES,
-        "labs::karma::2.0": RENDER_PRODUCT_TYPES,
-        "kinefx::rop_fbxanimoutput": FBX_ONLY_PRODUCT_TYPES,
-        "kinefx::rop_fbxcharacteroutput": FBX_ONLY_PRODUCT_TYPES,
-        "kinefx::rop_gltfcharacteroutput": GLTF_PRODUCT_TYPES,
-        "rop_gltf": GLTF_PRODUCT_TYPES
-    }
-
-    node_type_product_types_default = NodeTypeProductTypes(
-        product_types=list(sorted(
-            {
-                "ass", "pointcache", "model", "render", "camera", 
-                "imagesequence", "review", "vdbcache", "fbx"
-            })),
-        default="pointcache",
-        strict=False
-    )
+    node_type_product_types = node_wrap.NODE_TYPE_PRODUCT_TYPES
+    node_type_product_types_default = node_wrap.NODE_TYPE_PRODUCT_TYPES_DEFAULT
 
     def get_detail_description(self):
         return "Publish any ROP node."
@@ -541,7 +456,7 @@ class CreateHoudiniGeneric(plugin.HoudiniCreator):
                 publish_attributes_folder.addParmTemplate(parm_template)
 
         # Define the product types picker options
-        node_type_product_types: NodeTypeProductTypes = (
+        node_type_product_types: node_wrap.NodeTypeProductTypes = (
             self.node_type_product_types.get(
                 node.type().name(), self.node_type_product_types_default
             ))
