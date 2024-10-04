@@ -115,6 +115,7 @@ def autocreate_publishable(node):
     # For now only consider RopNode; the LABS Karma node is the odd one out
     # here because it's not a RopNode but a LopNode but with an embedded
     # RopNode. So we will allow only that for now.
+    # TODO: Make this more explicit so we don't need the odd edge cases
     node_type = node.type().name()
     if not isinstance(node, hou.RopNode) and node_type != "labs::karma::2.0":
         return
