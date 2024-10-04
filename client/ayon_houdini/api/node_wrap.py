@@ -112,10 +112,12 @@ def make_publishable(node):
 
 
 def autocreate_publishable(node):
-    # For now only consider RopNode
-    if not isinstance(node, hou.RopNode):
+    # For now only consider RopNode; the LABS Karma node is the odd one out
+    # here because it's not a RopNode but a LopNode but with an embedded
+    # RopNode. So we will allow only that for now.
+    node_type = node.type().name()
+    if not isinstance(node, hou.RopNode) and node_type != "labs::karma::2.0":
         return
 
-    node_type = node.type().name()
     if node_type in AUTO_CREATE_NODE_TYPES:
         make_publishable(node)
