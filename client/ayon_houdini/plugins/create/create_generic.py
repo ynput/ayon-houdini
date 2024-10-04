@@ -1,4 +1,4 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from ayon_houdini.api import plugin, node_wrap
 from ayon_houdini.api.lib import (
@@ -23,6 +23,7 @@ import hou
 import json
 
 if TYPE_CHECKING:
+    from typing import Optional  # noqa: F401
     from ayon_core.lib import AbstractAttrDef  # noqa: F401
 
 
