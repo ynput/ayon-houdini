@@ -78,23 +78,6 @@
             default { "usd" }
         }
         parm {
-            name    "load_refresh"
-            label   "Refresh"
-            type    button
-            joinnext
-            default { "0" }
-            help    "Click to refresh and retry applying the product load parameters to load the correct file"
-            parmtag { "button_icon" "" }
-        }
-        parm {
-            name    "load_message"
-            label   "Message"
-            type    label
-            default { "" }
-            hidewhen "{ load_message == \"\" }"
-            parmtag { "sidefx::look" "block" }
-        }
-        parm {
             name    "sepparm"
             label   "Separator"
             type    separator
@@ -118,9 +101,9 @@
         parm {
             name    "use_ayon_entity_uri"
             label   "Use AYON Entity URI"
-            help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
             type    toggle
             default { "0" }
+            help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
         }
         groupcollapsible {
             name    "extra_options"
