@@ -312,6 +312,11 @@ def get_representation_id(
         Optional[str]: Representation id or None if not found.
 
     """
+    # TODO: This is now used in an expression in LOPs and preferably should
+    #  not trigger setting additional parameters. As such, we should maybe
+    #  somehow offload the warning message to the "cook" or some other way
+    #  of identifying whether the parms are all valid without requiring
+    #  more queries of the database.
 
     if not all([
         project_name, folder_path, product_name, version, representation_name
