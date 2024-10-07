@@ -1,7 +1,6 @@
 """Helper functions for load HDA"""
 
 import os
-import contextlib
 import uuid
 from typing import List
 
@@ -48,16 +47,6 @@ def is_valid_uuid(value) -> bool:
     except ValueError:
         return False
     return True
-
-
-@contextlib.contextmanager
-def _unlocked_parm(parm):
-    """Unlock parm during context; will always lock after"""
-    try:
-        parm.lock(False)
-        yield
-    finally:
-        parm.lock(True)
 
 
 def get_available_versions(node):
