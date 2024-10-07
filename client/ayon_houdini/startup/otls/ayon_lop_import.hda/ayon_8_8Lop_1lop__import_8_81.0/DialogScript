@@ -84,25 +84,6 @@
             default { "usd" }
         }
         parm {
-            name    "load_refresh"
-            label   "Refresh"
-            type    button
-            joinnext
-            default { "0" }
-            help    "Click to refresh and retry applying the product load parameters to load the correct file"
-            parmtag { "button_icon" "" }
-            parmtag { "script_callback" "" }
-            parmtag { "script_callback_language" "python" }
-        }
-        parm {
-            name    "load_message"
-            label   "Message"
-            type    label
-            default { "" }
-            hidewhen "{ load_message == \"\" }"
-            parmtag { "sidefx::look" "block" }
-        }
-        parm {
             name    "sepparm"
             label   "Separator"
             type    separator

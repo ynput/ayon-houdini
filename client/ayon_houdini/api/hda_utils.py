@@ -274,19 +274,13 @@ def on_representation_id_changed(node):
 def get_node_expected_representation_id(node) -> str:
     project_name = node.evalParm(
         "project_name") or get_current_project_name()
-    representation_id = get_representation_id(
-        project_name=project_name,
-        folder_path=node.evalParm("folder_path"),
-        product_name=node.evalParm("product_name"),
-        version=node.evalParm("version"),
-        representation_name=node.evalParm("representation_name"),
-        load_message_parm=node.parm("load_message")
+    return get_representation_id(
+            project_name=project_name,
+            folder_path=node.evalParm("folder_path"),
+            product_name=node.evalParm("product_name"),
+            version=node.evalParm("version"),
+            representation_name=node.evalParm("representation_name"),
     )
-    if representation_id is None:
-        representation_id = ""
-    else:
-        representation_id = str(representation_id)
-    return representation_id
 
 
 def get_representation_id(
@@ -295,7 +289,6 @@ def get_representation_id(
         product_name,
         version,
         representation_name,
-        load_message_parm,
 ):
     """Get representation id.
 
@@ -305,19 +298,14 @@ def get_representation_id(
         product_name (str): Product name
         version (str): Version name as string
         representation_name (str): Representation name
-        load_message_parm (hou.Parm): A string message parm to report
-            any error messages to.
 
     Returns:
-        Optional[str]: Representation id or None if not found.
+        str: Representation id or None if not found.
+
+    Raises:
+        ValueError: If the entity could not be resolved with input values.
 
     """
-    # TODO: This is now used in an expression in LOPs and preferably should
-    #  not trigger setting additional parameters. As such, we should maybe
-    #  somehow offload the warning message to the "cook" or some other way
-    #  of identifying whether the parms are all valid without requiring
-    #  more queries of the database.
-
     if not all([
         project_name, folder_path, product_name, version, representation_name
     ]):
@@ -329,15 +317,14 @@ def get_representation_id(
             "representation": representation_name
         }
         missing = ", ".join(key for key, value in labels.items() if not value)
-        load_message_parm.set(f"Load info incomplete. Found empty: {missing}")
-        return
+        raise ValueError(f"Load info incomplete. Found empty: {missing}")
 
     try:
         version = int(version.strip())
     except ValueError:
-        load_message_parm.set(f"Invalid version format: '{version}'\n"
-                              "Make sure to set a valid version number.")
-        return
+        raise ValueError(
+            f"Invalid version format: '{version}'\n"
+            "Make sure to set a valid version number.")
 
     folder_entity = get_folder_by_path(project_name,
                                        folder_path=folder_path,
@@ -346,10 +333,8 @@ def get_representation_id(
         # This may be due to the project not existing - so let's validate
         # that first
         if not get_project(project_name):
-            load_message_parm.set(f"Project not found: '{project_name}'")
-            return
-        load_message_parm.set(f"Folder not found: '{folder_path}'")
-        return
+            raise ValueError(f"Project not found: '{project_name}'")
+        raise ValueError(f"Folder not found: '{folder_path}'")
 
     product_entity = get_product_by_name(
         project_name,
@@ -357,25 +342,23 @@ def get_representation_id(
         folder_id=folder_entity["id"],
         fields={"id"})
     if not product_entity:
-        load_message_parm.set(f"Product not found: '{product_name}'")
-        return
+        raise ValueError(f"Product not found: '{product_name}'")
+
     version_entity = get_version_by_name(
         project_name,
         version,
         product_id=product_entity["id"],
         fields={"id"})
     if not version_entity:
-        load_message_parm.set(f"Version not found: '{version}'")
-        return
+        raise ValueError(f"Version not found: '{version}'")
+
     representation_entity = get_representation_by_name(
         project_name,
         representation_name,
         version_id=version_entity["id"],
         fields={"id"})
     if not representation_entity:
-        load_message_parm.set(
-            f"Representation not found: '{representation_name}'.")
-        return
+        raise ValueError(f"Representation not found: '{representation_name}'.")
     return representation_entity["id"]
 
 
@@ -750,7 +733,12 @@ def expression_get_representation_id() -> str:
     if hash_value in cache:
         return cache[hash_value]
 
-    repre_id = get_node_expected_representation_id(node)
+    try:
+        repre_id = get_node_expected_representation_id(node)
+    except ValueError:
+        # Ignore invalid parameters
+        repre_id = ""
+
     cache[hash_value] = repre_id
 
 
