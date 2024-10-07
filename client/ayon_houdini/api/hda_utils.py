@@ -708,3 +708,56 @@ def set_to_latest_version(node):
     versions = get_available_versions(node)
     if versions:
         node.parm("version").set(str(versions[0]))
+
+
+# region Parm Expressions
+# Callbacks used for expression on HDAs (e.g. Load Asset or Load Shot LOP)
+# Note that these are called many times, sometimes even multiple times when
+# the Parameters tab is open on the node. So some caching is performed to
+# avoid expensive re-querying.
+def expression_clear_cache(subkey=None) -> bool:
+    # Clear full cache if no subkey provided
+    if subkey is None:
+        if hasattr(hou.session, "ayon_cache"):
+            delattr(hou.session, "ayon_cache")
+            return True
+        return False
+
+    # Clear only key in cache if provided
+    cache = getattr(hou.session, "ayon_cache", {})
+    if subkey in cache:
+        cache.pop(subkey)
+        return True
+    return False
+
+
+def expression_get_representation_id() -> str:
+    project_name = hou.evalParm("project_name")
+    folder_path = hou.evalParm("folder_path")
+    product_name = hou.evalParm("product_name")
+    version = hou.evalParm("version")
+    representation_name = hou.evalParm("representation_name")
+
+    node = hou.pwd()
+    hash_value = (project_name, folder_path, product_name, version,
+                  representation_name)
+    cache = get_session_cache().setdefault("representation_ids", {})
+    if hash_value in cache:
+        return cache[hash_value]
+
+    repre_id = get_node_expected_representation_id(node)
+    cache[hash_value] = repre_id
+
+
+def expression_get_representation_path() -> str:
+    cache = get_session_cache().setdefault("representation_path", {})
+    project_name = hou.evalParm("project_name")
+    repre_id = hou.evalParm("representation")
+    use_entity_uri = hou.evalParm("use_ayon_entity_uri")
+    hash_value = project_name, repre_id, use_entity_uri
+    if hash_value in cache:
+        return cache[hash_value]
+
+    path = get_representation_path(project_name, repre_id, use_entity_uri)
+    cache[hash_value] = path
+    return path

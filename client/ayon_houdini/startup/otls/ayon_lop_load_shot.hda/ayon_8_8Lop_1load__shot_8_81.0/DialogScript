@@ -112,7 +112,7 @@
             name    "file"
             label   "File"
             type    string
-            default { [ "# This triggers very often, for whatever reason. So we need to\n# optimize and cache to avoid heavy querying for each call.\nimport datetime\nimport hou.session\n\nfrom ayon_houdini.api import hda_utils\nimport importlib\nimportlib.reload(hda_utils)\n\n\ncache = hda_utils.get_session_cache().setdefault(\"representation_path\", {})\n\n# Set up input dependencies (by calling these Houdini links\n# there attributes as input dependencies and will update the\n# expression if any of them changes)\nproject_name = hou.evalParm(\"project_name\")\nrepre_id = hou.evalParm(\"representation\")\nuse_entity_uri = hou.evalParm(\"use_ayon_entity_uri\")\nhash_value = project_name, repre_id, use_entity_uri\nif hash_value in cache:\n    return cache[hash_value]\n\n\nprint(\"Compute\")\npath = hda_utils.get_representation_path(project_name, repre_id, use_entity_uri)\ncache[hash_value] = path\nreturn path\n" python ] }
+            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_path()" python ] }
             parmtag { "script_callback_language" "python" }
         }
         parm {
@@ -251,7 +251,7 @@
             name    "representation"
             label   "Representation ID"
             type    string
-            default { [ "# This triggers very often, for whatever reason. So we need to\n# optimize and cache to avoid heavy querying for each call.\nimport datetime\nimport hou.session\n\nfrom ayon_houdini.api import hda_utils\nimport importlib\nimportlib.reload(hda_utils)\n\ncache = hda_utils.get_session_cache().setdefault(\"representation_ids\", {})\n\n\n\n# Set up input dependencies (by calling these Houdini links\n# there attributes as input dependencies and will update the\n# expression if any of them changes)\nproject_name = hou.evalParm(\"project_name\")\nfolder_path = hou.evalParm(\"folder_path\")\nproduct_name = hou.evalParm(\"product_name\")\nversion = hou.evalParm(\"version\")\nrepresentation_name = hou.evalParm(\"representation_name\")\n\nnode = hou.pwd()\nhash_value = \">\".join([project_name, folder_path, product_name, version, representation_name])\nprint(f\"Expression: {node.path()} {datetime.datetime.now()} {hash_value}\")\nif hash_value in cache:\n    return cache[hash_value]\n\n\nprint(\"Compute\")\nrepre_id = hda_utils.get_node_expected_representation_id(node)\ncache[hash_value] = repre_id\n" python ] }
+            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_id()" python ] }
         }
         parm {
             name    "version_name"
