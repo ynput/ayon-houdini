@@ -96,7 +96,7 @@ def get_available_versions(node):
     return version_names
 
 
-def update_info(node, context):
+def set_node_representation_from_context(node, context):
     """Update project, folder, product, version, representation name parms.
 
      Arguments:
@@ -125,11 +125,6 @@ def update_info(node, context):
     }
     parms = {key: value for key, value in parms.items()
              if node.evalParm(key) != value}
-    parms["load_message"] = ""  # clear any warnings/errors
-
-    # Note that these never trigger any parm callbacks since we do not
-    # trigger the `parm.pressButton` and programmatically setting values
-    # in Houdini does not trigger callbacks automatically
     node.setParms(parms)
 
 
@@ -179,6 +174,11 @@ def get_representation_path(
 
 
 def set_representation(node, representation_id: str):
+    # For now this only updates the thumbnail, but it may update more over time
+    _update_thumbnail(node, representation_id)
+
+
+def _update_thumbnail(node, representation_id):
     # TODO: Unused currently; add support again for thumbnail updates
     if not representation_id:
         set_node_thumbnail(node, None)
@@ -189,9 +189,6 @@ def set_representation(node, representation_id: str):
         or get_current_project_name()
     )
     repre_entity = get_representation_by_id(project_name, representation_id)
-    context = get_representation_context(project_name, repre_entity)
-    update_info(node, context)
-
     if node.evalParm("show_thumbnail"):
         # Update thumbnail
         # TODO: Cache thumbnail path as well
@@ -743,3 +740,6 @@ def expression_get_representation_path() -> str:
     path = get_representation_path(project_name, repre_id, use_entity_uri)
     cache[hash_value] = path
     return path
+
+# endregion
+
