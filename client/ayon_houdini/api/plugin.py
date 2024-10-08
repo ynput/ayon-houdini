@@ -20,7 +20,14 @@ from ayon_core.pipeline import (
 )
 from ayon_core.lib import BoolDef
 
-from .lib import imprint, read, lsattr, add_self_publish_button, render_rop
+from .lib import (
+    imprint,
+    read,
+    lsattr,
+    add_self_publish_button,
+    no_auto_create_publishable,
+    render_rop
+)
 from .usd import get_ayon_entity_uri_from_representation_context
 
 
@@ -124,13 +131,14 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
             folder_path = instance_data["folderPath"]
 
-            instance_node = self.create_instance_node(
-                folder_path,
-                product_name,
-                "/out",
-                node_type,
-                pre_create_data
-            )
+            with no_auto_create_publishable():
+                instance_node = self.create_instance_node(
+                    folder_path,
+                    product_name,
+                    "/out",
+                    node_type,
+                    pre_create_data
+                )
 
             self.customize_node_look(instance_node)
 
