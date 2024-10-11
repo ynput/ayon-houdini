@@ -166,6 +166,15 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
             str: The AOV identifier
 
         """
+        # Allow explicit naming through custom attribute on the render product
+        aov_identifier = render_product.GetAttribute(
+            "ayon:aov_identifier").Get()
+        if aov_identifier:
+            self.log.debug(
+                "Using explicit ayon:aov_identifier on render product"
+                " '{render_product}': {aov_identifier}")
+            return str(aov_identifier)
+
         targets = render_product.GetOrderedVarsRel().GetTargets()
         if len(targets) > 1:
             # Cryptomattes usually are combined render vars, for example:
