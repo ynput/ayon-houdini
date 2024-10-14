@@ -1283,7 +1283,7 @@ def get_node_thumbnail(node, first_only=True):
         return attached_images
 
 
-def find_active_network(category, default):
+def find_active_network(category=None, default="/obj"):
     """Find the first active network editor in the UI.
 
     If no active network editor pane is found at the given category then the
@@ -1317,7 +1317,7 @@ def find_active_network(category, default):
             continue
 
         pwd = pane.pwd()
-        if pwd.type().category() != category:
+        if category and pwd.type().category() != category:
             continue
 
         if not pwd.isEditable():
