@@ -1,0 +1,14 @@
+Operator:     AyonPub::1.1
+Label:        AyonPub
+Path:         oplib:/Driver/AyonPub::1.1?Driver/AyonPub::1.1
+Icon:         ROP_soho
+Table:        Driver
+License:      
+Extra:        
+User:         
+Inputs:       0 to 99999
+Subnet:       false
+Python:       false
+Empty:        false
+Modified:     Mon Oct 14 15:16:38 2024
+

@@ -1,0 +1,15 @@
+# Automatically generated script
+\set noalias = 1
+#
+#  Creation script for AyonPub::1.1 operator
+#
+
+if ( "$arg1" == "" ) then
+    echo This script is intended as a creation script
+    exit
+endif
+
+# Node $arg1 (Driver/AyonPub::1.1)
+opspareds "" $arg1
+opexprlanguage -s hscript $arg1
+opuserdata -n '___Version___' -v '' $arg1
