@@ -1,3 +1,4 @@
+import os
 from ayon_applications import PreLaunchHook, LaunchTypes
 
 
@@ -6,6 +7,7 @@ class SetPath(PreLaunchHook):
 
     Hook `GlobalHostDataHook` must be executed before this hook.
     """
+
     app_groups = {"houdini"}
     launch_types = {LaunchTypes.local}
 
@@ -14,5 +16,7 @@ class SetPath(PreLaunchHook):
         if not workdir:
             self.log.warning("BUG: Workdir is not filled.")
             return
+
+        addon_dir = os.path.dirname(os.path.dirname(__file__))
 
         self.launch_context.kwargs["cwd"] = workdir
