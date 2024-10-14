@@ -1,0 +1,17 @@
+# Dialog script for ayon::generic_loader::1.0 automatically generated
+
+{
+    name	ayon::generic_loader::1.0
+    script	ayon::generic_loader::1.0
+    label	"AYON Generic Loader"
+
+    help {
+	""
+    }
+
+    inputlabel	1	"Sub-Network Input #1"
+    inputlabel	2	"Sub-Network Input #2"
+    inputlabel	3	"Sub-Network Input #3"
+    inputlabel	4	"Sub-Network Input #4"
+
+}
