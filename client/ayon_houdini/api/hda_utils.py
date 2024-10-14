@@ -13,7 +13,8 @@ from ayon_api import (
     get_folder_by_path,
     get_product_by_name,
     get_version_by_name,
-    get_representation_by_name
+    get_representation_by_name,
+    get_representations
 )
 from ayon_core.pipeline.load import (
     get_representation_context,
@@ -97,6 +98,58 @@ def get_available_versions(node):
     version_names = [version["version"] for version in versions]
     version_names.reverse()
     return version_names
+
+
+def get_available_representations(node):
+    """Return the representation list for node.
+
+    Args:
+        node (hou.Node): Node to query selected version's representations for.
+
+    Returns:
+        list[str]: representation names for the product version.
+    """
+
+    project_name = node.evalParm("project_name") or get_current_project_name()
+    folder_path = node.evalParm("folder_path")
+    product_name = node.evalParm("product_name")
+    version = node.evalParm("version")
+
+    if not all([
+        project_name, folder_path, product_name, version
+    ]):
+        return []
+
+    try:
+        version = int(version.strip())
+    except ValueError:
+        load_message_parm = node.parm("load_message")
+        load_message_parm.set(f"Invalid version format: '{version}'\n"
+                              "Make sure to set a valid version number.")
+        return
+
+    folder_entity = get_folder_by_path(
+        project_name,
+        folder_path=folder_path,
+        fields={"id"}
+    )
+    product_entity = get_product_by_name(
+            project_name,
+            product_name=product_name,
+            folder_id=folder_entity["id"],
+            fields={"id"})
+    version_entity = get_version_by_name(
+            project_name,
+            version,
+            product_id=product_entity["id"],
+            fields={"id"})
+    representations = get_representations(
+            project_name,
+            version_ids={version_entity["id"]},
+            fields={"name"}
+    )   
+    representations_names = [n["name"] for n in representations]
+    return representations_names
 
 
 def update_info(node, context):
@@ -704,8 +757,9 @@ def select_product_name(node):
 def set_to_latest_version(node):
     """Callback on product name change
 
-    Refresh version parameter value by setting its value to
-    the latest version of the selected product.
+    Refresh version and representation parameters value by setting
+    their value to the latest version and representation of
+    the selected product.
 
     Args:
         node (hou.OpNode): The HDA node.
@@ -714,3 +768,7 @@ def set_to_latest_version(node):
     versions = get_available_versions(node)
     if versions:
         node.parm("version").set(str(versions[0]))
+
+    representations = get_available_representations(node)
+    if representations:
+        node.parm("representation_name").set(representations[0])

@@ -20,9 +20,9 @@ Content-Type: text/plain
 
 sopflags sopflags = 
 comment ""
-position -4.63456 2.16084
+position -13.3313 6.98532
 connectornextid 0
-flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault off exposed on
+flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on
 outputsNamed3
 {
 }
@@ -39,7 +39,7 @@ stat
   author Mustafa_Taher@Major-Kalawy
   access 0777
 }
-color UT_Color RGB 0.616 0.871 0.769 
+color UT_Color RGB 0.8 0.8 0.8 
 delscript ""
 exprlanguage hscript
 end
