@@ -167,7 +167,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
 
         """
         # Allow explicit naming through custom attribute on the render product
-        aov_identifier = render_product.GetAttribute(
+        aov_identifier = render_product.GetPrim().GetAttribute(
             "ayon:aov_identifier").Get()
         if aov_identifier:
             self.log.debug(
