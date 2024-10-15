@@ -1,0 +1,6 @@
+def run(*args, **kwargs):
+    import importlib
+    from ayon_houdini.api import ayon_publish
+
+    importlib.reload(ayon_publish)
+    ayon_publish.ayon_publish_command(*args, **kwargs)

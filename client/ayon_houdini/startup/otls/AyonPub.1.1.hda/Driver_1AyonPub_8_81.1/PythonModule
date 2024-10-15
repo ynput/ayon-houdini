@@ -1,8 +1,0 @@
-
-def run(*args, **kwargs):
-    import importlib
-    import ayon_houdini
-    from ayon_houdini.standalone import ayonpub
-
-    importlib.reload(ayonpub)
-    ayonpub.ayon_pub_command(*args, **kwargs)

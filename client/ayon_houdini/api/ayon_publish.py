@@ -6,9 +6,6 @@ def get_upstream_nodes(node: hou.Node):
     return [i_node.inputNode() for i_node in node.inputConnections()]
 
 
-from ayon_houdini.standalone import ayonpub
-
-
 def get_us_node_grapth(node: hou.Node, root_node: hou.Node = None):
     # get the the upstream nodes untill we find a nother ayonPub node instance
     # deuplicate the nodes in the upstream.
@@ -38,7 +35,7 @@ def print_grapth(graph: dict, depth: int = 0):
         print_grapth(v, depth=depth + 1)
 
 
-def ayon_pub_command():
+def ayon_publish_command():
     print("Current Node: ", hou.pwd())
     parent_nodes = get_us_node_grapth(hou.pwd())
     print_grapth(parent_nodes)
