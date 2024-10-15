@@ -1,6 +1,6 @@
 name = "houdini"
 title = "Houdini"
-version = "0.3.15"
+version = "0.3.15+dev"
 app_host_name = "houdini"
 client_dir = "ayon_houdini"
 
