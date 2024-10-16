@@ -4,7 +4,7 @@ In order to be able to see the contents of HDAs and store them in version contro
 
 ### How to
 
-We run the following command, delete the original hdafile and then rename the directory to match the hdafile name.
+We run the following command, delete the original hda file and then rename the directory to match the hdafile name.
 ```
 hotl -t directory hdafile
 ```
