@@ -112,6 +112,9 @@ def create_interactive(creator_identifier, **kwargs):
         tool_fn = CATEGORY_GENERIC_TOOL.get(pwd.childTypeCategory())
         if tool_fn is not None:
             out_null = tool_fn(kwargs, "null")
+            # TODO: For whatever reason the code does not continue if the
+            #  user cancels the operation with escape; yet also no error seems
+            #  to be raised.
             if out_null:
                 out_null.setName("OUT_{}".format(product_name),
                                  unique_name=True)
