@@ -10,7 +10,7 @@ class GenericLoader(load.LoaderPlugin):
     product_types = {"*"}
     label = "Generic Loader"
     representations = ["*"]
-    order = -10
+    order = 9
     icon = "code-fork"
     color = "orange"
 
