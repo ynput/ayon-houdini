@@ -1,0 +1,14 @@
+Operator:     ynput::dev::ayon_publish::1.7
+Label:        ayon_publish
+Path:         oplib:/ynput::dev::Driver/ayon_publish::1.7?ynput::dev::Driver/ayon_publish::1.7
+Icon:         ROP_soho
+Table:        Driver
+License:      
+Extra:        
+User:         
+Inputs:       0 to 99999
+Subnet:       false
+Python:       false
+Empty:        false
+Modified:     Tue Oct 15 09:20:58 2024
+
