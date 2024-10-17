@@ -70,7 +70,9 @@
             default { "" }
             disablewhen "{ representation_old == \"\" }"
             menureplace {
-                [ "versions = hou.phm().get_available_versions(kwargs['node'])" ]
+                [ "from ayon_houdini.api.hda_utils import get_available_versions" ]
+                [ "" ]
+                [ "versions = get_available_versions(kwargs['node'])" ]
                 [ "" ]
                 [ "result = []" ]
                 [ "for version in versions:" ]
@@ -89,7 +91,9 @@
             type    string
             default { "" }
             menureplace {
-                [ "representations_names = hou.phm().get_available_representations(kwargs['node'])" ]
+                [ "from ayon_houdini.api.hda_utils import get_available_representations" ]
+                [ "" ]
+                [ "representations_names = get_available_representations(kwargs['node'])" ]
                 [ "" ]
                 [ "result = []" ]
                 [ "for name in representations_names:" ]
