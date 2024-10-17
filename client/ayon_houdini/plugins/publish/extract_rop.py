@@ -14,7 +14,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
     order = pyblish.api.ExtractorOrder
 
     families = ["abc", "camera", "bgeo", "pointcache", "fbx",
-                "vdbcache", "ass", "redshiftproxy", "mantraifd"]
+                "vdbcache", "ass", "redshiftproxy", "mantraifd", "rop"]
     targets = ["local", "remote"]
 
     def process(self, instance: pyblish.api.Instance):
@@ -31,7 +31,14 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        self.render_rop(instance)
+        render_target: str = instance.data.get("creator_attributes", {}).get(
+            "render_target", "local")
+        if render_target == "local":
+            self.render_rop(instance)
+        else:
+            self.log.debug(f"Skipping render because render target is not "
+                           f"'local' but '{render_target}")
+
         self.validate_expected_frames(instance)
 
         # In some cases representation name is not the the extension
