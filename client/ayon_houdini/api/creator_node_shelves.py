@@ -89,6 +89,7 @@ def create_interactive(creator_identifier, **kwargs):
     #   to a method on the Creators for which this could be the default
     #   implementation.
     pane = stateutils.activePane(kwargs)
+    is_null_created = False
     if isinstance(pane, hou.NetworkEditor):
         pwd = pane.pwd()
         project_name = context.get_current_project_name()
@@ -111,7 +112,13 @@ def create_interactive(creator_identifier, **kwargs):
         tool_fn = CATEGORY_GENERIC_TOOL.get(pwd.childTypeCategory())
         if tool_fn is not None:
             out_null = tool_fn(kwargs, "null")
-            out_null.setName("OUT_{}".format(product_name), unique_name=True)
+            # TODO: For whatever reason the code does not continue if the
+            #  user cancels the operation with escape; yet also no error seems
+            #  to be raised.
+            if out_null:
+                out_null.setName("OUT_{}".format(product_name),
+                                 unique_name=True)
+                is_null_created = True
 
     before = context.instances_by_id.copy()
 
@@ -123,11 +130,16 @@ def create_interactive(creator_identifier, **kwargs):
     )
 
     # For convenience we set the new node as current since that's much more
-    # familiar to the artist when creating a node interactively
+    # familiar to the artist when creating a node interactively. However
+    # we do not select it if the user used the "null" place down functionality
     # TODO Allow to disable auto-select in studio settings or user preferences
+    #  allow to choose:
+    #  - always select instance node
+    #  - never select instance node
+    #  - select null if created else select instance node (current default)
     after = context.instances_by_id
     new = set(after) - set(before)
-    if new:
+    if new and not is_null_created:
         # Select the new instance
         for instance_id in new:
             instance = after[instance_id]
