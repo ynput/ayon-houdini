@@ -131,7 +131,7 @@ def create_interactive(creator_identifier, **kwargs):
 
     # For convenience we set the new node as current since that's much more
     # familiar to the artist when creating a node interactively. However
-    # we do not selected if the user used the "null" place down functionality
+    # we do not select it if the user used the "null" place down functionality
     # TODO Allow to disable auto-select in studio settings or user preferences
     #  allow to choose:
     #  - always select instance node
