@@ -513,4 +513,27 @@
         }
     }
 
+    parm {
+        name    "number_of_referencing"
+        label   "number of referencing"
+        type    integer
+        invisible
+        default { [ "references = hou.parm('./file').parmsReferencingThis()\nnum_of_references = len(references)\nhou.parm('./ref_counter').set(num_of_references)\nfor idx, parm in enumerate(references):\n    hou.parm(f'./node_{idx+1}').set(parm.node().path())\nreturn num_of_references" python ] }
+        range   { 0 10 }
+        parmtag { "script_callback_language" "python" }
+    }
+    multiparm {
+        name    "ref_counter"
+        label    "Nodes referencing file"
+
+        parm {
+            name    "node_#"
+            label   "node #"
+            type    oppath
+            default { "" }
+            parmtag { "oprelative" "." }
+            parmtag { "script_callback_language" "python" }
+        }
+    }
+
 }
