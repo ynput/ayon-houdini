@@ -25,7 +25,6 @@ def get_input_ancestors(start_node: hou.Node,
     graph = defaultdict(dict)
     processed = set()
     queue = [start_node]
-    ancestors = set()  # All the ancestors in a
 
     for node in queue:
         # Avoid recursion in recursive networks
@@ -38,7 +37,6 @@ def get_input_ancestors(start_node: hou.Node,
             if filter_fn and filter_fn(upstream_node):
                 continue
 
-            ancestors.add(upstream_node)
             graph[node][upstream_node] = graph[upstream_node]
             if upstream_node in processed:
                 continue
