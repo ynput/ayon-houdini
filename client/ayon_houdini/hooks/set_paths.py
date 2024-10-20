@@ -6,7 +6,6 @@ class SetPath(PreLaunchHook):
 
     Hook `GlobalHostDataHook` must be executed before this hook.
     """
-
     app_groups = {"houdini"}
     launch_types = {LaunchTypes.local}
 
