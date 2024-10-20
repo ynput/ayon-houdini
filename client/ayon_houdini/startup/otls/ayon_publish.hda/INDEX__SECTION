@@ -1,5 +1,5 @@
 Operator:     ynput::dev::ayon_publish::1.7
-Label:        ayon_publish
+Label:        AYON Publish
 Path:         oplib:/ynput::dev::Driver/ayon_publish::1.7?ynput::dev::Driver/ayon_publish::1.7
 Icon:         ROP_soho
 Table:        Driver
