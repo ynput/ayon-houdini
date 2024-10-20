@@ -196,11 +196,16 @@ class ValidateRenderResolution(plugin.HoudiniInstancePlugin,
         pixel_aspect = attributes["pixelAspect"]
         return int(width), int(height), float(pixel_aspect)
 
-    @staticmethod
-    def iter_render_products(render_settings, stage):
+    @classmethod
+    def iter_render_products(cls, render_settings, stage):
         """Iterate over all render products in the USD render settings"""
         for product_path in render_settings.GetProductsRel().GetTargets():
             prim = stage.GetPrimAtPath(product_path)
+            if not prim.IsValid():
+                cls.log.debug(
+                    f"Render product path is not a valid prim: {product_path}")
+                return
+
             if prim.IsA(UsdRender.Product):
                 yield UsdRender.Product(prim)
                 
