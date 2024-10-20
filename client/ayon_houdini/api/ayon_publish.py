@@ -60,7 +60,7 @@ def get_input_rops(ayon_publish_node):
     )
 
 
-# TODO: Remove the graph functionality unless we have a usecase for this?
+# TODO: Remove the graph functionality unless we have a use-case for this?
 def get_upstream_node_graph(start_node: hou.Node):
     # Return upstream nodes until we find another node of the same node type
     start_node_type = start_node.type()
