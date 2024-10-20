@@ -164,8 +164,7 @@ class ValidateRenderResolution(plugin.HoudiniInstancePlugin,
             current_width, current_height = resolution_attr.Get(sample_time)
             if current_width != width or current_height != height:
                 cls.log.error(
-                    "Invalid render resolution configured on "
-                    f"'{resolution_attr.GetPath()}': "
+                    f"{resolution_attr.GetPath()}: "
                     f"{current_width}x{current_height} "
                     f"does not match context resolution {width}x{height}"
                 )
@@ -175,9 +174,8 @@ class ValidateRenderResolution(plugin.HoudiniInstancePlugin,
             current_pixel_aspect = pixel_aspect_attr.Get(sample_time)
             if current_pixel_aspect != pixel_aspect:
                 cls.log.error(
-                    "Invalid render pixel aspect configured on: "
-                    f"'{pixel_aspect_attr.GetPath()}': "
-                    f"Render pixel aspect {current_pixel_aspect} does not "
+                    f"{pixel_aspect_attr.GetPath()}: "
+                    f"{current_pixel_aspect} does not "
                     f"match context pixel aspect {pixel_aspect}")
                 invalid.append(pixel_aspect_attr)
 
