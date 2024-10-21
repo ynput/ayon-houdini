@@ -19,19 +19,17 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position -4.36447 -0.693346
-connectornextid 1
+position -3.95588 0.372876
+connectornextid 0
 flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
 inputsNamed3
 {
-0 	cube1 0 1 "input1"
 }
 inputs
 {
-0 	cube1 0 1
 }
 stat
 {
@@ -81,7 +79,7 @@ Content-Type: text/plain
 comment ""
 position -0.346993 0.925092
 connectornextid 1
-flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display off render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
@@ -147,11 +145,11 @@ outputsNamed3
 }
 inputsNamed3
 {
-1 	switch_load_warnings 1 1 "input1"
+1 	warn_no_representation_set 1 1 "input1"
 }
 inputs
 {
-0 	switch_load_warnings 0 1
+0 	warn_no_representation_set 0 1
 }
 stat
 {
@@ -304,9 +302,9 @@ Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.de
 Content-Type: text/plain
 
 comment ""
-position 1.06093 5.41052
+position -0.346993 4.50044
 connectornextid 2
-flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 1 "output1"
@@ -355,12 +353,23 @@ return \\\"Unable to get representation\\\"\""
 
 # Parent node
 node = hou.pwd().parent()
+if node.evalParm(\"representation\"):
+    return \"\"
+
 try:
     hda_utils.get_node_expected_representation_id(node)
 except ValueError as exc:
     return str(exc)
-    
-return \"Unable to get representation.\"" language = python }
+else:
+    return \"\"" language = python }
+    }
+    channel enable1 {
+      lefttype = extend
+      righttype = extend
+      default = 1
+      flags = 0
+      start = 40
+      segment { length = 0 value = 1 1 expr = "strlen(chs(\"../representation\")) == 0" }
     }
   }
 
@@ -373,7 +382,7 @@ version 0.8
 numerror	[ 0	locks=0 ]	(	1	)
 errormsg1	[ 0	locks=0 ]	(	[ errormsg1	"" ] 	)
 severity1	[ 0	locks=0 ]	(	"warn"	)
-enable1	[ 0	locks=0 ]	(	1	)
+enable1	[ 0	locks=0 ]	(	[ enable1	0 ] 	)
 }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
@@ -388,108 +397,13 @@ Content-Type: text/plain
 }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/switch_load_warnings.init"
-Content-Type: text/plain
-
-type = switch
-matchesdef = 1
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/switch_load_warnings.def"
-Content-Type: text/plain
-
-comment ""
-position -0.154899 4.11657
-connectornextid 3
-flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
-outputsNamed3
-{
-1 "output1"
-}
-inputsNamed3
-{
-2 	(0) "" 1 "input1"
-0 	warn_no_representation_set 1 1 "input2"
-}
-inputs
-{
-0 	(0) 0 1
-1 	warn_no_representation_set 0 1
-}
-stat
-{
-  create -1
-  modify -1
-  author User@HP-Z820-03
-  access 0777
-}
-color UT_Color RGB 0.8 1 0.7 
-delscript ""
-exprlanguage hscript
-end
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/switch_load_warnings.editableinputdata"
-Content-Type: text/plain
-
-[
-	{
-	},
-	{
-	}
-]
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/switch_load_warnings.chn"
-Content-Type: text/plain
-
-{
-    channel input {
-      lefttype = extend
-      righttype = extend
-      flags = 0
-      start = 40
-      segment { length = 0 expr = "if(ch(\"../representation\"), 0, 1)" }
-    }
-  }
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/switch_load_warnings.parm"
-Content-Type: text/plain
-
-{
-version 0.8
-chooseinputbyname	[ 0	locks=0 ]	(	"off"	)
-input	[ 0	locks=0 ]	(	[ input	0 ] 	)
-selectinputname	[ 0	locks=0 ]	(	""	)
-selectinputvalue	[ 0	locks=0 ]	(	""	)
-config_separator	[ 0	locks=0 ]	(	)
-badinput	[ 0	locks=0 ]	(	ignore	)
-fallback	[ 0	locks=0 ]	(	0	)
-selectfallbackname	[ 0	locks=0 ]	(	""	)
-inputname	[ 0	locks=0 ]	(	"`opinput(\".\", @input)`"	)
-}
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/switch_load_warnings.userdata"
-Content-Type: text/plain
-
-{
-	"___Version___":{
-		"type":"string",
-		"value":"___EXTERNAL___"
-	}
-}
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.order"
 Content-Type: text/plain
 
-4
+3
 output0
 reference
 warn_no_representation_set
-switch_load_warnings
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.net"

@@ -269,8 +269,6 @@
             label   "Show Pipeline Parms"
             type    toggle
             default { "0" }
-            parmtag { "script_callback" "hou.phm().on_thumbnail_show_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
     }
 

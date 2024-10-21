@@ -1,8 +1,11 @@
-"""Helper functions for load HDA"""
+"""Heper functions for load HDA"""
 
 import os
 import uuid
 from typing import List
+
+import hou
+from qtpy import QtCore, QtWidgets, QtGui
 
 import ayon_api
 from ayon_api import (
@@ -14,22 +17,18 @@ from ayon_api import (
     get_version_by_name,
     get_representation_by_name
 )
-from ayon_core.pipeline.load import (
-    get_representation_context,
-    get_representation_path_from_context
-)
 from ayon_core.pipeline.context_tools import (
     get_current_project_name,
     get_current_folder_path
 )
-from ayon_core.tools.utils import SimpleFoldersWidget
+from ayon_core.pipeline.load import (
+    get_representation_context,
+    get_representation_path_from_context
+)
 from ayon_core.style import load_stylesheet
-
+from ayon_core.tools.utils import SimpleFoldersWidget
 from ayon_houdini.api import lib
 from .usd import get_ayon_entity_uri_from_representation_context
-
-from qtpy import QtCore, QtWidgets, QtGui
-import hou
 
 
 def get_session_cache() -> dict:
@@ -128,25 +127,6 @@ def set_node_representation_from_context(node, context):
     node.setParms(parms)
 
 
-def _get_thumbnail(project_name: str, version_id: str, thumbnail_dir: str):
-    folder = hou.text.expandString(thumbnail_dir)
-    path = os.path.join(folder, "{}_thumbnail.jpg".format(version_id))
-    expanded_path = hou.text.expandString(path)
-    if os.path.isfile(expanded_path):
-        return path
-
-    # Try and create a thumbnail cache file
-    data = ayon_api.get_thumbnail(project_name,
-                                  entity_type="version",
-                                  entity_id=version_id)
-    if data:
-        thumbnail_dir_expanded = hou.text.expandString(thumbnail_dir)
-        os.makedirs(thumbnail_dir_expanded, exist_ok=True)
-        with open(expanded_path, "wb") as f:
-            f.write(data.content)
-        return path
-
-
 def get_representation_path(
     project_name: str,
     representation_id: str,
@@ -173,13 +153,31 @@ def get_representation_path(
     return path
 
 
-def set_representation(node, representation_id: str):
-    # For now this only updates the thumbnail, but it may update more over time
-    _update_thumbnail(node, representation_id)
+def _get_thumbnail(project_name: str, version_id: str, thumbnail_dir: str):
+    folder = hou.text.expandString(thumbnail_dir)
+    path = os.path.join(folder, "{}_thumbnail.jpg".format(version_id))
+    expanded_path = hou.text.expandString(path)
+    if os.path.isfile(expanded_path):
+        return path
+
+    # Try and create a thumbnail cache file
+    data = ayon_api.get_thumbnail(project_name,
+                                  entity_type="version",
+                                  entity_id=version_id)
+    if data:
+        thumbnail_dir_expanded = hou.text.expandString(thumbnail_dir)
+        os.makedirs(thumbnail_dir_expanded, exist_ok=True)
+        with open(expanded_path, "wb") as f:
+            f.write(data.content)
+        return path
 
 
-def _update_thumbnail(node, representation_id):
-    # TODO: Unused currently; add support again for thumbnail updates
+def update_thumbnail(node):
+    if not node.evalParm("show_thumbnail"):
+        lib.remove_all_thumbnails(node)
+        return
+
+    representation_id = node.evalParm("representation")
     if not representation_id:
         set_node_thumbnail(node, None)
         return
@@ -231,11 +229,7 @@ def compute_thumbnail_rect(node):
 
 def on_thumbnail_show_changed(node):
     """Callback on thumbnail show parm changed"""
-    if node.evalParm("show_thumbnail"):
-        # For now, update all
-        on_representation_id_changed(node)
-    else:
-        lib.remove_all_thumbnails(node)
+    update_thumbnail(node)
 
 
 def on_thumbnail_size_changed(node):
@@ -245,16 +239,6 @@ def on_thumbnail_size_changed(node):
         rect = compute_thumbnail_rect(node)
         thumbnail.setRect(rect)
         lib.set_node_thumbnail(node, thumbnail)
-
-
-def on_representation_id_changed(node):
-    """Callback on representation id changed
-
-    Args:
-        node (hou.Node): Node to update.
-    """
-    repre_id = node.evalParm("representation")
-    set_representation(node, repre_id)
 
 
 def get_node_expected_representation_id(node) -> str:
@@ -730,9 +714,9 @@ def expression_get_representation_id() -> str:
 
 def expression_get_representation_path() -> str:
     cache = get_session_cache().setdefault("representation_path", {})
-    project_name = hou.evalParm("project_name")
-    repre_id = hou.evalParm("representation")
-    use_entity_uri = hou.evalParm("use_ayon_entity_uri")
+    project_name: str = hou.evalParm("project_name")
+    repre_id: str = hou.evalParm("representation")
+    use_entity_uri = bool(hou.evalParm("use_ayon_entity_uri"))
     hash_value = project_name, repre_id, use_entity_uri
     if hash_value in cache:
         return cache[hash_value]
