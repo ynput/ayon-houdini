@@ -3,6 +3,7 @@ DialogScript	DialogScript
 CreateScript	CreateScript
 TypePropertiesOptions	TypePropertiesOptions
 Help	Help
+IconImage	IconImage
 Tools.shelf	Tools.shelf
 PythonModule	PythonModule
 ExtraFileOptions	ExtraFileOptions
