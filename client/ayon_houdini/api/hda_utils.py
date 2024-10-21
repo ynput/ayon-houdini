@@ -1,6 +1,7 @@
 """Helper functions for load HDA"""
 
 import os
+import re
 import contextlib
 import uuid
 from typing import List
@@ -13,8 +14,11 @@ from ayon_api import (
     get_folder_by_path,
     get_product_by_name,
     get_version_by_name,
-    get_representation_by_name
+    get_representation_by_name,
+    get_representations
 )
+from ayon_core.pipeline import Anatomy
+from ayon_core.lib import StringTemplate
 from ayon_core.pipeline.load import (
     get_representation_context,
     get_representation_path_from_context
@@ -99,6 +103,58 @@ def get_available_versions(node):
     return version_names
 
 
+def get_available_representations(node):
+    """Return the representation list for node.
+
+    Args:
+        node (hou.Node): Node to query selected version's representations for.
+
+    Returns:
+        list[str]: representation names for the product version.
+    """
+
+    project_name = node.evalParm("project_name") or get_current_project_name()
+    folder_path = node.evalParm("folder_path")
+    product_name = node.evalParm("product_name")
+    version = node.evalParm("version")
+
+    if not all([
+        project_name, folder_path, product_name, version
+    ]):
+        return []
+
+    try:
+        version = int(version.strip())
+    except ValueError:
+        load_message_parm = node.parm("load_message")
+        load_message_parm.set(f"Invalid version format: '{version}'\n"
+                              "Make sure to set a valid version number.")
+        return
+
+    folder_entity = get_folder_by_path(
+        project_name,
+        folder_path=folder_path,
+        fields={"id"}
+    )
+    product_entity = get_product_by_name(
+            project_name,
+            product_name=product_name,
+            folder_id=folder_entity["id"],
+            fields={"id"})
+    version_entity = get_version_by_name(
+            project_name,
+            version,
+            product_id=product_entity["id"],
+            fields={"id"})
+    representations = get_representations(
+            project_name,
+            version_ids={version_entity["id"]},
+            fields={"name"}
+    )   
+    representations_names = [n["name"] for n in representations]
+    return representations_names
+
+
 def update_info(node, context):
     """Update project, folder, product, version, representation name parms.
 
@@ -155,6 +211,54 @@ def _get_thumbnail(project_name: str, version_id: str, thumbnail_dir: str):
         return path
 
 
+def _remove_format_spec(template: str, key: str) -> str:
+    """Remove format specifier from a format token in formatting string.
+    For example, change `{frame:0>4d}` into `{frame}`
+    Examples:
+        >>> remove_format_spec("{frame:0>4d}", "frame")
+        '{frame}'
+        >>> remove_format_spec("{digit:04d}/{frame:0>4d}", "frame")
+        '{digit:04d}/{udim}_{frame}'
+        >>> remove_format_spec("{a: >4}/{aa: >4}", "a")
+        '{a}/{aa: >4}'
+    """
+    # Find all {key:foobar} and remove the `:foobar`
+    # Pattern will be like `({key):[^}]+(})` where we use the captured groups
+    # to keep those parts in the resulting string
+    pattern = f"({{{key}):[^}}]+(}})"
+    return re.sub(pattern, r"\1\2", template)
+
+
+def _get_file_path_from_context(context: dict):
+    """Format file path for sequence with $F or <UDIM>."""
+    # The path is either a single file or sequence in a folder.
+    # Format frame as $F and udim as <UDIM>
+    representation = context["representation"]
+    frame = representation["context"].get("frame")
+    udim = representation["context"].get("udim")
+    if frame is not None or udim is not None:
+        template: str = representation["attrib"]["template"]
+        repre_context: dict = representation["context"]
+        if udim is not None:
+            repre_context["udim"] = "<UDIM>"
+            template = _remove_format_spec(template, "udim")
+        if frame is not None:
+            # Substitute frame number in sequence with $F with padding
+            repre_context["frame"] = "$F{}".format(len(frame))   # e.g. $F4
+            template = _remove_format_spec(template, "frame")
+
+        project_name: str = repre_context["project"]["name"]
+        anatomy = Anatomy(project_name, project_entity=context["project"])
+        repre_context["root"] = anatomy.roots
+        path = StringTemplate(template).format(repre_context)
+    else:
+        path = get_representation_path_from_context(context)
+    
+    # Load fails on UNC paths with backslashes and also
+    # fails to resolve @sourcename var with backslashed
+    # paths correctly. So we force forward slashes
+    return os.path.normpath(path).replace("\\", "/")
+
 def set_representation(node, representation_id: str):
     file_parm = node.parm("file")
     if not representation_id:
@@ -188,11 +292,8 @@ def set_representation(node, representation_id: str):
     if use_ayon_entity_uri:
         path = get_ayon_entity_uri_from_representation_context(context)
     else:
-        path = get_representation_path_from_context(context)
-        # Load fails on UNC paths with backslashes and also
-        # fails to resolve @sourcename var with backslashed
-        # paths correctly. So we force forward slashes
-        path = path.replace("\\", "/")
+        path = _get_file_path_from_context(context)
+
     with _unlocked_parm(file_parm):
         file_parm.set(path)
 
@@ -704,8 +805,9 @@ def select_product_name(node):
 def set_to_latest_version(node):
     """Callback on product name change
 
-    Refresh version parameter value by setting its value to
-    the latest version of the selected product.
+    Refresh version and representation parameters value by setting
+    their value to the latest version and representation of
+    the selected product.
 
     Args:
         node (hou.OpNode): The HDA node.
@@ -714,3 +816,7 @@ def set_to_latest_version(node):
     versions = get_available_versions(node)
     if versions:
         node.parm("version").set(str(versions[0]))
+
+    representations = get_available_representations(node)
+    if representations:
+        node.parm("representation_name").set(representations[0])
