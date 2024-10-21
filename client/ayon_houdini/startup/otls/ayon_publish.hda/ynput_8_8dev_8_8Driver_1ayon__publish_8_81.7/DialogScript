@@ -687,4 +687,11 @@
         label   "Render with Take"
         export  none
     }
+    parm {
+        name    "pub_from_node"
+        label   "pub_from_node"
+        type    toggle
+        default { "0" }
+        parmtag { "script_callback_language" "python" }
+    }
 }

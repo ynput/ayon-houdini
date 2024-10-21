@@ -64,12 +64,16 @@ def pub(node_path: str):
     log = logging.getLogger("publish-from-code")
     log.setLevel(logging.ERROR)
 
+    deactivated_instances = []
     create_context = CreateContext(host)
 
     for instance in create_context.instances:
-        instance["active"] = False
         if instance["instance_id"] == node_path:
             instance["active"] = True
+        else:
+            if instance["active"]:
+                deactivated_instances.append(instance)
+            instance["active"] = False
 
     create_context.save_changes()
 
@@ -88,13 +92,34 @@ def pub(node_path: str):
             error_message = error_format.format(**result)
             log.debug(error_message)
 
+    for instance in deactivated_instances:
+        instance["active"] = True
+
+    create_context.save_changes()
+
+
+def set_ayon_publish_nodes_pre_render_script(
+    node: hou.Node, log: logging.Logger, val: str
+):
+    if node.type() == hou.nodeType(
+        hou.ropNodeTypeCategory(), "ynput::dev::ayon_publish::1.7"
+    ):
+        node.parm("prerender").set(val)
+
+    usp_nodes = get_upstream_nodes(node)
+    for p_node in usp_nodes:
+        set_ayon_publish_nodes_pre_render_script(p_node, log, val)
+
 
 def ayon_publish_command():
     """this command is called by the ayon_pub rop and will trigger publish only for this given node."""
-    # print("Current Node: ", hou.pwd())
-    pub(hou.pwd().path())
-    # parent_nodes = get_us_node_graph(hou.pwd())
-    # for i in get_graph_output(parent_nodes):
-    #     print(i.split(".")[0])
-    # print(print_grapth(parent_nodes))
+
+    node = hou.pwd()
+    print("Current Node: ", node)
+
+    node.parm("pub_from_node").set(True)
+
+    pub(node.path())
+
+    node.parm("pub_from_node").set(False)
     print()

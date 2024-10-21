@@ -19,16 +19,26 @@ class CollectAyonPub(plugin.HoudiniInstancePlugin):
     families = ["pub"]
 
     def process(self, instance):
-
-        rop_node = hou.node(instance.data["instance_node"])
         import importlib
 
         importlib.reload(ayon_publish)
 
-        parent_nodes = ayon_publish.get_us_node_graph(rop_node)
-        t = ayon_publish.print_grapth(parent_nodes)
+        rop_node = hou.node(instance.data["instance_node"])
+        out_con = rop_node.outputConnections()
+        if out_con:
+            self.log.debug("deactivate node")
+            self.log.debug(instance.data)
 
-        self.log.debug("\n" + t)
+        if not rop_node.parm("pub_from_node").eval():
+            ayon_publish.set_ayon_publish_nodes_pre_render_script(
+                rop_node, self.log, ""
+            )
+            rop_node.render()
+            ayon_publish.set_ayon_publish_nodes_pre_render_script(
+                rop_node, self.log, "hou.phm().run()"
+            )
+
+        parent_nodes = ayon_publish.get_us_node_graph(rop_node)
 
         self.log.debug(ayon_publish.get_graph_output(parent_nodes))
         for path in ayon_publish.get_graph_output(parent_nodes):
@@ -39,6 +49,5 @@ class CollectAyonPub(plugin.HoudiniInstancePlugin):
                 "files": os.path.basename(path),
                 "stagingDir": os.path.dirname(path),
             }
-            self.log.debug(representation)
             instance.data["representations"].append(representation)
         self.log.debug(instance.data["representations"])

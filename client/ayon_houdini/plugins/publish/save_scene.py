@@ -16,9 +16,10 @@ class SaveCurrentScene(plugin.HoudiniContextPlugin):
         # Filename must not have changed since collecting
         host = registered_host()
         current_file = host.get_current_workfile()
-        assert context.data['currentFile'] == current_file, (
-            "Collected filename from current scene name."
-        )
+
+        assert (
+            context.data["currentFile"] == current_file
+        ), "Collected filename from current scene name."
 
         if host.workfile_has_unsaved_changes():
             self.log.info("Saving current file: {}".format(current_file))
