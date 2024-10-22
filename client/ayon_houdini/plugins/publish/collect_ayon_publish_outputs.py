@@ -8,6 +8,7 @@ import hou
 
 # TODO: Remove this live debugging reload
 import importlib
+
 importlib.reload(ayon_publish)
 
 
@@ -23,40 +24,60 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
         # Get the AYON Publish ROP node and the input ROPs we want to collect
         # as part of this instance.
         rop_node = hou.node(instance.data["instance_node"])
+        if not instance.data.get("from_node", False):
+            ayon_publish.set_ayon_publish_nodes_pre_render_script(
+                rop_node,
+                self.log,
+                "",
+            )
+            rop_node.render()
+            ayon_publish.set_ayon_publish_nodes_pre_render_script(
+                rop_node,
+                self.log,
+                "hou.phm().run()",
+            )
+
         input_rops = ayon_publish.get_input_rops(rop_node)
 
-        self.log.debug(
-            f"Collecting '{rop_node.path()} input ROPs: {input_rops}")
+        self.log.debug(f"Collecting '{rop_node.path()} input ROPs: {input_rops}")
 
         representations = instance.data.setdefault("representations", [])
         for input_rop in input_rops:
 
+            self.log.debug(f"Processing: '{input_rop.path()}'")
+
             try:
-                file_parm = lib.get_output_parameter(input_rop)
+                file_parms = ayon_publish.get_rop_output(input_rop)
             except TypeError:
                 self.log.warning(
                     f"Skipping unsupported ROP type '{input_rop.path()}' as "
-                    "we can not detect its output files.")
+                    "we can not detect its output files."
+                )
                 continue
-            self.log.debug(f"Processing: '{input_rop.path()}'")
 
             # TODO: Support filepaths with frame ranges, like $F4
-            filepath = file_parm.eval()
-
-            # Split extension, but allow for multi-dot extensions
+            file_name_list = []
+            for file in file_parms:
+                file_name_list.append(os.path.basename(file))
+                # Split extension, but allow for multi-dot extensions
             ext = lib.splitext(
-                filepath,
+                file_parms[0],
                 allowed_multidot_extensions=[
-                ".ass.gz", ".bgeo.sc", ".bgeo.gz",
-                ".bgeo.lzma", ".bgeo.bz2"]
+                    ".ass.gz",
+                    ".bgeo.sc",
+                    ".bgeo.gz",
+                    ".bgeo.lzma",
+                    ".bgeo.bz2",
+                ],
             )[-1]
             ext_no_dot = ext[1:]
+            representation_name = os.path.basename(file_parms[0]).replace(ext, "")
 
             representation = {
-                "name": ext_no_dot,
+                "name": representation_name,
                 "ext": ext_no_dot,
-                "files": os.path.basename(filepath),
-                "stagingDir": os.path.dirname(filepath),
+                "files": file_name_list,
+                "stagingDir": os.path.dirname(file_parms[0]),
             }
             self.log.debug(f"Collected representation: {representation}")
             representations.append(representation)

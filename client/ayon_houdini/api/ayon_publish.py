@@ -1,11 +1,19 @@
 from collections import defaultdict
 import logging
+import re
+import os
 
 import hou
 import pyblish
 
+from ayon_houdini.api import lib
 from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.create import CreateContext
+
+
+import importlib
+
+importlib.reload(lib)
 
 
 def get_input_ancestors(start_node: hou.Node, filter_fn=None, as_graph=False):
@@ -47,7 +55,7 @@ def get_input_ancestors(start_node: hou.Node, filter_fn=None, as_graph=False):
         return list(processed)
 
 
-def get_input_rops(ayon_publish_node):
+def get_input_rops(ayon_publish_node: hou.Node):
     """Return all inputs ROPs we consider part of this AYON Publish node."""
     stop_node_type = ayon_publish_node.type()
     return get_input_ancestors(
@@ -89,14 +97,16 @@ def publish(node_path: str):
     log.setLevel(logging.ERROR)
 
     deactivated_instances = []
+    from_code_instances = []
     create_context = CreateContext(host)
 
     # Deactivate all instances except the one from this node.
     for instance in create_context.instances:
 
-        instance["active"] = False
         if instance.get("instance_node") == node_path:
             instance["active"] = True
+            instance["from_node"] = True
+            from_code_instances.append(instance)
         else:
             if instance["active"]:
                 deactivated_instances.append(instance)
@@ -118,7 +128,8 @@ def publish(node_path: str):
         if result["error"]:
             error_message = error_format.format(**result)
             log.debug(error_message)
-
+    for instance in from_code_instances:
+        instance["from_node"] = False
     for instance in deactivated_instances:
         instance["active"] = True
 
@@ -133,12 +144,70 @@ def set_ayon_publish_nodes_pre_render_script(
     ):
         node.parm("prerender").set(val)
 
-    usp_nodes = get_upstream_nodes(node)
+    usp_nodes = get_input_rops(node)
     for p_node in usp_nodes:
         set_ayon_publish_nodes_pre_render_script(p_node, log, val)
+
+
+frame_var_regx = r"\$F(?:\d*|F)"
+
+
+def get_rop_output(rop: hou.RopNode) -> list:
+    """returns a list of output files a Given node will generated based on Frame range and replacement Varaibles
+
+    Args:
+        rop: input Rop Node
+
+
+
+    Returns (list:str): list of strings with the output files. Empty list if its not possible to evaluate the output
+
+    """
+    out_parm = lib.get_output_parameter(rop)
+
+    renders_range = rop.parm("trange").eval()
+    if 0:  # Render Current Frame
+        return [out_parm.eval()]
+        # just evaluate the parm
+    elif 1 or 2:  # Render Frame Range or Render Frame Range Only
+        raw_out = out_parm.rawValue()
+
+        match = re.findall(frame_var_regx, raw_out)
+        if not match:
+            # if no Range parms exist we just return the eveluated parm
+            return [out_parm.eval()]
+
+        start = rop.parm("f1").eval()
+        end = rop.parm("f2").eval()
+        inc = rop.parm("f3").eval()
+        out_list = []
+        for frame in range(int(start), int(end), int(inc)):
+            frame_out_parm = raw_out
+            for i in match:
+                frame_out_parm = frame_out_parm.replace(i, str(frame))
+
+            # TODO move this before the loop as we can eveluate all Vars execpt $F
+            frame_out_parm = frame_out_parm.replace(
+                "$OS", rop.name()
+            )  # TODO find out why expandString replaces $OS with Director and not the actual node name
+            frame_out_parm = hou.expandString(frame_out_parm)
+
+            out_list.append(frame_out_parm)
+
+        return out_list
+        # get start end frame range
+        # get increment
+        # resolve Hou env variables (hou.expandString('$HIP'))
+        # replace $F $F4 varialbes with numbers
+        # resolve the $F $F4 varialbe
+    return []
 
 
 def ayon_publish_command():
     """This command is called by the AYON Publish Rop and will trigger
     publish only for this given node."""
+
+    # for i in get_input_rops(hou.pwd()):
+    #     print(lib.get_output_parameter(i))
+
     publish(hou.pwd().path())
