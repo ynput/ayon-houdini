@@ -10,9 +10,10 @@ from contextlib import contextmanager
 import six
 import ayon_api
 
+import hou
+
 from ayon_core.lib import StringTemplate
 from ayon_core.settings import get_current_project_settings
-from ayon_core.resources import get_ayon_icon_filepath
 from ayon_core.pipeline import (
     Anatomy,
     registered_host,
@@ -27,8 +28,6 @@ from ayon_core.pipeline.workfile.workfile_template_builder import (
 )
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
-
-import hou
 
 
 self = sys.modules[__name__]
