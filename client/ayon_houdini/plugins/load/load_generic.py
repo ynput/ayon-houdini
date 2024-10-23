@@ -1,7 +1,5 @@
 from ayon_core.pipeline import load
-from ayon_houdini.api.lib import find_active_network
-
-import hou
+from ayon_houdini.api.pipeline import get_or_create_avalon_container
 
 
 class GenericLoader(load.LoaderPlugin):
@@ -21,8 +19,8 @@ class GenericLoader(load.LoaderPlugin):
         node_name = "{}_{}".format(namespace, name) if namespace else name
 
         # Create node
-        network = find_active_network()
-        node = network.createNode("ayon::generic_loader", node_name=node_name)
+        parent_node = get_or_create_avalon_container()
+        node = parent_node.createNode("ayon::generic_loader", node_name=node_name)
         node.moveToGoodPosition()
 
         # Set representation id
@@ -32,6 +30,7 @@ class GenericLoader(load.LoaderPlugin):
 
         nodes = [node]
         self[:] = nodes
+        return node
 
     def update(self, container, context):
         node = container["node"]
