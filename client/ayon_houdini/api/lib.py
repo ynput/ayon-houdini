@@ -1423,7 +1423,7 @@ def start_workfile_template_builder():
         log.warning("Template profile not found. Skipping...")
 
 
-def connect_node_to_loader(file_parm):
+def connect_file_parm_to_loader(file_parm):
     """Connect the given file parm to a generic loader.
     If the parm is already connected to a generic loader node, go to that node.
     """
@@ -1452,36 +1452,3 @@ def connect_node_to_loader(file_parm):
     # TODO: Show window the reflects the loader parameters
     #   and set the values to the created node.
     node.setCurrent(True, clear_all_selected=True)
-
-
-def insert_ayon_load_button_after_file_parm(file_parm):
-    """Insert AYON load button after the given file parm.
-
-    It also joins the file parm with the AYON load button.
-    """
-    
-    node = file_parm.node()
-    
-    button_callback = f"""from ayon_houdini.api.lib import connect_node_to_loader
-connect_node_to_loader(hou.pwd().parm("{file_parm.name()}"))"""
-
-    # find file parm in template group
-    parm_group = node.parmTemplateGroup()
-    
-    file_parm = parm_group.find(file_parm.name())
-    file_parm.setJoinWithNext(True)
-    parm_group.replace(file_parm.name(), file_parm)
-
-    ayon_load_btn = hou.ButtonParmTemplate(
-        name="ayon_load",
-        label="AYON Load",
-        is_label_hidden=True,
-        script_callback=button_callback,
-        script_callback_language=hou.scriptLanguage.Python,
-        tags={
-            "button_icon": get_ayon_icon_filepath().replace("\\", "/")
-        }
-    )
-    parm_group.insertAfter(file_parm.name(), ayon_load_btn)
-
-    node.setParmTemplateGroup(parm_group)

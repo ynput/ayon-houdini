@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<menuDocument>
+    <menu>
+        <scriptItem id="ayon.generic_load">
+            <label>Load with AYON</label>
+            <context>
+                <expression>len(kwargs["parms"]) > 0 and kwargs["parms"][0].parmTemplate().type() == hou.parmTemplateType.String and kwargs["parms"][0].parmTemplate().stringType() == hou.stringParmType.FileReference and not isinstance(kwargs["parms"][0].node(), hou.RopNode)</expression>
+            </context>
+            <scriptCode><![CDATA[
+from ayon_houdini.api.lib import connect_file_parm_to_loader
+
+parms = kwargs["parms"]
+connect_file_parm_to_loader(parms[0])
+]]></scriptCode>
+        </scriptItem>
+    </menu>
+</menuDocument>
