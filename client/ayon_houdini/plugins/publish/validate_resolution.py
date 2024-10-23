@@ -57,11 +57,14 @@ class JumpToEditorNodeAction(pyblish.api.Action):
 
         nodes: "list[hou.Node]" = []
         for obj in objects:
-            # We select the last one if any found because that's the last
-            # node in the graph editing this attribute
             lop_editor_nodes = self.get_lop_editor_node(obj)
             if lop_editor_nodes:
-                nodes.append(lop_editor_nodes[-1])
+                # Get the last entry because it is the last node in the graph
+                # that edited attribute or prim. For that node find the first
+                # editable node so that we do not select inside e.g. a locked
+                # HDA.
+                editable_node = self.get_editable_node(lop_editor_nodes[-1])
+                nodes.append(editable_node)
 
         hou.clearAllSelected()
         if nodes:
@@ -97,6 +100,22 @@ class JumpToEditorNodeAction(pyblish.api.Action):
         if not editor_nodes:
             return []
         return [hou.nodeBySessionId(node) for node in editor_nodes]
+
+    def get_editable_node(self, node: hou.Node):
+        """Return the node or nearest parent that is editable.
+
+        If the node is inside a locked HDA and it's not editable, then go up
+        to the first parent that is editable.
+
+        Returns:
+            hou.Node: The node itself or the first parent that is editable.
+        """
+        while node.isInsideLockedHDA():
+            # Allow editable node inside HDA
+            if node.isEditableInsideLockedHDA():
+                return node
+            node = node.parent()
+        return node
 
 
 class ValidateRenderResolution(plugin.HoudiniInstancePlugin,
