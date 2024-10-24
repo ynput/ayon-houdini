@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pythonPanelDocument>
+  <!-- This file contains definitions of Python interfaces and the
+ interfaces menu.  It should not be hand-edited when it is being
+ used by the application.  Note, that two definitions of the
+ same interface or of the interfaces menu are not allowed
+ in a single file. -->
+  <interface name="ayon_panel" label="AYON Generic Load Panel" icon="MISC_python" showNetworkNavigationBar="false" help_url="">
+    <script><![CDATA[
+import hou
+from PySide2 import QtCore, QtWidgets
+from ayon_houdini.api.ayon_load_menu import SelectAYONProductDialog
+
+
+class NodePathExample(QtWidgets.QWidget):
+    def __init__(self):
+        super(NodePathExample, self).__init__()
+
+        instruction_label = QtWidgets.QLabel(
+            "Please navigate the Houdini node network using the network editor.")
+
+        nodeLabel = QtWidgets.QLabel('Generic Loader')
+
+        self.ayon_product_dialog = SelectAYONProductDialog()
+
+        self.nodePathField = QtWidgets.QLineEdit()
+        self.nodePathField.setFixedWidth(500)
+        self.nodePathField.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.nodePathField.editingFinished.connect(self._onFinishedEditingNodePath)
+
+        nodeSelector = QtWidgets.QPushButton(self)
+        nodeSelector.clicked.connect(self._onShowNodeChooser)
+        nodeSelector.setText("Choose a node")
+
+        selectorLayout = QtWidgets.QHBoxLayout()
+        selectorLayout.addWidget(nodeLabel)
+        selectorLayout.addWidget(self.nodePathField)
+        selectorLayout.addWidget(nodeSelector)
+        selectorLayout.addStretch(3)
+
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(instruction_label)
+        layout.addSpacing(5)
+        layout.addLayout(selectorLayout)
+        layout.addSpacing(5)
+        layout.addWidget(self.ayon_product_dialog)
+        layout.addStretch(1)
+
+        self.setLayout(layout)
+
+    def _onShowNodeChooser(self):
+        # Prompt the user to select node data.
+        node_path = hou.ui.selectNode(custom_node_filter_callback=_isGenericLoader)
+        self.updateNodePathField(node_path)
+
+    def _onFinishedEditingNodePath(self):
+        path = self.nodePathField.text()
+        self.updateNodePathField(path)
+    
+    def updateNodePathField(self, node_path):
+        self.nodePathField.setText(node_path)
+        self.ayon_product_dialog.updateNode(hou.node(node_path))
+
+theExampleWidget = NodePathExample()
+
+def _isGenericLoader(node):
+    return node.type().name().startswith("ayon::generic_loader")
+
+def onCreateInterface():
+    global theExampleWidget
+    return theExampleWidget
+
+def onNodePathChanged(node):
+    global theExampleWidget
+    if node and _isGenericLoader(node):
+        node_path = node.path()
+    else:
+        node_path = ""
+    theExampleWidget.updateNodePathField(node_path)
+
+]]></script>
+    <includeInPaneTabMenu menu_position="0" create_separator="false"/>
+    <includeInToolbarMenu menu_position="104" create_separator="true"/>
+    <help><![CDATA[]]></help>
+  </interface>
+</pythonPanelDocument>
