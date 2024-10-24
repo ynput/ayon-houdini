@@ -10,6 +10,8 @@ from contextlib import contextmanager
 import six
 import ayon_api
 
+import hou
+
 from ayon_core.lib import StringTemplate
 from ayon_core.settings import get_current_project_settings
 from ayon_core.pipeline import (
@@ -26,8 +28,6 @@ from ayon_core.pipeline.workfile.workfile_template_builder import (
 )
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
-
-import hou
 
 
 self = sys.modules[__name__]
@@ -1283,7 +1283,7 @@ def get_node_thumbnail(node, first_only=True):
         return attached_images
 
 
-def find_active_network(category, default):
+def find_active_network(category=None, default="/obj"):
     """Find the first active network editor in the UI.
 
     If no active network editor pane is found at the given category then the
@@ -1317,7 +1317,7 @@ def find_active_network(category, default):
             continue
 
         pwd = pane.pwd()
-        if pwd.type().category() != category:
+        if category and pwd.type().category() != category:
             continue
 
         if not pwd.isEditable():
@@ -1420,3 +1420,34 @@ def start_workfile_template_builder():
         build_workfile_template(workfile_creation_enabled=True)
     except TemplateProfileNotFound:
         log.warning("Template profile not found. Skipping...")
+
+
+def connect_file_parm_to_loader(file_parm):
+    """Connect the given file parm to a generic loader.
+    If the parm is already connected to a generic loader node, go to that node.
+    """
+    
+    from .pipeline import get_or_create_avalon_container
+
+    referenced_parm = file_parm.getReferencedParm()
+
+    # If the parm has reference
+    if file_parm != referenced_parm:
+        referenced_node = referenced_parm.getReferencedParm().node()
+        if referenced_node.type().name() == "ayon::generic_loader::1.0":
+            # TODO: Show window the reflects the loader parameters
+            #   and set the values to the referenced node.
+            referenced_node.setCurrent(True, clear_all_selected=True)
+            return
+
+    # Create a generic loader node and reference its file parm
+    main_container = get_or_create_avalon_container()
+    node = main_container.createNode("ayon::generic_loader")
+    node.moveToGoodPosition()
+    # Set relative reference via hscript. this way avoids the issues of `setExpression` e.g. having a keyframe.
+    hou.hscript(
+        f"""opparm -r  {file_parm.node().path()} {file_parm.name()} \`chs\(\\"`oprelativepath("{file_parm.node().path()}", "{node.path()}")`/file\\"\)\`"""
+    )
+    # TODO: Show window the reflects the loader parameters
+    #   and set the values to the created node.
+    node.setCurrent(True, clear_all_selected=True)
