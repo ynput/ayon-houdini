@@ -60,8 +60,11 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
             for file in file_parms:
                 file_name_list.append(os.path.basename(file))
                 # Split extension, but allow for multi-dot extensions
+            self.log.debug(f"files {file_parms}")
             ext = lib.splitext(
-                file_parms[0],
+                file_parms[
+                    0
+                ],  # TODO this dose not work if first input is someting like merge or switch
                 allowed_multidot_extensions=[
                     ".ass.gz",
                     ".bgeo.sc",
@@ -72,6 +75,9 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
             )[-1]
             ext_no_dot = ext[1:]
             representation_name = os.path.basename(file_parms[0]).replace(ext, "")
+            if len(file_name_list) <= 1:
+                self.log.debug(f"Single File Publish {file_name_list}")
+                file_name_list = file_name_list[0]
 
             representation = {
                 "name": representation_name,

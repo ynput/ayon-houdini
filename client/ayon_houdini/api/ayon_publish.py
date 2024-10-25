@@ -1,7 +1,8 @@
-from collections import defaultdict
 import logging
 import re
 import os
+from collections import defaultdict, deque
+from typing import Callable
 
 import hou
 import pyblish
@@ -16,7 +17,8 @@ import importlib
 importlib.reload(lib)
 
 
-def get_input_ancestors(start_node: hou.Node, filter_fn=None, as_graph=False):
+# TODO this should take hou.RopNode or use checks
+def get_input_ancestors(start_node: hou.RopNode, filter_fn=None, as_graph=False):
     """Return all the input ancestors of the given node.
 
     This is similar to `hou.OpNode.inputAncestors()`, but allows for filtering
@@ -28,30 +30,47 @@ def get_input_ancestors(start_node: hou.Node, filter_fn=None, as_graph=False):
     inputs.
 
     """
-    graph = defaultdict(dict)
-    processed = set()
-    queue = [start_node]
 
-    for node in queue:
-        # Avoid recursion in recursive networks
+    def node_active(node: hou.RopNode) -> bool:
+        if node.isBypassed():
+            return False
+        return True
+
+    graph = defaultdict(dict)
+    processed: hou.Node = set()
+    queue = deque(list(start_node.inputs()))
+
+    while queue:
+        node: hou.RopNode = queue.popleft()
+
         if node in processed:
             continue
 
-        processed.add(node)
-        for upstream_node in node.inputs():
-            # Ignore upstream node if it's to be filtered out
-            if filter_fn and filter_fn(upstream_node):
-                continue
+        if filter_fn(node):
+            continue
 
-            graph[node][upstream_node] = graph[upstream_node]
+        if (
+            str(node.type()).endswith("switch>") and not node.isBypassed()
+        ):  # TODO find a better way for this
+            index = node.parm("index").eval()
+            node_inputs = [node.inputs()[index]]
+        else:
+            node_inputs = node.inputs()
+
+        for upstream_node in node_inputs:
             if upstream_node in processed:
                 continue
+            graph[node][upstream_node] = graph[upstream_node]
+
             queue.append(upstream_node)
+        if not node_active(node):
+            continue
+        processed.add(node)
 
     if as_graph:
         return graph[start_node]
     else:
-        processed.remove(start_node)
+        # processed.remove(start_node)
         return list(processed)
 
 
@@ -61,7 +80,7 @@ def get_input_rops(ayon_publish_node: hou.Node):
     return get_input_ancestors(
         ayon_publish_node,
         # Stop at nodes of the same type
-        filter_fn=lambda node: node.type() == stop_node_type,
+        filter_fn=lambda node: node.type() == stop_node_type and not node.isBypassed(),
         as_graph=False,
     )
 
@@ -73,7 +92,7 @@ def get_upstream_node_graph(start_node: hou.Node):
     return get_input_ancestors(
         start_node,
         # Stop at nodes of the same type
-        filter_fn=lambda node: node.type() == start_node_type,
+        filter_fn=lambda node: node.type() == start_node_type and not node.isBypassed(),
         as_graph=True,
     )
 
@@ -166,10 +185,13 @@ def get_rop_output(rop: hou.RopNode) -> list:
     out_parm = lib.get_output_parameter(rop)
 
     renders_range = rop.parm("trange").eval()
-    if 0:  # Render Current Frame
+
+    if 0 == renders_range:  # Render Current Frame
         return [out_parm.eval()]
         # just evaluate the parm
-    elif 1 or 2:  # Render Frame Range or Render Frame Range Only
+    elif (
+        1 == renders_range or 2 == renders_range
+    ):  # Render Frame Range or Render Frame Range Only
         raw_out = out_parm.rawValue()
 
         match = re.findall(frame_var_regx, raw_out)
@@ -181,33 +203,34 @@ def get_rop_output(rop: hou.RopNode) -> list:
         end = rop.parm("f2").eval()
         inc = rop.parm("f3").eval()
         out_list = []
+        # TODO dose this need to be O(n*m) ?
+
+        # TODO find out why expandString replaces $OS with Director and not the actual node name
+        # https://www.sidefx.com/docs/houdini/network/expressions.html#globals
+        os_replaced_out = raw_out.replace("$OS", rop.name())
         for frame in range(int(start), int(end), int(inc)):
-            frame_out_parm = raw_out
-            for i in match:
+            frame_out_parm = os_replaced_out
+
+            for (
+                i
+            ) in (
+                match
+            ):  # TODO this dose not handle the different frame padding options correctly
                 frame_out_parm = frame_out_parm.replace(i, str(frame))
 
-            # TODO move this before the loop as we can eveluate all Vars execpt $F
-            frame_out_parm = frame_out_parm.replace(
-                "$OS", rop.name()
-            )  # TODO find out why expandString replaces $OS with Director and not the actual node name
             frame_out_parm = hou.expandString(frame_out_parm)
-
+            if not os.path.exists(
+                frame_out_parm
+            ):  # TODO this should probably check the time stamp to avoid publishing files from old exports into the same dir
+                continue
             out_list.append(frame_out_parm)
 
         return out_list
-        # get start end frame range
-        # get increment
-        # resolve Hou env variables (hou.expandString('$HIP'))
-        # replace $F $F4 varialbes with numbers
-        # resolve the $F $F4 varialbe
+
     return []
 
 
 def ayon_publish_command():
     """This command is called by the AYON Publish Rop and will trigger
     publish only for this given node."""
-
-    # for i in get_input_rops(hou.pwd()):
-    #     print(lib.get_output_parameter(i))
-
     publish(hou.pwd().path())

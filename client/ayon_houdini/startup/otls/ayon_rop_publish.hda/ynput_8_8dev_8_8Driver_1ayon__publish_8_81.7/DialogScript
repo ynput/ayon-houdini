@@ -3,7 +3,7 @@
 {
     name	ynput::dev::ayon_publish::1.7
     script	AyonPub
-    label	ayon_publish
+    label	"AYON Publish"
 
     help {
 	""
@@ -514,6 +514,7 @@
         name    "soho_program"
         label   "soho_program"
         type    string
+        invisible
         default { "ayon_pub.py" }
         parmtag { "script_callback_language" "python" }
     }
@@ -521,6 +522,7 @@
         name    "soho_outputmode"
         label   "soho_outputmode"
         type    integer
+        invisible
         default { "2" }
         range   { 0 10 }
         parmtag { "script_callback_language" "python" }
@@ -528,17 +530,20 @@
     group {
         name    "switcher3_1"
         label   "Scripts"
+        invisibletab
 
         parm {
             name    "initsim"
             label   "Initialize Simulation OPs"
             type    toggle
+            invisible
             default { "0" }
         }
         parm {
             name    "tprerender"
             label   "Pre-Render Script"
             type    toggle
+            invisible
             joinnext
             default { "1" }
         }
@@ -546,6 +551,7 @@
             name    "prerender"
             label   "Pre-Render Script"
             type    file
+            invisible
             joinnext
             default { "hou.phm().run()" }
             parmtag { "filechooser_mode" "read" }
@@ -554,6 +560,7 @@
             name    "lprerender"
             label   "Pre-Render Script Language"
             type    string
+            invisible
             nolabel
             default { "python" }
             menu {
@@ -565,6 +572,7 @@
             name    "tpreframe"
             label   "Pre-Frame Script"
             type    toggle
+            invisible
             joinnext
             default { "1" }
         }
@@ -572,6 +580,7 @@
             name    "preframe"
             label   "Pre-Frame Script"
             type    file
+            invisible
             joinnext
             default { "" }
             parmtag { "filechooser_mode" "read" }
@@ -580,6 +589,7 @@
             name    "lpreframe"
             label   "Pre-Frame Script Language"
             type    string
+            invisible
             nolabel
             default { "hscript" }
             menu {
@@ -591,6 +601,7 @@
             name    "tpostframe"
             label   "Post-Frame Script"
             type    toggle
+            invisible
             joinnext
             default { "1" }
         }
@@ -598,6 +609,7 @@
             name    "postframe"
             label   "Post-Frame Script"
             type    file
+            invisible
             joinnext
             default { "" }
             parmtag { "filechooser_mode" "read" }
@@ -606,6 +618,7 @@
             name    "lpostframe"
             label   "Post-Frame Script Language"
             type    string
+            invisible
             nolabel
             default { "hscript" }
             menu {
@@ -617,6 +630,7 @@
             name    "tpostrender"
             label   "Post-Render Script"
             type    toggle
+            invisible
             joinnext
             default { "1" }
         }
@@ -624,6 +638,7 @@
             name    "postrender"
             label   "Post-Render Script"
             type    file
+            invisible
             joinnext
             default { "" }
             parmtag { "filechooser_mode" "read" }
@@ -632,6 +647,7 @@
             name    "lpostrender"
             label   "Post-Render Script Language"
             type    string
+            invisible
             nolabel
             default { "hscript" }
             menu {
@@ -686,12 +702,5 @@
         baseparm
         label   "Render with Take"
         export  none
-    }
-    parm {
-        name    "pub_from_node"
-        label   "pub_from_node"
-        type    toggle
-        default { "0" }
-        parmtag { "script_callback_language" "python" }
     }
 }
