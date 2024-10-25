@@ -1422,6 +1422,35 @@ def start_workfile_template_builder():
         log.warning("Template profile not found. Skipping...")
 
 
+def show_generic_loader_pypanel(node):
+    """show generic loader python panel.
+    and set its path to the given node.
+    """
+
+    pypanel_interface_name = "ayon_panel"
+    panel_label = "AYON Generic Loader"
+
+    pytype = hou.pypanel.interfaces()[pypanel_interface_name]
+    tabs = hou.ui.paneTabs()
+
+    pypanel = None
+    # Check if panel exists.
+    for t in tabs:
+        if t.type() == hou.paneTabType.PythonPanel:
+            if t.activeInterface() == pytype:
+                t.setIsCurrentTab()
+                pypanel = t
+    # Create a panel if it doesn't exist.
+    if not pypanel:
+        pypanel = hou.ui.curDesktop().createFloatingPaneTab(hou.paneTabType.PythonPanel)
+        pypanel.setActiveInterface(pytype)
+        
+        pypanel.floatingPanel().setName(panel_label)
+
+    pypanel.setPin(True)
+    pypanel.setCurrentNode(node, pick_node=True)
+
+
 def connect_file_parm_to_loader(file_parm):
     """Connect the given file parm to a generic loader.
     If the parm is already connected to a generic loader node, go to that node.
@@ -1435,9 +1464,7 @@ def connect_file_parm_to_loader(file_parm):
     if file_parm != referenced_parm:
         referenced_node = referenced_parm.getReferencedParm().node()
         if referenced_node.type().name() == "ayon::generic_loader::1.0":
-            # TODO: Show window the reflects the loader parameters
-            #   and set the values to the referenced node.
-            referenced_node.setCurrent(True, clear_all_selected=True)
+            show_generic_loader_pypanel(referenced_node)
             return
 
     # Create a generic loader node and reference its file parm
@@ -1448,6 +1475,4 @@ def connect_file_parm_to_loader(file_parm):
     hou.hscript(
         f"""opparm -r  {file_parm.node().path()} {file_parm.name()} \`chs\(\\"`oprelativepath("{file_parm.node().path()}", "{node.path()}")`/file\\"\)\`"""
     )
-    # TODO: Show window the reflects the loader parameters
-    #   and set the values to the created node.
-    node.setCurrent(True, clear_all_selected=True)
+    show_generic_loader_pypanel(node)
