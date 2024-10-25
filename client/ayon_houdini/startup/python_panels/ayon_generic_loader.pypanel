@@ -5,7 +5,7 @@
  used by the application.  Note, that two definitions of the
  same interface or of the interfaces menu are not allowed
  in a single file. -->
-  <interface name="ayon_panel" label="AYON Generic Load Panel" icon="MISC_python" showNetworkNavigationBar="false" help_url="">
+  <interface name="ayon_panel" label="AYON Generic Load Panel" icon="MISC_python" showNetworkNavigationBar="true" help_url="">
     <script><![CDATA[
 import hou
 from qtpy import QtCore, QtWidgets
