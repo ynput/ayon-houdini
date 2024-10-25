@@ -8,7 +8,7 @@
   <interface name="ayon_panel" label="AYON Generic Load Panel" icon="MISC_python" showNetworkNavigationBar="false" help_url="">
     <script><![CDATA[
 import hou
-from PySide2 import QtCore, QtWidgets
+from qtpy import QtCore, QtWidgets
 from ayon_houdini.api.ayon_load_menu import SelectAYONProductDialog
 
 
