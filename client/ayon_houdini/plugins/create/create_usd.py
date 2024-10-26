@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Creator plugin for creating USDs."""
+import inspect
+
 from ayon_houdini.api import plugin
 
 import hou
@@ -13,6 +15,8 @@ class CreateUSD(plugin.HoudiniCreator):
     icon = "cubes"
     enabled = False
     description = "Create USD"
+
+    additional_parameters = {}
 
     def create(self, product_name, instance_data, pre_create_data):
 
@@ -29,6 +33,7 @@ class CreateUSD(plugin.HoudiniCreator):
             "lopoutput": "$HIP/pyblish/{}.usd".format(product_name),
             "enableoutputprocessor_simplerelativepaths": False,
         }
+        parms.update(self.additional_parameters)
 
         if self.selected_nodes:
             parms["loppath"] = self.selected_nodes[0].path()
@@ -52,3 +57,63 @@ class CreateUSD(plugin.HoudiniCreator):
 
     def get_publish_families(self):
         return ["usd", "usdrop"]
+
+
+class CreateUSDModel(CreateUSD):
+    identifier = "io.openpype.creators.houdini.model.usd"
+    label = "USD Model"
+    product_type = "model"
+    enabled = True
+    description = "Create USD model"
+
+    additional_parameters = {
+        # Set the 'default prim' by default to the folder name being
+        # published to
+        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+    }
+
+
+class CreateUSDGroom(CreateUSD):
+    identifier = "io.openpype.creators.houdini.groom.usd"
+    label = "USD Groom"
+    product_type = "groom"
+    icon = "scissors"
+    enabled = True
+    description = "Create USD groom of fur and or hairs"
+
+    additional_parameters = {
+        # Set the 'default prim' by default to the folder name being
+        # published to
+        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+    }
+
+
+class CreateUSDLook(CreateUSD):
+    """Universal Scene Description Look"""
+
+    identifier = "io.openpype.creators.houdini.usd.look"
+    label = "USD Look"
+    product_type = "look"
+    icon = "paint-brush"
+    enabled = True
+    description = "Create USD Look with localized textures"
+
+    additional_parameters = {
+        # Set the 'default prim' by default to the folder name being
+        # published to
+        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+    }
+
+    def get_detail_description(self):
+        return inspect.cleandoc("""Publish looks in USD data.
+
+        From the Houdini Solaris context (LOPs) this will publish the look for
+        an asset as a USD file with the used textures.
+
+        Any assets used by the look will be relatively remapped to the USD
+        file and integrated into the publish as `resources`.
+
+        """)
+
+    def get_publish_families(self):
+        return ["usd", "look", "usdrop"]
