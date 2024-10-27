@@ -23,7 +23,7 @@ def copy_stage_layers(stage) -> Dict[Sdf.Layer, Sdf.Layer]:
         # It seems layer.IsAnonymous() fails (does not exist yet?) so we use
         # the identifier to check if it is an anonymous layer
         if not Sdf.Layer.IsAnonymousLayerIdentifier(layer.identifier):
-            # We disregard non-anonmyous layers for replacing and assume
+            # We disregard non-anonymous layers for replacing and assume
             # they are static enough for our use case.
             continue
 
