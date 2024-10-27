@@ -1,5 +1,6 @@
 import json
 import contextlib
+from typing import Dict
 
 import hou
 from pxr import Sdf, Usd
@@ -13,7 +14,7 @@ from ayon_houdini.api.lib import (
 )
 
 
-def copy_stage_layers(stage) -> dict[Sdf.Layer, Sdf.Layer]:
+def copy_stage_layers(stage) -> Dict[Sdf.Layer, Sdf.Layer]:
     # Create a mapping from original layers to their copies
     layer_mapping = {}
 
