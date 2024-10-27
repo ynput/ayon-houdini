@@ -6,7 +6,7 @@ from ayon_houdini.api import plugin
 class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
     """Collect the out node's SOP/COP Path value."""
 
-    order = pyblish.api.CollectorOrder
+    order = pyblish.api.CollectorOrder - 0.45
     families = [
         "pointcache",
         "camera",
@@ -16,7 +16,9 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
         "usdrender",
         "redshiftproxy",
         "staticMesh",
-        "model"
+        "model",
+        "usdrender",
+        "usdrop"
     ]
 
     label = "Collect Output Node Path"

@@ -163,7 +163,7 @@ class ValidateUSDRenderArnoldSettings(plugin.HoudiniInstancePlugin):
 
         # Validate Arnold Product Type is enabled on the Arnold Render Settings
         # This is confirmed by the `includeAovs` attribute on the RenderProduct
-        stage: pxr.Usd.Stage = node.stage()
+        stage: pxr.Usd.Stage = instance.data["stage"]
         invalid = False
         for prim_path in instance.data.get("usdRenderProducts", []):
             prim = stage.GetPrimAtPath(prim_path)
@@ -223,8 +223,7 @@ class ValidateUSDRenderCamera(plugin.HoudiniInstancePlugin):
             # be validated by another plug-in.
             return
 
-        stage = lop_node.stage()
-
+        stage = instance.data["stage"]
         render_settings = get_usd_render_rop_rendersettings(rop_node, stage,
                                                             logger=self.log)
         if not render_settings:
