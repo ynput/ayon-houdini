@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import inspect
-import hou
 from pxr import Usd, UsdShade, UsdGeom
 
 import pyblish.api
@@ -54,16 +53,18 @@ class ValidateUsdLookAssignments(plugin.HoudiniInstancePlugin,
         if not self.is_active(instance.data):
             return
 
-        lop_node: hou.LopNode = instance.data.get("output_node")
-        if not lop_node:
+        # Get Usd.Stage from "Collect ROP Sdf Layers and USD Stage" plug-in
+        stage = instance.data.get("stage")
+        if not stage:
+            self.log.debug("No USD stage found.")
             return
+        stage: Usd.Stage
 
         # We iterate the composed stage for code simplicity; however this
         # means that it does not validate across e.g. multiple model variants
         # but only checks against the current composed stage. Likely this is
         # also what you actually want to validate, because your look might not
         # apply to *all* model variants.
-        stage = lop_node.stage()
         invalid = []
         for prim in stage.Traverse():
             if not prim.IsA(UsdGeom.Gprim):
