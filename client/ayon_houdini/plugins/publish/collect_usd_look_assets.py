@@ -6,7 +6,6 @@ from typing import List, Optional
 import dataclasses
 
 import pyblish.api
-import hou
 from pxr import Sdf
 
 from ayon_houdini.api import plugin
@@ -71,23 +70,13 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
 
     def process(self, instance):
 
-        rop: hou.RopNode = hou.node(instance.data.get("instance_node"))
-        if not rop:
+        # Get Sdf.Layers from "Collect ROP Sdf Layers and USD Stage" plug-in
+        layers = instance.data.get("layers")
+        if layers is None:
+            self.log.warning(f"No USD layers found on instance: {instance}")
             return
 
-        lop_node: hou.LopNode = instance.data.get("output_node")
-        if not lop_node:
-            return
-
-        above_break_layers = set(lop_node.layersAboveLayerBreak())
-
-        stage = lop_node.stage()
-        layers = [
-            layer for layer
-            in stage.GetLayerStack(includeSessionLayers=False)
-            if layer.identifier not in above_break_layers
-        ]
-
+        layers: List[Sdf.Layer]
         instance_resources = self.get_layer_assets(layers)
 
         # Define a relative asset remapping for the USD Extractor so that
