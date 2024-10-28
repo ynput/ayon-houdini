@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import inspect
+from typing import List
+
 import hou
 from pxr import Sdf
 import pyblish.api
@@ -30,20 +32,12 @@ class ValidateUSDRopDefaultPrim(plugin.HoudiniInstancePlugin):
             )
             return
 
-        lop_node: hou.LopNode = instance.data.get("output_node")
-        if not lop_node:
-            return
-
-        above_break_layers = set(layer for layer in lop_node.layersAboveLayerBreak())
-        stage = lop_node.stage()
-        layers = [
-            layer for layer
-            in stage.GetLayerStack(includeSessionLayers=False)
-            if layer.identifier not in above_break_layers
-        ]
+        # Get Sdf.Layers from "Collect ROP Sdf Layers and USD Stage" plug-in
+        layers = instance.data.get("layers")
         if not layers:
             self.log.error("No USD layers found. This is likely a bug.")
             return
+        layers: List[Sdf.Layer]
 
         # TODO: This only would detect any local opinions on that prim and thus
         #   would fail to detect if a sublayer added on the stage root layer

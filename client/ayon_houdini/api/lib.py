@@ -109,6 +109,107 @@ def get_output_parameter(node):
     raise TypeError("Node type '%s' not supported" % node_type)
 
 
+def get_lops_rop_context_options(
+        ropnode: hou.RopNode) -> "dict[str, str | float]":
+    """Return the Context Options that a LOP ROP node uses."""
+    rop_context_options: "dict[str, str | float]" = {}
+
+    # Always set @ropname and @roppath
+    # See: https://www.sidefx.com/docs/houdini/hom/hou/isAutoContextOption.html
+    rop_context_options["ropname"] = ropnode.name()
+    rop_context_options["roppath"] = ropnode.path()
+
+    # Set @ropcook, @ropstart, @ropend and @ropinc if setropcook is enabled
+    setropcook_parm = ropnode.parm("setropcook")
+    if setropcook_parm:
+        setropcook = setropcook_parm.eval()
+        if setropcook:
+            # TODO: Support "Render Frame Range from Stage" correctly
+            # TODO: Support passing in the start, end, and increment values
+            #  for the cases where this may need to consider overridden
+            #  frame ranges for `RopNode.render()` calls.
+            trange = ropnode.evalParm("trange")
+            if trange == 0:
+                # Current frame
+                start: float = hou.frame()
+                end: float = start
+                inc: float = 1.0
+            elif trange in {1, 2}:
+                # Frame range
+                start: float = ropnode.evalParm("f1")
+                end: float = ropnode.evalParm("f2")
+                inc: float = ropnode.evalParm("f3")
+            else:
+                raise ValueError("Unsupported trange value: %s" % trange)
+            rop_context_options["ropcook"] = 1.0
+            rop_context_options["ropstart"] = start
+            rop_context_options["ropend"] = end
+            rop_context_options["ropinc"] = inc
+
+    # Get explicit context options set on the ROP node.
+    num = ropnode.evalParm("optioncount")
+    for i in range(1, num + 1):
+        # Ignore disabled options
+        if not ropnode.evalParm(f"optionenable{i}"):
+            continue
+
+        name: str = ropnode.evalParm(f"optionname{i}")
+        option_type: str = ropnode.evalParm(f"optiontype{i}")
+        if option_type == "string":
+            value: str = ropnode.evalParm(f"optionstrvalue{i}")
+        elif option_type == "float":
+            value: float = ropnode.evalParm(f"optionfloatvalue{i}")
+        else:
+            raise ValueError(f"Unsupported option type: {option_type}")
+        rop_context_options[name] = value
+
+    return rop_context_options
+
+
+@contextmanager
+def context_options(context_options: "dict[str, str | float]"):
+    """Context manager to set Solaris Context Options.
+
+    The original context options are restored after the context exits.
+
+    Arguments:
+        context_options (dict[str, str | float]):
+            The Solaris Context Options to set.
+
+    Yields:
+        dict[str, str | float]: The original context options that were changed.
+
+    """
+    # Get the original context options and their values
+    original_context_options: "dict[str, str | float]" = {}
+    for name in hou.contextOptionNames():
+        original_context_options[name] = hou.contextOption(name)
+
+    try:
+        # Override the context options
+        for name, value in context_options.items():
+            hou.setContextOption(name, value)
+        yield original_context_options
+    finally:
+        # Restore original context options that we changed
+        for name in context_options:
+            if name in original_context_options:
+                hou.setContextOption(name, original_context_options[name])
+            else:
+                # Clear context option
+                hou.setContextOption(name, None)
+
+
+@contextmanager
+def update_mode_context(mode):
+    original = hou.updateModeSetting()
+    try:
+        hou.setUpdateMode(mode)
+        yield
+    finally:
+        hou.setUpdateMode(original)
+
+
 def set_scene_fps(fps):
     hou.setFps(fps)
 
