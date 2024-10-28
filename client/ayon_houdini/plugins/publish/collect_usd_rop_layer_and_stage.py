@@ -15,6 +15,16 @@ from ayon_houdini.api.lib import (
 
 
 def copy_stage_layers(stage) -> Dict[Sdf.Layer, Sdf.Layer]:
+    """Copy a stage's anonymous layers to new in-memory layers.
+
+    The layers will be remapped to use the copied layers instead of the
+    original layers if e.g. the root layer uses one of the other layers.
+
+    Returns:
+        Dict[Sdf.Layer, Sdf.Layer]: Mapping from original layers to
+            copied layers.
+
+    """
     # Create a mapping from original layers to their copies
     layer_mapping: Dict[Sdf.Layer, Sdf.Layer] = {}
 
@@ -28,6 +38,14 @@ def copy_stage_layers(stage) -> Dict[Sdf.Layer, Sdf.Layer]:
         copied_layer = Sdf.Layer.CreateAnonymous()
         copied_layer.TransferContent(layer)
         layer_mapping[layer] = copied_layer
+
+    # Remap all used layers in the root layer
+    copied_root_layer = layer_mapping[stage.GetRootLayer()]
+    for old_layer, new_layer in layer_mapping.items():
+        copied_root_layer.UpdateCompositionAssetDependency(
+            old_layer.identifier,
+            new_layer.identifier
+        )
 
     return layer_mapping
 
