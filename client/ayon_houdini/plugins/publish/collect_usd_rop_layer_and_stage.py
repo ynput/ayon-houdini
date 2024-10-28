@@ -80,10 +80,21 @@ class CollectUsdRenderLayerAndStage(plugin.HoudiniInstancePlugin):
             # Set the context options of the ROP node.
             stack.enter_context(context_options(options))
 
+            # Force cook. There have been some cases where the LOP node
+            # just would not return the USD stage without force cooking it.
+            lop_node.cook(force=True)
+
             # Get stage and layers from the LOP node.
             stage = lop_node.stage(use_last_cook_context_options=False,
                                    apply_viewport_overrides=False,
                                    apply_post_layers=False)
+            if stage is None:
+                self.log.error(
+                    "Unable to get USD stage from LOP node: "
+                    f"{lop_node.path()}. It may have failed to cook due to "
+                    "errors in the node graph.")
+                return
+
             above_break_layers = set(lop_node.layersAboveLayerBreak(
                 use_last_cook_context_options=False))
             layers = [
