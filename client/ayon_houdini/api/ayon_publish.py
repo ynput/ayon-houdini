@@ -80,20 +80,11 @@ def get_input_rops(ayon_publish_node: hou.Node):
     return get_input_ancestors(
         ayon_publish_node,
         # Stop at nodes of the same type
-        filter_fn=lambda node: node.type() == stop_node_type and not node.isBypassed(),
+        filter_fn=lambda node: node.type() == stop_node_type
+        or node.type()
+        == hou.nodeType(hou.ropNodeTypeCategory(), "ayon::rop_publish_breaker::1.0")
+        and not node.isBypassed(),
         as_graph=False,
-    )
-
-
-# TODO: Remove the graph functionality unless we have a use-case for this?
-def get_upstream_node_graph(start_node: hou.Node):
-    # Return upstream nodes until we find another node of the same node type
-    start_node_type = start_node.type()
-    return get_input_ancestors(
-        start_node,
-        # Stop at nodes of the same type
-        filter_fn=lambda node: node.type() == start_node_type and not node.isBypassed(),
-        as_graph=True,
     )
 
 
