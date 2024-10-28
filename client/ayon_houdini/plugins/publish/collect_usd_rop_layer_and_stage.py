@@ -16,7 +16,7 @@ from ayon_houdini.api.lib import (
 
 def copy_stage_layers(stage) -> Dict[Sdf.Layer, Sdf.Layer]:
     # Create a mapping from original layers to their copies
-    layer_mapping = {}
+    layer_mapping: Dict[Sdf.Layer, Sdf.Layer] = {}
 
     # Copy each layer
     for layer in stage.GetLayerStack(includeSessionLayers=False):
