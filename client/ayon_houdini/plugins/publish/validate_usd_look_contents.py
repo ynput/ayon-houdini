@@ -3,7 +3,6 @@ import inspect
 from typing import List, Union
 from functools import partial
 
-import hou
 from pxr import Sdf
 import pyblish.api
 
@@ -44,20 +43,11 @@ class ValidateUsdLookContents(plugin.HoudiniInstancePlugin):
 
     def process(self, instance):
 
-        lop_node: hou.LopNode = instance.data.get("output_node")
-        if not lop_node:
-            return
-
-        # Get layers below layer break
-        above_break_layers = set(layer for layer in lop_node.layersAboveLayerBreak())
-        stage = lop_node.stage()
-        layers = [
-            layer for layer
-            in stage.GetLayerStack(includeSessionLayers=False)
-            if layer.identifier not in above_break_layers
-        ]
+        # Get Sdf.Layers from "Collect ROP Sdf Layers and USD Stage" plug-in
+        layers = instance.data.get("layers")
         if not layers:
             return
+        layers: List[Sdf.Layer]
 
         # The Sdf.PrimSpec type name will not have knowledge about inherited
         # types for the type, name. So we pre-collect all invalid types
