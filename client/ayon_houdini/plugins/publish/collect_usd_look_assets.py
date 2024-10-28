@@ -6,7 +6,6 @@ from typing import List, Optional
 import dataclasses
 
 import pyblish.api
-import hou
 from pxr import Sdf
 
 from ayon_houdini.api import plugin
