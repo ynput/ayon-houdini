@@ -27,21 +27,9 @@ def copy_stage_layers(stage) -> Dict[Sdf.Layer, Sdf.Layer]:
             # they are static enough for our use case.
             continue
 
-        # Sdf.Layer.TransferContent seems to crash, so instead we export
-        # and import (serialize/deserialize) to make a unique copy.
-        layer_str = layer.ExportToString()
         copied_layer = Sdf.Layer.CreateAnonymous()
-        copied_layer.ImportFromString(layer_str)
+        copied_layer.TransferContent(layer)
         layer_mapping[layer] = copied_layer
-
-    # Remap all used layers in the root layer
-    # TODO: Confirm whether this is technically sufficient?
-    copied_root_layer = layer_mapping[stage.GetRootLayer()]
-    for old_layer, new_layer in layer_mapping.items():
-        copied_root_layer.UpdateCompositionAssetDependency(
-            old_layer.identifier,
-            new_layer.identifier
-        )
 
     return layer_mapping
 
