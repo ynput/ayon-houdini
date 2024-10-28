@@ -23,7 +23,6 @@ def copy_stage_layers(stage) -> Dict[Sdf.Layer, Sdf.Layer]:
     Returns:
         Dict[Sdf.Layer, Sdf.Layer]: Mapping from original layers to
             copied layers.
-
     """
     # Create a mapping from original layers to their copies
     layer_mapping: Dict[Sdf.Layer, Sdf.Layer] = {}
