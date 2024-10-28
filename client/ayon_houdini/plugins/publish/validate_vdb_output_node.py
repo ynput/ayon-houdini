@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-import contextlib
 import hou
 
 import pyblish.api
 from ayon_core.pipeline import PublishXmlValidationError
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import update_mode_context
 from ayon_houdini.api.action import SelectInvalidAction
 
 
@@ -40,16 +40,6 @@ def group_consecutive_numbers(nums):
             end = num
     if start is not None:
         yield _result(start, end)
-
-
-@contextlib.contextmanager
-def update_mode_context(mode):
-    original = hou.updateModeSetting()
-    try:
-        hou.setUpdateMode(mode)
-        yield
-    finally:
-        hou.setUpdateMode(original)
 
 
 def get_geometry_at_frame(sop_node, frame, force=True):
