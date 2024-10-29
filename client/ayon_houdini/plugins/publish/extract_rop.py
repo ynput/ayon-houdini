@@ -84,7 +84,7 @@ class ExtractOpenGL(ExtractROP,
 
     order = pyblish.api.ExtractorOrder - 0.01
     label = "Extract OpenGL"
-    families = ["opengl"]
+    families = ["rop.opengl"]
 
     def update_representation_data(self,
                                    instance: pyblish.api.Instance,

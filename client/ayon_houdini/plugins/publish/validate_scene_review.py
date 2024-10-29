@@ -14,7 +14,7 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
     """
 
     order = pyblish.api.ValidatorOrder
-    families = ["opengl"]
+    families = ["rop.opengl"]
     label = "Scene Setting for review"
 
     def process(self, instance):

@@ -17,7 +17,7 @@ class CreateReview(plugin.HoudiniCreator):
     review_color_space = ""
     
     def get_publish_families(self):
-        return ["review", "opengl"]
+        return ["review", "rop.opengl"]
     
     def apply_settings(self, project_settings):
         super(CreateReview, self).apply_settings(project_settings)
