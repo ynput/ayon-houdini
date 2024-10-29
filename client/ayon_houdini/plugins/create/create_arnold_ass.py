@@ -17,6 +17,9 @@ class CreateArnoldAss(plugin.HoudiniCreator):
     # will override it by the value in the project settings
     ext = ".ass"
 
+    def get_publish_families(self):
+        return ["ass", "publish.hou"]
+    
     def create(self, product_name, instance_data, pre_create_data):
         import hou
 

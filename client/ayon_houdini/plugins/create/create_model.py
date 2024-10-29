@@ -24,6 +24,9 @@ class CreateModel(plugin.HoudiniCreator):
     product_type = "model"
     icon = "cube"
 
+    def get_publish_families(self):
+        return ["model", "abc", "publish.hou"]
+
     def create(self, product_name, instance_data, pre_create_data):
         instance_data.update({"node_type": "alembic"})
         creator_attributes = instance_data.setdefault(

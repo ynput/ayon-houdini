@@ -12,6 +12,9 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
     product_type = "redshiftproxy"
     icon = "magic"
 
+    def get_publish_families(self):
+        return ["redshiftproxy", "publish.hou"]
+    
     def create(self, product_name, instance_data, pre_create_data):
 
         # Redshift provides a `Redshift_Proxy_Output` node type which shows

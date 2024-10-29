@@ -14,6 +14,9 @@ class CreateVDBCache(plugin.HoudiniCreator):
     product_type = "vdbcache"
     icon = "cloud"
 
+    def get_publish_families(self):
+        return ["vbdcache", "publish.hou"]
+    
     def create(self, product_name, instance_data, pre_create_data):
         import hou
 
