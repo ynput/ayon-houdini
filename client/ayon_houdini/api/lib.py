@@ -1422,6 +1422,30 @@ def start_workfile_template_builder():
         log.warning("Template profile not found. Skipping...")
 
 
+def show_generic_loader_parmpanel(node):
+    """show generic loader parameter panel.
+    """
+
+    panel_label = "AYON Generic Loader"
+
+    tabs = hou.ui.paneTabs()
+
+    parmpanel = None
+    # Check if panel exists.
+    for t in tabs:
+        if t.type() == hou.paneTabType.Parm:
+            if t.isFloating() and t.currentNode() == node :
+                t.setIsCurrentTab()
+                parmpanel = t
+    # Create a panel if it doesn't exist.
+    if not parmpanel:
+        parmpanel = hou.ui.curDesktop().createFloatingPaneTab(hou.paneTabType.Parm)
+        parmpanel.floatingPanel().setName(panel_label)
+
+    parmpanel.setPin(True)
+    parmpanel.setCurrentNode(node, pick_node=True)
+
+
 def connect_file_parm_to_loader(file_parm):
     """Connect the given file parm to a generic loader.
     If the parm is already connected to a generic loader node, go to that node.
@@ -1435,9 +1459,7 @@ def connect_file_parm_to_loader(file_parm):
     if file_parm != referenced_parm:
         referenced_node = referenced_parm.getReferencedParm().node()
         if referenced_node.type().name() == "ayon::generic_loader::1.0":
-            # TODO: Show window the reflects the loader parameters
-            #   and set the values to the referenced node.
-            referenced_node.setCurrent(True, clear_all_selected=True)
+            show_generic_loader_parmpanel(referenced_node)
             return
 
     # Create a generic loader node and reference its file parm
@@ -1448,6 +1470,4 @@ def connect_file_parm_to_loader(file_parm):
     hou.hscript(
         f"""opparm -r  {file_parm.node().path()} {file_parm.name()} \`chs\(\\"`oprelativepath("{file_parm.node().path()}", "{node.path()}")`/file\\"\)\`"""
     )
-    # TODO: Show window the reflects the loader parameters
-    #   and set the values to the created node.
-    node.setCurrent(True, clear_all_selected=True)
+    show_generic_loader_parmpanel(node)
