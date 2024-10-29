@@ -14,6 +14,7 @@ class SaveCurrentScene(plugin.HoudiniContextPlugin):
     def process(self, context):
 
         # Filename must not have changed since collecting
+
         host = registered_host()
         current_file = host.get_current_workfile()
 

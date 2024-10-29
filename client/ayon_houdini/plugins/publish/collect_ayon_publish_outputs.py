@@ -37,7 +37,7 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
                 "hou.phm().run()",
             )
 
-        input_rops = ayon_publish.get_input_rops(rop_node)
+        input_rops = rop_node.inputs()
 
         self.log.debug(f"Collecting '{rop_node.path()} input ROPs: {input_rops}")
 

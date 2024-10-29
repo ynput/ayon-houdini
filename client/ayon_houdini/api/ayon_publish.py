@@ -17,86 +17,6 @@ import importlib
 importlib.reload(lib)
 
 
-# TODO this should take hou.RopNode or use checks
-def get_input_ancestors(start_node: hou.RopNode, filter_fn=None, as_graph=False):
-    """Return all the input ancestors of the given node.
-
-    This is similar to `hou.OpNode.inputAncestors()`, but allows for filtering
-    out certain nodes based on a filter function. The upstream detection will
-    stop at the filtered nodes.
-
-    When `as_graph` is True, the function will return a nested dictionary of
-    the input ancestors. Otherwise, it will return a flat list of all the
-    inputs.
-
-    """
-
-    def node_active(node: hou.RopNode) -> bool:
-        if node.isBypassed():
-            return False
-        return True
-
-    graph = defaultdict(dict)
-    processed: hou.Node = set()
-    queue = deque(list(start_node.inputs()))
-
-    while queue:
-        node: hou.RopNode = queue.popleft()
-
-        if node in processed:
-            continue
-
-        if filter_fn(node):
-            continue
-
-        if (
-            str(node.type()).endswith("switch>") and not node.isBypassed()
-        ):  # TODO find a better way for this
-            index = node.parm("index").eval()
-            node_inputs = [node.inputs()[index]]
-        else:
-            node_inputs = node.inputs()
-
-        for upstream_node in node_inputs:
-            if upstream_node in processed:
-                continue
-            graph[node][upstream_node] = graph[upstream_node]
-
-            queue.append(upstream_node)
-        if not node_active(node):
-            continue
-        processed.add(node)
-
-    if as_graph:
-        return graph[start_node]
-    else:
-        # processed.remove(start_node)
-        return list(processed)
-
-
-def get_input_rops(ayon_publish_node: hou.Node):
-    """Return all inputs ROPs we consider part of this AYON Publish node."""
-    stop_node_type = ayon_publish_node.type()
-    return get_input_ancestors(
-        ayon_publish_node,
-        # Stop at nodes of the same type
-        filter_fn=lambda node: node.type() == stop_node_type
-        or node.type()
-        == hou.nodeType(hou.ropNodeTypeCategory(), "ayon::rop_publish_breaker::1.0")
-        and not node.isBypassed(),
-        as_graph=False,
-    )
-
-
-def format_graph(graph: dict, depth: int = 0) -> str:
-    """Format the graph output to a human-readable printable string."""
-    out_string = ""
-    for k, v in graph.items():
-        out_string = out_string + ("-" * depth + k.path()) + "\n"
-        out_string = out_string + format_graph(v, depth=depth + 1) + "\n"
-    return out_string
-
-
 def publish(node_path: str):
     """Publish the given AYON Publish node."""
     host = registered_host()
@@ -130,7 +50,16 @@ def publish(node_path: str):
     pyblish_plugins = create_context.publish_plugins
 
     error_format = "Failed {plugin.__name__}: {error} -- {error.traceback}"
-    for result in pyblish.util.publish_iter(pyblish_context, pyblish_plugins):
+    # filter out the increment plugin because it will cause our export to get out of sync with later run nodes
+    filtered_plugins = [
+        plugin
+        for plugin in pyblish_plugins
+        if not "IncrementCurrentFile" in str(plugin)
+    ]
+
+    for result in pyblish.util.publish_iter(pyblish_context, filtered_plugins):
+
+        log.debug(result)
         for record in result["records"]:
             log.debug("{}: {}".format(result["plugin"].label, record.msg))
 
@@ -147,16 +76,16 @@ def publish(node_path: str):
 
 
 def set_ayon_publish_nodes_pre_render_script(
-    node: hou.Node, log: logging.Logger, val: str
+    rop_node: hou.Node, log: logging.Logger, val: str
 ):
-    if node.type() == hou.nodeType(
-        hou.ropNodeTypeCategory(), "ynput::dev::ayon_publish::1.7"
-    ):
-        node.parm("prerender").set(val)
+    node_list = [rop_node]
+    node_list.extend(rop_node.inputAncestors())
+    for node in node_list:
 
-    usp_nodes = get_input_rops(node)
-    for p_node in usp_nodes:
-        set_ayon_publish_nodes_pre_render_script(p_node, log, val)
+        if node.type() == hou.nodeType(
+            hou.ropNodeTypeCategory(), "ynput::dev::ayon_publish::1.7"
+        ):
+            node.parm("prerender").set(val)
 
 
 frame_var_regx = r"\$F(?:\d*|F)"
@@ -174,6 +103,7 @@ def get_rop_output(rop: hou.RopNode) -> list:
 
     """
     out_parm = lib.get_output_parameter(rop)
+    rop = out_parm.node()
 
     renders_range = rop.parm("trange").eval()
 
