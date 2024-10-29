@@ -6,5 +6,5 @@ from ayon_houdini.api.hda_utils import (
     get_available_versions,
     select_product_name,
     set_to_latest_version,
-    clear_cache
+    expression_clear_cache
 )

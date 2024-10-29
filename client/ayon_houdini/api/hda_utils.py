@@ -39,12 +39,6 @@ def get_session_cache() -> dict:
     return cache
 
 
-def clear_session_cache():
-    """Clear the current session `hou.session.ayon_cache` dict"""
-    if hasattr(hou.session, "ayon_cache"):
-        del hou.session.ayon_cache
-
-
 def is_valid_uuid(value) -> bool:
     """Return whether value is a valid UUID"""
     try:

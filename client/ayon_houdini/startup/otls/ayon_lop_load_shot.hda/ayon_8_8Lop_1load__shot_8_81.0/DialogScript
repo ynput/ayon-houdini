@@ -83,7 +83,7 @@
             type    button
             default { "0" }
             help    "The load logic uses expressions that cache into the current session to avoid continuously requeryin the database. This clear that cache to enforce a full refresh of the expressions."
-            parmtag { "script_callback" "hou.phm().clear_cache()" }
+            parmtag { "script_callback" "hou.phm().expression_clear_cache()" }
             parmtag { "script_callback_language" "python" }
         }
         parm {
