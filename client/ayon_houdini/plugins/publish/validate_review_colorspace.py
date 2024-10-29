@@ -30,7 +30,7 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
     """
 
     order = pyblish.api.ValidatorOrder + 0.1
-    families = ["review"]
+    families = ["opengl"]
     label = "Validate Review Colorspace"
     actions = [ResetViewSpaceAction, SelectROPAction]
 
@@ -57,18 +57,6 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
 
     def process(self, instance):
 
-        rop_node = hou.node(instance.data["instance_node"])
-
-        # This plugin is triggered when marking render as reviewable.
-        # Therefore, this plugin will run on over wrong instances.
-        # TODO: Don't run this plugin on wrong instances.
-        # This plugin should run only on review product type
-        # with instance node of opengl type.
-        if rop_node.type().name() != "opengl":
-            self.log.debug("Skipping Validation. Rop node {} "
-                           "is not an OpenGl node.".format(rop_node.path()))
-            return
-
         if not self.is_active(instance.data):
             return
 
@@ -78,6 +66,8 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
                 " skipping check.."
             )
             return
+        
+        rop_node = hou.node(instance.data["instance_node"])
 
         if rop_node.evalParm("colorcorrect") != 2:
             # any colorspace settings other than default requires

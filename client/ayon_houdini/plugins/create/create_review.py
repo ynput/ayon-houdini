@@ -11,11 +11,14 @@ class CreateReview(plugin.HoudiniCreator):
     """Review with OpenGL ROP"""
 
     identifier = "io.openpype.creators.houdini.review"
-    label = "Review"
+    label = "Review (OpenGL)"
     product_type = "review"
     icon = "video-camera"
     review_color_space = ""
-
+    
+    def get_publish_families(self):
+        return ["review", "opengl"]
+    
     def apply_settings(self, project_settings):
         super(CreateReview, self).apply_settings(project_settings)
         # workfile settings added in '0.2.13'
