@@ -60,7 +60,7 @@ class CreateUSD(plugin.HoudiniCreator):
 
 
 class CreateUSDModel(CreateUSD):
-    identifier = "io.openpype.creators.houdini.model.usd"
+    identifier = "io.ayon.creators.houdini.model.usd"
     label = "USD Model"
     product_type = "model"
     enabled = True
@@ -83,7 +83,7 @@ class CreateUSDModel(CreateUSD):
 
 
 class CreateUSDGroom(CreateUSD):
-    identifier = "io.openpype.creators.houdini.groom.usd"
+    identifier = "io.ayon.creators.houdini.groom.usd"
     label = "USD Groom"
     product_type = "groom"
     icon = "scissors"
