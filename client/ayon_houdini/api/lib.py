@@ -1424,14 +1424,15 @@ def start_workfile_template_builder():
 
 def show_generic_loader_parmpanel(node):
     """show generic loader parameter panel.
+
+    Args:
+        node(hou.Node): node instance
     """
 
-    panel_label = "AYON Generic Loader"
-
     tabs = hou.ui.paneTabs()
-
     parmpanel = None
-    # Check if panel exists.
+
+    # Check if there's a floating panel with its node set to the specified node.
     for t in tabs:
         if t.type() == hou.paneTabType.Parm:
             if t.isFloating() and t.currentNode() == node :
@@ -1439,6 +1440,8 @@ def show_generic_loader_parmpanel(node):
                 parmpanel = t
     # Create a panel if it doesn't exist.
     if not parmpanel:
+        panel_label = f"AYON Generic Loader - {node.name()}"
+
         parmpanel = hou.ui.curDesktop().createFloatingPaneTab(hou.paneTabType.Parm)
         parmpanel.floatingPanel().setName(panel_label)
 
@@ -1464,7 +1467,9 @@ def connect_file_parm_to_loader(file_parm):
 
     # Create a generic loader node and reference its file parm
     main_container = get_or_create_avalon_container()
-    node = main_container.createNode("ayon::generic_loader")
+    
+    node_name = f"{file_parm.node().name()}_{file_parm.name()}_loader"
+    node = main_container.createNode("ayon::generic_loader", node_name=node_name)
     node.moveToGoodPosition()
     # Set relative reference via hscript. this way avoids the issues of `setExpression` e.g. having a keyframe.
     hou.hscript(
