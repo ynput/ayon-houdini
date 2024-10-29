@@ -38,7 +38,6 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
             )
 
         input_rops = rop_node.inputs()
-
         self.log.debug(f"Collecting '{rop_node.path()} input ROPs: {input_rops}")
 
         representations = instance.data.setdefault("representations", [])

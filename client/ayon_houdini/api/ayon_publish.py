@@ -132,12 +132,10 @@ def get_rop_output(rop: hou.RopNode) -> list:
         for frame in range(int(start), int(end), int(inc)):
             frame_out_parm = os_replaced_out
 
-            for (
-                i
-            ) in (
-                match
-            ):  # TODO this dose not handle the different frame padding options correctly
-                frame_out_parm = frame_out_parm.replace(i, str(frame))
+            # TODO this dose not handle the different frame padding options correctly
+            for i in match:
+                num = re.findall(r"\d+", i)[0]
+                frame_out_parm = frame_out_parm.replace(i, str(frame).zfill(int(num)))
 
             frame_out_parm = hou.expandString(frame_out_parm)
             if not os.path.exists(
