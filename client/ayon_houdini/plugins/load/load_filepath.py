@@ -3,7 +3,6 @@ from ayon_houdini.api import (
     plugin
 )
 from ayon_houdini.api.pipeline import get_or_create_avalon_container
-from ayon_houdini.api.lib import show_node_parmeditor
 
 
 class FilePathLoader(plugin.HoudiniLoader):
