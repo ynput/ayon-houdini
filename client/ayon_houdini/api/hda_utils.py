@@ -710,6 +710,7 @@ def expression_get_representation_id() -> str:
         repre_id = ""
 
     cache[hash_value] = repre_id
+    return repre_id
 
 
 def expression_get_representation_path() -> str:
