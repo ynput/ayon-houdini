@@ -167,6 +167,9 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateWorkfilePaths: ValidateWorkfilePathsModel = SettingsField(
         default_factory=ValidateWorkfilePathsModel,
         title="Validate workfile paths settings")
+    ValidateUsdLookAssignments: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate USD Look Assignments")
     ValidateUSDRenderProductPaths: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate USD Render Product Paths")
@@ -255,6 +258,11 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
             "$HIP",
             "$JOB"
         ]
+    },
+    "ValidateUsdLookAssignments": {
+        "enabled": True,
+        "optional": True,
+        "active": True
     },
     "ValidateUSDRenderProductPaths": {
         "enabled": False,
