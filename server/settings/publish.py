@@ -170,6 +170,13 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateUSDRenderProductPaths: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate USD Render Product Paths")
+    ValidateRenderResolution: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate USD Render Resolution",
+        description=(
+            "Validate render resolution and pixel aspect of USD render"
+            " products match the context resolution.")
+    )
     ExtractActiveViewThumbnail: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Extract Active View Thumbnail",
@@ -251,6 +258,11 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     },
     "ValidateUSDRenderProductPaths": {
         "enabled": False,
+        "optional": True,
+        "active": True
+    },
+    "ValidateRenderResolution": {
+        "enabled": True,
         "optional": True,
         "active": True
     },
