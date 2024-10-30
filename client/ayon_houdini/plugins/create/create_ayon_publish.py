@@ -10,7 +10,7 @@ class CreateAyonPub(plugin.HoudiniCreator):
 
     identifier = "io.openpype.creators.houdini.pub"
     label = "AYON Publish"
-    product_type = "pub"  # TODO: Come up with better name
+    product_type = "rop_publish"  # TODO: Come up with better name
     icon = "cubes"
     description = "Create AYON publish ROP "
 
@@ -43,4 +43,4 @@ class CreateAyonPub(plugin.HoudiniCreator):
         return [hou.ropNodeTypeCategory(), hou.lopNodeTypeCategory()]
 
     def get_publish_families(self):
-        return ["pub"]
+        return ["rop_publish"]

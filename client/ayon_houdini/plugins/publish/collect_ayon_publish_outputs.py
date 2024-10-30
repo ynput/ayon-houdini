@@ -17,7 +17,7 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
 
     order = pyblish.api.CollectorOrder
     label = "Collect AYON Publish ROP outputs"
-    families = ["pub"]
+    families = ["rop_publish"]
 
     def process(self, instance):
 
