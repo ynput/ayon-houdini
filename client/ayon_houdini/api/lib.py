@@ -1422,31 +1422,31 @@ def start_workfile_template_builder():
         log.warning("Template profile not found. Skipping...")
 
 
-def show_generic_loader_parmpanel(node):
-    """show generic loader parameter panel.
+def show_node_parmeditor(node):
+    """Show Parameter Editor for the Node.
 
     Args:
         node(hou.Node): node instance
     """
 
     tabs = hou.ui.paneTabs()
-    parmpanel = None
+    parmeditor = None
 
-    # Check if there's a floating panel with its node set to the specified node.
+    # Check if there's a floating pane with its node set to the specified node.
     for t in tabs:
         if t.type() == hou.paneTabType.Parm:
             if t.isFloating() and t.currentNode() == node :
                 t.setIsCurrentTab()
-                parmpanel = t
-    # Create a panel if it doesn't exist.
-    if not parmpanel:
-        panel_label = f"AYON Generic Loader - {node.name()}"
+                parmeditor = t
+                
+    # Create a pane if it doesn't exist.
+    if not parmeditor:
 
-        parmpanel = hou.ui.curDesktop().createFloatingPaneTab(hou.paneTabType.Parm)
-        parmpanel.floatingPanel().setName(panel_label)
+        parmeditor = hou.ui.curDesktop().createFloatingPaneTab(hou.paneTabType.Parm)
+        parmeditor.floatingPanel().setName(node.name())
 
-    parmpanel.setPin(True)
-    parmpanel.setCurrentNode(node, pick_node=True)
+    parmeditor.setPin(True)
+    parmeditor.setCurrentNode(node, pick_node=True)
 
 
 def connect_file_parm_to_loader(file_parm):
@@ -1462,7 +1462,7 @@ def connect_file_parm_to_loader(file_parm):
     if file_parm != referenced_parm:
         referenced_node = referenced_parm.getReferencedParm().node()
         if referenced_node.type().name() == "ayon::generic_loader::1.0":
-            show_generic_loader_parmpanel(referenced_node)
+            show_node_parmeditor(referenced_node)
             return
 
     # Create a generic loader node and reference its file parm
@@ -1475,4 +1475,4 @@ def connect_file_parm_to_loader(file_parm):
     hou.hscript(
         f"""opparm -r  {file_parm.node().path()} {file_parm.name()} \`chs\(\\"`oprelativepath("{file_parm.node().path()}", "{node.path()}")`/file\\"\)\`"""
     )
-    show_generic_loader_parmpanel(node)
+    show_node_parmeditor(node)
