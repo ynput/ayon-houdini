@@ -1429,24 +1429,26 @@ def show_node_parmeditor(node):
         node(hou.Node): node instance
     """
 
-    tabs = hou.ui.paneTabs()
-    parmeditor = None
+    # Check if there's a floating parmater editor pane with its node set to the specified node.
+    for t in hou.ui.paneTabs():
+        if (
+            t.type() == hou.paneTabType.Parm
+            and t.isFloating()
+            and t.currentNode() == node
+        ):
+            t.setIsCurrentTab()
+            return
 
-    # Check if there's a floating pane with its node set to the specified node.
-    for t in tabs:
-        if t.type() == hou.paneTabType.Parm:
-            if t.isFloating() and t.currentNode() == node :
-                t.setIsCurrentTab()
-                parmeditor = t
-                
-    # Create a pane if it doesn't exist.
-    if not parmeditor:
-
-        parmeditor = hou.ui.curDesktop().createFloatingPaneTab(hou.paneTabType.Parm)
-        parmeditor.floatingPanel().setName(node.name())
-
-    parmeditor.setPin(True)
-    parmeditor.setCurrentNode(node, pick_node=True)
+    # We are using the hscript to create and set the network path of the pane
+    #   becasue hscript can set the node path without selecting the node.
+    # Create a floating pane and set its name to the node path.
+    hou.hscript(
+        f"pane -F -m parmeditor -n {node.path()}"
+    )
+    # Hide network controls, turn linking off and set operator node path.
+    hou.hscript(
+        f"pane -a 1 -l 0 -H {node.path()} {node.path()}"
+    )
 
 
 def connect_file_parm_to_loader(file_parm):
