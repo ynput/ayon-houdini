@@ -1451,7 +1451,7 @@ def show_node_parmeditor(node):
     )
 
 
-def connect_file_parm_to_loader(file_parm):
+def connect_file_parm_to_loader(file_parm: hou.Parm):
     """Connect the given file parm to a generic loader.
     If the parm is already connected to a generic loader node, go to that node.
     """
@@ -1471,10 +1471,16 @@ def connect_file_parm_to_loader(file_parm):
     main_container = get_or_create_avalon_container()
     
     node_name = f"{file_parm.node().name()}_{file_parm.name()}_loader"
-    node = main_container.createNode("ayon::generic_loader", node_name=node_name)
-    node.moveToGoodPosition()
-    # Set relative reference via hscript. this way avoids the issues of `setExpression` e.g. having a keyframe.
+    load_node = main_container.createNode("ayon::generic_loader",
+                                          node_name=node_name)
+    load_node.moveToGoodPosition()
+
+    # Set relative reference via hscript. This avoids the issues of
+    # `setExpression` e.g. having a keyframe.
+    relative_path = file_parm.node().relativePathTo(load_node)
+    expression = rf'chs\(\"{relative_path}/file\"\)'  # noqa
     hou.hscript(
-        f"""opparm -r  {file_parm.node().path()} {file_parm.name()} \`chs\(\\"`oprelativepath("{file_parm.node().path()}", "{node.path()}")`/file\\"\)\`"""
+        'opparm -r'
+        f' {file_parm.node().path()} {file_parm.name()} \`{expression}\`'
     )
-    show_node_parmeditor(node)
+    show_node_parmeditor(load_node)
