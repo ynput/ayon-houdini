@@ -228,7 +228,7 @@
             name    "loader"
             label   "Loader"
             type    label
-            default { "GenericLoader" }
+            default { "FilePathLoader" }
         }
         parm {
             name    "id"
