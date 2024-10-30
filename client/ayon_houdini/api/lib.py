@@ -1426,7 +1426,7 @@ def show_node_parmeditor(node):
     """Show Parameter Editor for the Node.
 
     Args:
-        node(hou.Node): node instance
+        node (hou.Node): node instance
     """
 
     # Check if there's a floating parameter editor pane with its node set to the specified node.
