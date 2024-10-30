@@ -40,9 +40,6 @@ class FilePathLoader(plugin.HoudiniLoader):
         parm.set(context["representation"]["id"])
         parm.pressButton()  # trigger callbacks
 
-        # Show Parameter Editor for the Node
-        show_node_parmeditor(node)
-
     def update(self, container, context):
 
         # First we handle backwards compatibility where this loader still
@@ -57,9 +54,6 @@ class FilePathLoader(plugin.HoudiniLoader):
         parm = node.parm("representation")
         parm.set(context["representation"]["id"])
         parm.pressButton()  # trigger callbacks
-
-        # Show Parameter Editor for the Node
-        show_node_parmeditor(node)
 
     def switch(self, container, context):
         self.update(container, context)

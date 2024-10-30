@@ -1429,18 +1429,18 @@ def show_node_parmeditor(node):
         node(hou.Node): node instance
     """
 
-    # Check if there's a floating parmater editor pane with its node set to the specified node.
-    for t in hou.ui.paneTabs():
+    # Check if there's a floating parameter editor pane with its node set to the specified node.
+    for tab in hou.ui.paneTabs():
         if (
-            t.type() == hou.paneTabType.Parm
-            and t.isFloating()
-            and t.currentNode() == node
+            tab.type() == hou.paneTabType.Parm
+            and tab.isFloating()
+            and tab.currentNode() == node
         ):
-            t.setIsCurrentTab()
+            tab.setIsCurrentTab()
             return
 
     # We are using the hscript to create and set the network path of the pane
-    #   becasue hscript can set the node path without selecting the node.
+    # because hscript can set the node path without selecting the node.
     # Create a floating pane and set its name to the node path.
     hou.hscript(
         f"pane -F -m parmeditor -n {node.path()}"
