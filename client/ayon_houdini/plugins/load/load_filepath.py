@@ -3,7 +3,7 @@ from ayon_houdini.api import (
     plugin
 )
 from ayon_houdini.api.pipeline import get_or_create_avalon_container
-from ayon_houdini.api.lib import show_generic_loader_parmpanel
+from ayon_houdini.api.lib import show_node_parmeditor
 
 
 class FilePathLoader(plugin.HoudiniLoader):
@@ -40,9 +40,6 @@ class FilePathLoader(plugin.HoudiniLoader):
         parm.set(context["representation"]["id"])
         parm.pressButton()  # trigger callbacks
 
-        # Show Parm panel of the node
-        show_generic_loader_parmpanel(node)
-
     def update(self, container, context):
 
         # First we handle backwards compatibility where this loader still
@@ -57,9 +54,6 @@ class FilePathLoader(plugin.HoudiniLoader):
         parm = node.parm("representation")
         parm.set(context["representation"]["id"])
         parm.pressButton()  # trigger callbacks
-
-        # Show Parm panel of the node
-        show_generic_loader_parmpanel(node)
 
     def switch(self, container, context):
         self.update(container, context)
