@@ -34,8 +34,6 @@
             default { "$AYON_PROJECT_NAME" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_folder_path;select_folder_path(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "folder_path"
@@ -44,8 +42,6 @@
             default { "$AYON_FOLDER_PATH" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_folder_path;select_folder_path(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "folder_name"
@@ -60,7 +56,7 @@
             default { "usdAsset" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_product_name;select_product_name(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
-            parmtag { "script_callback" "hou.phm().set_to_latest_version(kwargs['node'])\nhou.phm().on_representation_parms_changed(kwargs['node'])" }
+            parmtag { "script_callback" "hou.phm().set_to_latest_version(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
         }
         parm {
@@ -80,35 +76,21 @@
                 [ "return result" ]
                 language python
             }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "representation_name"
             label   "Representation"
             type    string
             default { "usd" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
         parm {
-            name    "load_refresh"
-            label   "Refresh"
+            name    "clear_cache"
+            label   "Clear Cache"
             type    button
-            joinnext
             default { "0" }
-            help    "Click to refresh and retry applying the product load parameters to load the correct file"
-            parmtag { "button_icon" "" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
+            help    "The load logic uses expressions that cache into the current session to avoid continuously requeryin the database. This clear that cache to enforce a full refresh of the expressions."
+            parmtag { "script_callback" "hou.phm().expression_clear_cache()" }
             parmtag { "script_callback_language" "python" }
-        }
-        parm {
-            name    "load_message"
-            label   "Message"
-            type    label
-            default { "" }
-            hidewhen "{ load_message == \"\" }"
-            parmtag { "sidefx::look" "block" }
         }
         parm {
             name    "sepparm"
@@ -128,17 +110,15 @@
             name    "file"
             label   "File"
             type    string
-            default { "" }
+            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_path()" python ] }
             parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "use_ayon_entity_uri"
             label   "Use AYON Entity URI"
-            help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
             type    toggle
             default { "0" }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'], force=True)" }
-            parmtag { "script_callback_language" "python" }
+            help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
         }
         parm {
             name    "primpath1"
@@ -294,12 +274,19 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
+            name    "update_thumbnail"
+            label   "Update Thumbnail"
+            type    button
+            default { "0" }
+            hidewhen "{ show_thumbnail == 0 }"
+            parmtag { "script_callback" "hou.phm().update_thumbnail(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
             name    "show_pipeline_parms"
             label   "Show Pipeline Parms"
             type    toggle
             default { "0" }
-            parmtag { "script_callback" "hou.phm().on_thumbnail_show_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
         }
     }
 
@@ -336,9 +323,7 @@
             name    "representation"
             label   "Representation ID"
             type    string
-            default { "" }
-            parmtag { "script_callback" "hou.phm().on_representation_id_changed(kwargs['node'])" }
-            parmtag { "script_callback_language" "python" }
+            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_id()" python ] }
         }
         parm {
             name    "version_name"
