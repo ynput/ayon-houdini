@@ -19,12 +19,11 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position -3.46569 1.07549
-connectornextid 1
+position -4.13562 1.50033
+connectornextid 0
 flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
-0 "output1"
 }
 inputsNamed3
 {
@@ -68,7 +67,7 @@ Content-Disposition: attachment; filename="hdaroot.inp"
 Content-Type: text/plain
 
 1
-0 -1.3044269152357999 6.2635205889365251 2 0 __NO_OWNER_NETWORK_BOX__ "FROMOUTPUT"
+0 -1.18363 4.7584699999999991 2 0 __NO_OWNER_NETWORK_BOX__ "FROMOUTPUT"
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/output0.init"
@@ -82,7 +81,7 @@ Content-Disposition: attachment; filename="hdaroot/output0.def"
 Content-Type: text/plain
 
 comment ""
-position -1.13898e-08 2.03328
+position -1.18363 1.36997
 connectornextid 1
 flags =  lock off model off template off footprint off xray off bypass off display off render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
@@ -130,82 +129,6 @@ Content-Type: text/plain
 }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.init"
-Content-Type: text/plain
-
-type = error
-matchesdef = 1
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.def"
-Content-Type: text/plain
-
-comment ""
-position -1.13898e-08 5.20999
-connectornextid 2
-flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
-outputsNamed3
-{
-1 "output1"
-}
-inputsNamed3
-{
-0 	(0) "" 1 "input1"
-}
-inputs
-{
-0 	(0) 0 1
-}
-stat
-{
-  create -1
-  modify -1
-  author User@HP-Z820-03
-  access 0777
-}
-color UT_Color RGB 0.8 0.8 0.8 
-delscript ""
-exprlanguage hscript
-end
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.chn"
-Content-Type: text/plain
-
-{
-    channel enable1 {
-      lefttype = extend
-      righttype = extend
-      flags = 0
-      start = 39.800000000000004
-      segment { length = 0 expr = "if(ch(\"../representation\"), 0, 1)" }
-    }
-  }
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.parm"
-Content-Type: text/plain
-
-{
-version 0.8
-numerror	[ 0	locks=0 ]	(	1	)
-errormsg1	[ 0	locks=0 ]	(	`chs(\"../load_message\")`	)
-severity1	[ 0	locks=0 ]	(	"warn"	)
-enable1	[ 0	locks=0 ]	(	[ enable1	0 ] 	)
-}
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
-Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.userdata"
-Content-Type: text/plain
-
-{
-	"___Version___":{
-		"type":"string",
-		"value":"___EXTERNAL___"
-	}
-}
-
---HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot/sublayer.init"
 Content-Type: text/plain
 
@@ -217,7 +140,7 @@ Content-Disposition: attachment; filename="hdaroot/sublayer.def"
 Content-Type: text/plain
 
 comment ""
-position -0.00125004 4.03316
+position -1.18363 2.49947
 connectornextid 2
 flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
@@ -322,13 +245,119 @@ Content-Type: text/plain
 }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.init"
+Content-Type: text/plain
+
+type = error
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.def"
+Content-Type: text/plain
+
+comment ""
+position -1.18363 3.62897
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+0 	(0) "" 1 "input1"
+}
+inputs
+{
+0 	(0) 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author User@HP-Z820-03
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.chn"
+Content-Type: text/plain
+
+{
+    channel errormsg1 {
+      lefttype = extend
+      righttype = extend
+      defaultString = "\"from ayon_houdini.api import hda_utils
+
+# Parent node
+node = hou.pwd().parent()
+try:
+    hda_utils.get_node_expected_representation_id(node)
+except ValueError as exc:
+    return str(exc)
+    
+return \\\"Unable to get representation\\\"\""
+      flags = 0
+      start = 40
+      segment { length = 0 expr = "from ayon_houdini.api import hda_utils
+
+# Parent node
+node = hou.pwd().parent()
+if node.evalParm(\"representation\"):
+    return \"\"
+
+try:
+    hda_utils.get_node_expected_representation_id(node)
+except ValueError as exc:
+    return str(exc)
+else:
+    return \"\"" language = python }
+    }
+    channel enable1 {
+      lefttype = extend
+      righttype = extend
+      default = 1
+      flags = 0
+      start = 40
+      segment { length = 0 value = 1 1 expr = "strlen(chs(\"../representation\")) == 0" }
+    }
+  }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+numerror	[ 0	locks=0 ]	(	1	)
+errormsg1	[ 0	locks=0 ]	(	[ errormsg1	"" ] 	)
+severity1	[ 0	locks=0 ]	(	"warn"	)
+enable1	[ 0	locks=0 ]	(	[ enable1	0 ] 	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.order"
 Content-Type: text/plain
 
 3
 output0
-warn_no_representation_set
 sublayer
+warn_no_representation_set
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.net"
