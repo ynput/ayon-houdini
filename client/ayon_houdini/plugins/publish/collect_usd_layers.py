@@ -137,8 +137,6 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             layer_inst.data["instance_node"] = instance.data["instance_node"]
             layer_inst.data["render"] = False
             layer_inst.data["output_node"] = creator_node
-            if instance.data.get("productGroup"):
-                layer_inst.data["productGroup"] = instance.data["productGroup"]
 
             # Inherit "use handles" from the source instance
             # TODO: Do we want to maybe copy full `publish_attributes` instead?
@@ -148,8 +146,9 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             )
 
             # Allow this subset to be grouped into a USD Layer on creation
-            layer_inst.data["subsetGroup"] = "USD Layer"
-
+            layer_inst.data["productGroup"] = (
+                instance.data.get("productGroup") or "USD Layer"
+            )
             # For now just assume the representation will get published
             representation = {
                 "name": "usd",

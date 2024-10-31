@@ -1,0 +1,258 @@
+# Dialog script for ayon::generic_loader::1.0 automatically generated
+
+{
+    name	ayon::generic_loader::1.0
+    script	ayon::generic_loader::1.0
+    label	"AYON Generic Loader"
+
+    help {
+	""
+    }
+
+    inputlabel	1	"Sub-Network Input #1"
+    inputlabel	2	"Sub-Network Input #2"
+    inputlabel	3	"Sub-Network Input #3"
+    inputlabel	4	"Sub-Network Input #4"
+
+    groupsimple {
+        name    "info2"
+        label   "Info"
+        parmtag { "script_callback" "hou.phm().refresh_available_versions(kwargs['node'])" }
+        parmtag { "script_callback_language" "python" }
+
+        parm {
+            name    "assetinfo_labelparm"
+            label   "Heading"
+            type    label
+            default { "Choose Product" }
+            parmtag { "sidefx::look" "heading" }
+        }
+        parm {
+            name    "project_name"
+            label   "Project"
+            type    string
+            default { "$AYON_PROJECT_NAME" }
+            parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_folder_path;select_folder_path(kwargs['node'])" }
+            parmtag { "script_action_icon" "BUTTONS_reselect" }
+        }
+        parm {
+            name    "folder_path"
+            label   "Folder Path"
+            type    string
+            default { "$AYON_FOLDER_PATH" }
+            parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_folder_path;select_folder_path(kwargs['node'])" }
+            parmtag { "script_action_icon" "BUTTONS_reselect" }
+        }
+        parm {
+            name    "folder_name"
+            label   "Folder Name"
+            type    label
+            default { "`strsplit(chs(\"folder_path\"), \"/\", -1)`" }
+        }
+        parm {
+            name    "product_name"
+            label   "Product"
+            type    string
+            default { "" }
+            parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_product_name;select_product_name(kwargs['node'])" }
+            parmtag { "script_action_icon" "BUTTONS_reselect" }
+            parmtag { "script_callback" "hou.phm().set_to_latest_version(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "version"
+            label   "Version"
+            type    string
+            default { "" }
+            disablewhen "{ representation_old == \"\" }"
+            menureplace {
+                [ "versions = hou.phm().get_available_versions(kwargs['node'])" ]
+                [ "" ]
+                [ "result = []" ]
+                [ "for version in versions:" ]
+                [ "    result.append(str(version))" ]
+                [ "    result.append(f\"v{version:03d}\")" ]
+                [ "    " ]
+                [ "return result" ]
+                language python
+            }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "representation_name"
+            label   "Representation"
+            type    string
+            default { "" }
+            menureplace {
+                [ "representations_names = hou.phm().get_available_representations(kwargs['node'])" ]
+                [ "" ]
+                [ "result = []" ]
+                [ "for name in representations_names:" ]
+                [ "    result.append(name)" ]
+                [ "    result.append(name)" ]
+                [ "    " ]
+                [ "return result" ]
+                language python
+            }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "clear_cache"
+            label   "Clear Cache"
+            type    button
+            default { "0" }
+            help    "The load logic uses expressions that cache into the current session to avoid continuously requeryin the database. This clear that cache to enforce a full refresh of the expressions."
+            parmtag { "script_callback" "hou.phm().expression_clear_cache()" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "sepparm"
+            label   "Separator"
+            type    separator
+            default { "" }
+        }
+        parm {
+            name    "file"
+            label   "File"
+            type    string
+            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_path()" python ] }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "use_ayon_entity_uri"
+            label   "Use AYON Entity URI"
+            type    toggle
+            default { "0" }
+            help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
+        }
+    }
+
+    groupcollapsible {
+        name    "info_display2"
+        label   "Info Display"
+
+        parm {
+            name    "show_thumbnail"
+            label   "Show Entity Thumbnail"
+            type    toggle
+            joinnext
+            default { "0" }
+            parmtag { "script_callback" "hou.phm().on_thumbnail_show_changed(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "thumbnail_size"
+            label   "Size"
+            type    float
+            joinnext
+            default { "2" }
+            hidewhen "{ show_thumbnail == 0 }"
+            range   { 0 10 }
+            parmtag { "script_callback" "hou.phm().on_thumbnail_size_changed(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "thumbnail_cache_dir"
+            label   "Thumbnail Cache Dir"
+            type    directory
+            invisible
+            default { "$JOB/.houdini_loader_thumbnails" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "thumbnail_padding"
+            label   "Padding"
+            type    float
+            invisible
+            default { "1" }
+            range   { 0 10 }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "thumbnail_offset"
+            label   "Offset"
+            type    vector2
+            size    2
+            default { "0" "0.35" }
+            hidewhen "{ show_thumbnail == 0 }"
+            range   { -1 1 }
+            parmtag { "script_callback" "hou.phm().on_thumbnail_size_changed(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "update_thumbnail"
+            label   "Update Thumbnail"
+            type    button
+            default { "0" }
+            hidewhen "{ show_thumbnail == 0 }"
+            parmtag { "script_callback" "hou.phm().update_thumbnail(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "show_pipeline_parms"
+            label   "Show Pipeline Parms"
+            type    toggle
+            default { "0" }
+        }
+    }
+
+    group {
+        name    "ayon_folder0"
+        label   "Ayon"
+        hidewhen "{ show_pipeline_parms == 0 }"
+
+        parm {
+            name    "name"
+            label   "Name"
+            type    label
+            default { "$OS" }
+        }
+        parm {
+            name    "namespace"
+            label   "Namespace"
+            type    label
+            default { "`opfullpath(\".\")`" }
+        }
+        parm {
+            name    "loader"
+            label   "Loader"
+            type    label
+            default { "FilePathLoader" }
+        }
+        parm {
+            name    "id"
+            label   "ID"
+            type    label
+            default { "pyblish.avalon.container" }
+        }
+        parm {
+            name    "representation"
+            label   "Representation ID"
+            type    string
+            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_id()" python ] }
+        }
+        parm {
+            name    "version_name"
+            label   "Current Version Label"
+            type    label
+            invisible
+            default { "" }
+        }
+        parm {
+            name    "subset_name"
+            label   "Subset (backwards compatibility)"
+            type    label
+            invisible
+            default { "`chs(\"product_name\")`" }
+        }
+    }
+
+    parm {
+        name    "newparameter"
+        label   "Nodes referencing file"
+        type    oplist
+        default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
+        parmtag { "oprelative" "/" }
+        parmtag { "script_callback_language" "python" }
+    }
+}

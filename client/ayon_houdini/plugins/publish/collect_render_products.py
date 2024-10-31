@@ -46,7 +46,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
 
         filenames = []
         files_by_product = {}
-        stage = node.stage()
+        stage = instance.data["stage"]
         for prim_path in self.get_render_products(rop_node, stage):
             prim = stage.GetPrimAtPath(prim_path)
             if not prim or not prim.IsA(pxr.UsdRender.Product):

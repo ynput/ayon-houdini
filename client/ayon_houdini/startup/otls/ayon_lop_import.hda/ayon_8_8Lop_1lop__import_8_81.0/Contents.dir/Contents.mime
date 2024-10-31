@@ -19,7 +19,7 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position -1.67827 1.26636
+position -3.95588 0.372876
 connectornextid 0
 flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
@@ -35,10 +35,10 @@ stat
 {
   create -1
   modify -1
-  author Mustafa_Taher@Major-Kalawy
+  author User@HP-Z820-03
   access 0777
 }
-color UT_Color RGB 0.8 0.8 0.8
+color UT_Color RGB 0.8 0.8 0.8 
 delscript ""
 exprlanguage hscript
 end
@@ -77,7 +77,7 @@ Content-Disposition: attachment; filename="hdaroot/output0.def"
 Content-Type: text/plain
 
 comment ""
-position -1.13898e-08 2.03328
+position -0.346993 0.925092
 connectornextid 1
 flags =  lock off model off template off footprint off xray off bypass off display off render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
@@ -98,7 +98,7 @@ stat
   author Maqina-05@Maqina-05
   access 0777
 }
-color UT_Color RGB 0.8 0.8 0.8
+color UT_Color RGB 0.8 0.8 0.8 
 delscript ""
 exprlanguage hscript
 end
@@ -136,7 +136,7 @@ Content-Disposition: attachment; filename="hdaroot/reference.def"
 Content-Type: text/plain
 
 comment ""
-position -0.00125004 4.19692
+position -0.348243 2.45537
 connectornextid 2
 flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
@@ -158,7 +158,7 @@ stat
   author Maqina-05@Maqina-05
   access 0777
 }
-color UT_Color RGB 0.8 0.8 0.8
+color UT_Color RGB 0.8 0.8 0.8 
 delscript ""
 exprlanguage hscript
 end
@@ -302,7 +302,7 @@ Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.de
 Content-Type: text/plain
 
 comment ""
-position -1.13898e-08 5.20999
+position -0.346993 4.50044
 connectornextid 2
 flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
@@ -324,7 +324,7 @@ stat
   author User@HP-Z820-03
   access 0777
 }
-color UT_Color RGB 0.8 0.8 0.8
+color UT_Color RGB 0.8 0.8 0.8 
 delscript ""
 exprlanguage hscript
 end
@@ -334,12 +334,42 @@ Content-Disposition: attachment; filename="hdaroot/warn_no_representation_set.ch
 Content-Type: text/plain
 
 {
+    channel errormsg1 {
+      lefttype = extend
+      righttype = extend
+      defaultString = "\"from ayon_houdini.api import hda_utils
+
+# Parent node
+node = hou.pwd().parent()
+try:
+    hda_utils.get_node_expected_representation_id(node)
+except ValueError as exc:
+    return str(exc)
+    
+return \\\"Unable to get representation\\\"\""
+      flags = 0
+      start = 40
+      segment { length = 0 expr = "from ayon_houdini.api import hda_utils
+
+# Parent node
+node = hou.pwd().parent()
+if node.evalParm(\"representation\"):
+    return \"\"
+
+try:
+    hda_utils.get_node_expected_representation_id(node)
+except ValueError as exc:
+    return str(exc)
+else:
+    return \"\"" language = python }
+    }
     channel enable1 {
       lefttype = extend
       righttype = extend
+      default = 1
       flags = 0
-      start = 39.800000000000004
-      segment { length = 0 expr = "if(ch(\"../representation\"), 0, 1)" }
+      start = 40
+      segment { length = 0 value = 1 1 expr = "strlen(chs(\"../representation\")) == 0" }
     }
   }
 
@@ -350,7 +380,7 @@ Content-Type: text/plain
 {
 version 0.8
 numerror	[ 0	locks=0 ]	(	1	)
-errormsg1	[ 0	locks=0 ]	(	`chs(\"../load_message\")`	)
+errormsg1	[ 0	locks=0 ]	(	[ errormsg1	"" ] 	)
 severity1	[ 0	locks=0 ]	(	"warn"	)
 enable1	[ 0	locks=0 ]	(	[ enable1	0 ] 	)
 }

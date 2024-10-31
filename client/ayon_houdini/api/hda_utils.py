@@ -1,9 +1,12 @@
-"""Helper functions for load HDA"""
+"""Heper functions for load HDA"""
 
 import os
-import contextlib
+import re
 import uuid
 from typing import List
+
+import hou
+from qtpy import QtCore, QtWidgets, QtGui
 
 import ayon_api
 from ayon_api import (
@@ -13,24 +16,31 @@ from ayon_api import (
     get_folder_by_path,
     get_product_by_name,
     get_version_by_name,
-    get_representation_by_name
+    get_representation_by_name,
+    get_representations
+)
+from ayon_core.pipeline import Anatomy
+from ayon_core.lib import StringTemplate
+from ayon_core.pipeline.context_tools import (
+    get_current_project_name,
+    get_current_folder_path
 )
 from ayon_core.pipeline.load import (
     get_representation_context,
     get_representation_path_from_context
 )
-from ayon_core.pipeline.context_tools import (
-    get_current_project_name,
-    get_current_folder_path
-)
-from ayon_core.tools.utils import SimpleFoldersWidget
 from ayon_core.style import load_stylesheet
-
+from ayon_core.tools.utils import SimpleFoldersWidget
 from ayon_houdini.api import lib
 from .usd import get_ayon_entity_uri_from_representation_context
 
-from qtpy import QtCore, QtWidgets, QtGui
-import hou
+
+def get_session_cache() -> dict:
+    """Get a persistent `hou.session.ayon_cache` dict"""
+    cache = getattr(hou.session, "ayon_cache", None)
+    if cache is None:
+        hou.session.ayon_cache = cache = {}
+    return cache
 
 
 def is_valid_uuid(value) -> bool:
@@ -40,16 +50,6 @@ def is_valid_uuid(value) -> bool:
     except ValueError:
         return False
     return True
-
-
-@contextlib.contextmanager
-def _unlocked_parm(parm):
-    """Unlock parm during context; will always lock after"""
-    try:
-        parm.lock(False)
-        yield
-    finally:
-        parm.lock(True)
 
 
 def get_available_versions(node):
@@ -99,7 +99,7 @@ def get_available_versions(node):
     return version_names
 
 
-def update_info(node, context):
+def set_node_representation_from_context(node, context):
     """Update project, folder, product, version, representation name parms.
 
      Arguments:
@@ -128,12 +128,82 @@ def update_info(node, context):
     }
     parms = {key: value for key, value in parms.items()
              if node.evalParm(key) != value}
-    parms["load_message"] = ""  # clear any warnings/errors
-
-    # Note that these never trigger any parm callbacks since we do not
-    # trigger the `parm.pressButton` and programmatically setting values
-    # in Houdini does not trigger callbacks automatically
     node.setParms(parms)
+
+
+def get_representation_path(
+    project_name: str,
+    representation_id: str,
+    use_ayon_entity_uri: bool
+) -> str:
+    # Ignore invalid representation ids silently
+    # TODO remove - added for backwards compatibility with OpenPype scenes
+    if not is_valid_uuid(representation_id):
+        return ""
+
+    repre_entity = get_representation_by_id(project_name, representation_id)
+    if not repre_entity:
+        return ""
+
+    context = get_representation_context(project_name, repre_entity)
+    if use_ayon_entity_uri:
+        path = get_ayon_entity_uri_from_representation_context(context)
+    else:
+        path = _get_filepath_from_context(context)
+        # Load fails on UNC paths with backslashes and also
+        # fails to resolve @sourcename var with backslashed
+        # paths correctly. So we force forward slashes
+        path = path.replace("\\", "/")
+    return path
+
+
+def _remove_format_spec(template: str, key: str) -> str:
+    """Remove format specifier from a format token in formatting string.
+    For example, change `{frame:0>4d}` into `{frame}`
+    Examples:
+        >>> remove_format_spec("{frame:0>4d}", "frame")
+        '{frame}'
+        >>> remove_format_spec("{digit:04d}/{frame:0>4d}", "frame")
+        '{digit:04d}/{udim}_{frame}'
+        >>> remove_format_spec("{a: >4}/{aa: >4}", "a")
+        '{a}/{aa: >4}'
+    """
+    # Find all {key:foobar} and remove the `:foobar`
+    # Pattern will be like `({key):[^}]+(})` where we use the captured groups
+    # to keep those parts in the resulting string
+    pattern = f"({{{key}):[^}}]+(}})"
+    return re.sub(pattern, r"\1\2", template)
+
+
+def _get_filepath_from_context(context: dict):
+    """Format file path for sequence with $F or <UDIM>."""
+    # The path is either a single file or sequence in a folder.
+    # Format frame as $F and udim as <UDIM>
+    representation = context["representation"]
+    frame = representation["context"].get("frame")
+    udim = representation["context"].get("udim")
+    if frame is not None or udim is not None:
+        template: str = representation["attrib"]["template"]
+        repre_context: dict = representation["context"]
+        if udim is not None:
+            repre_context["udim"] = "<UDIM>"
+            template = _remove_format_spec(template, "udim")
+        if frame is not None:
+            # Substitute frame number in sequence with $F with padding
+            repre_context["frame"] = "$F{}".format(len(frame))  # e.g. $F4
+            template = _remove_format_spec(template, "frame")
+
+        project_name: str = repre_context["project"]["name"]
+        anatomy = Anatomy(project_name, project_entity=context["project"])
+        repre_context["root"] = anatomy.roots
+        path = StringTemplate(template).format(repre_context)
+    else:
+        path = get_representation_path_from_context(context)
+
+    # Load fails on UNC paths with backslashes and also
+    # fails to resolve @sourcename var with backslashed
+    # paths correctly. So we force forward slashes
+    return os.path.normpath(path).replace("\\", "/")
 
 
 def _get_thumbnail(project_name: str, version_id: str, thumbnail_dir: str):
@@ -155,12 +225,13 @@ def _get_thumbnail(project_name: str, version_id: str, thumbnail_dir: str):
         return path
 
 
-def set_representation(node, representation_id: str):
-    file_parm = node.parm("file")
+def update_thumbnail(node):
+    if not node.evalParm("show_thumbnail"):
+        lib.remove_all_thumbnails(node)
+        return
+
+    representation_id = node.evalParm("representation")
     if not representation_id:
-        # Clear filepath and thumbnail
-        with _unlocked_parm(file_parm):
-            file_parm.set("")
         set_node_thumbnail(node, None)
         return
 
@@ -168,34 +239,7 @@ def set_representation(node, representation_id: str):
         node.evalParm("project_name")
         or get_current_project_name()
     )
-
-    # Ignore invalid representation ids silently
-    # TODO remove - added for backwards compatibility with OpenPype scenes
-    if not is_valid_uuid(representation_id):
-        return
-
     repre_entity = get_representation_by_id(project_name, representation_id)
-    if not repre_entity:
-        return
-
-    context = get_representation_context(project_name, repre_entity)
-    update_info(node, context)
-
-    if node.parm("use_ayon_entity_uri"):
-        use_ayon_entity_uri = node.evalParm("use_ayon_entity_uri")
-    else:
-        use_ayon_entity_uri = False
-    if use_ayon_entity_uri:
-        path = get_ayon_entity_uri_from_representation_context(context)
-    else:
-        path = get_representation_path_from_context(context)
-        # Load fails on UNC paths with backslashes and also
-        # fails to resolve @sourcename var with backslashed
-        # paths correctly. So we force forward slashes
-        path = path.replace("\\", "/")
-    with _unlocked_parm(file_parm):
-        file_parm.set(path)
-
     if node.evalParm("show_thumbnail"):
         # Update thumbnail
         # TODO: Cache thumbnail path as well
@@ -238,11 +282,7 @@ def compute_thumbnail_rect(node):
 
 def on_thumbnail_show_changed(node):
     """Callback on thumbnail show parm changed"""
-    if node.evalParm("show_thumbnail"):
-        # For now, update all
-        on_representation_id_changed(node)
-    else:
-        lib.remove_all_thumbnails(node)
+    update_thumbnail(node)
 
 
 def on_thumbnail_size_changed(node):
@@ -254,45 +294,16 @@ def on_thumbnail_size_changed(node):
         lib.set_node_thumbnail(node, thumbnail)
 
 
-def on_representation_id_changed(node):
-    """Callback on representation id changed
-
-    Args:
-        node (hou.Node): Node to update.
-    """
-    repre_id = node.evalParm("representation")
-    set_representation(node, repre_id)
-
-
-def on_representation_parms_changed(node, force=False):
-    """
-    Usually used as callback to the project, folder, product, version and
-    representation parms which on change - would result in a different
-    representation id to be resolved.
-
-    Args:
-        node (hou.Node): Node to update.
-        force (Optional[bool]): Whether to force the callback to retrigger
-            even if the representation id already matches. For example, when
-            needing to resolve the filepath in a different way.
-    """
-    project_name = node.evalParm("project_name") or get_current_project_name()
-    representation_id = get_representation_id(
-        project_name=project_name,
-        folder_path=node.evalParm("folder_path"),
-        product_name=node.evalParm("product_name"),
-        version=node.evalParm("version"),
-        representation_name=node.evalParm("representation_name"),
-        load_message_parm=node.parm("load_message")
+def get_node_expected_representation_id(node) -> str:
+    project_name = node.evalParm(
+        "project_name") or get_current_project_name()
+    return get_representation_id(
+            project_name=project_name,
+            folder_path=node.evalParm("folder_path"),
+            product_name=node.evalParm("product_name"),
+            version=node.evalParm("version"),
+            representation_name=node.evalParm("representation_name"),
     )
-    if representation_id is None:
-        representation_id = ""
-    else:
-        representation_id = str(representation_id)
-
-    if force or node.evalParm("representation") != representation_id:
-        node.parm("representation").set(representation_id)
-        node.parm("representation").pressButton()  # trigger callback
 
 
 def get_representation_id(
@@ -301,7 +312,6 @@ def get_representation_id(
         product_name,
         version,
         representation_name,
-        load_message_parm,
 ):
     """Get representation id.
 
@@ -311,14 +321,14 @@ def get_representation_id(
         product_name (str): Product name
         version (str): Version name as string
         representation_name (str): Representation name
-        load_message_parm (hou.Parm): A string message parm to report
-            any error messages to.
 
     Returns:
-        Optional[str]: Representation id or None if not found.
+        str: Representation id or None if not found.
+
+    Raises:
+        ValueError: If the entity could not be resolved with input values.
 
     """
-
     if not all([
         project_name, folder_path, product_name, version, representation_name
     ]):
@@ -330,15 +340,14 @@ def get_representation_id(
             "representation": representation_name
         }
         missing = ", ".join(key for key, value in labels.items() if not value)
-        load_message_parm.set(f"Load info incomplete. Found empty: {missing}")
-        return
+        raise ValueError(f"Load info incomplete. Found empty: {missing}")
 
     try:
         version = int(version.strip())
     except ValueError:
-        load_message_parm.set(f"Invalid version format: '{version}'\n"
-                              "Make sure to set a valid version number.")
-        return
+        raise ValueError(
+            f"Invalid version format: '{version}'\n"
+            "Make sure to set a valid version number.")
 
     folder_entity = get_folder_by_path(project_name,
                                        folder_path=folder_path,
@@ -347,10 +356,8 @@ def get_representation_id(
         # This may be due to the project not existing - so let's validate
         # that first
         if not get_project(project_name):
-            load_message_parm.set(f"Project not found: '{project_name}'")
-            return
-        load_message_parm.set(f"Folder not found: '{folder_path}'")
-        return
+            raise ValueError(f"Project not found: '{project_name}'")
+        raise ValueError(f"Folder not found: '{folder_path}'")
 
     product_entity = get_product_by_name(
         project_name,
@@ -358,25 +365,23 @@ def get_representation_id(
         folder_id=folder_entity["id"],
         fields={"id"})
     if not product_entity:
-        load_message_parm.set(f"Product not found: '{product_name}'")
-        return
+        raise ValueError(f"Product not found: '{product_name}'")
+
     version_entity = get_version_by_name(
         project_name,
         version,
         product_id=product_entity["id"],
         fields={"id"})
     if not version_entity:
-        load_message_parm.set(f"Version not found: '{version}'")
-        return
+        raise ValueError(f"Version not found: '{version}'")
+
     representation_entity = get_representation_by_name(
         project_name,
         representation_name,
         version_id=version_entity["id"],
         fields={"id"})
     if not representation_entity:
-        load_message_parm.set(
-            f"Representation not found: '{representation_name}'.")
-        return
+        raise ValueError(f"Representation not found: '{representation_name}'.")
     return representation_entity["id"]
 
 
@@ -405,7 +410,10 @@ def on_flag_changed(node, **kwargs):
     if not images:
         return
 
-    brightness = 0.3 if node.isBypassed() else 1.0
+    # This may trigger on a node that can't be bypassed, like `ObjNode` so
+    # consider those never bypassed
+    is_bypassed = hasattr(node, "isBypassed") and node.isBypassed()
+    brightness = 0.3 if is_bypassed else 1.0
     has_changes = False
     node_path = node.path()
     for image in images:
@@ -701,11 +709,64 @@ def select_product_name(node):
         product_parm.pressButton()  # allow any callbacks to trigger
 
 
+def get_available_representations(node):
+    """Return the representation list for node.
+
+    Args:
+        node (hou.Node): Node to query selected version's representations for.
+
+    Returns:
+        list[str]: representation names for the product version.
+    """
+
+    project_name = node.evalParm("project_name") or get_current_project_name()
+    folder_path = node.evalParm("folder_path")
+    product_name = node.evalParm("product_name")
+    version = node.evalParm("version")
+
+    if not all([
+        project_name, folder_path, product_name, version
+    ]):
+        return []
+
+    try:
+        version = int(version.strip())
+    except ValueError:
+        load_message_parm = node.parm("load_message")
+        load_message_parm.set(f"Invalid version format: '{version}'\n"
+                              "Make sure to set a valid version number.")
+        return
+
+    folder_entity = get_folder_by_path(
+        project_name,
+        folder_path=folder_path,
+        fields={"id"}
+    )
+    product_entity = get_product_by_name(
+            project_name,
+            product_name=product_name,
+            folder_id=folder_entity["id"],
+            fields={"id"})
+    version_entity = get_version_by_name(
+            project_name,
+            version,
+            product_id=product_entity["id"],
+            fields={"id"})
+    representations = get_representations(
+            project_name,
+            version_ids={version_entity["id"]},
+            fields={"name"}
+    )
+    representations_names = [n["name"] for n in representations]
+    return representations_names
+
+
 def set_to_latest_version(node):
     """Callback on product name change
 
-    Refresh version parameter value by setting its value to
-    the latest version of the selected product.
+    Refresh version and representation parameters value by setting
+    their value to the latest version and representation of
+    the selected product.
 
     Args:
         node (hou.OpNode): The HDA node.
@@ -714,3 +775,69 @@ def set_to_latest_version(node):
     versions = get_available_versions(node)
     if versions:
         node.parm("version").set(str(versions[0]))
+
+    representations = get_available_representations(node)
+    if representations:
+        node.parm("representation_name").set(representations[0])
+
+
+# region Parm Expressions
+# Callbacks used for expression on HDAs (e.g. Load Asset or Load Shot LOP)
+# Note that these are called many times, sometimes even multiple times when
+# the Parameters tab is open on the node. So some caching is performed to
+# avoid expensive re-querying.
+def expression_clear_cache(subkey=None) -> bool:
+    # Clear full cache if no subkey provided
+    if subkey is None:
+        if hasattr(hou.session, "ayon_cache"):
+            delattr(hou.session, "ayon_cache")
+            return True
+        return False
+
+    # Clear only key in cache if provided
+    cache = getattr(hou.session, "ayon_cache", {})
+    if subkey in cache:
+        cache.pop(subkey)
+        return True
+    return False
+
+
+def expression_get_representation_id() -> str:
+    project_name = hou.evalParm("project_name")
+    folder_path = hou.evalParm("folder_path")
+    product_name = hou.evalParm("product_name")
+    version = hou.evalParm("version")
+    representation_name = hou.evalParm("representation_name")
+
+    node = hou.pwd()
+    hash_value = (project_name, folder_path, product_name, version,
+                  representation_name)
+    cache = get_session_cache().setdefault("representation_ids", {})
+    if hash_value in cache:
+        return cache[hash_value]
+
+    try:
+        repre_id = get_node_expected_representation_id(node)
+    except ValueError:
+        # Ignore invalid parameters
+        repre_id = ""
+
+    cache[hash_value] = repre_id
+    return repre_id
+
+
+def expression_get_representation_path() -> str:
+    cache = get_session_cache().setdefault("representation_path", {})
+    project_name: str = hou.evalParm("project_name")
+    repre_id: str = hou.evalParm("representation")
+    use_entity_uri = bool(hou.evalParm("use_ayon_entity_uri"))
+    hash_value = project_name, repre_id, use_entity_uri
+    if hash_value in cache:
+        return cache[hash_value]
+
+    path = get_representation_path(project_name, repre_id, use_entity_uri)
+    cache[hash_value] = path
+    return path
+
+# endregion
+
