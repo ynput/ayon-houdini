@@ -10,6 +10,8 @@ from contextlib import contextmanager
 import six
 import ayon_api
 
+import hou
+
 from ayon_core.lib import StringTemplate
 from ayon_core.settings import get_current_project_settings
 from ayon_core.pipeline import (
@@ -26,8 +28,6 @@ from ayon_core.pipeline.workfile.workfile_template_builder import (
 )
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
-
-import hou
 
 
 self = sys.modules[__name__]
@@ -1400,7 +1400,7 @@ def find_active_network(category, default):
     Arguments:
         category (hou.NodeTypeCategory): The node network category type.
         default (str): The default path to fallback to if no active pane
-            is found with the given category.
+            is found with the given category, e.g. "/obj"
 
     Returns:
         hou.Node: The node network to return.
@@ -1521,3 +1521,67 @@ def start_workfile_template_builder():
         build_workfile_template(workfile_creation_enabled=True)
     except TemplateProfileNotFound:
         log.warning("Template profile not found. Skipping...")
+
+
+def show_node_parmeditor(node):
+    """Show Parameter Editor for the Node.
+
+    Args:
+        node (hou.Node): node instance
+    """
+
+    # Check if there's a floating parameter editor pane with its node set to the specified node.
+    for tab in hou.ui.paneTabs():
+        if (
+            tab.type() == hou.paneTabType.Parm
+            and tab.isFloating()
+            and tab.currentNode() == node
+        ):
+            tab.setIsCurrentTab()
+            return
+
+    # We are using the hscript to create and set the network path of the pane
+    # because hscript can set the node path without selecting the node.
+    # Create a floating pane and set its name to the node path.
+    hou.hscript(
+        f"pane -F -m parmeditor -n {node.path()}"
+    )
+    # Hide network controls, turn linking off and set operator node path.
+    hou.hscript(
+        f"pane -a 1 -l 0 -H {node.path()} {node.path()}"
+    )
+
+
+def connect_file_parm_to_loader(file_parm: hou.Parm):
+    """Connect the given file parm to a generic loader.
+    If the parm is already connected to a generic loader node, go to that node.
+    """
+    
+    from .pipeline import get_or_create_avalon_container
+
+    referenced_parm = file_parm.getReferencedParm()
+
+    # If the parm has reference
+    if file_parm != referenced_parm:
+        referenced_node = referenced_parm.getReferencedParm().node()
+        if referenced_node.type().name() == "ayon::generic_loader::1.0":
+            show_node_parmeditor(referenced_node)
+            return
+
+    # Create a generic loader node and reference its file parm
+    main_container = get_or_create_avalon_container()
+    
+    node_name = f"{file_parm.node().name()}_{file_parm.name()}_loader"
+    load_node = main_container.createNode("ayon::generic_loader",
+                                          node_name=node_name)
+    load_node.moveToGoodPosition()
+
+    # Set relative reference via hscript. This avoids the issues of
+    # `setExpression` e.g. having a keyframe.
+    relative_path = file_parm.node().relativePathTo(load_node)
+    expression = rf'chs\(\"{relative_path}/file\"\)'  # noqa
+    hou.hscript(
+        'opparm -r'
+        f' {file_parm.node().path()} {file_parm.name()} \`{expression}\`'
+    )
+    show_node_parmeditor(load_node)
