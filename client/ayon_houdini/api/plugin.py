@@ -109,6 +109,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
     add_publish_button = False
 
     settings_category = SETTINGS_CATEGORY
+    node_type = "geometry"
 
     def create(self, product_name, instance_data, pre_create_data):
         try:
@@ -120,7 +121,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             # Get the node type and remove it from the data, not needed
             node_type = instance_data.pop("node_type", None)
             if node_type is None:
-                node_type = "geometry"
+                node_type = self.node_type
 
             folder_path = instance_data["folderPath"]
 
