@@ -76,7 +76,6 @@
                 [ "return result" ]
                 language python
             }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
         }
         parm {
@@ -95,7 +94,6 @@
                 [ "return result" ]
                 language python
             }
-            parmtag { "script_callback" "hou.phm().on_representation_parms_changed(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
         }
         parm {
