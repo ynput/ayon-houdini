@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import inspect
-from pxr import Usd, UsdShade, UsdGeom
+from typing import Iterable, Optional, List
+
+from pxr import Sdf, Usd, UsdShade, UsdGeom
 
 import pyblish.api
 
@@ -13,22 +15,26 @@ from ayon_houdini.api import plugin
 
 
 def has_material(prim: Usd.Prim,
-                 include_subsets: bool=True,
-                 purpose=UsdShade.Tokens.allPurpose) -> bool:
+                 include_subsets: bool = True,
+                 purposes: Optional[Iterable[str]] = None) -> bool:
     """Return whether primitive has any material binding."""
+    if purposes is None:
+        purposes = [UsdShade.Tokens.allPurpose]
+
     search_from = [prim]
     if include_subsets:
         subsets = UsdShade.MaterialBindingAPI(prim).GetMaterialBindSubsets()
         for subset in subsets:
             search_from.append(subset.GetPrim())
 
-    bounds = UsdShade.MaterialBindingAPI.ComputeBoundMaterials(search_from,
-                                                               purpose)
-    for (material, relationship) in zip(*bounds):
-        material_prim = material.GetPrim()
-        if material_prim.IsValid():
-            # Has a material binding
-            return True
+    for purpose in purposes:
+        bounds = UsdShade.MaterialBindingAPI.ComputeBoundMaterials(search_from,
+                                                                   purpose)
+        for (material, relationship) in zip(*bounds):
+            material_prim = material.GetPrim()
+            if material_prim.IsValid():
+                # Has a material binding
+                return True
 
     return False
 
@@ -49,6 +55,15 @@ class ValidateUsdLookAssignments(plugin.HoudiniInstancePlugin,
     actions = [SelectROPAction]
     optional = True
 
+    # The USD documentation mentions that it's okay to have custom material
+    # purposes but the USD standard only supports 2 (technically 3, since
+    # allPurpose is empty)
+    allowed_material_purposes = (
+        UsdShade.Tokens.full,
+        UsdShade.Tokens.preview,
+        UsdShade.Tokens.allPurpose,
+    )
+
     def process(self, instance):
         if not self.is_active(instance.data):
             return
@@ -65,12 +80,12 @@ class ValidateUsdLookAssignments(plugin.HoudiniInstancePlugin,
         # but only checks against the current composed stage. Likely this is
         # also what you actually want to validate, because your look might not
         # apply to *all* model variants.
-        invalid = []
+        invalid: List[Sdf.Path] = []
         for prim in stage.Traverse():
             if not prim.IsA(UsdGeom.Gprim):
                 continue
 
-            if not has_material(prim):
+            if not has_material(prim, purposes=self.allowed_material_purposes):
                 invalid.append(prim.GetPath())
 
         for path in sorted(invalid):
