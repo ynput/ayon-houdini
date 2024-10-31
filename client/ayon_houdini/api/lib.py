@@ -105,6 +105,21 @@ def get_output_parameter(node):
         return node.parm("outputimage")
     elif node_type == "vray_renderer":
         return node.parm("SettingsOutput_img_file_path")
+    elif node_type == "labs::karma::2.0":
+        return node.parm("picture")
+
+    if isinstance(node, hou.RopNode):
+        # Use the parm name fallback that SideFX applies for detecting output
+        # files from PDG/TOPs graphs for ROP nodes. See #ayon-core/692
+        parm_names = [
+            "vm_picture", "sopoutput", "dopoutput", "lopoutput", "picture",
+            "copoutput", "filename", "usdfile", "file", "output",
+            "outputfilepath", "outputimage", "outfile"
+        ]
+        for name in parm_names:
+            parm = node.parm(name)
+            if parm:
+                return parm
 
     raise TypeError("Node type '%s' not supported" % node_type)
 
@@ -456,6 +471,9 @@ def read(node):
             except json.JSONDecodeError:
                 # not a json
                 pass
+        elif parameter.parmTemplate().type() is hou.parmTemplateType.Toggle:
+            # Toggles should be returned as boolean instead of int of 1 or 0
+            value = bool(value)
         data[parameter.name()] = value
 
     return data
@@ -1107,10 +1125,20 @@ def self_publish():
 def add_self_publish_button(node):
     """Adds a self publish button to the rop node."""
 
+    parm_name = "ayon_self_publish"
+
     label = os.environ.get("AYON_MENU_LABEL") or "AYON"
+    template = node.parmTemplateGroup()
+    existing = template.find(parm_name)
+    if existing:
+        log.warning(
+            f"Self publish parm already found on {node.path()}. "
+            "Skipping creation..."
+        )
+        return
 
     button_parm = hou.ButtonParmTemplate(
-        "ayon_self_publish",
+        parm_name,
         "{} Publish".format(label),
         script_callback="from ayon_houdini.api.lib import "
                         "self_publish; self_publish()",
@@ -1118,7 +1146,6 @@ def add_self_publish_button(node):
         join_with_next=True
     )
 
-    template = node.parmTemplateGroup()
     template.insertBefore((0,), button_parm)
     node.setParmTemplateGroup(template)
 
@@ -1521,3 +1548,16 @@ def start_workfile_template_builder():
         build_workfile_template(workfile_creation_enabled=True)
     except TemplateProfileNotFound:
         log.warning("Template profile not found. Skipping...")
+
+
+@contextmanager
+def no_auto_create_publishable():
+    value = os.environ.get("AYON_HOUDINI_AUTOCREATE")
+    os.environ["AYON_HOUDINI_AUTOCREATE"] = "0"
+    try:
+        yield
+    finally:
+        if value is None:
+            del os.environ["AYON_HOUDINI_AUTOCREATE"]
+        else:
+            os.environ["AYON_HOUDINI_AUTOCREATE"] = value
