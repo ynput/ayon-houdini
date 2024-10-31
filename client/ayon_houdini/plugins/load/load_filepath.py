@@ -34,10 +34,7 @@ class FilePathLoader(plugin.HoudiniLoader):
                                       node_name=node_name)
         node.moveToGoodPosition()
 
-        # Set representation id
-        parm = node.parm("representation")
-        parm.set(context["representation"]["id"])
-        parm.pressButton()  # trigger callbacks
+        hda_utils.set_node_representation_from_context(node, context)
 
     def update(self, container, context):
 
@@ -49,10 +46,7 @@ class FilePathLoader(plugin.HoudiniLoader):
             self.update_legacy(node, context)
             return
 
-        # Set representation id
-        parm = node.parm("representation")
-        parm.set(context["representation"]["id"])
-        parm.pressButton()  # trigger callbacks
+        hda_utils.set_node_representation_from_context(node, context)
 
     def switch(self, container, context):
         self.update(container, context)
