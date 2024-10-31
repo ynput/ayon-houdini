@@ -190,7 +190,7 @@ def _get_filepath_from_context(context: dict):
             template = _remove_format_spec(template, "udim")
         if frame is not None:
             # Substitute frame number in sequence with $F with padding
-            repre_context["frame"] = "$F{}".format(len(frame))   # e.g. $F4
+            repre_context["frame"] = "$F{}".format(len(frame))  # e.g. $F4
             template = _remove_format_spec(template, "frame")
 
         project_name: str = repre_context["project"]["name"]
@@ -410,7 +410,10 @@ def on_flag_changed(node, **kwargs):
     if not images:
         return
 
-    brightness = 0.3 if node.isBypassed() else 1.0
+    # This may trigger on a node that can't be bypassed, like `ObjNode` so
+    # consider those never bypassed
+    is_bypassed = hasattr(node, "isBypassed") and node.isBypassed()
+    brightness = 0.3 if is_bypassed else 1.0
     has_changes = False
     node_path = node.path()
     for image in images:
