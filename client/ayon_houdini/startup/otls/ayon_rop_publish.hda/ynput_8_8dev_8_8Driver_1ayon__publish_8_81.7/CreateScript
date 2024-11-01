@@ -13,3 +13,4 @@ endif
 opspareds "" $arg1
 opexprlanguage -s hscript $arg1
 opuserdata -n '___Version___' -v '' $arg1
+opuserdata -n 'nodeshape' -v 'chevron_down' $arg1

@@ -703,4 +703,76 @@
         label   "Render with Take"
         export  none
     }
+    group {
+        name    "folder"
+        label   "Extra"
+
+        parm {
+            name    "id"
+            label   "id"
+            type    string
+            default { "pyblish.avalon.instance" }
+        }
+        parm {
+            name    "productType"
+            label   "productType"
+            type    string
+            default { "pub" }
+        }
+        parm {
+            name    "active"
+            label   "active"
+            type    toggle
+            default { "1" }
+        }
+        parm {
+            name    "creator_identifier"
+            label   "creator_identifier"
+            type    string
+            default { "io.openpype.creators.houdini.pub" }
+        }
+        parm {
+            name    "variant"
+            label   "variant"
+            type    string
+            default { "" }
+        }
+        parm {
+            name    "folderPath"
+            label   "folderPath"
+            type    string
+            default { "" }
+        }
+        parm {
+            name    "task"
+            label   "task"
+            type    string
+            default { "" }
+        }
+        parm {
+            name    "creator_attributes"
+            label   "creator_attributes"
+            type    string
+            default { "" }
+        }
+        parm {
+            name    "publish_attributes"
+            label   "publish_attributes"
+            type    string
+            default { "" }
+        }
+        parm {
+            name    "AYON_productName"
+            label   "AYON_productName"
+            type    string
+            default { "" }
+        }
+        parm {
+            name    "from_node"
+            label   "from_node"
+            type    toggle
+            default { "0" }
+        }
+    }
+
 }
