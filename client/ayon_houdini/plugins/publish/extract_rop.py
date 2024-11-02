@@ -1,6 +1,5 @@
 import os
 import hou
-import inspect
 
 import pyblish.api
 
