@@ -1,5 +1,6 @@
 import os
 import hou
+import inspect
 
 import pyblish.api
 
@@ -31,7 +32,11 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        self.render_rop(instance)
+        if instance.data.get("creator_attributes",{}).get("local_no_render"):
+            print("Using Existing Frames")
+        else:
+            self.render_rop(instance)
+
         self.validate_expected_frames(instance)
 
         # In some cases representation name is not the the extension

@@ -19,6 +19,7 @@ class CreateBGEO(plugin.HoudiniCreator):
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
         creator_attributes["farm"] = pre_create_data["farm"]
+        creator_attributes["local_no_render"] = pre_create_data["local_no_render"]
 
         instance = super(CreateBGEO, self).create(
             product_name,
@@ -63,6 +64,9 @@ class CreateBGEO(plugin.HoudiniCreator):
         return [
             BoolDef("farm",
                     label="Submitting to Farm",
+                    default=False),
+            BoolDef("local_no_render",
+                    label="Use existing frames (local)",
                     default=False)
         ]
 
