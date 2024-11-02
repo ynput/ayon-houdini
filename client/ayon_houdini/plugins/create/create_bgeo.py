@@ -70,16 +70,16 @@ class CreateBGEO(plugin.HoudiniCreator):
         attrs = super().get_pre_create_attr_defs()
         bgeo_enum = [
             {
-                "value": "bgeo",
-                "label": "uncompressed bgeo (.bgeo)"
+                "value": "bgeo.sc",
+                "label": "BLOSC compressed bgeo (.bgeo.sc)"
             },
             {
                 "value": "bgeosc",
                 "label": "BLOSC compressed bgeo (.bgeosc)"
             },
             {
-                "value": "bgeo.sc",
-                "label": "BLOSC compressed bgeo (.bgeo.sc)"
+                "value": "bgeo",
+                "label": "uncompressed bgeo (.bgeo)"
             },
             {
                 "value": "bgeo.gz",
