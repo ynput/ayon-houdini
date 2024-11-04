@@ -103,13 +103,14 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             layer_inst.append(rop_node)
 
             staging_dir, fname = os.path.split(save_path)
-            fname_no_ext, ext = os.path.splitext(fname)
 
             # The save path may include :SDF_FORMAT_ARGS: which will conflict
             # with how we end up integrating these files because those will
             # NOT be included in the actual output filename on disk, so we
             # remove the SDF_FORMAT_ARGS from the filename.
             fname = Sdf.Layer.SplitIdentifier(fname)[0]
+
+            fname_no_ext, ext = os.path.splitext(fname)
 
             variant = fname_no_ext
 
@@ -163,5 +164,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                 "stagingDir": staging_dir,
                 "files": fname
             }
+
+            self.log.info(representation)
             layer_inst.data.setdefault("representations", []).append(
                 representation)
