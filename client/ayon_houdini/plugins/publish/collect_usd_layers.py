@@ -8,6 +8,7 @@ from ayon_core.pipeline.create import get_product_name
 from ayon_houdini.api import plugin
 import ayon_houdini.api.usd as usdlib
 
+from pxr import Sdf
 import hou
 
 
@@ -103,6 +104,12 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
 
             staging_dir, fname = os.path.split(save_path)
             fname_no_ext, ext = os.path.splitext(fname)
+
+            # The save path may include :SDF_FORMAT_ARGS: which will conflict
+            # with how we end up integrating these files because those will
+            # NOT be included in the actual output filename on disk, so we
+            # remove the SDF_FORMAT_ARGS from the filename.
+            fname = Sdf.Layer.SplitIdentifier(fname)[0]
 
             variant = fname_no_ext
 
