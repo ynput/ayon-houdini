@@ -120,7 +120,15 @@ def get_source_paths(
     """Return the full source filepaths for an instance's representations"""
 
     staging = repre.get("stagingDir", instance.data.get("stagingDir"))
-    files = repre.get("files", [])
+
+    # Support special `files_raw` key for representations that may originate
+    # from a path in the USD file including `:SDF_FORMAT_ARGS:` which we will
+    # also want to match against.
+    if "files_raw" in repre:
+        files = repre["files_raw"]
+    else:
+        files = repre.get("files", [])
+
     if isinstance(files, list):
         return [os.path.join(staging, fname) for fname in files]
     elif isinstance(files, str):
