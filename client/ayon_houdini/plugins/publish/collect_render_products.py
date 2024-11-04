@@ -7,9 +7,7 @@ import pxr.UsdRender
 import pyblish.api
 
 from ayon_houdini.api import plugin
-from ayon_houdini.api.usd import (
-    get_usd_render_rop_rendersettings
-)
+from ayon_houdini.api.usd import get_usd_render_rop_rendersettings
 
 
 class CollectRenderProducts(plugin.HoudiniInstancePlugin):
@@ -50,9 +48,12 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
         for prim_path in self.get_render_products(rop_node, stage):
             prim = stage.GetPrimAtPath(prim_path)
             if not prim or not prim.IsA(pxr.UsdRender.Product):
-                self.log.warning("Found invalid render product path "
-                                 "configured in render settings that is not a "
-                                 "Render Product prim: %s", prim_path)
+                self.log.warning(
+                    "Found invalid render product path "
+                    "configured in render settings that is not a "
+                    "Render Product prim: %s",
+                    prim_path,
+                )
                 continue
 
             render_product = pxr.UsdRender.Product(prim)
@@ -67,6 +68,8 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
 
             dirname = os.path.dirname(name)
             basename = os.path.basename(name)
+
+            instance.data["stagingDir"] = dirname
 
             dollarf_regex = r"(\$F([0-9]?))"
             if re.match(dollarf_regex, basename):
@@ -108,8 +111,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
                 filename = filename.replace("\\", "/")
 
             assert "#" in filename, (
-                "Couldn't resolve render product name "
-                "with frame number: %s" % name
+                "Couldn't resolve render product name " "with frame number: %s" % name
             )
 
             filenames.append(filename)
@@ -120,13 +122,13 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
                 self.log.error(
                     "Multiple render products are identified as the same AOV "
                     "which means one of the two will not be ingested during"
-                    "publishing. AOV: '%s'", aov_identifier
+                    "publishing. AOV: '%s'",
+                    aov_identifier,
                 )
                 self.log.warning("Skipping Render Product: %s", render_product)
 
             files_by_product[aov_identifier] = self.generate_expected_files(
-                instance,
-                filename
+                instance, filename
             )
 
             aov_label = f"'{aov_identifier}' aov in " if aov_identifier else ""
@@ -183,12 +185,11 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
             # AOV for a single var
             return targets[0].name
         else:
-            self.log.warning(
-                f"Render product has no rendervars set: {render_product}")
+            self.log.warning(f"Render product has no rendervars set: {render_product}")
             return ""
 
     def get_render_products(self, usdrender_rop, stage):
-        """"The render products in the defined render settings
+        """ "The render products in the defined render settings
 
         Args:
             usdrender_rop (hou.Node): The Houdini USD Render ROP node.
@@ -200,9 +201,9 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
             List[Sdf.Path]: Render Product paths enabled in the render settings
 
         """
-        render_settings = get_usd_render_rop_rendersettings(usdrender_rop,
-                                                            stage,
-                                                            logger=self.log)
+        render_settings = get_usd_render_rop_rendersettings(
+            usdrender_rop, stage, logger=self.log
+        )
         if not render_settings:
             return []
 
@@ -228,6 +229,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
         filename = os.path.basename(path)
 
         if "#" in filename:
+
             def replace(match):
                 return "%0{}d".format(len(match.group()))
 
@@ -243,6 +245,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
 
         for frame in range(int(start), (int(end) + 1)):
             expected_files.append(
-                os.path.join(folder, (filename % frame)).replace("\\", "/"))
+                os.path.join(folder, (filename % frame)).replace("\\", "/")
+            )
 
         return expected_files
