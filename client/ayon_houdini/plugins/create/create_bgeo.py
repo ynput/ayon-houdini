@@ -96,7 +96,12 @@ class CreateBGEO(plugin.HoudiniCreator):
         ]
 
         return attrs + [
-            EnumDef("bgeo_type", bgeo_enum, label="BGEO Options"),
+            EnumDef(
+                "bgeo_type",
+                bgeo_enum,
+                default="bgeo.sc",
+                label="BGEO Options"
+            ),
         ] + self.get_instance_attr_defs()
 
     def get_network_categories(self):
