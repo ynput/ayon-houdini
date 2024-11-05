@@ -68,6 +68,8 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
             dirname = os.path.dirname(name)
             basename = os.path.basename(name)
 
+            instance.data["stagingDir"] = dirname
+
             dollarf_regex = r"(\$F([0-9]?))"
             if re.match(dollarf_regex, basename):
                 # TODO: Confirm this actually is allowed USD stages and HUSK
