@@ -1,5 +1,6 @@
 from ayon_core.pipeline import load
 from ayon_houdini.api.lib import find_active_network
+from ayon_houdini.api import hda_utils
 
 import hou
 
@@ -28,21 +29,14 @@ class LOPLoadAssetLoader(load.LoaderPlugin):
         node = network.createNode("ayon::lop_import", node_name=node_name)
         node.moveToGoodPosition()
 
-        # Set representation id
-        parm = node.parm("representation")
-        parm.set(context["representation"]["id"])
-        parm.pressButton()  # trigger callbacks
+        hda_utils.set_node_representation_from_context(node, context)
 
         nodes = [node]
         self[:] = nodes
 
     def update(self, container, context):
         node = container["node"]
-
-        # Set representation id
-        parm = node.parm("representation")
-        parm.set(context["representation"]["id"])
-        parm.pressButton()  # trigger callbacks
+        hda_utils.set_node_representation_from_context(node, context)
 
     def remove(self, container):
         node = container["node"]
