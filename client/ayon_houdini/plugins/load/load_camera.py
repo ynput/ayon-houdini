@@ -1,4 +1,7 @@
+from typing import Optional
 import hou
+
+from ayon_core.lib import EnumDef
 from ayon_core.pipeline import get_representation_path
 
 from ayon_houdini.api import (
@@ -13,6 +16,14 @@ from ayon_houdini.api.lib import (
 
 ARCHIVE_EXPRESSION = ('__import__("_alembic_hom_extensions")'
                       '.alembicGetCameraDict')
+
+
+def get_expression(parm: hou.Parm) -> Optional[str]:
+    try:
+        return parm.expression()
+    except hou.OperationFailed:
+        # No expression present
+        pass
 
 
 def transfer_non_default_values(src, dest, ignore=None):
@@ -62,13 +73,7 @@ def transfer_non_default_values(src, dest, ignore=None):
             # are implementation details
             continue
 
-        expression = None
-        try:
-            expression = parm.expression()
-        except hou.OperationFailed:
-            # No expression present
-            pass
-
+        expression = get_expression(parm)
         if expression is not None and ARCHIVE_EXPRESSION in expression:
             # Assume it's part of the automated connections that the
             # Alembic Archive makes on loading of the camera and thus we do
@@ -94,7 +99,40 @@ class CameraLoader(plugin.HoudiniLoader):
     icon = "code-fork"
     color = "orange"
 
-    def load(self, context, name=None, namespace=None, data=None):
+    camera_aperture_expression = "default"
+
+    _match_maya_render_mask_expression = """
+# Match maya render mask (logic from Houdini's own FBX importer)
+node = hou.pwd()
+resx = node.evalParm('resx')
+resy = node.evalParm('resy')
+aspect = node.evalParm('aspect')
+aperture *= min(1, (resx / resy * aspect) / 1.5)
+return aperture
+"""
+
+    @classmethod
+    def get_options(cls, contexts):
+        return [
+            EnumDef(
+                "cameraApertureExpression",
+                label="Camera Aperture Expression",
+                items=[
+                    {"label": "Houdini Default", "value": "default"},
+                    {"label": "Match Maya render mask", "value": "match_maya"}
+                ],
+                default=cls.camera_aperture_expression,
+                tooltip=(
+                    "Set the aperture expression on the camera from the "
+                    "Alembic using either:\n"
+                    "- Houdini default expression\n"
+                    "- Match the Maya render mask (which matches Houdini's "
+                    "FBX Import camera expression."
+                )
+            )
+        ]
+
+    def load(self, context, name=None, namespace=None, options=None):
 
         # Format file name, Houdini only wants forward slashes
         file_path = self.filepath_from_context(context).replace("\\", "/")
@@ -120,7 +158,11 @@ class CameraLoader(plugin.HoudiniLoader):
         nodes = [node]
 
         camera = get_camera_from_container(node)
-        self._match_maya_render_mask(camera)
+
+        if options.get("cameraApertureExpression",
+                       self.camera_aperture_expression) == "match_maya":
+            self._match_maya_render_mask(camera)
+
         set_camera_resolution(camera, entity=context["folder"])
         self[:] = nodes
 
@@ -161,7 +203,14 @@ class CameraLoader(plugin.HoudiniLoader):
                                     # "icon_scale" just skip that completely
                                     ignore={"scale"})
 
-        self._match_maya_render_mask(new_camera)
+        # Detect whether the camera was loaded with the "Match Maya render
+        # mask" before. If so, we want to maintain that expression on update.
+        if (
+                self._match_maya_render_mask_expression
+                in get_expression(temp_camera.parm("aperture"))
+        ):
+            self._match_maya_render_mask(new_camera)
+
         set_camera_resolution(new_camera)
 
         temp_camera.destroy()
@@ -196,17 +245,10 @@ class CameraLoader(plugin.HoudiniLoader):
 
     def _match_maya_render_mask(self, camera):
         """Workaround to match Maya render mask in Houdini"""
-
         parm = camera.parm("aperture")
+        print(f"Applying match Maya render mask expression to: {parm.path()}")
+
         expression = parm.expression()
         expression = expression.replace("return ", "aperture = ")
-        expression += """
-# Match maya render mask (logic from Houdini's own FBX importer)
-node = hou.pwd()
-resx = node.evalParm('resx')
-resy = node.evalParm('resy')
-aspect = node.evalParm('aspect')
-aperture *= min(1, (resx / resy * aspect) / 1.5)
-return aperture
-"""
+        expression += self._match_maya_render_mask_expression
         parm.setExpression(expression, language=hou.exprLanguage.Python)
