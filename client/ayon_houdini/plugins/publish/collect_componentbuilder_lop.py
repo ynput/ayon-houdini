@@ -30,9 +30,6 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
 
         node = hou.node(instance.data["instance_node"])
 
-        # Use existing files for now
-        filepath = node.evalParm("lopoutput")
-
         # Render the component builder LOPs
         # TODO: Do we want this? or use existing frames? Usually a Collector
         #  should not 'extract' but in this case we need the resulting USD
@@ -47,6 +44,7 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
             raise PublishError(f"Failed to save to disk '{node.path()}'")
 
         # Define the main asset usd file
+        filepath = node.evalParm("lopoutput")
         representations = instance.data.setdefault("representations", [])
         representations.append({
             "name": "usd",
