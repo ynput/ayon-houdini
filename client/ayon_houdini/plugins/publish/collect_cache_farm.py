@@ -7,11 +7,9 @@ from ayon_houdini.api import (
 )
 
 
-class CollectDataforCache(plugin.HoudiniInstancePlugin):
-    """Collect data for caching to Deadline."""
-
-    # Run after Collect Frames
-    order = pyblish.api.CollectorOrder + 0.11
+class CollectFarmCacheFamily(plugin.HoudiniInstancePlugin):
+    """Collect publish.hou family for caching on farm as early as possible."""
+    order = pyblish.api.CollectorOrder - 0.5
     families = ["ass", "pointcache", "redshiftproxy", "vdbcache", "model"]
     targets = ["local", "remote"]
     label = "Collect Data for Cache"
@@ -24,6 +22,19 @@ class CollectDataforCache(plugin.HoudiniInstancePlugin):
             self.log.debug("Caching on farm is disabled. "
                            "Skipping farm collecting.")
             return
+        instance.data["families"].append("publish.hou")
+
+
+class CollectDataforCache(plugin.HoudiniInstancePlugin):
+    """Collect data for caching to Deadline."""
+
+    # Run after Collect Frames
+    order = pyblish.api.CollectorOrder + 0.11
+    families = ["publish.hou"]
+    targets = ["local", "remote"]
+    label = "Collect Data for Cache"
+
+    def process(self, instance):
         # Why do we need this particular collector to collect the expected
         # output files from a ROP node. Don't we have a dedicated collector
         # for that yet?
@@ -55,7 +66,5 @@ class CollectDataforCache(plugin.HoudiniInstancePlugin):
             "plugin": "Houdini",
             "publish": True
         })
-        instance.data["families"].append("publish.hou")
         instance.data["expectedFiles"].append(cache_files)
-
         self.log.debug("Caching on farm expected files: {}".format(instance.data["expectedFiles"]))
