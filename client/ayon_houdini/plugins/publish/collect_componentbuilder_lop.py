@@ -8,7 +8,7 @@ from ayon_core.pipeline import AYONPyblishPluginMixin, PublishError
 from ayon_houdini.api import plugin
 
 import hou
-from pxr import Sdf, Usd, UsdUtils
+from pxr import Sdf, UsdUtils
 
 
 def compute_all_dependencies(
