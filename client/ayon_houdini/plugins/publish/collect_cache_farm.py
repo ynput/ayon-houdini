@@ -46,25 +46,23 @@ class CollectDataforCache(plugin.HoudiniInstancePlugin):
         ropnode = hou.node(instance.data["instance_node"])
         output_parm = lib.get_output_parameter(ropnode)
         expected_filepath = output_parm.eval()
-        instance.data.setdefault("files", list())
-        instance.data.setdefault("expectedFiles", list())
 
+        files = instance.data.setdefault("files", list())
         frames = instance.data.get("frames", "")
         if isinstance(frames, str):
             # single file
-            instance.data["files"].append(expected_filepath)
+            files.append(expected_filepath)
         else:
             # list of files
             staging_dir, _ = os.path.split(expected_filepath)
-            instance.data["files"].extend(
-                ["{}/{}".format(staging_dir, f) for f in frames]
-            )
+            files.extend("{}/{}".format(staging_dir, f) for f in frames)
 
-        cache_files = {"cache": instance.data["files"]}
+        expected_files = instance.data.setdefault("expectedFiles", list())
+        expected_files.append({"cache": files})
+        self.log.debug(f"Caching on farm expected files: {expected_files}")
 
         instance.data.update({
+             # used in HoudiniCacheSubmitDeadline in ayon-deadline
             "plugin": "Houdini",
             "publish": True
         })
-        instance.data["expectedFiles"].append(cache_files)
-        self.log.debug("Caching on farm expected files: {}".format(instance.data["expectedFiles"]))
