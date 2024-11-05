@@ -7,7 +7,7 @@ import hou
 
 
 class CreateUSDComponentBuilder(plugin.HoudiniCreator):
-    identifier = "io.ayon.creators.houdini.componentbuilders"
+    identifier = "io.ayon.creators.houdini.componentbuilder"
     label = "USD Component Builder LOPs"
     product_type = "usd"
     icon = "cubes"
