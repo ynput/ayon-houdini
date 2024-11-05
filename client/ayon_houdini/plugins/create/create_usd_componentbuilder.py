@@ -27,18 +27,12 @@ class CreateUSDComponentBuilder(plugin.HoudiniCreator):
         """)
 
     def create(self, product_name, instance_data, pre_create_data):
-
         nodes = hou.selectedNodes()
-
         builders = [
             node for node in nodes if node.type().name() == "componentoutput"
         ]
-        if not builders:
-            return
-
         for builder in builders:
             self.create_for_instance_node(product_name, instance_data, builder)
-
 
     def create_for_instance_node(
             self, product_name, instance_data, instance_node):
