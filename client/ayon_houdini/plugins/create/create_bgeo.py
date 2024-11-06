@@ -13,13 +13,18 @@ class CreateBGEO(plugin.HoudiniCreator):
     product_type = "pointcache"
     icon = "gears"
 
+    # Default render target
+    render_target = "local"
+
     def create(self, product_name, instance_data, pre_create_data):
 
         instance_data.update({"node_type": "geometry"})
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
-        creator_attributes["farm"] = pre_create_data["farm"]
-        creator_attributes["local_no_render"] = pre_create_data["local_no_render"]
+        
+        for key in ["render_target"]:
+            if key in pre_create_data:
+                creator_attributes[key] = pre_create_data[key]
 
         instance = super(CreateBGEO, self).create(
             product_name,
@@ -61,13 +66,17 @@ class CreateBGEO(plugin.HoudiniCreator):
         instance_node.setParms(parms)
 
     def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+            "farm_no_render": "Use existing frames (farm)"
+        }
         return [
-            BoolDef("farm",
-                    label="Submitting to Farm",
-                    default=False),
-            BoolDef("local_no_render",
-                    label="Use existing frames (local)",
-                    default=False)
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
         ]
 
     def get_pre_create_attr_defs(self):
