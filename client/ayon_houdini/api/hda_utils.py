@@ -99,12 +99,17 @@ def get_available_versions(node):
     return version_names
 
 
-def set_node_representation_from_context(node, context):
+def set_node_representation_from_context(
+        node,
+        context,
+        ensure_expression_defaults=True
+):
     """Update project, folder, product, version, representation name parms.
 
      Arguments:
          node (hou.Node): Node to update
          context (dict): Context of representation
+         ensure_expression_defaults (bool): Ensure expression defaults.
 
      """
     # TODO: Avoid 'duplicate' taking over the expression if originally
@@ -129,6 +134,54 @@ def set_node_representation_from_context(node, context):
     parms = {key: value for key, value in parms.items()
              if node.evalParm(key) != value}
     node.setParms(parms)
+
+    if ensure_expression_defaults:
+        ensure_loader_expression_parm_defaults(node)
+
+
+def ensure_loader_expression_parm_defaults(node):
+    """Reset `representation` and `file` parm to defaults.
+
+    The filepath and representation id parms are updated through expressions,
+    however in older versions they were explicitly set so we ensure that the
+    current value is set to the default value with the expression - otherwise
+    the value will be set to the previously explicitly set overridden value.
+
+    Silently ignores if the parm does not exist or is already at default.
+
+    Args:
+        node (hou.OpNode): The node to reset.
+
+    """
+    for parm_name in ["representation", "file"]:
+        parm = node.parm(parm_name)
+        if parm is None:
+            continue
+
+        # TODO: For whatever reason this still returns True even if the
+        #  expression does not match the default, so for now we always revert
+        # if parm.isAtDefault(compare_expressions=True):
+        #     continue
+
+        default_expression = parm.parmTemplate().defaultExpression()
+        if not default_expression:
+            continue
+
+        default_expression = default_expression[0]
+
+        try:
+            current_expression = parm.expression()
+            if current_expression == default_expression:
+                continue
+        except hou.OperationFailed:
+            pass
+
+        print(f"Enforcing {parm.path()} to default value")
+        locked = parm.isLocked()
+        parm.lock(False)
+        parm.deleteAllKeyframes()
+        parm.revertToDefaults()
+        parm.lock(locked)
 
 
 def get_representation_path(

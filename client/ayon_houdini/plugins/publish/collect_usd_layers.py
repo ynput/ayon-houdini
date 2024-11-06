@@ -8,6 +8,7 @@ from ayon_core.pipeline.create import get_product_name
 from ayon_houdini.api import plugin
 import ayon_houdini.api.usd as usdlib
 
+from pxr import Sdf
 import hou
 
 
@@ -101,7 +102,13 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             # include same USD ROP
             layer_inst.append(rop_node)
 
-            staging_dir, fname = os.path.split(save_path)
+            staging_dir, fname_with_args = os.path.split(save_path)
+
+            # The save path may include :SDF_FORMAT_ARGS: which will conflict
+            # with how we end up integrating these files because those will
+            # NOT be included in the actual output filename on disk, so we
+            # remove the SDF_FORMAT_ARGS from the filename.
+            fname = Sdf.Layer.SplitIdentifier(fname_with_args)[0]
             fname_no_ext, ext = os.path.splitext(fname)
 
             variant = fname_no_ext
@@ -154,7 +161,12 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                 "name": "usd",
                 "ext": ext.lstrip("."),
                 "stagingDir": staging_dir,
-                "files": fname
+                "files": fname,
+
+                # Store an additional key with filenames including the
+                # SDF_FORMAT_ARGS so we can use this to remap paths
+                # accurately later.
+                "files_raw": fname_with_args
             }
             layer_inst.data.setdefault("representations", []).append(
                 representation)
