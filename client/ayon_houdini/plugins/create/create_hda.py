@@ -218,9 +218,7 @@ class CreateHDA(plugin.HoudiniCreator):
             hda_node.layoutChildren()
         elif self._check_existing(folder_path, node_name):
             raise CreatorError(
-                (
-                    "product {} is already published with different HDA" "definition."
-                ).format(node_name)
+                f"product {node_name} is already published with different HDA definition."
             )
         else:
             hda_node = to_hda
