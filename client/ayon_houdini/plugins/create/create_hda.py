@@ -236,7 +236,7 @@ class CreateHDA(plugin.HoudiniCreator):
             )
 
             hda_def = hda_node.type().definition()
-            hda_def.setMaxNumOutputs(len(output_index_list))
+            hda_def.setMaxNumOutputs(max(len(output_index_list), 1))
 
             hda_parm_template_group = hda_def.parmTemplateGroup()
 
