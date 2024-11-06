@@ -196,9 +196,10 @@ class CreateHDA(plugin.HoudiniCreator):
             to_hda = parent_node.createNode(
                 "subnet", node_name="{}_subnet".format(node_name)
             )
+
         if not to_hda.type().definition():
-            # if node type has not its definition, it is not user
-            # created hda. We test if hda can be created from the node.
+            # If the node's type lacks a definition, it isn't an user-created HDA.
+            # We test whether an HDA can be generated from this node.
             if not to_hda.canCreateDigitalAsset():
                 raise CreatorError("cannot create hda from node {}".format(to_hda))
 
@@ -209,12 +210,45 @@ class CreateHDA(plugin.HoudiniCreator):
                 node_name=node_name,
             )
 
+            intput_names = to_hda.inputs()
+            input_count = len(intput_names)
+
+            source_parm_template_group = to_hda.parmTemplateGroup()
+
+            output_index_list = set()
+            for node in [
+                node
+                for node in to_hda.allSubChildren()
+                if node.type().name() == "output"
+            ]:
+                output_index = node.parm("outputidx").eval()
+                output_index_list.add(output_index)
+
+            raise RuntimeError(
+                output_index_list,
+                "find out what inputs are connected to outputs and then use this info to fill in the max inputs ",
+            )
+
             hda_node = to_hda.createDigitalAsset(
                 name=type_name,
                 description=node_name,
                 hda_file_name="$HIP/{}.hda".format(node_name),
                 ignore_external_references=True,
+                min_num_inputs=0,
+                max_num_inputs=max(input_count, 1),
             )
+
+            hda_def = hda_node.type().definition()
+            hda_def.setMaxNumOutputs(len(output_index_list))
+
+            hda_parm_template_group = hda_def.parmTemplateGroup()
+
+            for parm_template in source_parm_template_group.entries():
+                if not hda_parm_template_group.find(parm_template.name()):
+                    hda_parm_template_group.addParmTemplate(parm_template)
+
+            hda_def.setParmTemplateGroup(hda_parm_template_group)
+
             hda_node.layoutChildren()
         elif self._check_existing(folder_path, node_name):
             raise CreatorError(
