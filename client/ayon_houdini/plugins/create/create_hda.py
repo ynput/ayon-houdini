@@ -210,9 +210,6 @@ class CreateHDA(plugin.HoudiniCreator):
                 node_name=node_name,
             )
 
-            intput_names = to_hda.inputs()
-            input_count = len(intput_names)
-
             source_parm_template_group = to_hda.parmTemplateGroup()
 
             output_index_list = set()
@@ -224,10 +221,10 @@ class CreateHDA(plugin.HoudiniCreator):
                 output_index = node.parm("outputidx").eval()
                 output_index_list.add(output_index)
 
-            raise RuntimeError(
-                output_index_list,
-                "find out what inputs are connected to outputs and then use this info to fill in the max inputs ",
-            )
+            subnet_inputs_with_connections = set()
+            for subnet_input in to_hda.indirectInputs():
+                if subnet_input.outputs():
+                    subnet_inputs_with_connections.add(subnet_input)
 
             hda_node = to_hda.createDigitalAsset(
                 name=type_name,
@@ -235,7 +232,7 @@ class CreateHDA(plugin.HoudiniCreator):
                 hda_file_name="$HIP/{}.hda".format(node_name),
                 ignore_external_references=True,
                 min_num_inputs=0,
-                max_num_inputs=max(input_count, 1),
+                max_num_inputs=max(len(subnet_inputs_with_connections), 1),
             )
 
             hda_def = hda_node.type().definition()
