@@ -32,7 +32,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         ext = ext.lstrip(".")
 
         creator_attributes = (instance.data["creator_attributes"])
-        if creator_attributes["render_target"] == "local":
+        if creator_attributes.get("render_target") in {"local"}:
             self.render_rop(instance)
         else:
             print("Skipping Houdini local render...")
