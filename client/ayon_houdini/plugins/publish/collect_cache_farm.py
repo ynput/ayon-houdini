@@ -18,9 +18,9 @@ class CollectDataforCache(plugin.HoudiniInstancePlugin):
 
     def process(self, instance):
         creator_attribute = instance.data["creator_attributes"]
-        farm_enabled = creator_attribute["render_target"]
+        render_target: str = creator_attribute.get("render_target")
         # Determine settings based on render_target value
-        farm_enabled = False if farm_enabled in ["local", "local_no_render"] else farm_enabled
+        farm_enabled = render_target in {"farm", "farm_no_render"}
         instance.data["farm"] = farm_enabled
         if not farm_enabled:
             self.log.debug("Caching on farm is disabled. "
