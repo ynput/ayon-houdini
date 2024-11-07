@@ -31,11 +31,13 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        creator_attributes = (instance.data["creator_attributes"])
-        if creator_attributes.get("render_target") in {"local"}:
-            self.render_rop(instance)
+        creator_attributes = instance.data["creator_attributes"]
+        if creator_attributes.get("render_target") == "local_no_render":
+            self.log.debug(
+                "Skipping ROP render to use existing frames"
+                f" for instance: {instance}")
         else:
-            print("Skipping Houdini local render...")
+            self.render_rop(instance)
 
         self.validate_expected_frames(instance)
 
