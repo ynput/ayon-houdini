@@ -1,6 +1,6 @@
 import inspect
 from collections import defaultdict
-from typing import List
+from typing import Dict, List
 
 import pyblish.api
 import clique
@@ -15,6 +15,39 @@ from ayon_houdini.api import plugin
 from ayon_houdini.api.action import SelectInvalidAction
 
 
+def get_instance_expected_files(instance: pyblish.api.Instance) -> List[str]:
+    """Get the expected source render files for the instance."""
+    # Prefer 'expectedFiles' over 'frames' because it usually contains more
+    # output files than just a single file or single sequence of files.
+    expected_files: List[Dict[str, List[str]]] = (
+        instance.data.get("expectedFiles", [])
+    )
+    filepaths: List[str] = []
+    if expected_files:
+        # Products with expected files
+        # This can be Render products or submitted cache to farm.
+        for expected in expected_files:
+            # expected.values() is a list of lists
+            filepaths.extend(expected.values())
+    else:
+        # Products with frames or single file.
+        staging_dir = instance.data.get("stagingDir")
+        frames = instance.data.get("frames")
+        if frames is None or not staging_dir:
+            return []
+
+        if isinstance(frames, str):
+            # single file.
+            filepaths.append(f"{staging_dir}/{frames}")
+        else:
+            # list of frame.
+            filepaths.extend(
+                [f"{staging_dir}/{frame}" for frame in frames]
+            )
+
+    return filepaths
+
+
 class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
                                        OptionalPyblishPluginMixin):
     """Validate that render product paths are unique.
@@ -26,7 +59,15 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
 
     """
     order = pyblish.api.ValidatorOrder
-    families = ["usdrender"]
+    families = [
+        # Render products
+        "usdrender", "karma_rop", "redshift_rop", "arnold_rop", "mantra_rop",
+
+        # Product families from collect frames plug-in
+        "camera", "vdbcache", "imagesequence", "ass", "redshiftproxy",
+        "review", "pointcache", "fbx", "model"
+    ]
+
     hosts = ["houdini"]
     label = "Unique Render Product Paths"
     actions = [SelectInvalidAction]
@@ -61,11 +102,8 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
         # Get expected rendered filepaths
         paths_to_instance_id = defaultdict(list)
         for instance in instances:
-            expected_files = instance.data.get("expectedFiles", [])
-            files_by_aov = expected_files[0]
-            for aov_name, aov_filepaths in files_by_aov.items():
-                for aov_filepath in aov_filepaths:
-                    paths_to_instance_id[aov_filepath].append(instance.id)
+            for filepath in get_instance_expected_files(instance):
+                paths_to_instance_id[filepath].append(instance.id)
 
         # Get invalid instances by instance.id
         invalid_instance_ids = set()
