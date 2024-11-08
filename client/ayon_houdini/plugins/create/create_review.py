@@ -11,10 +11,11 @@ class CreateReview(plugin.HoudiniCreator):
     """Review with OpenGL ROP"""
 
     identifier = "io.openpype.creators.houdini.review"
-    label = "Review"
+    label = "Review (OpenGL)"
     product_type = "review"
     icon = "video-camera"
     review_color_space = ""
+    node_type = "opengl"
 
     def apply_settings(self, project_settings):
         super(CreateReview, self).apply_settings(project_settings)
@@ -27,7 +28,7 @@ class CreateReview(plugin.HoudiniCreator):
 
     def create(self, product_name, instance_data, pre_create_data):
 
-        instance_data.update({"node_type": "opengl"})
+        instance_data.update({"node_type": self.node_type})
         instance_data["imageFormat"] = pre_create_data.get("imageFormat")
         instance_data["keepImages"] = pre_create_data.get("keepImages")
 
@@ -150,3 +151,10 @@ class CreateReview(plugin.HoudiniCreator):
                       minimum=0.0001,
                       decimals=3)
         ]
+
+
+class CreateFlipbookReview(CreateReview):
+    
+    identifier = "io.ayon.creators.houdini.review.flipbook"
+    label = "Review (Flipbook)"
+    node_type = "flipbook"
