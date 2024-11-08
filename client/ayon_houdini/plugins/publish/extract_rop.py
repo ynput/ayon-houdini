@@ -79,11 +79,11 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         pass
 
 
-class ExtractOpenGL(ExtractROP,
-                    publish.ColormanagedPyblishPluginMixin):
+class ExtractOpenGLAndFlipbook(ExtractROP,
+                               publish.ColormanagedPyblishPluginMixin):
 
     order = pyblish.api.ExtractorOrder - 0.01
-    label = "Extract OpenGL"
+    label = "Extract Review (OpenGL & Flipbook)"
     families = ["review"]
 
     def process(self, instance):
@@ -98,12 +98,12 @@ class ExtractOpenGL(ExtractROP,
             return
 
         rop_node = hou.node(instance_node)
-        if rop_node.type().name() != "opengl":
+        if rop_node.type().name() not in {"opengl", "flipbook"}:
             self.log.debug("Skipping OpenGl extraction. Rop node {} "
                            "is not an OpenGl node.".format(rop_node.path()))
             return
 
-        super(ExtractOpenGL, self).process(instance)
+        super(ExtractOpenGLAndFlipbook, self).process(instance)
 
     def update_representation_data(self,
                                    instance: pyblish.api.Instance,
