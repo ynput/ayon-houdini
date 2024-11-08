@@ -35,9 +35,6 @@ class SelectInvalidAction(pyblish.api.Action):
                         self.log.warning("Plug-in returned to be invalid, "
                                          "but has no selectable nodes.")
 
-        errored_instances = get_errored_instances_from_context(context,
-                                                               plugin=plugin)
-
         hou.clearAllSelected()
         if invalid:
             self.log.info("Selecting invalid nodes: {}".format(
