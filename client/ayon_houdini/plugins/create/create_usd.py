@@ -78,7 +78,28 @@ class CreateUSDModel(CreateUSD):
         From the Houdini Solaris context (LOPs) this will publish a static
         model. Usually used for publishing geometry into a USD asset using
         the USD contribution workflow.
+        """)
 
+
+class CreateUSDAssembly(CreateUSD):
+    identifier = "io.ayon.creators.houdini.assembly.usd"
+    label = "USD Assembly"
+    product_type = "assembly"
+    enabled = True
+    description = "Create USD assembly"
+
+    additional_parameters = {
+        # Set the 'default prim' by default to the folder name being
+        # published to
+        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+    }
+
+    def get_detail_description(self):
+        return inspect.cleandoc("""Publish assembly in USD data.
+
+        From the Houdini Solaris context (LOPs) this will publish an assembly
+        product. Usually used for publishing multiple referenced USD assets
+        grouped together and positioned to make an assembled asset.
         """)
 
 
@@ -130,7 +151,6 @@ class CreateUSDLook(CreateUSD):
 
         Any assets used by the look will be relatively remapped to the USD
         file and integrated into the publish as `resources`.
-
         """)
 
     def get_publish_families(self):
