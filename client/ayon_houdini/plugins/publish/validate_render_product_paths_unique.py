@@ -100,6 +100,12 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
         # Get expected rendered filepaths
         paths_to_instance_id = defaultdict(list)
         for instance in instances:
+            # Skip the original instance when local rendering and those have
+            # created additional runtime instances per AOV. This avoids
+            # validating similar instances multiple times.
+            if not instance.data.get("integrate", True):
+                continue
+
             for filepath in get_instance_expected_files(instance):
                 paths_to_instance_id[filepath].append(instance.id)
 
