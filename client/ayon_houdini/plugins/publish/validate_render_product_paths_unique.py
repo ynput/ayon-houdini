@@ -40,10 +40,8 @@ def get_instance_expected_files(instance: pyblish.api.Instance) -> List[str]:
             # single file.
             filepaths.append(f"{staging_dir}/{frames}")
         else:
-            # list of frame.
-            filepaths.extend(
-                [f"{staging_dir}/{frame}" for frame in frames]
-            )
+            # list of frames
+            filepaths.extend(f"{staging_dir}/{frame}" for frame in frames)
 
     return filepaths
 
