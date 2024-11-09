@@ -27,8 +27,8 @@ def get_instance_expected_files(instance: pyblish.api.Instance) -> List[str]:
         # Products with expected files
         # This can be Render products or submitted cache to farm.
         for expected in expected_files:
-            # expected.values() is a list of lists
-            filepaths.extend(expected.values())
+            for sequence_files in expected.values():
+                filepaths.extend(sequence_files)
     else:
         # Products with frames or single file.
         staging_dir = instance.data.get("stagingDir")
@@ -103,6 +103,7 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
         paths_to_instance_id = defaultdict(list)
         for instance in instances:
             for filepath in get_instance_expected_files(instance):
+                cls.log.info(filepath)
                 paths_to_instance_id[filepath].append(instance.id)
 
         # Get invalid instances by instance.id
