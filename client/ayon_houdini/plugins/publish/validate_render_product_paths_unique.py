@@ -101,7 +101,6 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
         paths_to_instance_id = defaultdict(list)
         for instance in instances:
             for filepath in get_instance_expected_files(instance):
-                cls.log.info(filepath)
                 paths_to_instance_id[filepath].append(instance.id)
 
         # Get invalid instances by instance.id
