@@ -54,7 +54,7 @@ def publish(node_path: str):
     filtered_plugins = [
         plugin
         for plugin in pyblish_plugins
-        if not "IncrementCurrentFile" in str(plugin)
+        if "IncrementCurrentFile" not in str(plugin)
     ]
 
     for result in pyblish.util.publish_iter(pyblish_context, filtered_plugins):
