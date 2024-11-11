@@ -753,13 +753,13 @@
             name    "creator_attributes"
             label   "creator_attributes"
             type    string
-            default { "" }
+            default { "JSON:::{}" }
         }
         parm {
             name    "publish_attributes"
             label   "publish_attributes"
             type    string
-            default { "" }
+            default { "JSON:::{}" }
         }
         parm {
             name    "AYON_productName"
