@@ -1,4 +1,5 @@
 import os
+from re import findall
 
 import pyblish.api
 
@@ -23,19 +24,21 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
 
         # Get the AYON Publish ROP node and the input ROPs we want to collect
         # as part of this instance.
-        rop_node = hou.node(instance.data["instance_node"])
+        rop_node: hou.RopNode = hou.node(instance.data["instance_node"])
         if not instance.data.get("from_node", False):
             ayon_publish.set_ayon_publish_nodes_pre_render_script(
                 rop_node,
                 self.log,
                 "",
             )
-            rop_node.render()
-            ayon_publish.set_ayon_publish_nodes_pre_render_script(
-                rop_node,
-                self.log,
-                "hou.phm().run()",
-            )
+            try:
+                rop_node.render()
+            finally:
+                ayon_publish.set_ayon_publish_nodes_pre_render_script(
+                    rop_node,
+                    self.log,
+                    "hou.phm().run()",
+                )
 
         input_rops = rop_node.inputs()
         self.log.debug(f"Collecting '{rop_node.path()} input ROPs: {input_rops}")
