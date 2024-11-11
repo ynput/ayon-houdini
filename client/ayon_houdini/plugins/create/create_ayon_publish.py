@@ -20,6 +20,9 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
     def get_network_categories(self):
         return [hou.ropNodeTypeCategory()]
 
+    def get_publish_families(self):
+        return ["rop_publish"]
+
     def imprint(self, node, values, update=False):
         # Imprint the value onto existing attributes instead
         # of trying to force create them because the HDA already
