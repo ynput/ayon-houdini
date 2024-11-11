@@ -1,16 +1,10 @@
 import os
-from re import findall
 
 import pyblish.api
 
 from ayon_houdini.api import lib, plugin, ayon_publish
 
 import hou
-
-# TODO: Remove this live debugging reload
-import importlib
-
-importlib.reload(ayon_publish)
 
 
 class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
