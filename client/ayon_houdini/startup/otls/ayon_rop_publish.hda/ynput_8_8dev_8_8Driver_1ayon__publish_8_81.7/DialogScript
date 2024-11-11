@@ -735,19 +735,19 @@
             name    "variant"
             label   "variant"
             type    string
-            default { "" }
+            default { "Main" }
         }
         parm {
             name    "folderPath"
             label   "folderPath"
             type    string
-            default { "" }
+            default { "$AYON_FOLDER_PATH" }
         }
         parm {
             name    "task"
             label   "task"
             type    string
-            default { "" }
+            default { "$AYON_TASK_NAME" }
         }
         parm {
             name    "creator_attributes"
