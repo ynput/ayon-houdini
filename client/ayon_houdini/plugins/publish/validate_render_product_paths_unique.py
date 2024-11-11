@@ -147,5 +147,10 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
             render to overwrite the other providing unexpected results.
             
             Update the output paths to be unique across all instances.
+            
+            It may be the case that a single instance outputs multiple files
+            that overwrite each other, like separate AOV outputs from one ROP.
+            In that case it may be necessary to update the individual AOV 
+            output paths, instead of outputs between separate instances.
             """
         )
