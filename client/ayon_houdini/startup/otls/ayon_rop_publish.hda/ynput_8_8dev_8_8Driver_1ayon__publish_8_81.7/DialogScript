@@ -765,7 +765,7 @@
             name    "AYON_productName"
             label   "AYON_productName"
             type    string
-            default { "" }
+            default { "rop_publishMain" }
         }
         parm {
             name    "from_node"
