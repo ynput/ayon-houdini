@@ -35,13 +35,25 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
                 )
 
         input_rops = rop_node.inputs()
-        self.log.debug(
-            f"Collecting '{rop_node.path()}' input ROPs: {input_rops}")
+        self.log.debug(f"Collecting AYON Publish ROP '{rop_node.path()}'")
 
         representations = instance.data.setdefault("representations", [])
         for input_rop in input_rops:
-
             self.log.debug(f"Processing: '{input_rop.path()}'")
+
+            # Support fetch ROP by getting it source ROP and processing
+            # that instead. This way we also support ROPs that are not inside
+            # an ROPs network.
+            if input_rop.type().name() == "fetch":
+                fetched_rop = input_rop.parm("source").evalAsNode()
+                if fetched_rop is None:
+                    self.log.warning(
+                        f"Skipping fetch ROP '{input_rop.path()}' as it has "
+                        f"no valid source ROP set."
+                    )
+                    continue
+                self.log.debug(f"Processing fetched ROP: {fetched_rop.path()}")
+                input_rop = fetched_rop
 
             # TODO this does not work if first input is something like merge
             #  or switch
