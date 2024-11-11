@@ -81,9 +81,10 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
             )[-1]
             ext_no_dot = ext[1:]
 
+            # representation files must be single `str` if single file
+            # and also must be the filename, not full path
             filenames = [os.path.basename(file) for file in filepaths]
             if len(filenames) == 1:
-                self.log.debug(f"Single file Publish {filenames}")
                 filenames = filenames[0]
 
             representation = {
