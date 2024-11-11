@@ -729,7 +729,7 @@
             name    "creator_identifier"
             label   "creator_identifier"
             type    string
-            default { "io.openpype.creators.houdini.pub" }
+            default { "io.openpype.creators.houdini.rop_publish" }
         }
         parm {
             name    "variant"
