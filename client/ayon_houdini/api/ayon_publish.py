@@ -121,7 +121,7 @@ def get_rop_output(rop: hou.RopNode, frame_range=None) -> list:
         end = rop.parm("f2").eval()
 
     files = []
-    for frame in range(int(start), int(end), int(inc)):
+    for frame in range(int(start), int(end) + 1, int(inc)):
         files.append(path_template.format(frame=frame))
 
     return files
