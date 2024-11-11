@@ -704,8 +704,8 @@
         export  none
     }
     group {
-        name    "ayon_product"
-        label   "AYON Product"
+        name    "ayon_folder"
+        label   "AYON"
 
         parm {
             name    "productType"
