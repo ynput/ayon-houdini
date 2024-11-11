@@ -1,8 +1,6 @@
 import logging
 import re
 import os
-from collections import defaultdict, deque
-from typing import Callable
 
 import hou
 import pyblish
@@ -12,8 +10,8 @@ from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.create import CreateContext
 
 
+# TODO: Remove when testing
 import importlib
-
 importlib.reload(lib)
 
 
