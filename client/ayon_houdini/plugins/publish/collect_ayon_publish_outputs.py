@@ -73,13 +73,13 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
                 ],
             )[-1]
             ext_no_dot = ext[1:]
-            representation_name = os.path.basename(file_parms[0]).replace(ext, "")
+
             if len(file_name_list) <= 1:
                 self.log.debug(f"Single File Publish {file_name_list}")
                 file_name_list = file_name_list[0]
 
             representation = {
-                "name": representation_name,
+                "name": ext_no_dot,
                 "ext": ext_no_dot,
                 "files": file_name_list,
                 "stagingDir": os.path.dirname(file_parms[0]),
