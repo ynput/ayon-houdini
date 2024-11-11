@@ -10,7 +10,12 @@ from ayon_core.pipeline.create import CreateContext
 
 
 def publish(node_path: str):
-    """Publish the given AYON Publish node."""
+    """Publish the given AYON Publish node.
+
+    This does not save any changed instance data but only does the single
+    publish run with the customized data on the instances for that publish run.
+
+    """
     host = registered_host()
     assert host, "No registered host."
 
@@ -18,23 +23,15 @@ def publish(node_path: str):
     log = logging.getLogger("publish-from-code")
     log.setLevel(logging.ERROR)
 
-    deactivated_instances = []
-    from_code_instances = []
     create_context = CreateContext(host)
 
     # Deactivate all instances except the one from this node.
     for instance in create_context.instances:
-
         if instance.get("instance_node") == node_path:
             instance["active"] = True
             instance["from_node"] = True
-            from_code_instances.append(instance)
         else:
-            if instance["active"]:
-                deactivated_instances.append(instance)
             instance["active"] = False
-
-    create_context.save_changes()
 
     pyblish_context = pyblish.api.Context()
     pyblish_context.data["create_context"] = create_context
@@ -60,12 +57,6 @@ def publish(node_path: str):
         if result["error"]:
             error_message = error_format.format(**result)
             log.debug(error_message)
-    for instance in from_code_instances:
-        instance["from_node"] = False
-    for instance in deactivated_instances:
-        instance["active"] = True
-
-    create_context.save_changes()
 
 
 def set_ayon_publish_nodes_pre_render_script(
