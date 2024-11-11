@@ -14,6 +14,14 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
     label = "Collect AYON Publish ROP outputs"
     families = ["rop_publish"]
 
+    multidot_extensions = [
+        ".ass.gz",
+        ".bgeo.sc",
+        ".bgeo.gz",
+        ".bgeo.lzma",
+        ".bgeo.bz2",
+    ]
+
     def process(self, instance):
 
         # Get the AYON Publish ROP node and the input ROPs we want to collect
@@ -69,13 +77,7 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
             # Split extension, but allow for multi-dot extensions
             ext = lib.splitext(
                 filepaths[0],
-                allowed_multidot_extensions=[
-                    ".ass.gz",
-                    ".bgeo.sc",
-                    ".bgeo.gz",
-                    ".bgeo.lzma",
-                    ".bgeo.bz2",
-                ],
+                allowed_multidot_extensions=self.multidot_extensions,
             )[-1]
             ext_no_dot = ext[1:]
 
