@@ -704,73 +704,90 @@
         export  none
     }
     group {
-        name    "folder"
-        label   "Extra"
+        name    "ayon_product"
+        label   "AYON Product"
 
         parm {
-            name    "id"
-            label   "id"
-            type    string
-            default { "pyblish.avalon.instance" }
-        }
-        parm {
             name    "productType"
-            label   "productType"
+            label   "Product Type"
             type    string
             default { "rop_publish" }
-        }
-        parm {
-            name    "active"
-            label   "active"
-            type    toggle
-            default { "1" }
-        }
-        parm {
-            name    "creator_identifier"
-            label   "creator_identifier"
-            type    string
-            default { "io.openpype.creators.houdini.rop_publish" }
-        }
-        parm {
-            name    "variant"
-            label   "variant"
-            type    string
-            default { "Main" }
+            menureplace {
+                "fbx"           "fbx"
+                "model"         "model"
+                "pointcache"    "pointcache"
+                "render"        "render"
+                "review"        "review"
+                "usd"           "usd"
+                "vdbcache"      "vdbcache"
+                "look"          "look"
+            }
         }
         parm {
             name    "folderPath"
-            label   "folderPath"
+            label   "Folder Path"
             type    string
             default { "$AYON_FOLDER_PATH" }
         }
         parm {
             name    "task"
-            label   "task"
+            label   "Task Name"
             type    string
             default { "$AYON_TASK_NAME" }
         }
         parm {
-            name    "creator_attributes"
-            label   "creator_attributes"
+            name    "variant"
+            label   "Variant"
             type    string
+            default { "Main" }
+        }
+        parm {
+            name    "active"
+            label   "Active"
+            type    toggle
+            invisible
+            default { "1" }
+        }
+        parm {
+            name    "creator_attributes"
+            label   "Creator Attributes"
+            type    string
+            invisible
             default { "JSON:::{}" }
         }
         parm {
             name    "publish_attributes"
-            label   "publish_attributes"
+            label   "Publish Attributes"
             type    string
+            invisible
             default { "JSON:::{}" }
+        }
+        parm {
+            name    "creator_identifier"
+            label   "creator_identifier"
+            type    string
+            invisible
+            default { "io.openpype.creators.houdini.rop_publish" }
+        }
+        parm {
+            name    "id"
+            label   "id"
+            type    string
+            invisible
+            default { "pyblish.avalon.instance" }
         }
         parm {
             name    "AYON_productName"
             label   "AYON_productName"
             type    string
+            invisible
             default { "rop_publishMain" }
         }
         parm {
             name    "from_node"
             label   "from_node"
             type    toggle
+            invisible
             default { "0" }
         }
     }
