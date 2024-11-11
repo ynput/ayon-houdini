@@ -41,15 +41,18 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
                 )
 
         input_rops = rop_node.inputs()
-        self.log.debug(f"Collecting '{rop_node.path()} input ROPs: {input_rops}")
+        self.log.debug(
+            f"Collecting '{rop_node.path()}' input ROPs: {input_rops}")
 
         representations = instance.data.setdefault("representations", [])
         for input_rop in input_rops:
 
             self.log.debug(f"Processing: '{input_rop.path()}'")
 
+            # TODO this does not work if first input is something like merge
+            #  or switch
             try:
-                file_parms = ayon_publish.get_rop_output(input_rop)
+                filepaths = ayon_publish.get_rop_output(input_rop)
             except TypeError:
                 self.log.warning(
                     f"Skipping unsupported ROP type '{input_rop.path()}' as "
@@ -57,16 +60,9 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
                 )
                 continue
 
-            # TODO: Support filepaths with frame ranges, like $F4
-            file_name_list = []
-            for file in file_parms:
-                file_name_list.append(os.path.basename(file))
-                # Split extension, but allow for multi-dot extensions
-            self.log.debug(f"files {file_parms}")
+            # Split extension, but allow for multi-dot extensions
             ext = lib.splitext(
-                file_parms[
-                    0
-                ],  # TODO this dose not work if first input is someting like merge or switch
+                filepaths[0],
                 allowed_multidot_extensions=[
                     ".ass.gz",
                     ".bgeo.sc",
@@ -77,15 +73,16 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
             )[-1]
             ext_no_dot = ext[1:]
 
-            if len(file_name_list) <= 1:
-                self.log.debug(f"Single File Publish {file_name_list}")
-                file_name_list = file_name_list[0]
+            filenames = [os.path.basename(file) for file in filepaths]
+            if len(filenames) == 1:
+                self.log.debug(f"Single file Publish {filenames}")
+                filenames = filenames[0]
 
             representation = {
                 "name": ext_no_dot,
                 "ext": ext_no_dot,
-                "files": file_name_list,
-                "stagingDir": os.path.dirname(file_parms[0]),
+                "files": filenames,
+                "stagingDir": os.path.dirname(filepaths[0]),
             }
             self.log.debug(f"Collected representation: {representation}")
             representations.append(representation)
