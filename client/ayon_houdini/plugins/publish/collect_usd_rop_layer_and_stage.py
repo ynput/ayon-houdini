@@ -68,7 +68,9 @@ class CollectUsdRenderLayerAndStage(plugin.HoudiniInstancePlugin):
 
     label = "Collect ROP Sdf Layers and USD Stage"
     # Run after Collect Output Node
-    order = pyblish.api.CollectorOrder
+    # Run just before regular CollectorOrder to have stage accessible
+    # to default collector orders
+    order = pyblish.api.CollectorOrder - 0.01
     hosts = ["houdini"]
     families = ["usdrender", "usdrop"]
 
