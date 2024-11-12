@@ -212,15 +212,17 @@ class CreateHDA(plugin.HoudiniCreator):
 
             source_parm_template_group = to_hda.parmTemplateGroup()
 
-            output_index_list = set()
+            # Identify all distinct output nodes within the initial layer of the chosen subnet
+            # to determine the total number of outputs required for the HDA.
+            output_indexes = set()
             for node in [
-                node
-                for node in to_hda.allSubChildren()
-                if node.type().name() == "output"
+                node for node in to_hda.children() if node.type().name() == "output"
             ]:
                 output_index = node.parm("outputidx").eval()
-                output_index_list.add(output_index)
+                output_indexes.add(output_index)
 
+            # Find all inputs within the chosen subnet connected to anything to determine
+            # the input count required for the HDA.
             subnet_inputs_with_connections = set()
             for subnet_input in to_hda.indirectInputs():
                 if subnet_input.outputs():
@@ -235,8 +237,9 @@ class CreateHDA(plugin.HoudiniCreator):
                 max_num_inputs=max(len(subnet_inputs_with_connections), 1),
             )
 
+            # add the parm template that we got from the source Subnet into the hda type definition
             hda_def = hda_node.type().definition()
-            hda_def.setMaxNumOutputs(max(len(output_index_list), 1))
+            hda_def.setMaxNumOutputs(max(len(output_indexes), 1))
 
             hda_parm_template_group = hda_def.parmTemplateGroup()
 
