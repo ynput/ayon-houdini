@@ -9,7 +9,7 @@ from ayon_houdini.api import (
 
 class CollectFarmCacheFamily(plugin.HoudiniInstancePlugin):
     """Collect publish.hou family for caching on farm as early as possible."""
-    order = pyblish.api.CollectorOrder - 0.5
+    order = pyblish.api.CollectorOrder - 0.45
     families = ["ass", "pointcache", "redshiftproxy", "vdbcache", "model"]
     targets = ["local", "remote"]
     label = "Collect Data for Cache"
