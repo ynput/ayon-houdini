@@ -14,23 +14,13 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
     """
 
     order = pyblish.api.ValidatorOrder
-    families = ["review"]
+    families = ["rop.opengl"]
     label = "Scene Setting for review"
 
     def process(self, instance):
 
         report = []
         instance_node = hou.node(instance.data.get("instance_node"))
-
-        # This plugin is triggered when marking render as reviewable.
-        # Therefore, this plugin will run on over wrong instances.
-        # TODO: Don't run this plugin on wrong instances.
-        # This plugin should run only on review product type
-        # with instance node of opengl type.
-        if instance_node.type().name() != "opengl":
-            self.log.debug("Skipping Validation. Rop node {} "
-                           "is not an OpenGl node.".format(instance_node.path()))
-            return
 
         invalid = self.get_invalid_scene_path(instance_node)
         if invalid:
