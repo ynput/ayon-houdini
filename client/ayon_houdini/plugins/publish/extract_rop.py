@@ -1,6 +1,5 @@
 import os
 import hou
-
 import pyblish.api
 
 from ayon_core.pipeline import publish
@@ -84,7 +83,7 @@ class ExtractOpenGLAndFlipbook(ExtractROP,
 
     order = pyblish.api.ExtractorOrder - 0.01
     label = "Extract Review (OpenGL & Flipbook)"
-    families = ["review"]
+    families = ["rop.opengl"]
 
     def process(self, instance):
         # This plugin is triggered when marking render as reviewable.

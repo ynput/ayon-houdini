@@ -112,9 +112,12 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         # Force forwards slashes to avoid segfault
         filepath = filepath.replace("\\", "/")
 
-        hou.hipFile.load(filepath,
-                         suppress_save_prompt=True,
-                         ignore_load_warnings=False)
+        try:
+            hou.hipFile.load(filepath,
+                             suppress_save_prompt=True,
+                             ignore_load_warnings=False)
+        except hou.LoadWarning as exc:
+            log.warning(exc)
 
         return filepath
 

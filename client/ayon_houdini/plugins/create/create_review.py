@@ -16,7 +16,10 @@ class CreateReview(plugin.HoudiniCreator):
     icon = "video-camera"
     review_color_space = ""
     node_type = "opengl"
-
+    
+    def get_publish_families(self):
+        return ["review", "rop.opengl"]
+    
     def apply_settings(self, project_settings):
         super(CreateReview, self).apply_settings(project_settings)
         # workfile settings added in '0.2.13'

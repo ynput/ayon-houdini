@@ -30,7 +30,7 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
     """
 
     order = pyblish.api.ValidatorOrder + 0.1
-    families = ["review"]
+    families = ["rop.opengl"]
     label = "Validate Review Colorspace"
     actions = [ResetViewSpaceAction, SelectROPAction]
 
