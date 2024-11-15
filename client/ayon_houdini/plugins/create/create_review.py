@@ -139,7 +139,7 @@ class CreateReview(plugin.HoudiniCreator):
             EnumDef("node_type",
                     node_type_enum,
                     default=self.node_type,
-                    label="Image Format Options"),
+                    label="Node Type"),
             BoolDef("keepImages",
                     label="Keep Image Sequences",
                     default=False),
