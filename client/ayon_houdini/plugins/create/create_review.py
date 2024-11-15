@@ -11,7 +11,7 @@ class CreateReview(plugin.HoudiniCreator):
     """Review with OpenGL ROP"""
 
     identifier = "io.openpype.creators.houdini.review"
-    label = "Review (OpenGL)"
+    label = "Review"
     product_type = "review"
     icon = "video-camera"
     review_color_space = ""
@@ -30,6 +30,13 @@ class CreateReview(plugin.HoudiniCreator):
             self.review_color_space = color_settings.get("review_color_space")
 
     def create(self, product_name, instance_data, pre_create_data):
+        
+        self.node_type = pre_create_data.get("node_type")
+        hou_version = hou.applicationVersionString()
+        if self.node_type == "flipbook" and not hou_version.startswith("20.5"):
+            self.log.debug("The Flipbook node type isn't supported in Houdini versions below 20.5."
+                           " Switching to the OpenGL node type instead.")
+            self.node_type = "opengl"
 
         instance_data.update({"node_type": self.node_type})
         instance_data["imageFormat"] = pre_create_data.get("imageFormat")
@@ -124,8 +131,15 @@ class CreateReview(plugin.HoudiniCreator):
             "bmp", "cin", "exr", "jpg", "pic", "pic.gz", "png",
             "rad", "rat", "rta", "sgi", "tga", "tif",
         ]
+        node_type_enum = [
+            "opengl", "flipbook"
+        ]
 
         return attrs + [
+            EnumDef("node_type",
+                    node_type_enum,
+                    default=self.node_type,
+                    label="Image Format Options"),
             BoolDef("keepImages",
                     label="Keep Image Sequences",
                     default=False),
@@ -154,10 +168,3 @@ class CreateReview(plugin.HoudiniCreator):
                       minimum=0.0001,
                       decimals=3)
         ]
-
-
-class CreateFlipbookReview(CreateReview):
-    
-    identifier = "io.ayon.creators.houdini.review.flipbook"
-    label = "Review (Flipbook)"
-    node_type = "flipbook"
