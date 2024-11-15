@@ -222,7 +222,9 @@ class CreateHDA(plugin.HoudiniCreator):
                 name=type_name,
                 description=node_name,
                 hda_file_name="$HIP/{}.hda".format(node_name),
-                ignore_external_references=True
+                ignore_external_references=True,
+                min_num_inputs=0,
+                max_num_inputs=len(to_hda.inputs()) or 1,
             )
             hda_node.layoutChildren()
         elif self._check_existing(folder_path, node_name):
