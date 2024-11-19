@@ -29,8 +29,6 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
                 creator_attributes[key] = pre_create_data[key]
 
         instance_data.update({"node_type": "Redshift_ROP"})
-        # Add chunk size attribute
-        instance_data["chunkSize"] = 10
 
         instance = super(CreateRedshiftROP, self).create(
             product_name,
