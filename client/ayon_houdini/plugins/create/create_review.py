@@ -32,11 +32,6 @@ class CreateReview(plugin.HoudiniCreator):
     def create(self, product_name, instance_data, pre_create_data):
         
         self.node_type = pre_create_data.get("node_type")
-        hou_version = hou.applicationVersionString()
-        if self.node_type == "flipbook" and not hou_version.startswith("20.5"):
-            self.log.debug("The Flipbook node type isn't supported in Houdini versions below 20.5."
-                           " Switching to the OpenGL node type instead.")
-            self.node_type = "opengl"
 
         instance_data.update({"node_type": self.node_type})
         instance_data["imageFormat"] = pre_create_data.get("imageFormat")
@@ -131,9 +126,9 @@ class CreateReview(plugin.HoudiniCreator):
             "bmp", "cin", "exr", "jpg", "pic", "pic.gz", "png",
             "rad", "rat", "rta", "sgi", "tga", "tif",
         ]
-        node_type_enum = [
-            "opengl", "flipbook"
-        ]
+        node_type_enum = ["opengl"]
+        if hou.applicationVersion() >= (20, 5, 0):
+            node_type_enum.append("flipbook")
 
         return attrs + [
             EnumDef("node_type",
