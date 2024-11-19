@@ -57,18 +57,6 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
 
     def process(self, instance):
 
-        rop_node = hou.node(instance.data["instance_node"])
-
-        # This plugin is triggered when marking render as reviewable.
-        # Therefore, this plugin will run on over wrong instances.
-        # TODO: Don't run this plugin on wrong instances.
-        # This plugin should run only on review product type
-        # with instance node of opengl type.
-        if rop_node.type().name() not in {"opengl", "flipbook"}:
-            self.log.debug("Skipping Validation. Rop node {} "
-                           "is not an `opengl` or `flipbook` node.".format(rop_node.path()))
-            return
-
         if not self.is_active(instance.data):
             return
 
@@ -79,6 +67,7 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
             )
             return
 
+        rop_node = hou.node(instance.data["instance_node"])
         colorcorrect = rop_node.parm("colorcorrect").evalAsString()
         if not colorcorrect.startswith("ocio"):
             # any colorspace settings other than default requires

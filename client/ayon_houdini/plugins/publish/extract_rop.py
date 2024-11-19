@@ -85,25 +85,6 @@ class ExtractOpenGLAndFlipbook(ExtractROP,
     label = "Extract Review (OpenGL & Flipbook)"
     families = ["rop.opengl"]
 
-    def process(self, instance):
-        # This plugin is triggered when marking render as reviewable.
-        # Therefore, this plugin will run over wrong instances.
-        # TODO: Don't run this plugin on wrong instances.
-        # This plugin should run only on review product type
-        # with instance node of opengl type.
-        instance_node = instance.data.get("instance_node")
-        if not instance_node:
-            self.log.debug("Skipping instance without instance node.")
-            return
-
-        rop_node = hou.node(instance_node)
-        if rop_node.type().name() not in {"opengl", "flipbook"}:
-            self.log.debug("Skipping OpenGl extraction. Rop node {} "
-                           "is not an OpenGl node.".format(rop_node.path()))
-            return
-
-        super(ExtractOpenGLAndFlipbook, self).process(instance)
-
     def update_representation_data(self,
                                    instance: pyblish.api.Instance,
                                    representation: dict):
