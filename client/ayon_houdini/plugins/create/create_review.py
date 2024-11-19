@@ -17,6 +17,9 @@ class CreateReview(plugin.HoudiniCreator):
     review_color_space = ""
     node_type = "opengl"
     
+    # TODO: Publish families should reflect the node type, 
+    # such as `rop.flipbook` for flipbook nodes 
+    # and `rop.opengl` for OpenGL nodes.
     def get_publish_families(self):
         return ["review", "rop.opengl"]
     
