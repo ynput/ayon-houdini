@@ -22,7 +22,7 @@ class CreateReviewModel(BaseSettingsModel):
         default_factory=list,
     )
     node_type: str = SettingsField(
-        Title="Default Node Type",
+        title="Default Node Type",
         enum_resolver=review_node_types_enum,
     )
 
