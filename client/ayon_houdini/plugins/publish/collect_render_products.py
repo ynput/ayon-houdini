@@ -159,6 +159,11 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
         otherwise we'll assume renderproduct to be a combined multilayer
         'main' layer
 
+        Note:
+            Different products can export the same AOV but with different
+            configurations, such as Beauty and Deep Beauty.
+            Therefore, we prefix the AOV with the render product name.
+
         Args:
             render_product (pxr.UsdRender.Product): The Render Product
 
@@ -167,6 +172,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
 
         """
         targets = render_product.GetOrderedVarsRel().GetTargets()
+        render_product_name = render_product.GetPrim().GetName()
         if len(targets) > 1:
             # Cryptomattes usually are combined render vars, for example:
             # - crypto_asset, crypto_asset01, crypto_asset02, crypto_asset03
@@ -175,13 +181,13 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
             # e.g. `crypto_asset` or `crypto` (if multiple are combined)
             if all(target.name.startswith("crypto") for target in targets):
                 start = os.path.commonpath([target.name for target in targets])
-                return start.rstrip("_")  # remove any trailing _
+                return f"{render_product_name}.{start.rstrip('_')}"  # remove any trailing _
 
             # Main layer
-            return ""
+            return render_product_name
         elif len(targets) == 1:
             # AOV for a single var
-            return targets[0].name
+            return f"{render_product_name}.{targets[0].name}"
         else:
             self.log.warning(
                 f"Render product has no rendervars set: {render_product}")
