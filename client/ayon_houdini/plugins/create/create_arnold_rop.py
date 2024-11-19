@@ -28,9 +28,6 @@ class CreateArnoldRop(plugin.HoudiniCreator):
         # Remove the active, we are checking the bypass flag of the nodes
         instance_data.update({"node_type": "arnold"})
 
-        # Add chunk size attribute
-        instance_data["chunkSize"] = 1
-
         instance = super(CreateArnoldRop, self).create(
             product_name,
             instance_data,
