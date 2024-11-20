@@ -16,9 +16,11 @@ class CollectFarmCacheFamily(plugin.HoudiniInstancePlugin):
 
     def process(self, instance):
         creator_attribute = instance.data["creator_attributes"]
-        farm_enabled = creator_attribute["farm"]
-        instance.data["farm"] = farm_enabled
-        if not farm_enabled:
+        farm_enabled = creator_attribute.get("farm")
+        if farm_enabled is not None:
+            instance.data["farm"] = farm_enabled
+
+        if not instance.data["farm"]:
             self.log.debug("Caching on farm is disabled. "
                            "Skipping farm collecting.")
             return
