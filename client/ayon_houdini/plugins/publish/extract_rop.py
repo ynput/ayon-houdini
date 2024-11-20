@@ -1,5 +1,4 @@
 import os
-import hou
 import pyblish.api
 
 from ayon_core.pipeline import publish
