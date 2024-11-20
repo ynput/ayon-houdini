@@ -69,7 +69,7 @@ class CollectHoudiniReviewData(plugin.HoudiniInstancePlugin):
         """
 
         if ropnode.type().name() in {
-            "opengl", "karma", "ifd", "arnold"
+            "opengl", "karma", "ifd", "arnold", "flipbook"
         }:
             return ropnode.parm("camera").eval()
 

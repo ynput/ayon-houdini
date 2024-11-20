@@ -1,5 +1,4 @@
 import os
-
 import pyblish.api
 
 from ayon_core.pipeline import publish
@@ -78,11 +77,11 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         pass
 
 
-class ExtractOpenGL(ExtractROP,
-                    publish.ColormanagedPyblishPluginMixin):
+class ExtractOpenGLAndFlipbook(ExtractROP,
+                               publish.ColormanagedPyblishPluginMixin):
 
     order = pyblish.api.ExtractorOrder - 0.01
-    label = "Extract OpenGL"
+    label = "Extract Review (OpenGL & Flipbook)"
     families = ["rop.opengl"]
 
     def update_representation_data(self,
