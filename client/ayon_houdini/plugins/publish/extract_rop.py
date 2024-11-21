@@ -30,7 +30,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        if creator_attribute.get("render_target") in {None, "local"}:
+        if creator_attribute.get("render_target", "local") == "local":
             self.render_rop(instance)
         self.validate_expected_frames(instance)
 
