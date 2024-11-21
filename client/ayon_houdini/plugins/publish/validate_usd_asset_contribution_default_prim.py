@@ -37,6 +37,8 @@ class ValidateUSDAssetContributionDefaultPrim(plugin.HoudiniInstancePlugin,
     #   not want to run this for ALL `usd` product types?
     optional = True
 
+    default_prim_parm = "defaultprim"
+
     def process(self, instance):
         if not self.is_active(instance.data):
             return
@@ -52,7 +54,7 @@ class ValidateUSDAssetContributionDefaultPrim(plugin.HoudiniInstancePlugin,
             return
 
         rop_node = hou.node(instance.data["instance_node"])
-        default_prim = rop_node.evalParm("defaultprim")
+        default_prim = rop_node.evalParm(self.default_prim_parm)
         if not default_prim:
             raise PublishValidationError(
                 f"No default prim specified on ROP node: {rop_node.path()}",
@@ -99,4 +101,18 @@ class ValidateUSDAssetContributionDefaultPrim(plugin.HoudiniInstancePlugin,
             This validation solely ensures the **default primitive** on the ROP
             node is set to match the folder name.
             """
+        )
+
+
+class ValidateUSDAssetContributionRootPrim(ValidateUSDAssetContributionDefaultPrim):
+    families = ["componentbuilder"]
+    default_prim_parm = "rootprim"
+
+    @classmethod
+    def repair(cls, instance):
+        from ayon_core.pipeline import get_current_folder_path 
+
+        rop_node = hou.node(instance.data["instance_node"])
+        rop_node.parm("rootprim").set(
+            "/" + get_current_folder_path().split("/")[-1]
         )
