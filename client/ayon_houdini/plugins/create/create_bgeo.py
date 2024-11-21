@@ -3,7 +3,7 @@
 from ayon_houdini.api import plugin
 from ayon_core.pipeline import CreatorError
 import hou
-from ayon_core.lib import EnumDef, BoolDef
+from ayon_core.lib import EnumDef
 
 
 class CreateBGEO(plugin.HoudiniCreator):
