@@ -28,13 +28,6 @@ class CollectVrayROPRenderProducts(plugin.HoudiniInstancePlugin):
 
         rop = hou.node(instance.data.get("instance_node"))
 
-        # Collect chunkSize
-        chunk_size_parm = rop.parm("chunkSize")
-        if chunk_size_parm:
-            chunk_size = int(chunk_size_parm.eval())
-            instance.data["chunkSize"] = chunk_size
-            self.log.debug("Chunk Size: %s" % chunk_size)
-
         default_prefix = evalParmNoFrame(rop, "SettingsOutput_img_file_path")
         render_products = []
         # TODO: add render elements if render element
