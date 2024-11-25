@@ -30,6 +30,9 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
+        # Value `local` is used as a fallback if the `render_target` key is missing.
+        # This key might be absent because render targets are not yet implemented
+        #  for all product types that use this plugin.
         if creator_attribute.get("render_target", "local") == "local":
             self.render_rop(instance)
         self.validate_expected_frames(instance)
