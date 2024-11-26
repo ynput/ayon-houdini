@@ -2,7 +2,7 @@
 """Creator plugin for creating Redshift proxies."""
 from ayon_houdini.api import plugin
 import hou
-from ayon_core.lib import BoolDef
+from ayon_core.lib import EnumDef
 
 
 class CreateRedshiftProxy(plugin.HoudiniCreator):
@@ -11,6 +11,9 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
     label = "Redshift Proxy"
     product_type = "redshiftproxy"
     icon = "magic"
+
+    # Default render target
+    render_target = "local"
 
     def create(self, product_name, instance_data, pre_create_data):
 
@@ -24,7 +27,7 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
         instance_data.update({"node_type": "Redshift_Proxy_Output"})
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
-        creator_attributes["farm"] = pre_create_data["farm"]
+        creator_attributes["render_target"] = pre_create_data["render_target"]
 
         instance = super(CreateRedshiftProxy, self).create(
             product_name,
@@ -53,10 +56,17 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
         ]
 
     def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+        }
+
         return [
-            BoolDef("farm",
-                    label="Submitting to Farm",
-                    default=False)
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
         ]
 
     def get_pre_create_attr_defs(self):
