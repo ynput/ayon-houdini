@@ -10,15 +10,15 @@ from ayon_houdini.api import (
 class CollectFarmCacheFamily(plugin.HoudiniInstancePlugin):
     """Collect publish.hou family for caching on farm as early as possible."""
     order = pyblish.api.CollectorOrder - 0.45
-    families = ["ass", "pointcache", "redshiftproxy", "vdbcache", "model"]
+    families = ["ass", "pointcache", "redshiftproxy",
+                "vdbcache", "model", "staticMesh",
+                 "rop.opengl", "usdrop", "camera"]
     targets = ["local", "remote"]
     label = "Collect Data for Cache"
 
     def process(self, instance):
-        creator_attribute = instance.data["creator_attributes"]
-        farm_enabled = creator_attribute["farm"]
-        instance.data["farm"] = farm_enabled
-        if not farm_enabled:
+
+        if not instance.data["farm"]:
             self.log.debug("Caching on farm is disabled. "
                            "Skipping farm collecting.")
             return
