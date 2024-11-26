@@ -16,9 +16,15 @@ class CreateStaticMesh(plugin.HoudiniCreator):
 
     default_variants = ["Main"]
 
+    # Default render target
+    render_target = "local"
+
     def create(self, product_name, instance_data, pre_create_data):
 
         instance_data.update({"node_type": "filmboxfbx"})
+        creator_attributes = instance_data.setdefault(
+            "creator_attributes", dict())
+        creator_attributes["render_target"] = pre_create_data["render_target"]
 
         instance = super(CreateStaticMesh, self).create(
             product_name,
@@ -57,11 +63,25 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             hou.objNodeTypeCategory(),
             hou.sopNodeTypeCategory()
         ]
+    
+    def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+        }
+
+        return [
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
+        ]
 
     def get_pre_create_attr_defs(self):
         """Add settings for users. """
 
-        attrs = super(CreateStaticMesh, self).get_pre_create_attr_defs()
+        attrs = super().get_pre_create_attr_defs()
         createsubnetroot = BoolDef("createsubnetroot",
                                    tooltip="Create an extra root for the "
                                            "Export node when it's a "
@@ -85,7 +105,9 @@ class CreateStaticMesh(plugin.HoudiniCreator):
                                 default=False,
                                 label="Convert Units")
 
-        return attrs + [createsubnetroot, vcformat, convert_units]
+        return attrs + [
+            createsubnetroot, vcformat, convert_units
+        ] + self.get_instance_attr_defs()
 
     def get_dynamic_data(
         self,
