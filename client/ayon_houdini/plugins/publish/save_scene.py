@@ -18,7 +18,10 @@ class SaveCurrentScene(plugin.HoudiniContextPlugin):
         host = registered_host()
         current_file = host.get_current_workfile()
         if context.data['currentFile'] != current_file:
-            raise PublishError("Collected filename from current scene name.")
+            raise PublishError(
+                f"Collected filename '{context.data['currentFile']}' differs"
+                f" from current scene name '{current_file}'."
+            )
 
         if host.workfile_has_unsaved_changes():
             self.log.info("Saving current file: {}".format(current_file))
