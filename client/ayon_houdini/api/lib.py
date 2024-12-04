@@ -676,7 +676,10 @@ def get_top_referenced_parm(parm):
 def evalParmNoFrame(node, parm, pad_character="#"):
 
     parameter = node.parm(parm)
-    assert parameter, "Parameter does not exist: %s.%s" % (node, parm)
+    if not parameter:
+        raise PublishError(
+            message=f"Parameter does not exist: {node}.{parm}",
+        )
 
     # If the parameter has a parameter reference, then get that
     # parameter instead as otherwise `unexpandedString()` fails.
@@ -733,8 +736,10 @@ def get_color_management_preferences():
         config_path = preferences["config"]
         config = PyOpenColorIO.Config.CreateFromFile(config_path)
         display = config.getDefaultDisplay()
-        assert display == preferences["display"], \
-            "Houdini default OCIO display must match config default display"
+        if display != preferences["display"]:
+            raise PublishError(
+                message="Houdini default OCIO display must match config default display"
+            )
         view = config.getDefaultView(display)
         preferences["display"] = display
         preferences["view"] = view

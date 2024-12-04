@@ -5,6 +5,7 @@ import pyblish.api
 
 from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 from ayon_core.pipeline.publish.lib import get_instance_expected_output_path
+from ayon_core.pipeline.publish import PublishError
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import render_rop
 from ayon_houdini.api.usd import remap_paths
@@ -47,7 +48,9 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
         with remap_paths(ropnode, mapping):
             render_rop(ropnode)
 
-        assert os.path.exists(output), "Output does not exist: %s" % output
+        if not os.path.exists(output):
+            PublishError(
+                message=f"Output does not exist: {output}")
 
         if "representations" not in instance.data:
             instance.data["representations"] = []

@@ -5,6 +5,7 @@ import re
 import pyblish.api
 
 from ayon_core.pipeline.create import get_product_name
+from ayon_core.pipeline.publish import PublishError
 from ayon_houdini.api import plugin
 import ayon_houdini.api.usd as usdlib
 
@@ -27,8 +28,8 @@ def copy_instance_data(instance_src, instance_dest, attr):
             in the source instance's data.
 
     Raises:
-        KeyError: If the key does not exist on the source instance.
-        AssertionError: If a parent key already exists on the destination
+        PublishError: If the key does not exist on the source instance.
+        PublishError: If a parent key already exists on the destination
             instance but is not of the correct type (= is not a dict)
 
     """
@@ -38,12 +39,17 @@ def copy_instance_data(instance_src, instance_dest, attr):
     keys = attr.split(".")
     for i, key in enumerate(keys):
         if key not in src_data:
-            break
+            raise PublishError(
+                message= f"key '{key}' does not exist on the source instance."
+            )
 
         src_value = src_data[key]
         if i != len(key):
             dest_data = dest_data.setdefault(key, {})
-            assert isinstance(dest_data, dict), "Destination must be a dict"
+            if not isinstance(dest_data, dict):
+                raise PublishError(
+                    message="Destination must be a dict."
+                )
             src_data = src_value
         else:
             # Last iteration - assign the value
