@@ -288,7 +288,7 @@ def render_rop(ropnode, frame_range=None):
         # so we explicitly capture the houdini error, otherwise pyblish
         # will remain hanging.
         raise PublishError(
-            message="Render failed or interrupted",
+            "Render failed or interrupted",
             description=f"An Error occurred while rendering {ropnode.path()}",
             detail=f"{exc}"
         )
@@ -658,9 +658,7 @@ def get_top_referenced_parm(parm):
     processed = set()  # disallow infinite loop
     while True:
         if parm.path() in processed:
-            raise PublishError(
-                message="Parameter references result in cycle.",
-            )
+            raise PublishError("Parameter references result in cycle.")
 
         processed.add(parm.path())
 
@@ -677,9 +675,7 @@ def evalParmNoFrame(node, parm, pad_character="#"):
 
     parameter = node.parm(parm)
     if not parameter:
-        raise PublishError(
-            message=f"Parameter does not exist: {node}.{parm}",
-        )
+        raise PublishError(f"Parameter does not exist: {node}.{parm}")
 
     # If the parameter has a parameter reference, then get that
     # parameter instead as otherwise `unexpandedString()` fails.
@@ -690,7 +686,7 @@ def evalParmNoFrame(node, parm, pad_character="#"):
         raw = parameter.unexpandedString()
     except hou.Error as exc:
         raise PublishError(
-            message=f"Failed: {parameter}",
+            f"Failed: {parameter}",
             detail=f"{exc}"
         )
 
@@ -738,7 +734,7 @@ def get_color_management_preferences():
         display = config.getDefaultDisplay()
         if display != preferences["display"]:
             raise PublishError(
-                message="Houdini default OCIO display must match config default display"
+                "Houdini default OCIO display must match config default display"
             )
         view = config.getDefaultView(display)
         preferences["display"] = display

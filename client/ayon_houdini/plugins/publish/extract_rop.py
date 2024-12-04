@@ -76,7 +76,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         if missing_filenames:
             missing_filenames = "\n\n ●  ".join(missing_filenames)
             raise PublishError(
-                message="Failed to complete render extraction.",
+                "Failed to complete render extraction.",
                 detail=f"Missing frames:\n\n ●  {missing_filenames}"
             )
 

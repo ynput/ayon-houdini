@@ -84,6 +84,6 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
         if missing_frames:
             missing_frames = "\n\n ●  ".join(missing_frames)
             raise PublishError(
-                message="Failed to complete render extraction.",
+                "Failed to complete render extraction.",
                 detail=f"Missing output files:\n\n ●  {missing_frames}"
             )

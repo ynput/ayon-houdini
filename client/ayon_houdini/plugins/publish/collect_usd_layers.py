@@ -40,16 +40,14 @@ def copy_instance_data(instance_src, instance_dest, attr):
     for i, key in enumerate(keys):
         if key not in src_data:
             raise PublishError(
-                message= f"key '{key}' does not exist on the source instance."
+                f"key '{key}' does not exist on the source instance."
             )
 
         src_value = src_data[key]
         if i != len(key):
             dest_data = dest_data.setdefault(key, {})
             if not isinstance(dest_data, dict):
-                raise PublishError(
-                    message="Destination must be a dict."
-                )
+                raise PublishError("Destination must be a dict.")
             src_data = src_value
         else:
             # Last iteration - assign the value
