@@ -4,7 +4,7 @@ from ayon_core.lib import version_up
 from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.publish import (
     get_errored_plugins_from_context,
-    KnownPublishError
+    PublishError
 )
 
 from ayon_houdini.api import plugin
@@ -37,7 +37,7 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
             plugin.__name__ == "HoudiniSubmitPublishDeadline"
             for plugin in errored_plugins
         ):
-            raise KnownPublishError(
+            raise PublishError(
                 "Skipping incrementing current file because "
                 "submission to deadline failed."
             )
@@ -46,8 +46,9 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
         host = registered_host()
         current_file = host.current_file()
         if context.data["currentFile"] != current_file:
-            raise KnownPublishError(
-                "Collected filename mismatches from current scene name."
+            raise PublishError(
+                f"Collected filename '{context.data['currentFile']}'"
+                f" mismatches from current scene name '{current_file}'."
             )
 
         new_filepath = version_up(current_file)

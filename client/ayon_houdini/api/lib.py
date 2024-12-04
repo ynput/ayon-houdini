@@ -107,7 +107,7 @@ def get_output_parameter(node):
     elif node_type == "vray_renderer":
         return node.parm("SettingsOutput_img_file_path")
 
-    raise TypeError("Node type '%s' not supported" % node_type)
+    raise PublishError(f"Node type '{node_type}' is not supported")
 
 
 def get_lops_rop_context_options(
@@ -141,7 +141,8 @@ def get_lops_rop_context_options(
                 end: float = ropnode.evalParm("f2")
                 inc: float = ropnode.evalParm("f3")
             else:
-                raise ValueError("Unsupported trange value: %s" % trange)
+                raise PublishError(f"Unsupported trange value: {trange}"
+                                   f" for rop node: {ropnode.path()}")
             rop_context_options["ropcook"] = 1.0
             rop_context_options["ropstart"] = start
             rop_context_options["ropend"] = end
@@ -161,7 +162,8 @@ def get_lops_rop_context_options(
         elif option_type == "float":
             value: float = ropnode.evalParm(f"optionfloatvalue{i}")
         else:
-            raise ValueError(f"Unsupported option type: {option_type}")
+            raise PublishError(f"Unsupported option type: {option_type}"
+                               f" on rop node: '{ropnode.path()}'")
         rop_context_options[name] = value
 
     return rop_context_options

@@ -1,5 +1,5 @@
 import pyblish.api
-from ayon_core.pipeline.publish import KnownPublishError
+from ayon_core.pipeline.publish import PublishError
 from ayon_houdini.api import plugin
 
 
@@ -67,8 +67,8 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
             out_node = node.parm("startnode").evalAsNode()
 
         else:
-            raise KnownPublishError(
-                "ROP node type '{}' is not supported.".format(node_type)
+            raise PublishError(
+                f"ROP node type '{node_type}' is not supported."
             )
 
         if not out_node:
