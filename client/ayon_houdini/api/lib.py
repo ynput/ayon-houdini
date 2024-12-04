@@ -26,6 +26,7 @@ from ayon_core.pipeline.context_tools import get_current_task_entity
 from ayon_core.pipeline.workfile.workfile_template_builder import (
     TemplateProfileNotFound
 )
+from ayon_core.pipeline.publish import PublishError
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
 
@@ -286,9 +287,11 @@ def render_rop(ropnode, frame_range=None):
         # The hou.Error is not inherited from a Python Exception class,
         # so we explicitly capture the houdini error, otherwise pyblish
         # will remain hanging.
-        import traceback
-        traceback.print_exc()
-        raise RuntimeError("Render failed: {0}".format(exc))
+        raise PublishError(
+            message="Render failed or interrupted",
+            description=f"An Error occurred while rendering {ropnode.path()}",
+            detail=f"{exc}"
+        )
 
 
 def imprint(node, data, update=False):
@@ -655,7 +658,9 @@ def get_top_referenced_parm(parm):
     processed = set()  # disallow infinite loop
     while True:
         if parm.path() in processed:
-            raise RuntimeError("Parameter references result in cycle.")
+            raise PublishError(
+                message="Parameter references result in cycle.",
+            )
 
         processed.add(parm.path())
 
@@ -681,8 +686,10 @@ def evalParmNoFrame(node, parm, pad_character="#"):
     try:
         raw = parameter.unexpandedString()
     except hou.Error as exc:
-        print("Failed: %s" % parameter)
-        raise RuntimeError(exc)
+        raise PublishError(
+            message=f"Failed: {parameter}",
+            detail=f"{exc}"
+        )
 
     def replace(match):
         padding = 1
