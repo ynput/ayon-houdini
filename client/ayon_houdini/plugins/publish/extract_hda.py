@@ -32,7 +32,6 @@ class ExtractHDA(plugin.HoudiniExtractorPlugin):
         hda_def = hda_node.type().definition()
         hda_options = hda_def.options()
         hda_options.setSaveInitialParmsAndContents(True)
-        hda_options.setSaveSpareParms(True)
 
         next_version = instance.data["anatomyData"]["version"]
         self.log.info("setting version: {}".format(next_version))
