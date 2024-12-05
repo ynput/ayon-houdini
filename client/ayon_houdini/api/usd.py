@@ -10,9 +10,6 @@ import hou
 import ayon_api
 from pxr import Usd, Sdf, Tf, Vt, UsdRender
 
-from ayon_core.pipeline.publish import PublishError
-
-
 log = logging.getLogger(__name__)
 
 
@@ -208,8 +205,8 @@ def get_configured_save_layers(usd_rop, strip_above_layer_break=True):
     lop_node = get_usd_rop_loppath(usd_rop)
     stage = lop_node.stage(apply_viewport_overrides=False)
     if not stage:
-        raise PublishError(
-            f"No valid USD stage for ROP node: '{usd_rop.path()}' "
+        raise RuntimeError(
+            "No valid USD stage for ROP node: " "%s" % usd_rop.path()
         )
 
     root_layer = stage.GetRootLayer()

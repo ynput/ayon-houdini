@@ -75,7 +75,15 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         rop_node = hou.node(instance.data["instance_node"])
 
         save_layers = []
-        for layer in usdlib.get_configured_save_layers(rop_node):
+        try:
+            layers = usdlib.get_configured_save_layers(rop_node)
+        except Exception as exc:
+            raise PublishError(
+                f"Failed to get USD layers on rop node '{rop_node}'",
+                detail=f"{exc}"
+            )
+        
+        for layer in layers:
 
             info = layer.rootPrims.get("HoudiniLayerInfo")
             save_path = info.customData.get("HoudiniSavePath")
