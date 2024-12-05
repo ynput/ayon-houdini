@@ -4,6 +4,7 @@ import os
 import hou
 import pyblish.api
 
+from ayon_core.pipeline import PublishError
 from ayon_houdini.api.lib import evalParmNoFrame
 from ayon_houdini.api import plugin
 
@@ -27,12 +28,12 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
     def process(self, instance):
         rop = hou.node(instance.data.get("instance_node"))
 
-        default_prefix = evalParmNoFrame(rop, "RS_outputFileNamePrefix")
+        default_prefix = self.evalParmNoFrame(rop, "RS_outputFileNamePrefix")
         beauty_suffix = rop.evalParm("RS_outputBeautyAOVSuffix")
 
         export_products = []
         if instance.data["splitRender"]:
-            export_prefix = evalParmNoFrame(
+            export_prefix = self.evalParmNoFrame(
                 rop, "RS_archive_file", pad_character="0"
             )
             beauty_export_product = self.get_render_product_name(
@@ -80,7 +81,7 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
                 continue
 
             aov_suffix = rop.evalParm(f"RS_aovSuffix_{i}")
-            aov_prefix = evalParmNoFrame(rop, f"RS_aovCustomPrefix_{i}")
+            aov_prefix = self.evalParmNoFrame(rop, f"RS_aovCustomPrefix_{i}")
             if not aov_prefix:
                 aov_prefix = default_prefix
 
@@ -163,3 +164,12 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
                 os.path.join(dir, (file % i)).replace("\\", "/"))
 
         return expected_files
+
+    def evalParmNoFrame(self, rop, parm, **kwargs):
+        try:
+            return evalParmNoFrame(rop, parm, **kwargs)
+        except Exception as exc:
+            raise PublishError(
+                f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
+                detail=f"{exc}"
+            )

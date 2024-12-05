@@ -46,7 +46,14 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
         mapping.update(instance_mapping)
 
         with remap_paths(ropnode, mapping):
-            render_rop(ropnode)
+            try:
+                render_rop(ropnode)
+            except Exception as e:
+                raise PublishError(
+                    "Render failed or interrupted",
+                    description=f"An Error occurred while rendering {ropnode.path()}",
+                    detail=f"{e}"
+                )
 
         if not os.path.exists(output):
             PublishError(f"Output does not exist: {output}")

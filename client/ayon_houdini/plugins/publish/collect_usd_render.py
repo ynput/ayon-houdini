@@ -4,6 +4,7 @@ import re
 import hou
 import pyblish.api
 
+from ayon_core.pipeline import PublishError
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import evalParmNoFrame
 
@@ -31,7 +32,7 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
 
         if instance.data["splitRender"]:
             # USD file output
-            lop_output = evalParmNoFrame(
+            lop_output = self.evalParmNoFrame(
                 rop, "lopoutput", pad_character="#"
             )
 
@@ -40,7 +41,7 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
             # TODO: It is possible for a user to disable this
             # TODO: When enabled I think only the basename of the `lopoutput`
             #  parm is preserved, any parent folders defined are likely ignored
-            folder = evalParmNoFrame(
+            folder = self.evalParmNoFrame(
                 rop, "savetodirectory_directory", pad_character="#"
             )
 
@@ -68,3 +69,12 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
 
         # stub required data for Submit Publish Job publish plug-in
         instance.data["attachTo"] = []
+
+    def evalParmNoFrame(self, rop, parm, **kwargs):
+        try:
+            return evalParmNoFrame(rop, parm, **kwargs)
+        except Exception as exc:
+            raise PublishError(
+                f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
+                detail=f"{exc}"
+            )

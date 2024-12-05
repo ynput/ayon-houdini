@@ -4,6 +4,7 @@ import os
 import hou
 import pyblish.api
 
+from ayon_core.pipeline import PublishError
 from ayon_houdini.api.lib import evalParmNoFrame
 from ayon_houdini.api import plugin
 
@@ -28,13 +29,13 @@ class CollectMantraROPRenderProducts(plugin.HoudiniInstancePlugin):
 
         rop = hou.node(instance.data.get("instance_node"))
 
-        default_prefix = evalParmNoFrame(rop, "vm_picture")
+        default_prefix = self.evalParmNoFrame(rop, "vm_picture")
         render_products = []
 
         export_prefix = None
         export_products = []
         if instance.data["splitRender"]:
-            export_prefix = evalParmNoFrame(
+            export_prefix = self.evalParmNoFrame(
                 rop, "soho_diskfile", pad_character="0"
             )
             beauty_export_product = self.get_render_product_name(
@@ -74,7 +75,7 @@ class CollectMantraROPRenderProducts(plugin.HoudiniInstancePlugin):
                     aov_enabled = rop.evalParm(aov_boolean)
                     has_aov_path = rop.evalParm(aov_name)
                     if has_aov_path and aov_enabled == 1:
-                        aov_prefix = evalParmNoFrame(rop, aov_name)
+                        aov_prefix = self.evalParmNoFrame(rop, aov_name)
                         aov_product = self.get_render_product_name(
                             prefix=aov_prefix, suffix=None
                         )
@@ -137,3 +138,12 @@ class CollectMantraROPRenderProducts(plugin.HoudiniInstancePlugin):
                 os.path.join(dir, (file % i)).replace("\\", "/"))
 
         return expected_files
+
+    def evalParmNoFrame(self, rop, parm, **kwargs):
+        try:
+            return evalParmNoFrame(rop, parm, **kwargs)
+        except Exception as exc:
+            raise PublishError(
+                f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
+                detail=f"{exc}"
+            )

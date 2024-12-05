@@ -62,7 +62,14 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             # previously rendered version. This situation breaks the publishing.
             # because There will be missing frames as ROP nodes typically cannot render different
             #  frame ranges for each AOV; they always use the same frame range for all AOVs.
-            self.render_rop(instance)
+            try:
+                self.render_rop(instance)
+            except Exception as e:
+                raise PublishError(
+                    "Render failed or interrupted",
+                    description=f"An Error occurred while rendering {rop_node.path()}",
+                    detail=f"{e}"
+                )
 
         # `ExpectedFiles` is a list that includes one dict.
         expected_files = instance.data["expectedFiles"][0]

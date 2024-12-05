@@ -4,6 +4,7 @@ import os
 import hou
 import pyblish.api
 
+from ayon_core.pipeline import PublishError
 from ayon_houdini.api.lib import evalParmNoFrame
 from ayon_houdini.api import plugin
 
@@ -28,14 +29,14 @@ class CollectVrayROPRenderProducts(plugin.HoudiniInstancePlugin):
 
         rop = hou.node(instance.data.get("instance_node"))
 
-        default_prefix = evalParmNoFrame(rop, "SettingsOutput_img_file_path")
+        default_prefix = self.evalParmNoFrame(rop, "SettingsOutput_img_file_path")
         render_products = []
         # TODO: add render elements if render element
 
         export_prefix = None
         export_products = []
         if instance.data["splitRender"]:
-            export_prefix = evalParmNoFrame(
+            export_prefix = self.evalParmNoFrame(
                 rop, "render_export_filepath", pad_character="0"
             )
             beauty_export_product = self.get_render_product_name(
@@ -132,3 +133,12 @@ class CollectVrayROPRenderProducts(plugin.HoudiniInstancePlugin):
                 os.path.join(dir, (file % i)).replace("\\", "/"))
 
         return expected_files
+
+    def evalParmNoFrame(self, rop, parm, **kwargs):
+        try:
+            return evalParmNoFrame(rop, parm, **kwargs)
+        except Exception as exc:
+            raise PublishError(
+                f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
+                detail=f"{exc}"
+            )

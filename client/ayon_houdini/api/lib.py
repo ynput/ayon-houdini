@@ -289,11 +289,9 @@ def render_rop(ropnode, frame_range=None):
         # The hou.Error is not inherited from a Python Exception class,
         # so we explicitly capture the houdini error, otherwise pyblish
         # will remain hanging.
-        raise PublishError(
-            "Render failed or interrupted",
-            description=f"An Error occurred while rendering {ropnode.path()}",
-            detail=f"{exc}"
-        )
+        import traceback
+        traceback.print_exc()
+        raise RuntimeError("Render failed: {0}".format(exc))
 
 
 def imprint(node, data, update=False):
@@ -676,8 +674,7 @@ def get_top_referenced_parm(parm):
 def evalParmNoFrame(node, parm, pad_character="#"):
 
     parameter = node.parm(parm)
-    if not parameter:
-        raise PublishError(f"Parameter does not exist: {node}.{parm}")
+    assert parameter, "Parameter does not exist: %s.%s" % (node, parm)
 
     # If the parameter has a parameter reference, then get that
     # parameter instead as otherwise `unexpandedString()` fails.
@@ -687,10 +684,8 @@ def evalParmNoFrame(node, parm, pad_character="#"):
     try:
         raw = parameter.unexpandedString()
     except hou.Error as exc:
-        raise PublishError(
-            f"Failed: {parameter}",
-            detail=f"{exc}"
-        )
+        print("Failed: %s" % parameter)
+        raise RuntimeError(exc)
 
     def replace(match):
         padding = 1

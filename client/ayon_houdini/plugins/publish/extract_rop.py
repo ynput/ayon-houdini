@@ -35,7 +35,17 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         # This key might be absent because render targets are not yet implemented
         #  for all product types that use this plugin.
         if creator_attribute.get("render_target", "local") == "local":
-            self.render_rop(instance)
+            try:
+                self.render_rop(instance)
+            except Exception as e:
+                import hou
+                rop_node = hou.node(instance.data["instance_node"])
+                raise PublishError(
+                    "Render failed or interrupted",
+                    description=f"An Error occurred while rendering {rop_node.path()}",
+                    detail=f"{e}"
+                )
+
         self.validate_expected_frames(instance)
 
         # In some cases representation name is not the the extension
