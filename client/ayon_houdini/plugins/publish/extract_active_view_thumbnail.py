@@ -1,4 +1,5 @@
 import tempfile
+import os
 import pyblish.api
 
 from ayon_core.pipeline import OptionalPyblishPluginMixin
@@ -17,7 +18,8 @@ class ExtractActiveViewThumbnail(plugin.HoudiniExtractorPlugin,
     """
     order = pyblish.api.ExtractorOrder + 0.49
     label = "Extract Active View Thumbnail"
-    families = ["workfile"]
+    families = ["workfile",
+                "review"]
 
     def process(self, instance):
         if not self.is_active(instance.data):
@@ -42,6 +44,21 @@ class ExtractActiveViewThumbnail(plugin.HoudiniExtractorPlugin,
                        .format(view_thumbnail)
         )
         instance.data["thumbnailPath"] = view_thumbnail
+      
+        instance.data.setdefault("representations", [])
+        representation = {
+            "name": "thumbnail",
+            "ext": "jpg",
+            "files": os.path.basename(view_thumbnail),
+            "stagingDir": os.path.dirname(view_thumbnail),
+            "thumbnail": True
+        }
+
+        # Adding representation to instance
+        instance.data["representations"].append(representation)
+        self.log.debug(
+            "Adding thumbnail representation: {}".format(representation)
+        )
 
     def get_view_thumbnail(self, instance):
 
