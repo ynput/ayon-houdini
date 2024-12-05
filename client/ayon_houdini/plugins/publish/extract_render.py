@@ -89,8 +89,8 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             if not os.path.exists(frame)
         ]
         if missing_frames:
-            missing_frames = "\n\n ●  ".join(missing_frames)
+            missing_frames = "\n\n -  ".join(missing_frames)
             raise PublishError(
                 "Failed to complete render extraction.",
-                detail=f"Missing output files:\n\n ●  {missing_frames}"
+                detail=f"Missing output files:\n\n -  {missing_frames}"
             )

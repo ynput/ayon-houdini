@@ -84,10 +84,10 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
             if not os.path.isfile(os.path.join(staging_dir, filename))
         ]
         if missing_filenames:
-            missing_filenames = "\n\n ●  ".join(missing_filenames)
+            missing_filenames = "\n\n -  ".join(missing_filenames)
             raise PublishError(
                 "Failed to complete render extraction.",
-                detail=f"Missing frames:\n\n ●  {missing_filenames}"
+                detail=f"Missing frames:\n\n -  {missing_filenames}"
             )
 
     def update_representation_data(self,
