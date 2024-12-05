@@ -28,8 +28,8 @@ def copy_instance_data(instance_src, instance_dest, attr):
             in the source instance's data.
 
     Raises:
-        PublishError: If the key does not exist on the source instance.
-        PublishError: If a parent key already exists on the destination
+        KeyError: If the key does not exist on the source instance.
+        AssertionError: If a parent key already exists on the destination
             instance but is not of the correct type (= is not a dict)
 
     """
@@ -39,15 +39,12 @@ def copy_instance_data(instance_src, instance_dest, attr):
     keys = attr.split(".")
     for i, key in enumerate(keys):
         if key not in src_data:
-            raise PublishError(
-                f"key '{key}' does not exist on the source instance."
-            )
+            break
 
         src_value = src_data[key]
         if i != len(key):
             dest_data = dest_data.setdefault(key, {})
-            if not isinstance(dest_data, dict):
-                raise PublishError("Destination must be a dict.")
+            assert isinstance(dest_data, dict), "Destination must be a dict"
             src_data = src_value
         else:
             # Last iteration - assign the value
@@ -159,10 +156,16 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
 
             # Inherit "use handles" from the source instance
             # TODO: Do we want to maybe copy full `publish_attributes` instead?
-            copy_instance_data(
-                instance, layer_inst,
-                attr="publish_attributes.CollectRopFrameRange.use_handles"
-            )
+            try:
+                copy_instance_data(
+                    instance, layer_inst,
+                    attr="publish_attributes.CollectRopFrameRange.use_handles"
+                )
+            except Exception as exc:
+                raise PublishError(
+                    "Failed to copy instance data.",
+                    detail=f"{exc}"
+                )
 
             # Allow this subset to be grouped into a USD Layer on creation
             layer_inst.data["productGroup"] = (
