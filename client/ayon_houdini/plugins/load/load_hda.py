@@ -75,6 +75,16 @@ class HdaLoader(plugin.HoudiniLoader):
             "representation": repre_entity["id"]
         })
 
+        # Move the Extra parameter folder to the back.
+        parm_group = hda_node.parmTemplateGroup()
+        # The name 'Extra' is a hard coded name in AYON.
+        parm_folder = parm_group.findFolder("Extra")
+        # Remove `Extra` AYON parameters
+        parm_group.remove(parm_folder.name())
+        # Add `Extra` AYON parameters back
+        parm_group.append(parm_folder)
+        hda_node.setParmTemplateGroup(parm_group)
+
     def remove(self, container):
         node = container["node"]
         parent = node.parent()
