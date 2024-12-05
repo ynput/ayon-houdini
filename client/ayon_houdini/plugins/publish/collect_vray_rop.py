@@ -4,8 +4,6 @@ import os
 import hou
 import pyblish.api
 
-from ayon_core.pipeline import PublishError
-from ayon_houdini.api.lib import evalParmNoFrame
 from ayon_houdini.api import plugin
 
 
@@ -133,12 +131,3 @@ class CollectVrayROPRenderProducts(plugin.HoudiniInstancePlugin):
                 os.path.join(dir, (file % i)).replace("\\", "/"))
 
         return expected_files
-
-    def evalParmNoFrame(self, rop, parm, **kwargs):
-        try:
-            return evalParmNoFrame(rop, parm, **kwargs)
-        except Exception as exc:
-            raise PublishError(
-                f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
-                detail=f"{exc}"
-            )

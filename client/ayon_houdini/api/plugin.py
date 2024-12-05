@@ -16,11 +16,19 @@ from ayon_core.pipeline import (
     AYON_INSTANCE_ID,
     AVALON_INSTANCE_ID,
     load,
-    publish
+    publish,
+    PublishError
 )
 from ayon_core.lib import BoolDef
 
-from .lib import imprint, read, lsattr, add_self_publish_button, render_rop
+from .lib import (
+    imprint,
+    read,
+    lsattr,
+    add_self_publish_button,
+    render_rop,
+    evalParmNoFrame)
+
 from .usd import get_ayon_entity_uri_from_representation_context
 
 
@@ -333,6 +341,15 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
 
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
+
+    def evalParmNoFrame(self, rop, parm, **kwargs):
+        try:
+            return evalParmNoFrame(rop, parm, **kwargs)
+        except Exception as exc:
+            raise PublishError(
+                f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
+                detail=f"{exc}"
+            )
 
 
 class HoudiniContextPlugin(pyblish.api.ContextPlugin):

@@ -4,9 +4,7 @@ import re
 import hou
 import pyblish.api
 
-from ayon_core.pipeline import PublishError
 from ayon_houdini.api import plugin
-from ayon_houdini.api.lib import evalParmNoFrame
 
 
 class CollectUsdRender(plugin.HoudiniInstancePlugin):
@@ -69,12 +67,3 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
 
         # stub required data for Submit Publish Job publish plug-in
         instance.data["attachTo"] = []
-
-    def evalParmNoFrame(self, rop, parm, **kwargs):
-        try:
-            return evalParmNoFrame(rop, parm, **kwargs)
-        except Exception as exc:
-            raise PublishError(
-                f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
-                detail=f"{exc}"
-            )
