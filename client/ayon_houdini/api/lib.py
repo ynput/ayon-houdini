@@ -26,7 +26,6 @@ from ayon_core.pipeline.context_tools import get_current_task_entity
 from ayon_core.pipeline.workfile.workfile_template_builder import (
     TemplateProfileNotFound
 )
-from ayon_core.pipeline.publish import PublishError
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
 
@@ -729,10 +728,8 @@ def get_color_management_preferences():
         config_path = preferences["config"]
         config = PyOpenColorIO.Config.CreateFromFile(config_path)
         display = config.getDefaultDisplay()
-        if display != preferences["display"]:
-            raise PublishError(
-                "Houdini default OCIO display must match config default display"
-            )
+        assert display == preferences["display"], \
+            "Houdini default OCIO display must match config default display"
         view = config.getDefaultView(display)
         preferences["display"] = display
         preferences["view"] = view

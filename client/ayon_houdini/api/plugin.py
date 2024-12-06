@@ -32,7 +32,11 @@ from .lib import (
 )
 
 from .usd import get_ayon_entity_uri_from_representation_context
-
+from .colorspace import (
+    get_color_management_preferences,
+    get_scene_linear_colorspace,
+    ARenderProduct
+)
 
 SETTINGS_CATEGORY = "houdini"
 
@@ -361,6 +365,16 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
                 f"Node type '{node}' is not supported",
                 detail=f"{exc}"
             )
+        
+    def get_scene_linear_colorspace(self):
+        try:
+            return get_scene_linear_colorspace()
+        except Exception as exc:
+            raise PublishError(
+                "Failed to get scene linear colorspace.",
+                detail=f"{exc}"
+            )
+        
 
 
 class HoudiniContextPlugin(pyblish.api.ContextPlugin):
