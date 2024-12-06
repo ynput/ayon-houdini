@@ -658,7 +658,7 @@ def get_top_referenced_parm(parm):
     processed = set()  # disallow infinite loop
     while True:
         if parm.path() in processed:
-            raise PublishError("Parameter references result in cycle.")
+            raise RuntimeError("Parameter references result in cycle.")
 
         processed.add(parm.path())
 
