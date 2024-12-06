@@ -5,7 +5,7 @@ import hou
 import pyblish.api
 from ayon_core.pipeline import PublishValidationError
 
-from ayon_houdini.api import lib, plugin
+from ayon_houdini.api import plugin
 
 
 class ValidateFileExtension(plugin.HoudiniInstancePlugin):
@@ -50,7 +50,7 @@ class ValidateFileExtension(plugin.HoudiniInstancePlugin):
         families = set(families)
 
         # Perform extension check
-        output = lib.get_output_parameter(node).eval()
+        output = cls.get_output_parameter(node).eval()
         _, output_extension = os.path.splitext(output)
 
         for family in families:

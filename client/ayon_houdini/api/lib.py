@@ -107,7 +107,7 @@ def get_output_parameter(node):
     elif node_type == "vray_renderer":
         return node.parm("SettingsOutput_img_file_path")
 
-    raise PublishError(f"Node type '{node_type}' is not supported")
+    raise TypeError(f"Node type '{node_type}' is not supported")
 
 
 def get_lops_rop_context_options(

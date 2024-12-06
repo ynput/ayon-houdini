@@ -3,7 +3,7 @@ import hou
 import pyblish.api
 from ayon_core.pipeline.publish import PublishValidationError
 
-from ayon_houdini.api import lib, plugin
+from ayon_houdini.api import plugin
 
 
 class ValidateFrameToken(plugin.HoudiniInstancePlugin):
@@ -46,7 +46,7 @@ class ValidateFrameToken(plugin.HoudiniInstancePlugin):
         if frame_range == 0:
             return
 
-        output_parm = lib.get_output_parameter(node)
+        output_parm = cls.get_output_parameter(node)
         unexpanded_str = output_parm.unexpandedString()
 
         if "$F" not in unexpanded_str:

@@ -27,7 +27,9 @@ from .lib import (
     lsattr,
     add_self_publish_button,
     render_rop,
-    evalParmNoFrame)
+    evalParmNoFrame,
+    get_output_parameter
+)
 
 from .usd import get_ayon_entity_uri_from_representation_context
 
@@ -348,6 +350,15 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
         except Exception as exc:
             raise PublishError(
                 f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
+                detail=f"{exc}"
+            )
+    
+    def get_output_parameter(self, node):
+        try:
+            return get_output_parameter(node)
+        except Exception as exc:
+            raise PublishError(
+                f"Node type '{node}' is not supported",
                 detail=f"{exc}"
             )
 

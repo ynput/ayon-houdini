@@ -4,7 +4,7 @@ import os
 import hou  # noqa
 import clique
 import pyblish.api
-from ayon_houdini.api import lib, plugin
+from ayon_houdini.api import plugin
 
 
 class CollectFrames(plugin.HoudiniInstancePlugin):
@@ -27,7 +27,7 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
 
         # Evaluate the file name at the first frame.
         ropnode = hou.node(instance.data["instance_node"])
-        output_parm = lib.get_output_parameter(ropnode)
+        output_parm = self.get_output_parameter(ropnode)
         output = output_parm.evalAtFrame(start_frame)
         file_name = os.path.basename(output)
 
