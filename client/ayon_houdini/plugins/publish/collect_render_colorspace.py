@@ -1,4 +1,9 @@
-from ayon_houdini.api import plugin, colorspace
+from ayon_core.pipeline import PublishError
+from ayon_houdini.api import plugin
+from ayon_houdini.api.colorspace import (
+    ARenderProduct,
+    get_color_management_preferences
+)
 
 import pyblish.api
 
@@ -32,14 +37,27 @@ class CollectHoudiniRenderColorspace(plugin.HoudiniInstancePlugin):
                            "Skipping collecting of render colorspace.")
             return
         aov_name = list(expected_files[0].keys())
-        render_products_data = colorspace.ARenderProduct(aov_name)
+        try:
+            render_products_data = ARenderProduct(aov_name)
+        except Exception as exc:
+            raise PublishError(
+                "Failed to get render products with colorspace.",
+                detail=f"{exc}"
+            )
         instance.data["renderProducts"] = render_products_data
 
         # Required data for `create_instances_for_aov`
-        colorspace_data = colorspace.get_color_management_preferences()
+        try:
+            colorspace_data = get_color_management_preferences()
+        except Exception as exc:
+            raise PublishError(
+                "Failed to get color management preferences.",
+                detail=f"{exc}"
+            )
+        
         instance.data["colorspaceConfig"] = colorspace_data["config"]
         instance.data["colorspaceDisplay"] = colorspace_data["display"]
         instance.data["colorspaceView"] = colorspace_data["view"]
 
         # Used in `create_skeleton_instance()`
-        instance.data["colorspace"] = colorspace.get_scene_linear_colorspace()
+        instance.data["colorspace"] = self.get_scene_linear_colorspace()

@@ -2,6 +2,7 @@ import os
 import pyblish.api
 
 from ayon_core.pipeline import publish
+from ayon_core.pipeline.publish import PublishError
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import splitext
 
@@ -34,7 +35,17 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         # This key might be absent because render targets are not yet implemented
         #  for all product types that use this plugin.
         if creator_attribute.get("render_target", "local") == "local":
-            self.render_rop(instance)
+            try:
+                self.render_rop(instance)
+            except Exception as e:
+                import hou
+                rop_node = hou.node(instance.data["instance_node"])
+                raise PublishError(
+                    "Render failed or interrupted",
+                    description=f"An Error occurred while rendering {rop_node.path()}",
+                    detail=f"{e}"
+                )
+
         self.validate_expected_frames(instance)
 
         # In some cases representation name is not the the extension
@@ -73,7 +84,11 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
             if not os.path.isfile(os.path.join(staging_dir, filename))
         ]
         if missing_filenames:
-            raise RuntimeError(f"Missing frames: {missing_filenames}")
+            missing_filenames = "\n\n -  ".join(missing_filenames)
+            raise PublishError(
+                "Failed to complete render extraction.",
+                detail=f"Missing frames:\n\n -  {missing_filenames}"
+            )
 
     def update_representation_data(self,
                                    instance: pyblish.api.Instance,

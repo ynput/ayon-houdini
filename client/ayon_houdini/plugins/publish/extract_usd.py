@@ -5,6 +5,7 @@ import pyblish.api
 
 from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 from ayon_core.pipeline.publish.lib import get_instance_expected_output_path
+from ayon_core.pipeline.publish import PublishError
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import render_rop
 from ayon_houdini.api.usd import remap_paths
@@ -45,9 +46,17 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
         mapping.update(instance_mapping)
 
         with remap_paths(ropnode, mapping):
-            render_rop(ropnode)
+            try:
+                render_rop(ropnode)
+            except Exception as e:
+                raise PublishError(
+                    "Render failed or interrupted",
+                    description=f"An Error occurred while rendering {ropnode.path()}",
+                    detail=f"{e}"
+                )
 
-        assert os.path.exists(output), "Output does not exist: %s" % output
+        if not os.path.exists(output):
+            PublishError(f"Output does not exist: {output}")
 
         if "representations" not in instance.data:
             instance.data["representations"] = []
@@ -135,5 +144,7 @@ def get_source_paths(
         # Single file
         return [os.path.join(staging, files)]
 
-    raise TypeError(f"Unsupported type for representation files: {files} "
-                    "(supports list or str)")
+    raise PublishError(
+        f"Unsupported type for representation files: {files}"
+        " (supports list or str)"
+    )

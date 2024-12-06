@@ -1,8 +1,9 @@
 import hou
 
 import pyblish.api
+from ayon_core.pipeline.publish import PublishValidationError
 
-from ayon_houdini.api import lib, plugin
+from ayon_houdini.api import plugin
 
 
 class ValidateFrameToken(plugin.HoudiniInstancePlugin):
@@ -31,8 +32,9 @@ class ValidateFrameToken(plugin.HoudiniInstancePlugin):
 
         invalid = self.get_invalid(instance)
         if invalid:
-            raise RuntimeError(
-                "Output settings do no match for '%s'" % instance
+            raise PublishValidationError(
+                "No frame token '$F4' found in the output "
+                f"path of '{invalid[0].path()}'" 
             )
 
     @classmethod
@@ -42,11 +44,11 @@ class ValidateFrameToken(plugin.HoudiniInstancePlugin):
         # Check trange parm, 0 means Render Current Frame
         frame_range = node.evalParm("trange")
         if frame_range == 0:
-            return []
+            return
 
-        output_parm = lib.get_output_parameter(node)
+        output_parm = cls.get_output_parameter(node)
         unexpanded_str = output_parm.unexpandedString()
 
         if "$F" not in unexpanded_str:
             cls.log.error("No frame token found in '%s'" % node.path())
-            return [instance]
+            return [node]

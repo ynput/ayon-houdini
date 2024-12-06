@@ -5,6 +5,7 @@ import re
 import pyblish.api
 
 from ayon_core.pipeline.create import get_product_name
+from ayon_core.pipeline.publish import PublishError
 from ayon_houdini.api import plugin
 import ayon_houdini.api.usd as usdlib
 
@@ -71,7 +72,15 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         rop_node = hou.node(instance.data["instance_node"])
 
         save_layers = []
-        for layer in usdlib.get_configured_save_layers(rop_node):
+        try:
+            layers = usdlib.get_configured_save_layers(rop_node)
+        except Exception as exc:
+            raise PublishError(
+                f"Failed to get USD layers on rop node '{rop_node}'",
+                detail=f"{exc}"
+            )
+        
+        for layer in layers:
 
             info = layer.rootPrims.get("HoudiniLayerInfo")
             save_path = info.customData.get("HoudiniSavePath")
@@ -147,10 +156,16 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
 
             # Inherit "use handles" from the source instance
             # TODO: Do we want to maybe copy full `publish_attributes` instead?
-            copy_instance_data(
-                instance, layer_inst,
-                attr="publish_attributes.CollectRopFrameRange.use_handles"
-            )
+            try:
+                copy_instance_data(
+                    instance, layer_inst,
+                    attr="publish_attributes.CollectRopFrameRange.use_handles"
+                )
+            except Exception as exc:
+                raise PublishError(
+                    "Failed to copy instance data.",
+                    detail=f"{exc}"
+                )
 
             # Allow this subset to be grouped into a USD Layer on creation
             layer_inst.data["productGroup"] = (
