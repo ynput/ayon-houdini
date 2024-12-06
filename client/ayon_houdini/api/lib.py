@@ -141,8 +141,8 @@ def get_lops_rop_context_options(
                 end: float = ropnode.evalParm("f2")
                 inc: float = ropnode.evalParm("f3")
             else:
-                raise PublishError(f"Unsupported trange value: {trange}"
-                                   f" for rop node: {ropnode.path()}")
+                raise ValueError(f"Unsupported trange value: {trange}"
+                                 f" for rop node: {ropnode.path()}")
             rop_context_options["ropcook"] = 1.0
             rop_context_options["ropstart"] = start
             rop_context_options["ropend"] = end
@@ -162,8 +162,8 @@ def get_lops_rop_context_options(
         elif option_type == "float":
             value: float = ropnode.evalParm(f"optionfloatvalue{i}")
         else:
-            raise PublishError(f"Unsupported option type: {option_type}"
-                               f" on rop node: '{ropnode.path()}'")
+            raise ValueError(f"Unsupported option type: {option_type}"
+                             f" on rop node: '{ropnode.path()}'")
         rop_context_options[name] = value
 
     return rop_context_options

@@ -6,6 +6,7 @@ import hou
 from pxr import Sdf, Usd
 import pyblish.api
 
+from ayon_core.pipeline import PublishError
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import (
     get_lops_rop_context_options,
@@ -82,7 +83,13 @@ class CollectUsdRenderLayerAndStage(plugin.HoudiniInstancePlugin):
 
         lop_node: hou.LopNode
         rop: hou.RopNode = hou.node(instance.data["instance_node"])
-        options = get_lops_rop_context_options(rop)
+        try:
+            options = get_lops_rop_context_options(rop)
+        except hou.Error as exc:
+            raise PublishError(
+                f"Failed to get context options on rop: {rop.path()}",
+                detail=f"{exc}"
+            )
 
         # Log the context options
         self.log.debug(
