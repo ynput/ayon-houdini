@@ -4,7 +4,6 @@ import os
 import hou
 import pyblish.api
 
-from ayon_houdini.api.lib import evalParmNoFrame
 from ayon_houdini.api import plugin
 
 
@@ -28,7 +27,7 @@ class CollectKarmaROPRenderProducts(plugin.HoudiniInstancePlugin):
 
         rop = hou.node(instance.data.get("instance_node"))
 
-        default_prefix = evalParmNoFrame(rop, "picture")
+        default_prefix = self.eval_parm_no_frame(rop, "picture")
         render_products = []
 
         # Default beauty AOV

@@ -3,6 +3,7 @@ import hou
 
 import pyblish.api
 
+from ayon_core.pipeline.publish import PublishError
 from ayon_houdini.api import plugin
 
 
@@ -61,7 +62,14 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             # previously rendered version. This situation breaks the publishing.
             # because There will be missing frames as ROP nodes typically cannot render different
             #  frame ranges for each AOV; they always use the same frame range for all AOVs.
-            self.render_rop(instance)
+            try:
+                self.render_rop(instance)
+            except Exception as exc:
+                raise PublishError(
+                    "Render failed or interrupted",
+                    description=f"An Error occurred while rendering {rop_node.path()}",
+                    detail=str(exc)
+                )
 
         # `ExpectedFiles` is a list that includes one dict.
         expected_files = instance.data["expectedFiles"][0]
@@ -81,7 +89,8 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             if not os.path.exists(frame)
         ]
         if missing_frames:
-            # TODO: Use user friendly error reporting.
-            raise RuntimeError("Failed to complete render extraction. "
-                               "Missing output files: {}".format(
-                                   missing_frames))
+            missing_frames = "\n\n -  ".join(missing_frames)
+            raise PublishError(
+                "Failed to complete render extraction.",
+                detail=f"Missing output files:\n\n -  {missing_frames}"
+            )
