@@ -50,7 +50,7 @@ class ValidateFileExtension(plugin.HoudiniInstancePlugin):
         families = set(families)
 
         # Perform extension check
-        output = cls.get_output_parameter(node).eval()
+        output = cls.get_output_parameter(cls, node).eval()
         _, output_extension = os.path.splitext(output)
 
         for family in families:

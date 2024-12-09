@@ -46,7 +46,7 @@ class ValidateFrameToken(plugin.HoudiniInstancePlugin):
         if frame_range == 0:
             return
 
-        output_parm = cls.get_output_parameter(node)
+        output_parm = cls.get_output_parameter(cls, node)
         unexpanded_str = output_parm.unexpandedString()
 
         if "$F" not in unexpanded_str:
