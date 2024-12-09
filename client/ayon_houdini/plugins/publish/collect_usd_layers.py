@@ -77,7 +77,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         except Exception as exc:
             raise PublishError(
                 f"Failed to get USD layers on rop node '{rop_node}'",
-                detail=f"{exc}"
+                detail=str(exc)
             )
         
         for layer in layers:
@@ -164,7 +164,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             except Exception as exc:
                 raise PublishError(
                     "Failed to copy instance data.",
-                    detail=f"{exc}"
+                    detail=str(exc)
                 )
 
             # Allow this subset to be grouped into a USD Layer on creation

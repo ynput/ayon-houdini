@@ -34,7 +34,7 @@ class CollectKarmaROPRenderProducts(plugin.HoudiniInstancePlugin):
         except Exception as exc:
             raise PublishError(
                 f"Failed evaluating parameter 'picture' on Rop node: {rop.path()}",
-                detail=f"{exc}"
+                detail=str(exc)
             )
         render_products = []
 

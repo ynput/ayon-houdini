@@ -37,13 +37,13 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         if creator_attribute.get("render_target", "local") == "local":
             try:
                 self.render_rop(instance)
-            except Exception as e:
+            except Exception as exc:
                 import hou
                 rop_node = hou.node(instance.data["instance_node"])
                 raise PublishError(
                     "Render failed or interrupted",
                     description=f"An Error occurred while rendering {rop_node.path()}",
-                    detail=f"{e}"
+                    detail=str(exc)
                 )
 
         self.validate_expected_frames(instance)

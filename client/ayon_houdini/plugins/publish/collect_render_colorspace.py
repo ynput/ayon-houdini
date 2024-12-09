@@ -42,7 +42,7 @@ class CollectHoudiniRenderColorspace(plugin.HoudiniInstancePlugin):
         except Exception as exc:
             raise PublishError(
                 "Failed to get render products with colorspace.",
-                detail=f"{exc}"
+                detail=str(exc)
             )
         instance.data["renderProducts"] = render_products_data
 
@@ -52,7 +52,7 @@ class CollectHoudiniRenderColorspace(plugin.HoudiniInstancePlugin):
         except Exception as exc:
             raise PublishError(
                 "Failed to get color management preferences.",
-                detail=f"{exc}"
+                detail=str(exc)
             )
         
         instance.data["colorspaceConfig"] = colorspace_data["config"]

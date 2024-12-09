@@ -64,11 +64,11 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             #  frame ranges for each AOV; they always use the same frame range for all AOVs.
             try:
                 self.render_rop(instance)
-            except Exception as e:
+            except Exception as exc:
                 raise PublishError(
                     "Render failed or interrupted",
                     description=f"An Error occurred while rendering {rop_node.path()}",
-                    detail=f"{e}"
+                    detail=str(exc)
                 )
 
         # `ExpectedFiles` is a list that includes one dict.

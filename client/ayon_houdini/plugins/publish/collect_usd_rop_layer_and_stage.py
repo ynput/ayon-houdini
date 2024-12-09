@@ -88,7 +88,7 @@ class CollectUsdRenderLayerAndStage(plugin.HoudiniInstancePlugin):
         except hou.Error as exc:
             raise PublishError(
                 f"Failed to get context options on rop: {rop.path()}",
-                detail=f"{exc}"
+                detail=str(exc)
             )
 
         # Log the context options

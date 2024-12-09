@@ -354,7 +354,7 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
         except Exception as exc:
             raise PublishError(
                 f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
-                detail=f"{exc}"
+                detail=str(exc)
             )
     
     def get_output_parameter(self, node):
@@ -363,7 +363,7 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
         except Exception as exc:
             raise PublishError(
                 f"Node type '{node}' is not supported",
-                detail=f"{exc}"
+                detail=str(exc)
             )
         
     def get_scene_linear_colorspace(self):
@@ -372,7 +372,7 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
         except Exception as exc:
             raise PublishError(
                 "Failed to get scene linear colorspace.",
-                detail=f"{exc}"
+                detail=str(exc)
             )
         
 

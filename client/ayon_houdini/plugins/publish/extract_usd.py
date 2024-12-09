@@ -48,11 +48,11 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
         with remap_paths(ropnode, mapping):
             try:
                 render_rop(ropnode)
-            except Exception as e:
+            except Exception as exc:
                 raise PublishError(
                     "Render failed or interrupted",
                     description=f"An Error occurred while rendering {ropnode.path()}",
-                    detail=f"{e}"
+                    detail=str(exc)
                 )
 
         if not os.path.exists(output):
