@@ -27,13 +27,13 @@ class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
 
         rop = hou.node(instance.data.get("instance_node"))
 
-        default_prefix = self.evalParmNoFrame(rop, "ar_picture")
+        default_prefix = self.eval_parm_no_frame(rop, "ar_picture")
         render_products = []
 
         export_prefix = None
         export_products = []
         if instance.data["splitRender"]:
-            export_prefix = self.evalParmNoFrame(
+            export_prefix = self.eval_parm_no_frame(
                 rop, "ar_ass_file", pad_character="0"
             )
             beauty_export_product = self.get_render_product_name(
@@ -73,7 +73,7 @@ class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
             if rop.evalParm("ar_aov_exr_enable_layer_name{}".format(index)):
                 label = rop.evalParm("ar_aov_exr_layer_name{}".format(index))
             else:
-                label = self.evalParmNoFrame(rop, "ar_aov_label{}".format(index))
+                label = self.eval_parm_no_frame(rop, "ar_aov_label{}".format(index))
 
             # NOTE:
             #  we don't collect the actual AOV path but rather assume 

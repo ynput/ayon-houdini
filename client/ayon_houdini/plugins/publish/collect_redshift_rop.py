@@ -26,12 +26,12 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
     def process(self, instance):
         rop = hou.node(instance.data.get("instance_node"))
 
-        default_prefix = self.evalParmNoFrame(rop, "RS_outputFileNamePrefix")
+        default_prefix = self.eval_parm_no_frame(rop, "RS_outputFileNamePrefix")
         beauty_suffix = rop.evalParm("RS_outputBeautyAOVSuffix")
 
         export_products = []
         if instance.data["splitRender"]:
-            export_prefix = self.evalParmNoFrame(
+            export_prefix = self.eval_parm_no_frame(
                 rop, "RS_archive_file", pad_character="0"
             )
             beauty_export_product = self.get_render_product_name(
@@ -79,7 +79,7 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
                 continue
 
             aov_suffix = rop.evalParm(f"RS_aovSuffix_{i}")
-            aov_prefix = self.evalParmNoFrame(rop, f"RS_aovCustomPrefix_{i}")
+            aov_prefix = self.eval_parm_no_frame(rop, f"RS_aovCustomPrefix_{i}")
             if not aov_prefix:
                 aov_prefix = default_prefix
 

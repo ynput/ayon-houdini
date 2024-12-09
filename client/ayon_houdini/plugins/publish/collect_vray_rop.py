@@ -27,14 +27,14 @@ class CollectVrayROPRenderProducts(plugin.HoudiniInstancePlugin):
 
         rop = hou.node(instance.data.get("instance_node"))
 
-        default_prefix = self.evalParmNoFrame(rop, "SettingsOutput_img_file_path")
+        default_prefix = self.eval_parm_no_frame(rop, "SettingsOutput_img_file_path")
         render_products = []
         # TODO: add render elements if render element
 
         export_prefix = None
         export_products = []
         if instance.data["splitRender"]:
-            export_prefix = self.evalParmNoFrame(
+            export_prefix = self.eval_parm_no_frame(
                 rop, "render_export_filepath", pad_character="0"
             )
             beauty_export_product = self.get_render_product_name(

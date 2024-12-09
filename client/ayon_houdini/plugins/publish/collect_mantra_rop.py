@@ -27,13 +27,13 @@ class CollectMantraROPRenderProducts(plugin.HoudiniInstancePlugin):
 
         rop = hou.node(instance.data.get("instance_node"))
 
-        default_prefix = self.evalParmNoFrame(rop, "vm_picture")
+        default_prefix = self.eval_parm_no_frame(rop, "vm_picture")
         render_products = []
 
         export_prefix = None
         export_products = []
         if instance.data["splitRender"]:
-            export_prefix = self.evalParmNoFrame(
+            export_prefix = self.eval_parm_no_frame(
                 rop, "soho_diskfile", pad_character="0"
             )
             beauty_export_product = self.get_render_product_name(
@@ -73,7 +73,7 @@ class CollectMantraROPRenderProducts(plugin.HoudiniInstancePlugin):
                     aov_enabled = rop.evalParm(aov_boolean)
                     has_aov_path = rop.evalParm(aov_name)
                     if has_aov_path and aov_enabled == 1:
-                        aov_prefix = self.evalParmNoFrame(rop, aov_name)
+                        aov_prefix = self.eval_parm_no_frame(rop, aov_name)
                         aov_product = self.get_render_product_name(
                             prefix=aov_prefix, suffix=None
                         )

@@ -348,7 +348,7 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
 
-    def evalParmNoFrame(self, rop, parm, **kwargs):
+    def eval_parm_no_frame(self, rop, parm, **kwargs):
         try:
             return evalParmNoFrame(rop, parm, **kwargs)
         except Exception as exc:

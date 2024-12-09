@@ -30,7 +30,7 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
 
         if instance.data["splitRender"]:
             # USD file output
-            lop_output = self.evalParmNoFrame(
+            lop_output = self.eval_parm_no_frame(
                 rop, "lopoutput", pad_character="#"
             )
 
@@ -39,7 +39,7 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
             # TODO: It is possible for a user to disable this
             # TODO: When enabled I think only the basename of the `lopoutput`
             #  parm is preserved, any parent folders defined are likely ignored
-            folder = self.evalParmNoFrame(
+            folder = self.eval_parm_no_frame(
                 rop, "savetodirectory_directory", pad_character="#"
             )
 

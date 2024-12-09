@@ -5,7 +5,7 @@ import hou
 import pyblish.api
 
 from ayon_core.pipeline import PublishError
-from ayon_houdini.api.lib import evalParmNoFrame
+from ayon_houdini.api.lib import eval_parm_no_frame
 from ayon_houdini.api import plugin
 
 
@@ -30,7 +30,7 @@ class CollectKarmaROPRenderProducts(plugin.HoudiniInstancePlugin):
         rop = hou.node(instance.data.get("instance_node"))
 
         try:
-            default_prefix = evalParmNoFrame(rop, "picture")
+            default_prefix = eval_parm_no_frame(rop, "picture")
         except Exception as exc:
             raise PublishError(
                 f"Failed evaluating parameter 'picture' on Rop node: {rop.path()}",
