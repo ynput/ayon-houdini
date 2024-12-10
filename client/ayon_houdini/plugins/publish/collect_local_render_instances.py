@@ -12,7 +12,6 @@ from ayon_core.pipeline.publish import (
     ColormanagedPyblishPluginMixin
 )
 from ayon_houdini.api import plugin
-from ayon_houdini.api.colorspace import get_scene_linear_colorspace
 
 
 class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
@@ -87,7 +86,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         #   would need to be detected in a renderer-specific way and the
         #   majority of production scenarios these would not be overridden.
         # TODO: Support renderer-specific explicit colorspace overrides
-        colorspace = get_scene_linear_colorspace()
+        colorspace = self.get_scene_linear_colorspace()
 
         for aov_name, aov_filepaths in expected_files.items():
             dynamic_data = {}

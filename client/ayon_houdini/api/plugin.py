@@ -16,13 +16,27 @@ from ayon_core.pipeline import (
     AYON_INSTANCE_ID,
     AVALON_INSTANCE_ID,
     load,
-    publish
+    publish,
+    PublishError
 )
 from ayon_core.lib import BoolDef
 
-from .lib import imprint, read, lsattr, add_self_publish_button, render_rop
-from .usd import get_ayon_entity_uri_from_representation_context
+from .lib import (
+    imprint,
+    read,
+    lsattr,
+    add_self_publish_button,
+    render_rop,
+    evalParmNoFrame,
+    get_output_parameter
+)
 
+from .usd import get_ayon_entity_uri_from_representation_context
+from .colorspace import (
+    get_color_management_preferences,
+    get_scene_linear_colorspace,
+    ARenderProduct
+)
 
 SETTINGS_CATEGORY = "houdini"
 
@@ -333,6 +347,34 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
 
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
+
+    def eval_parm_no_frame(self, rop, parm, **kwargs):
+        try:
+            return evalParmNoFrame(rop, parm, **kwargs)
+        except Exception as exc:
+            raise PublishError(
+                f"Failed evaluating parameter '{parm}' on Rop node: {rop.path()}",
+                detail=str(exc)
+            )
+    
+    def get_output_parameter(self, node):
+        try:
+            return get_output_parameter(node)
+        except Exception as exc:
+            raise PublishError(
+                f"Node type '{node}' is not supported",
+                detail=str(exc)
+            )
+        
+    def get_scene_linear_colorspace(self):
+        try:
+            return get_scene_linear_colorspace()
+        except Exception as exc:
+            raise PublishError(
+                "Failed to get scene linear colorspace.",
+                detail=str(exc)
+            )
+        
 
 
 class HoudiniContextPlugin(pyblish.api.ContextPlugin):

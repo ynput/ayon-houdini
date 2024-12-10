@@ -1,10 +1,7 @@
 import os
 import hou
 import pyblish.api
-from ayon_houdini.api import (
-    lib,
-    plugin
-)
+from ayon_houdini.api import plugin
 
 
 class CollectFarmCacheFamily(plugin.HoudiniInstancePlugin):
@@ -44,7 +41,7 @@ class CollectDataforCache(plugin.HoudiniInstancePlugin):
         #               and CollectKarmaROPRenderProducts
         # Collect expected files
         ropnode = hou.node(instance.data["instance_node"])
-        output_parm = lib.get_output_parameter(ropnode)
+        output_parm = self.get_output_parameter(ropnode)
         expected_filepath = output_parm.eval()
 
         files = instance.data.setdefault("files", list())
