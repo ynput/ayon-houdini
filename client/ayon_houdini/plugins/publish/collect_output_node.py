@@ -12,8 +12,6 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
         "camera",
         "vdbcache",
         "imagesequence",
-        "usd",
-        "usdrender",
         "redshiftproxy",
         "staticMesh",
         "model",
