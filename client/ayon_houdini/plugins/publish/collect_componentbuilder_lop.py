@@ -34,14 +34,18 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
         # TODO: Do we want this? or use existing frames? Usually a Collector
         #  should not 'extract' but in this case we need the resulting USD
         #  file.
-        node.cook(force=True)  # required to clear existing errors
-        node.parm("execute").pressButton()
-
-        errors = node.errors()
-        if errors:
-            for error in errors:
-                self.log.error(error)
-            raise PublishError(f"Failed to save to disk '{node.path()}'")
+        try:
+            node.cook(force=True)  # required to clear existing errors
+            node.parm("execute").pressButton()
+        except Exception as exc:
+            errors = node.errors()
+            if errors:
+                errors = "\n\n - ".join(errors)
+                raise PublishError(
+                    "Failed to save to disk."
+                    f"Please fix node: '{node.path()}'",
+                    detail=f"{exc} \n\n - {errors}"
+                )
 
         # Define the main asset usd file
         filepath = node.evalParm("lopoutput")

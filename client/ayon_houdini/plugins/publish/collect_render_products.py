@@ -110,7 +110,8 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
 
                 if "#" not in filename:
                     raise PublishError(
-                        f"Couldn't resolve render product name with frame number: {name}"
+                        "Couldn't resolve render product output file"
+                        f" '{name}' with frame number."
                     )
 
             filenames.append(filename)
