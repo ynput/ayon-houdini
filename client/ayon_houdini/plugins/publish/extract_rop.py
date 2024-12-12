@@ -1,7 +1,7 @@
 import os
 import pyblish.api
 
-from ayon_core.pipeline import publish
+from ayon_core.pipeline import publish, PublishError
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import splitext
 
@@ -68,12 +68,16 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
             # Single frame
             filenames = [filenames]
 
-        missing_filenames = [
+        missing_filenames = "\n\n - ".join(
             filename for filename in filenames
             if not os.path.isfile(os.path.join(staging_dir, filename))
-        ]
+        )
         if missing_filenames:
-            raise RuntimeError(f"Missing frames: {missing_filenames}")
+            raise PublishError(
+                "Failed to complete render extraction.\n"
+                "Please render any missing output files.",
+                detail=f"Missing output files: \n\n - {missing_filenames}"
+            )
 
     def update_representation_data(self,
                                    instance: pyblish.api.Instance,

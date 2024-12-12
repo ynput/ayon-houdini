@@ -1,7 +1,7 @@
 import pyblish.api
 
 from ayon_core.lib import version_up
-from ayon_core.pipeline import registered_host
+from ayon_core.pipeline import registered_host, PublishError
 from ayon_core.pipeline.publish import (
     get_errored_plugins_from_context,
     KnownPublishError
@@ -46,8 +46,10 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
         host = registered_host()
         current_file = host.current_file()
         if context.data["currentFile"] != current_file:
-            raise KnownPublishError(
-                "Collected filename mismatches from current scene name."
+            raise PublishError(
+                f"Collected filename '{context.data['currentFile']}'"
+                f" mismatches from current scene name '{current_file}'."
+                "Save the file and republish. Don't change the file during publishing."
             )
 
         new_filepath = version_up(current_file)
