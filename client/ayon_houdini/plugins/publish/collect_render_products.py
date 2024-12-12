@@ -173,7 +173,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
         if aov_identifier:
             self.log.debug(
                 "Using explicit ayon:aov_identifier on render product"
-                " '{render_product}': {aov_identifier}")
+                f" '{render_product}': {aov_identifier}")
             return str(aov_identifier)
 
         targets = render_product.GetOrderedVarsRel().GetTargets()
