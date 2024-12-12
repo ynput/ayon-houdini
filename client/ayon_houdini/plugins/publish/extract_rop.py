@@ -19,6 +19,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         if instance.data.get("farm"):
             self.log.debug("Should be processed on farm, skipping.")
             return
+        creator_attribute = instance.data["creator_attributes"]
 
         files = instance.data["frames"]
         first_file = files[0] if isinstance(files, (list, tuple)) else files
@@ -29,7 +30,11 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        self.render_rop(instance)
+        # Value `local` is used as a fallback if the `render_target` key is missing.
+        # This key might be absent because render targets are not yet implemented
+        #  for all product types that use this plugin.
+        if creator_attribute.get("render_target", "local") == "local":
+            self.render_rop(instance)
         self.validate_expected_frames(instance)
 
         # In some cases representation name is not the the extension
