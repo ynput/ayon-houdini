@@ -3,7 +3,7 @@ from typing import List, AnyStr
 
 import pyblish.api
 
-from ayon_core.pipeline import KnownPublisherError, PublishError
+from ayon_core.pipeline import KnownPublishError, PublishError
 from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 from ayon_core.pipeline.publish.lib import get_instance_expected_output_path
 from ayon_houdini.api import plugin
@@ -137,6 +137,6 @@ def get_source_paths(
         # Single file
         return [os.path.join(staging, files)]
 
-    raise KnownPublisherError(
+    raise KnownPublishError(
         f"Unsupported type for representation files: {files} (supports list or str)"
     )
