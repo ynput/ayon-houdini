@@ -16,6 +16,20 @@ return label
 
             <separatorItem/>
 
+            <scriptItem id="ayon_version_up_workfile">
+                <label>Version Up Workfile...</label>
+                <scriptCode><![CDATA[
+from ayon_core.pipeline.context_tools import version_up_current_workfile
+version_up_current_workfile()
+]]></scriptCode>
+                <expression>
+from ayon_houdini.api.lib import is_version_up_workfile_menu_enabled
+return is_version_up_workfile_menu_enabled()
+                </expression>
+            </scriptItem>
+
+            <separatorItem/>
+
             <scriptItem id="ayon_create">
                 <label>Create...</label>
                 <scriptCode><![CDATA[
