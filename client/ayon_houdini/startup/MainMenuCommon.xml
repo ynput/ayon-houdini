@@ -17,7 +17,7 @@ return label
             <separatorItem/>
 
             <scriptItem id="ayon_version_up_workfile">
-                <label>Version Up Workfile...</label>
+                <label>Version Up Workfile</label>
                 <scriptCode><![CDATA[
 from ayon_core.pipeline.context_tools import version_up_current_workfile
 version_up_current_workfile()
