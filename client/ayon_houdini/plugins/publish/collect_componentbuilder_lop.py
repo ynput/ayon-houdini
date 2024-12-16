@@ -30,23 +30,22 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
 
         node = hou.node(instance.data["instance_node"])
 
-        # Render the component builder LOPs
-        # TODO: Do we want this? or use existing frames? Usually a Collector
-        #  should not 'extract' but in this case we need the resulting USD
-        #  file.
         try:
             node.cook(force=True)  # required to clear existing errors
-            node.parm("execute").pressButton()
-        except Exception as exc:
+        except hou.Error as exc:
             errors = node.errors()
             if errors:
                 errors = "\n\n - ".join(errors)
                 raise PublishError(
-                    "Failed to save to disk."
-                    f"Please fix node: '{node.path()}'",
+                    f"Failed to cook node: '{node.path()}'. Please fix it to proceed.",
                     detail=f"{exc} \n\n - {errors}"
                 )
 
+        # Render the component builder LOPs
+        # TODO: Do we want this? or use existing frames? Usually a Collector
+        #  should not 'extract' but in this case we need the resulting USD
+        #  file.
+        node.parm("execute").pressButton()
         # Define the main asset usd file
         filepath = node.evalParm("lopoutput")
         representations = instance.data.setdefault("representations", [])
