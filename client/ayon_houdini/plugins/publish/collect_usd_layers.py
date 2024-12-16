@@ -44,7 +44,7 @@ def copy_instance_data(instance_src, instance_dest, attr):
         if i != len(key):
             dest_data = dest_data.setdefault(key, {})
             if not isinstance(dest_data, dict):
-                raise KnownPublishError("Destination must be a dict")
+                raise KnownPublishError("Destination must be a dict.")
             src_data = src_value
         else:
             # Last iteration - assign the value
