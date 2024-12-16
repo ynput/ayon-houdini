@@ -1,11 +1,9 @@
-import inspect
 import pyblish.api
 
 from ayon_core.lib import version_up
 from ayon_core.pipeline import (
     registered_host,
-    KnownPublishError,
-    PublishError
+    KnownPublishError
 )
 from ayon_core.pipeline.publish import get_errored_plugins_from_context
 
@@ -44,23 +42,14 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
                 "submission to deadline failed."
             )
 
-        # Filename must not have changed since collecting
+        # Filename must not have changed since extraction.
         host = registered_host()
         current_file = host.current_file()
         if context.data["currentFile"] != current_file:
-            raise PublishError(
+            raise KnownPublishError(
                 f"Collected filename '{context.data['currentFile']}' differs"
-                f" from current scene name '{current_file}'.",
-                description=self.get_error_description()
+                f" from current scene name '{current_file}'."
             )
 
         new_filepath = version_up(current_file)
         host.save_workfile(new_filepath)
-
-    def get_error_description(self):
-        return inspect.cleandoc(
-            """### Scene File Name Change During Publishing
-            This error occurs when you validate the scene and then save it as a new file manually, or if you open a new file and continue publishing.
-            Please reset the publisher and publish without changing the scene file midway.
-            """
-        )
