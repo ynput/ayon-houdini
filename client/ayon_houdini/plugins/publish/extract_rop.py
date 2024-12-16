@@ -1,4 +1,5 @@
 import os
+import clique
 import pyblish.api
 
 from ayon_core.pipeline import publish, PublishError
@@ -68,15 +69,22 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
             # Single frame
             filenames = [filenames]
 
-        missing_filenames = "\n\n - ".join(
-            filename for filename in filenames
-            if not os.path.isfile(os.path.join(staging_dir, filename))
+        missing_frames = []
+        for filename in filenames:
+            filename = os.path.join(staging_dir, filename)
+            if not os.path.isfile(filename):
+                missing_frames.append(filename)
+
+        missing_frames , _ = clique.assemble(
+            missing_frames,
+            patterns=[clique.PATTERNS["frames"]],
+            minimum_items=1
         )
-        if missing_filenames:
+        if missing_frames:
             raise PublishError(
                 "Failed to complete render extraction.\n"
                 "Please render any missing output files.",
-                detail=f"Missing output files: \n\n - {missing_filenames}"
+                detail=f"Missing output files: \n\n - {missing_frames[0]}"
             )
 
     def update_representation_data(self,

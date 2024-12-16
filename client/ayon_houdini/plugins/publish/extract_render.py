@@ -1,4 +1,5 @@
 import os
+import clique
 import hou
 
 import pyblish.api
@@ -76,11 +77,17 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
                 all_frames.extend(value)
         # Check missing frames.
         # Frames won't exist if user cancels the render.
-        missing_frames = "\n\n - ".join(
+        missing_frames = [
             frame
             for frame in all_frames
             if not os.path.exists(frame)
+        ]
+        missing_frames , _ = clique.assemble(
+            missing_frames,
+            patterns=[clique.PATTERNS["frames"]],
+            minimum_items=1
         )
+        missing_frames = "\n\n - ".join(f"{sequence}" for sequence in missing_frames)
         if missing_frames:
             raise PublishError(
                 "Failed to complete render extraction.\n"
