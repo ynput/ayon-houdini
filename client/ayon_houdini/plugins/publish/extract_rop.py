@@ -1,5 +1,4 @@
 import os
-import clique
 import pyblish.api
 
 from ayon_core.pipeline import publish, PublishError

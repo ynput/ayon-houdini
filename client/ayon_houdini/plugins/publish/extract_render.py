@@ -1,5 +1,4 @@
 import os
-import clique
 import hou
 
 import pyblish.api
