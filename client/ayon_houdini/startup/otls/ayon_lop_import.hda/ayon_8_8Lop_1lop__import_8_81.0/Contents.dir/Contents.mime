@@ -33,7 +33,7 @@ Content-Type: text/plain
 comment ""
 position -1.25801 -0.244071
 connectornextid 1
-flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display off render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 0 "output1"
@@ -458,15 +458,6 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../file\") language = python }
     }
-    channel representation {
-      lefttype = extend
-      righttype = extend
-      defaultString = \"\"
-      flags = 0
-      start = 40
-      segment { length = 0 expr = "from ayon_houdini.api import hda_utils
-return hda_utils.expression_get_representation_id()" language = python }
-    }
     channel newparameter {
       lefttype = extend
       righttype = extend
@@ -581,6 +572,14 @@ return hda_utils.expression_get_representation_id()" language = python }
       start = 40
       segment { length = 0 expr = ch(\"../show_pipeline_parms\") }
     }
+    channel representation {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"3a00f472bbd711ef90bf69a4e7c0a418\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = ch(\"../representation\") language = python }
+    }
   }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
@@ -611,10 +610,10 @@ thumbnail_offset	[ 0	locks=0 ]	(	[ thumbnail_offsetx	0 ] 	[ thumbnail_offsety	0.
 update_thumbnail	[ 0	locks=0 ]	(	[ update_thumbnail	0 ] 	)
 show_pipeline_parms	[ 0	locks=0 ]	(	[ show_pipeline_parms	0 ] 	)
 ayon_folder0	[ 0	locks=0 ]	(	0	)
-name	[ 0	locks=0 ]	(	$OS	)
-namespace	[ 0	locks=0 ]	(	`opfullpath(\".\")`	)
-loader	[ 0	locks=0 ]	(	FilePathLoader	)
-id	[ 0	locks=0 ]	(	pyblish.avalon.container	)
+name	[ 0	locks=0 ]	(	---------	)
+namespace	[ 0	locks=0 ]	(	---------	)
+loader	[ 0	locks=0 ]	(	---------	)
+id	[ 0	locks=0 ]	(	---------	)
 representation	[ 0	locks=0 ]	(	[ representation	"from ayon_houdini.api import hda_utils
 return hda_utils.expression_get_representation_id()" ] 	)
 version_name	[ 0	locks=0 ]	(	""	)

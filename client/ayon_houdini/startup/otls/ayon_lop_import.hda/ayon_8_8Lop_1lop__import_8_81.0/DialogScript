@@ -328,6 +328,8 @@
             label   "Representation ID"
             type    string
             default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_id()" python ] }
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "version_name"
