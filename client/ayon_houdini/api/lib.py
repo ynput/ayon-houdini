@@ -1600,6 +1600,8 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
 
 
 def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail} [{ranges}]") -> list[str]:
+    """Return list of files as formatted sequence collections."""
+    
     collections, remainder = clique.assemble(files)
     result = [collection.format(pattern) for collection in collections]
     result.extend(remainder)

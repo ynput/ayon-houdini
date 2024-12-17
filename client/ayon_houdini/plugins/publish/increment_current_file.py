@@ -42,7 +42,7 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
                 "submission to deadline failed."
             )
 
-        # Filename must not have changed since extraction.
+        # Filename must not have changed since collecting.
         host = registered_host()
         current_file = host.current_file()
         if context.data["currentFile"] != current_file:
