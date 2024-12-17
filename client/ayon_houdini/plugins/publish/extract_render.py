@@ -87,10 +87,10 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             patterns=[clique.PATTERNS["frames"]],
             minimum_items=1
         )
-        missing_frames = "\n\n - ".join(f"{sequence}" for sequence in missing_frames)
+        missing_frames = "\n - ".join(f"{sequence}" for sequence in missing_frames)
         if missing_frames:
             raise PublishError(
                 "Failed to complete render extraction.\n"
                 "Please render any missing output files.",
-                detail=f"Missing output files: \n\n - {missing_frames}"
+                detail=f"Missing output files: \n - {missing_frames}"
             )

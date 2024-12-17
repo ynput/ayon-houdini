@@ -84,7 +84,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
             raise PublishError(
                 "Failed to complete render extraction.\n"
                 "Please render any missing output files.",
-                detail=f"Missing output files: \n\n - {missing_frames[0]}"
+                detail=f"Missing output files: \n - {missing_frames[0]}"
             )
 
     def update_representation_data(self,
