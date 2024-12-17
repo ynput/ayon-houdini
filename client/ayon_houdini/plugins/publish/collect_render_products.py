@@ -6,6 +6,7 @@ import pxr.UsdRender
 
 import pyblish.api
 
+from ayon_core.pipeline import PublishError
 from ayon_houdini.api import plugin
 from ayon_houdini.api.usd import (
     get_usd_render_rop_rendersettings
@@ -107,10 +108,11 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
                 filename = os.path.join(dirname, filename_base)
                 filename = filename.replace("\\", "/")
 
-            assert "#" in filename, (
-                "Couldn't resolve render product name "
-                "with frame number: %s" % name
-            )
+                if "#" not in filename:
+                    raise PublishError(
+                        "Couldn't resolve render product output file"
+                        f" '{name}' with frame number."
+                    )
 
             filenames.append(filename)
 

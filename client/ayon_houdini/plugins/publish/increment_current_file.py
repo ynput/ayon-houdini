@@ -1,11 +1,11 @@
 import pyblish.api
 
 from ayon_core.lib import version_up
-from ayon_core.pipeline import registered_host
-from ayon_core.pipeline.publish import (
-    get_errored_plugins_from_context,
+from ayon_core.pipeline import (
+    registered_host,
     KnownPublishError
 )
+from ayon_core.pipeline.publish import get_errored_plugins_from_context
 
 from ayon_houdini.api import plugin
 
@@ -42,12 +42,13 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
                 "submission to deadline failed."
             )
 
-        # Filename must not have changed since collecting
+        # Filename must not have changed since collecting.
         host = registered_host()
         current_file = host.current_file()
         if context.data["currentFile"] != current_file:
             raise KnownPublishError(
-                "Collected filename mismatches from current scene name."
+                f"Collected filename '{context.data['currentFile']}' differs"
+                f" from current scene name '{current_file}'."
             )
 
         new_filepath = version_up(current_file)

@@ -5,6 +5,7 @@ import errno
 import re
 import logging
 import json
+import clique
 from functools import lru_cache
 from contextlib import contextmanager
 
@@ -1614,3 +1615,12 @@ def is_version_up_workfile_menu_enabled() -> bool:
     ):
         return True
     return False
+
+
+def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail} [{ranges}]") -> list[str]:
+    """Return list of files as formatted sequence collections."""
+    
+    collections, remainder = clique.assemble(files)
+    result = [collection.format(pattern) for collection in collections]
+    result.extend(remainder)
+    return result

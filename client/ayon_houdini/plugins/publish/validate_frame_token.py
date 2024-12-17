@@ -2,6 +2,7 @@ import hou
 
 import pyblish.api
 
+from ayon_core.pipeline import PublishValidationError
 from ayon_houdini.api import lib, plugin
 
 
@@ -31,7 +32,7 @@ class ValidateFrameToken(plugin.HoudiniInstancePlugin):
 
         invalid = self.get_invalid(instance)
         if invalid:
-            raise RuntimeError(
+            raise PublishValidationError(
                 "Output settings do no match for '%s'" % instance
             )
 

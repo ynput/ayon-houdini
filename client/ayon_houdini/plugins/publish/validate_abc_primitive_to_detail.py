@@ -26,9 +26,12 @@ class ValidateAbcPrimitiveToDetail(plugin.HoudiniInstancePlugin):
         invalid = self.get_invalid(instance)
         if invalid:
             raise PublishValidationError(
-                ("Primitives found with inconsistent primitive "
-                 "to detail attributes. See log."),
-                title=self.label
+                "Primitives found with inconsistent primitive "
+                "to detail attributes.",
+                detail=(
+                    "See log for more info."
+                    f"Incorrect Rop(s)\n\n - {invalid[0].pah()}"
+                )
             )
 
     @classmethod
