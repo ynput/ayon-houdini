@@ -5,6 +5,7 @@ import errno
 import re
 import logging
 import json
+import clique
 from contextlib import contextmanager
 
 import six
@@ -1596,3 +1597,10 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
         f' {file_parm.node().path()} {file_parm.name()} \`{expression}\`'
     )
     show_node_parmeditor(load_node)
+
+
+def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail} [{ranges}]") -> list[str]:
+    collections, remainder = clique.assemble(files)
+    result = [collection.format(pattern) for collection in collections]
+    result.extend(remainder)
+    return result
