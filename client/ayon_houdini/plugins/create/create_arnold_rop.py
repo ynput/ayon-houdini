@@ -35,30 +35,25 @@ class CreateArnoldRop(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        ext = pre_create_data.get("image_format")
-
-        filepath = "{renders_dir}{product_name}/{product_name}.$F4.{ext}".format(
-            renders_dir=hou.text.expandString("$HIP/pyblish/renders/"),
-            product_name=product_name,
-            ext=ext,
-        )
         parms = {
             # Render frame range
             "trange": 1,
 
             # Arnold ROP settings
-            "ar_picture": filepath,
+            # keep dynamic link to product name in file path.
+            "ar_picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=pre_create_data.get("image_format")
+            ),
             "ar_exr_half_precision": 1           # half precision
         }
 
         if pre_create_data.get("render_target") == "farm_split":
-            ass_filepath = \
-                "{export_dir}{product_name}/{product_name}.$F4.ass".format(
-                    export_dir=hou.text.expandString("$HIP/pyblish/ass/"),
-                    product_name=product_name,
-                )
             parms["ar_ass_export_enable"] = 1
-            parms["ar_ass_file"] = ass_filepath
+            # keep dynamic link to product name in file path.
+            parms["ar_ass_file"] = "{root}/`chs('AYON_productName')`/ass/$OS.$F4.ass".format(
+                root=hou.text.expandString(self.staging_dir)
+            )
 
         instance_node.setParms(parms)
 

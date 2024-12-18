@@ -32,33 +32,24 @@ class CreateKarmaROP(plugin.HoudiniCreator):
             pre_create_data)
 
         instance_node = hou.node(instance.get("instance_node"))
-
-        ext = pre_create_data.get("image_format")
-
-        filepath = "{renders_dir}{product_name}/{product_name}.$F4.{ext}".format(
-            renders_dir=hou.text.expandString("$HIP/pyblish/renders/"),
-            product_name=product_name,
-            ext=ext,
-        )
-        checkpoint = "{cp_dir}{product_name}.$F4.checkpoint".format(
-            cp_dir=hou.text.expandString("$HIP/pyblish/"),
-            product_name=product_name
-        )
-
-        usd_directory = "{usd_dir}{product_name}_$RENDERID".format(
-            usd_dir=hou.text.expandString("$HIP/pyblish/renders/usd_renders/"),     # noqa
-            product_name=product_name
-        )
-
+        
         parms = {
             # Render Frame Range
             "trange": 1,
             # Karma ROP Setting
-            "picture": filepath,
+            # keep dynamic link to product name in file paths.
+            "picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=pre_create_data.get("image_format")
+            ),
             # Karma Checkpoint Setting
-            "productName": checkpoint,
+            "productName": "{root}/`chs('AYON_productName')`/checkpoint/$OS.$F4.checkpoint".format(
+                root=hou.text.expandString(self.staging_dir)
+            ),
             # USD Output Directory
-            "savetodirectory": usd_directory,
+            "savetodirectory": "{root}/`chs('AYON_productName')`/usd/$OS_$RENDERID".format(
+                root=hou.text.expandString(self.staging_dir)
+            ),
         }
 
         res_x = pre_create_data.get("res_x")
