@@ -317,6 +317,9 @@ def ls():
                             # sortable due to not supporting greater
                             # than comparisons
                             key=lambda node: node.path()):
+        if not container.isEditableInsideLockedHDA():
+            continue
+
         yield parse_container(container)
 
 

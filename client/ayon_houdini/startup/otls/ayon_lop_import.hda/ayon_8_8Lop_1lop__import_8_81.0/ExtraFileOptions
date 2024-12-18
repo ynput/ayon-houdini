@@ -21,7 +21,7 @@
 	},
 	"OnCreated/Cursor":{
 		"type":"intarray",
-		"value":[5,29]
+		"value":[1,15]
 	},
 	"OnCreated/IsExpr":{
 		"type":"bool",
@@ -36,26 +36,6 @@
 		"value":true
 	},
 	"OnCreated/Source":{
-		"type":"string",
-		"value":""
-	},
-	"OnDeleted/Cursor":{
-		"type":"intarray",
-		"value":[1,15]
-	},
-	"OnDeleted/IsExpr":{
-		"type":"bool",
-		"value":false
-	},
-	"OnDeleted/IsPython":{
-		"type":"bool",
-		"value":true
-	},
-	"OnDeleted/IsScript":{
-		"type":"bool",
-		"value":true
-	},
-	"OnDeleted/Source":{
 		"type":"string",
 		"value":""
 	},
@@ -101,7 +81,7 @@
 	},
 	"PythonModule/Cursor":{
 		"type":"intarray",
-		"value":[10,1]
+		"value":[7,1]
 	},
 	"PythonModule/IsExpr":{
 		"type":"bool",

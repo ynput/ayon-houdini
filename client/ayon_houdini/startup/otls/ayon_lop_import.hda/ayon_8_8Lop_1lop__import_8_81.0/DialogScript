@@ -77,11 +77,19 @@
             name    "representation_name"
             label   "Representation"
             type    string
-            default { "abc" }
+            default { "" }
             menureplace {
-                [ "opmenu -l -a generic_loader representation_name" ]
+                [ "representations_names = hou.phm().get_available_representations(kwargs['node'])" ]
+                [ "" ]
+                [ "result = []" ]
+                [ "for name in representations_names:" ]
+                [ "    if name in hou.phm().ALLOWED_USD_REPRESENTATIONS:" ]
+                [ "        result.append(name)" ]
+                [ "        result.append(name)" ]
+                [ "    " ]
+                [ "return result" ]
+                language python
             }
-            parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_callback_language" "python" }
         }
         parm {

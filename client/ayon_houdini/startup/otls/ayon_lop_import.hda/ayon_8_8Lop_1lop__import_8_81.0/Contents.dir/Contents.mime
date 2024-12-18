@@ -31,7 +31,7 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position -1.25801 -0.244071
+position -2.95241 0.650129
 connectornextid 1
 flags =  lock off model off template off footprint off xray off bypass off display off render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
@@ -458,6 +458,14 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../file\") language = python }
     }
+    channel representation {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"3a00f472bbd711ef90bf69a4e7c0a418\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = ch(\"../representation\") language = python }
+    }
     channel newparameter {
       lefttype = extend
       righttype = extend
@@ -505,14 +513,6 @@ Content-Type: text/plain
       flags = 0
       start = 40
       segment { length = 0 expr = chs(\"../version\") }
-    }
-    channel representation_name {
-      lefttype = extend
-      righttype = extend
-      defaultString = \"\"
-      flags = 0
-      start = 40
-      segment { length = 0 expr = chs(\"../representation_name\") }
     }
     channel clear_cache {
       lefttype = extend
@@ -572,14 +572,6 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../show_pipeline_parms\") }
     }
-    channel representation {
-      lefttype = extend
-      righttype = extend
-      defaultString = \"3a00f472bbd711ef90bf69a4e7c0a418\"
-      flags = 0
-      start = 40
-      segment { length = 0 expr = ch(\"../representation\") language = python }
-    }
   }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
@@ -595,25 +587,25 @@ folder_path	[ 0	locks=0 ]	(	[ folder_path	$AYON_FOLDER_PATH ] 	)
 folder_name	[ 0	locks=0 ]	(	[ folder_name	"`strsplit(chs(\"folder_path\"), \"/\", -1)`" ] 	)
 product_name	[ 0	locks=0 ]	(	[ product_name	"" ] 	)
 version	[ 0	locks=0 ]	(	[ version	"" ] 	)
-representation_name	[ 0	locks=0 ]	(	[ representation_name	"" ] 	)
+representation_name	[ 8	locks=0 ]	(	`chs(\"../representation_name\")`	)
 clear_cache	[ 0	locks=0 ]	(	[ clear_cache	0 ] 	)
 sepparm	[ 0	locks=0 ]	(	)
 file	[ 0	locks=1 ]	(	[ file	"from ayon_houdini.api import hda_utils
 return hda_utils.expression_get_representation_path()" ] 	)
 use_ayon_entity_uri	[ 0	locks=0 ]	(	[ use_ayon_entity_uri	0 ] 	)
-info_display2	[ 0	locks=0 ]	(	0	)
+info_display2	[ 0	locks=0 ]	(	1	)
 show_thumbnail	[ 0	locks=0 ]	(	[ show_thumbnail	0 ] 	)
 thumbnail_size	[ 0	locks=0 ]	(	[ thumbnail_size	2 ] 	)
 thumbnail_cache_dir	[ 0	locks=0 ]	(	$JOB/.houdini_loader_thumbnails	)
 thumbnail_padding	[ 0	locks=0 ]	(	1	)
-thumbnail_offset	[ 0	locks=0 ]	(	[ thumbnail_offsetx	0 ] 	[ thumbnail_offsety	0.34999999999999998 ] 	)
+thumbnail_offset	[ 0	locks=0 ]	(	[ thumbnail_offsetx	0 ] 	[ thumbnail_offsety	0.35 ] 	)
 update_thumbnail	[ 0	locks=0 ]	(	[ update_thumbnail	0 ] 	)
 show_pipeline_parms	[ 0	locks=0 ]	(	[ show_pipeline_parms	0 ] 	)
 ayon_folder0	[ 0	locks=0 ]	(	0	)
-name	[ 0	locks=0 ]	(	---------	)
-namespace	[ 0	locks=0 ]	(	---------	)
-loader	[ 0	locks=0 ]	(	---------	)
-id	[ 0	locks=0 ]	(	---------	)
+name	[ 0	locks=0 ]	(	$OS	)
+namespace	[ 0	locks=0 ]	(	`opfullpath(\".\")`	)
+loader	[ 0	locks=0 ]	(	FilePathLoader	)
+id	[ 0	locks=0 ]	(	pyblish.avalon.container	)
 representation	[ 0	locks=0 ]	(	[ representation	"from ayon_houdini.api import hda_utils
 return hda_utils.expression_get_representation_id()" ] 	)
 version_name	[ 0	locks=0 ]	(	""	)
