@@ -35,6 +35,11 @@ from ayon_houdini.api import lib
 from .usd import get_ayon_entity_uri_from_representation_context
 
 
+# NOTE: This can be an enum to support additional filters
+#       e.g. {POINTCACHE_REPRESENTATIONS: ["abc", "bgeo"]}
+ALLOWED_USD_REPRESENTATIONS = ["usd", "usda", "usdlc", "usdnc", "abc"]
+
+
 def get_session_cache() -> dict:
     """Get a persistent `hou.session.ayon_cache` dict"""
     cache = getattr(hou.session, "ayon_cache", None)
@@ -808,7 +813,9 @@ def get_available_representations(node):
     representations = get_representations(
             project_name,
             version_ids={version_entity["id"]},
-            fields={"name"}
+            fields={"name"},
+            representation_names=ALLOWED_USD_REPRESENTATIONS \
+                if node.parm("usd_compatible_representations").eval() else None
     )
     representations_names = [n["name"] for n in representations]
     return representations_names
@@ -832,6 +839,8 @@ def set_to_latest_version(node):
     representations = get_available_representations(node)
     if representations:
         node.parm("representation_name").set(representations[0])
+    else:
+        node.parm("representation_name").set("")
 
 
 # region Parm Expressions

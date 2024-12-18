@@ -97,6 +97,14 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
+            name    "usd_compatible_representations"
+            label   "USD compatible representations"
+            type    toggle
+            default { "1" }
+            help    "Enable to apply USD Compatible Representations filter"
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
             name    "clear_cache"
             label   "Clear Cache"
             type    button
