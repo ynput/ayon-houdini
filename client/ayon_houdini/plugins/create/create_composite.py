@@ -27,13 +27,13 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
             pre_create_data)
 
         instance_node = hou.node(instance.get("instance_node"))
-        filepath = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4{}".format(product_name, self.ext)
-        )
         parms = {
             "trange": 1,
-            "copoutput": filepath
+            # keep dynamic link to product name in file path.
+            "copoutput": "{root}/`chs('AYON_productName')`/$OS.$F4{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=self.ext
+            ),
         }
 
         if self.selected_nodes:

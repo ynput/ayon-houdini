@@ -33,14 +33,12 @@ class CreateBGEO(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        file_path = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4.{}".format(
-                product_name,
-                pre_create_data.get("bgeo_type") or "bgeo.sc")
-        )
         parms = {
-            "sopoutput": file_path
+            # keep dynamic link to product name in file path.
+            "sopoutput": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=pre_create_data.get("bgeo_type") or "bgeo.sc"
+            ),
         }
 
         instance_node.parm("trange").set(1)

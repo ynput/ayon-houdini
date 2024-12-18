@@ -36,7 +36,10 @@ class CreateUSDLook(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
 
         parms = {
-            "lopoutput": "$HIP/pyblish/{}.usd".format(product_name),
+            # keep dynamic link to product name in file path.
+            "lopoutput": "{root}/`chs('AYON_productName')`/$OS.usd".format(
+                root=hou.text.expandString(self.staging_dir)
+            ),
             "enableoutputprocessor_simplerelativepaths": False,
 
             # Set the 'default prim' by default to the folder name being

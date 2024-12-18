@@ -41,15 +41,15 @@ class CreateArnoldAss(plugin.HoudiniCreator):
         parm_template_group.hideFolder("Properties", True)
         instance_node.setParmTemplateGroup(parm_template_group)
 
-        filepath = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4{}".format(product_name, self.ext)
-        )
         parms = {
             # Render frame range
             "trange": 1,
             # Arnold ROP settings
-            "ar_ass_file": filepath,
+            # keep dynamic link to product name in file path.
+            "ar_ass_file": "{root}/`chs('AYON_productName')`/$OS.$F4{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=self.ext
+            ),
             "ar_ass_export_enable": 1
         }
 

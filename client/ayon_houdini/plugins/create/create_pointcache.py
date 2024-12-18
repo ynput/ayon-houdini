@@ -39,8 +39,10 @@ class CreatePointCache(plugin.HoudiniCreator):
             "prim_to_detail_pattern": "cbId",
             "format": 2,
             "facesets": 0,
-            "filename": hou.text.expandString(
-                "$HIP/pyblish/{}.abc".format(product_name))
+            # keep dynamic link to product name in file path.
+            "filename": "{root}/`chs('AYON_productName')`/$OS.abc".format(
+                root=hou.text.expandString(self.staging_dir)
+            )
         }
 
         if self.selected_nodes:

@@ -32,29 +32,23 @@ class CreateMantraROP(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        ext = pre_create_data.get("image_format")
-
-        filepath = "{renders_dir}{product_name}/{product_name}.$F4.{ext}".format(
-            renders_dir=hou.text.expandString("$HIP/pyblish/renders/"),
-            product_name=product_name,
-            ext=ext,
-        )
-
         parms = {
             # Render Frame Range
             "trange": 1,
             # Mantra ROP Setting
-            "vm_picture": filepath,
+            # keep dynamic link to product name in file path.
+            "vm_picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=pre_create_data.get("image_format")
+            ),
         }
 
         if pre_create_data.get("render_target") == "farm_split":
-            ifd_filepath = \
-                "{export_dir}{product_name}/{product_name}.$F4.ifd".format(
-                    export_dir=hou.text.expandString("$HIP/pyblish/ifd/"),
-                    product_name=product_name,
-                )
             parms["soho_outputmode"] = 1
-            parms["soho_diskfile"] = ifd_filepath
+            # keep dynamic link to product name in file path.
+            parms["soho_diskfile"] = "{root}/`chs('AYON_productName')`/ifd/$OS.$F4.ifd".format(
+                root=hou.text.expandString(self.staging_dir)
+            )
 
         if self.selected_nodes:
             # If camera found in selection

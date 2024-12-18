@@ -33,8 +33,10 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
         parms = {
-            "filename": hou.text.expandString(
-                "$HIP/pyblish/{}.abc".format(product_name)),
+            # keep dynamic link to product name in file path.
+            "filename": "{root}/`chs('AYON_productName')`/$OS.abc".format(
+                root=hou.text.expandString(self.staging_dir)
+            ),
             "use_sop_path": False,
         }
 

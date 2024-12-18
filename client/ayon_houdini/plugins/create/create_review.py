@@ -55,15 +55,12 @@ class CreateReview(plugin.HoudiniCreator):
 
         frame_range = hou.playbar.frameRange()
 
-        filepath = "{root}/{product_name}/{product_name}.$F4.{ext}".format(
-            root=hou.text.expandString("$HIP/pyblish"),
-            # keep dynamic link to product name
-            product_name="`chs(\"AYON_productName\")`",
-            ext=pre_create_data.get("image_format") or "png"
-        )
-
         parms = {
-            "picture": filepath,
+            # keep dynamic link to product name in file path.
+            "picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=pre_create_data.get("image_format") or "png"
+            ),
 
             "trange": 1,
 
