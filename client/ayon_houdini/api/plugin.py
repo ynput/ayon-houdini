@@ -107,6 +107,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
     selected_nodes = []
     settings_name = None
     add_publish_button = False
+    staging_dir = "$HIP/ayon"
 
     settings_category = SETTINGS_CATEGORY
 
@@ -295,6 +296,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         houdini_general_settings = project_settings["houdini"]["general"]
         self.add_publish_button = houdini_general_settings.get(
             "add_self_publish_button", False)
+        # TODO: Support StagingDir Template. https://github.com/ynput/ayon-houdini/issues/21
+        self.staging_dir = houdini_general_settings["default_output_dir"] or self.staging_dir
 
         # Apply Creator Settings
         settings_name = self.settings_name
