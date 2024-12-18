@@ -31,12 +31,11 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position -2.95241 0.650129
-connectornextid 1
-flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on debug off
+position -1.43119 0.227998
+connectornextid 0
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
-0 "output1"
 }
 inputsNamed3
 {
@@ -596,6 +595,7 @@ folder_name	[ 0	locks=0 ]	(	[ folder_name	"`strsplit(chs(\"folder_path\"), \"/\"
 product_name	[ 0	locks=0 ]	(	[ product_name	"" ] 	)
 version	[ 8	locks=0 ]	(	[ version	"" ] 	)
 representation_name	[ 0	locks=0 ]	(	[ representation_name	"" ] 	)
+usd_compatible_representations	[ 0	locks=0 ]	(	"on"	)
 clear_cache	[ 0	locks=0 ]	(	[ clear_cache	0 ] 	)
 sepparm	[ 0	locks=0 ]	(	)
 file	[ 0	locks=1 ]	(	[ file	"from ayon_houdini.api import hda_utils
