@@ -33,7 +33,7 @@ Content-Type: text/plain
 comment ""
 position -2.95241 0.650129
 connectornextid 1
-flags =  lock off model off template off footprint off xray off bypass off display off render on highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 0 "output1"
@@ -572,6 +572,14 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../show_pipeline_parms\") }
     }
+    channel representation_name {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"exr\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../representation_name\") }
+    }
   }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
@@ -586,8 +594,8 @@ project_name	[ 0	locks=0 ]	(	[ project_name	$AYON_PROJECT_NAME ] 	)
 folder_path	[ 0	locks=0 ]	(	[ folder_path	$AYON_FOLDER_PATH ] 	)
 folder_name	[ 0	locks=0 ]	(	[ folder_name	"`strsplit(chs(\"folder_path\"), \"/\", -1)`" ] 	)
 product_name	[ 0	locks=0 ]	(	[ product_name	"" ] 	)
-version	[ 0	locks=0 ]	(	[ version	"" ] 	)
-representation_name	[ 8	locks=0 ]	(	`chs(\"../representation_name\")`	)
+version	[ 8	locks=0 ]	(	[ version	"" ] 	)
+representation_name	[ 0	locks=0 ]	(	[ representation_name	"" ] 	)
 clear_cache	[ 0	locks=0 ]	(	[ clear_cache	0 ] 	)
 sepparm	[ 0	locks=0 ]	(	)
 file	[ 0	locks=1 ]	(	[ file	"from ayon_houdini.api import hda_utils
