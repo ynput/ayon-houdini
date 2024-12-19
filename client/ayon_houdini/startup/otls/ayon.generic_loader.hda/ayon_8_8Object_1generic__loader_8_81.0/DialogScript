@@ -497,10 +497,11 @@
     }
 
     parm {
-        name    "newparameter"
+        name    "nodes_referencing_file"
         label   "Nodes referencing file"
         type    oplist
         default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
+        parmtag { "oprelative" "/" }
         parmtag { "script_callback_language" "python" }
     }
 }
