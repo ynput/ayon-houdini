@@ -815,7 +815,7 @@ def get_available_representations(node):
             version_ids={version_entity["id"]},
             fields={"name"},
             representation_names=ALLOWED_USD_REPRESENTATIONS \
-                if node.parm("usd_compatible_representations").eval() else None
+                if node.parm("usd_compatible_representations") and node.parm("usd_compatible_representations").eval() else None
     )
     representations_names = [n["name"] for n in representations]
     return representations_names
