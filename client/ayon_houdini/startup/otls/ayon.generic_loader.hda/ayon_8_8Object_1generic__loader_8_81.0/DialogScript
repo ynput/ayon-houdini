@@ -498,7 +498,7 @@
 
     parm {
         name    "nodes_referencing_file"
-        label   "Nodes referencing file"
+        label   "Nodes Referencing File"
         type    oplist
         default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
         parmtag { "oprelative" "/" }

@@ -98,7 +98,7 @@
         }
         parm {
             name    "usd_compatible_representations"
-            label   "USD compatible representations"
+            label   "USD Compatible Representations"
             type    toggle
             default { "1" }
             help    "Enable to apply USD Compatible Representations filter"
@@ -257,7 +257,7 @@
 
     parm {
         name    "nodes_referencing_file"
-        label   "Nodes referencing file"
+        label   "Nodes Referencing File"
         type    oplist
         default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
         parmtag { "oprelative" "/" }
