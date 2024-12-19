@@ -41,7 +41,11 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
         if errors:
             for error in errors:
                 self.log.error(error)
-            raise PublishError(f"Failed to save to disk '{node.path()}'")
+            raise PublishError(
+                f"Failed to save to disk '{node.path()}'. "
+                "Please fix your scene to ensure it renders correctly "
+                "and re-publish. Check the log for more information."
+            )
 
         # Define the main asset usd file
         filepath = node.evalParm("lopoutput")

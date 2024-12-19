@@ -5,6 +5,8 @@ import errno
 import re
 import logging
 import json
+import clique
+from functools import lru_cache
 from contextlib import contextmanager
 
 import six
@@ -1596,3 +1598,29 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
         f' {file_parm.node().path()} {file_parm.name()} \`{expression}\`'
     )
     show_node_parmeditor(load_node)
+
+
+@lru_cache(1)
+def is_version_up_workfile_menu_enabled() -> bool:
+    """Check if the 'Version Up Workfile' menu should be enabled.
+
+    It's cached because we don't care about updating the menu during the
+    current Houdini session and this allows us to avoid re-querying the
+    project settings each time.
+
+    """
+    project_settings = get_current_project_settings()
+    if project_settings["core"]["tools"]["ayon_menu"].get(
+        "version_up_current_workfile"
+    ):
+        return True
+    return False
+
+
+def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail} [{ranges}]") -> list[str]:
+    """Return list of files as formatted sequence collections."""
+    
+    collections, remainder = clique.assemble(files)
+    result = [collection.format(pattern) for collection in collections]
+    result.extend(remainder)
+    return result

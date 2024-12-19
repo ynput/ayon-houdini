@@ -3,7 +3,9 @@ import hou
 
 import pyblish.api
 
+from ayon_core.pipeline import PublishError
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import format_as_collections
 
 
 class ExtractRender(plugin.HoudiniExtractorPlugin):
@@ -80,8 +82,13 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             for frame in all_frames
             if not os.path.exists(frame)
         ]
+
         if missing_frames:
-            # TODO: Use user friendly error reporting.
-            raise RuntimeError("Failed to complete render extraction. "
-                               "Missing output files: {}".format(
-                                   missing_frames))
+            # Combine collections for simpler logs of missing files
+            missing_frames  = format_as_collections(missing_frames)
+            missing_frames = "\n ".join(f"- {sequence}" for sequence in missing_frames)
+            raise PublishError(
+                "Failed to complete render extraction.\n"
+                "Please render any missing output files.",
+                detail=f"Missing output files: \n {missing_frames}"
+            )
