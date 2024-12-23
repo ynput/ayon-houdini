@@ -47,7 +47,7 @@ class ValidateCopOutputNode(plugin.HoudiniInstancePlugin):
                 "Ensure a valid COP output path is set." % node.path()
             )
 
-            return [node.path()]
+            return [node]
 
         # Output node must be a Sop node.
         if not isinstance(output_node, hou.CopNode):
@@ -57,7 +57,7 @@ class ValidateCopOutputNode(plugin.HoudiniInstancePlugin):
                 "instead found category type: %s",
                 output_node.path(), output_node.type().category().name()
             )
-            return [output_node.path()]
+            return [output_node]
 
         # For the sake of completeness also assert the category type
         # is Cop2 to avoid potential edge case scenarios even though
@@ -66,4 +66,4 @@ class ValidateCopOutputNode(plugin.HoudiniInstancePlugin):
             cls.log.error(
                 "Output node %s is not of category Cop2.", output_node.path()
             )
-            return [output_node.path()]
+            return [output_node]

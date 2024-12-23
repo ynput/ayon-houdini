@@ -61,4 +61,4 @@ class ValidateFileExtension(plugin.HoudiniInstancePlugin):
                     title=cls.label)
 
             if output_extension != extension:
-                return [node.path()]
+                return [node]

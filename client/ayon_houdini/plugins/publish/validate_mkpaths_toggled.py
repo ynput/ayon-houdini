@@ -30,6 +30,6 @@ class ValidateIntermediateDirectoriesChecked(plugin.HoudiniInstancePlugin):
         for node in instance[:]:
             if node.parm("mkpath").eval() != 1:
                 cls.log.error("Invalid settings found on `%s`" % node.path())
-                result.append(node.path())
+                result.append(node)
 
         return result

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Validator for checking that export is a single frame."""
+import hou
+
 from ayon_core.pipeline import (
     PublishValidationError,
     OptionalPyblishPluginMixin
@@ -35,8 +37,6 @@ class ValidateSingleFrame(plugin.HoudiniInstancePlugin,
     @classmethod
     def get_invalid(cls, instance):
 
-        invalid = []
-
         frame_start = instance.data.get("frameStartHandle")
         frame_end = instance.data.get("frameEndHandle")
 
@@ -48,12 +48,12 @@ class ValidateSingleFrame(plugin.HoudiniInstancePlugin,
             return
 
         if frame_start != frame_end:
-            invalid.append(instance.data["instance_node"])
+            rop = hou.node(instance.data["instance_node"])
             cls.log.error(
                 "Invalid frame range on '%s'."
                 "You should use the same frame number for 'f1' "
                 "and 'f2' parameters.",
-                instance.data["instance_node"].path()
+                rop.path()
             )
 
-        return invalid
+        return [rop]

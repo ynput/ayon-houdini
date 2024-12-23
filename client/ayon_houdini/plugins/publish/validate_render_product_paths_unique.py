@@ -95,7 +95,7 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
         # Get instances matching this plugin families
         instances = pyblish.api.instances_by_plugin(list(context), cls)
         if not instances:
-            return []
+            return
 
         # Get expected rendered filepaths
         paths_to_instance_id = defaultdict(list)
@@ -119,7 +119,7 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
                 invalid_paths.append(path)
 
         if not invalid_instance_ids:
-            return []
+            return
 
         # Log invalid sequences as single collection
         collections, remainder = clique.assemble(invalid_paths)

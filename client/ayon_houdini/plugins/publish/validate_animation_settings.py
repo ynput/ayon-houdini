@@ -43,11 +43,11 @@ class ValidateAnimationSettings(plugin.HoudiniInstancePlugin):
         # Check trange parm, 0 means Render Current Frame
         frame_range = node.evalParm("trange")
         if frame_range == 0:
-            return []
+            return
 
         output_parm = lib.get_output_parameter(node)
         unexpanded_str = output_parm.unexpandedString()
 
         if "$F" not in unexpanded_str:
             cls.log.error("No frame token found in '%s'" % node.path())
-            return [instance]
+            return [node]
