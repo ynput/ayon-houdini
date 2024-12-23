@@ -30,7 +30,7 @@ class ValidateAbcPrimitiveToDetail(plugin.HoudiniInstancePlugin):
                 "to detail attributes.",
                 detail=(
                     "See log for more info."
-                    f"Incorrect Rop(s)\n\n - {invalid[0].pah()}"
+                    f"Incorrect Rop(s)\n\n - {invalid[0].path()}"
                 )
             )
 
