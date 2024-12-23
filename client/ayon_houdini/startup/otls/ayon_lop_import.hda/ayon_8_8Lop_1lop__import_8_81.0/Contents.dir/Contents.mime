@@ -31,7 +31,7 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position -5.4029 -1.19804
+position 5.6226 -9.55283
 connectornextid 0
 flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
@@ -465,14 +465,6 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../representation\") language = python }
     }
-    channel nodes_referencing_file {
-      lefttype = extend
-      righttype = extend
-      defaultString = \"\"
-      flags = 0
-      start = 40
-      segment { length = 0 expr = "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" language = python }
-    }
     channel project_name {
       lefttype = extend
       righttype = extend
@@ -579,6 +571,14 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = chs(\"../representation_name\") }
     }
+    channel nodes_referencing_file {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" language = python }
+    }
   }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
@@ -595,7 +595,8 @@ folder_name	[ 0	locks=0 ]	(	[ folder_name	"`strsplit(chs(\"folder_path\"), \"/\"
 product_name	[ 0	locks=0 ]	(	[ product_name	"" ] 	)
 version	[ 8	locks=0 ]	(	[ version	"" ] 	)
 representation_name	[ 0	locks=0 ]	(	[ representation_name	"" ] 	)
-usd_compatible_representations	[ 0	locks=0 ]	(	"on"	)
+enable_repre_filter	[ 0	locks=0 ]	(	"on"	)
+representation_filter	[ 0	locks=0 ]	(	"usd usda usdlc usdnc abc"	)
 clear_cache	[ 0	locks=0 ]	(	[ clear_cache	0 ] 	)
 sepparm	[ 0	locks=0 ]	(	)
 file	[ 0	locks=1 ]	(	[ file	"from ayon_houdini.api import hda_utils

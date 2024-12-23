@@ -20,7 +20,7 @@ Content-Type: text/plain
 
 sopflags sopflags = 
 comment ""
-position 6.77217 -9.32374
+position 6.88107 -9.42883
 connectornextid 0
 flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
 outputsNamed3

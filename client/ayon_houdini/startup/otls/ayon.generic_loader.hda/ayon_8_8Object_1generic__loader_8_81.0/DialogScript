@@ -97,6 +97,23 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
+            name    "enable_repre_filter"
+            label   "Enable Representation Filter"
+            type    toggle
+            default { "0" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "representation_filter"
+            label   "Representation Filter"
+            type    string
+            default { "" }
+            help    "space separated list of representation names to filter to"
+            disablewhen "{ enable_repre_filter == 0 }"
+            hidewhen "{ enable_repre_filter == 0 }"
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
             name    "clear_cache"
             label   "Clear Cache"
             type    button
