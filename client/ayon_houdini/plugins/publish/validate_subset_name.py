@@ -48,8 +48,6 @@ class ValidateSubsetName(plugin.HoudiniInstancePlugin,
     @classmethod
     def get_invalid(cls, instance):
 
-        invalid = []
-
         rop_node = hou.node(instance.data["instance_node"])
 
         # Check product name
@@ -76,13 +74,11 @@ class ValidateSubsetName(plugin.HoudiniInstancePlugin,
         )
 
         if instance.data.get("productName") != product_name:
-            invalid.append(rop_node)
             cls.log.error(
                 "Invalid product name on rop node '%s' should be '%s'.",
                 rop_node.path(), product_name
             )
-
-        return invalid
+            return [rop_node]
 
     @classmethod
     def repair(cls, instance):
