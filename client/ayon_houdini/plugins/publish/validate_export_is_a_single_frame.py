@@ -55,5 +55,4 @@ class ValidateSingleFrame(plugin.HoudiniInstancePlugin,
                 "and 'f2' parameters.",
                 rop.path()
             )
-
-        return [rop]
+            return [rop]
