@@ -170,9 +170,9 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
 
         """
         # Allow explicit naming through custom attribute on the render product
-        aov_identifier = render_product.GetPrim().GetAttribute(
-            "ayon:aov_identifier").Get(time=Usd.TimeCode.EarliestTime())
-        if aov_identifier:
+        attr = render_product.GetPrim().GetAttribute("ayon:aov_identifier")
+        if attr:
+            aov_identifier = attr.Get(time=Usd.TimeCode.EarliestTime())
             self.log.debug(
                 "Using explicit ayon:aov_identifier on render product"
                 f" '{render_product}': {aov_identifier}")
