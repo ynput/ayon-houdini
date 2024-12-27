@@ -175,7 +175,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
             aov_identifier = attr.Get(time=Usd.TimeCode.EarliestTime())
             self.log.debug(
                 "Using explicit ayon:aov_identifier on render product"
-                f" '{render_product}': '{aov_identifier}'")
+                f" '{render_product.GetPath()}': '{aov_identifier}'")
             return str(aov_identifier)
 
         targets = render_product.GetOrderedVarsRel().GetTargets()
