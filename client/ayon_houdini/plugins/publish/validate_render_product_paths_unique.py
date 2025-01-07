@@ -1,6 +1,6 @@
 import inspect
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import pyblish.api
 import clique
@@ -91,7 +91,7 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
         )
 
     @classmethod
-    def get_invalid(cls, context) -> "List[hou.Node]":
+    def get_invalid(cls, context) -> "Optional[List[hou.Node]]":
         # Get instances matching this plugin families
         instances = pyblish.api.instances_by_plugin(list(context), cls)
         if not instances:
