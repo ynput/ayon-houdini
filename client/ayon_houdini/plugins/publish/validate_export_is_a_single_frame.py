@@ -30,7 +30,7 @@ class ValidateSingleFrame(plugin.HoudiniInstancePlugin,
         if invalid:
             raise PublishValidationError(
                 "See log for details. "
-                "Invalid nodes: {0}".format(invalid[0].path())
+                "Invalid ROP node: {0}".format(invalid[0].path())
             )
 
     @classmethod
