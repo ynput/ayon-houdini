@@ -32,7 +32,7 @@ class ValidateFileExtension(plugin.HoudiniInstancePlugin):
         invalid = self.get_invalid(instance)
         if invalid:
             raise PublishValidationError(
-                "ROP node has incorrect file extension: {}".format(invalid),
+                f"ROP node has incorrect file extension: {invalid[0].path()}",
                 title=self.label
             )
 

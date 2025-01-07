@@ -17,9 +17,10 @@ class ValidateIntermediateDirectoriesChecked(plugin.HoudiniInstancePlugin):
 
         invalid = self.get_invalid(instance)
         if invalid:
+            nodes = "\n".join(f"- {node.path()}" for node in invalid)
             raise PublishValidationError(
                 ("Found ROP node with Create Intermediate "
-                 "Directories turned off: {}".format(invalid)),
+                 "Directories turned off:\n {}".format(nodes)),
                 title=self.label)
 
     @classmethod

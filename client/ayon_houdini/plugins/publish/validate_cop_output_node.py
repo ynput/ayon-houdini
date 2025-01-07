@@ -27,7 +27,7 @@ class ValidateCopOutputNode(plugin.HoudiniInstancePlugin):
         if invalid:
             raise PublishValidationError(
                 "Output node '{}' is incorrect. "
-                "See plug-in log for details.".format(invalid),
+                "See plug-in log for details.".format(invalid[0].path()),
                 title=self.label,
                 description=(
                     "### Invalid COP output node\n\n"

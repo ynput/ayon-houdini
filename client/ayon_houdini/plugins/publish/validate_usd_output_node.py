@@ -30,9 +30,8 @@ class ValidateUSDOutputNode(plugin.HoudiniInstancePlugin):
 
         invalid = self.get_invalid(instance)
         if invalid:
-            path = invalid[0]
             raise PublishValidationError(
-                "Output node '{}' has no valid LOP path set.".format(path),
+                f"Output node '{invalid[0].path()}' has no valid LOP path set.",
                 title=self.label,
                 description=self.get_description()
             )

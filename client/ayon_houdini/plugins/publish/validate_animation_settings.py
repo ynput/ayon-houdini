@@ -33,7 +33,7 @@ class ValidateAnimationSettings(plugin.HoudiniInstancePlugin):
         invalid = self.get_invalid(instance)
         if invalid:
             raise PublishValidationError(
-                "Output settings do no match for '%s'" % instance
+                f"Output settings do no match for '{invalid[0].path()}'"
             )
 
     @classmethod

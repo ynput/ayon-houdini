@@ -28,10 +28,9 @@ class ValidateSingleFrame(plugin.HoudiniInstancePlugin,
 
         invalid = self.get_invalid(instance)
         if invalid:
-            nodes = [n.path() for n in invalid]
             raise PublishValidationError(
                 "See log for details. "
-                "Invalid nodes: {0}".format(nodes)
+                "Invalid nodes: {0}".format(invalid[0].path())
             )
 
     @classmethod
