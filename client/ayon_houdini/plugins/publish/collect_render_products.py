@@ -3,6 +3,7 @@ import os
 
 import hou
 import pxr.UsdRender
+from pxr import Usd
 
 import pyblish.api
 
@@ -168,6 +169,15 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
             str: The AOV identifier
 
         """
+        # Allow explicit naming through custom attribute on the render product
+        attr = render_product.GetPrim().GetAttribute("ayon:aov_identifier")
+        if attr:
+            aov_identifier = attr.Get(time=Usd.TimeCode.EarliestTime())
+            self.log.debug(
+                "Using explicit ayon:aov_identifier on render product"
+                f" '{render_product.GetPath()}': '{aov_identifier}'")
+            return str(aov_identifier)
+
         targets = render_product.GetOrderedVarsRel().GetTargets()
         if len(targets) > 1:
             # Cryptomattes usually are combined render vars, for example:
