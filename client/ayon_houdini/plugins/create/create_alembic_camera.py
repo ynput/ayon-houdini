@@ -33,12 +33,14 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
         parms = {
-            # keep dynamic link to product name in file path.
-            "filename": "{root}/`chs('AYON_productName')`/$OS.abc".format(
-                root=hou.text.expandString(self.staging_dir)
-            ),
             "use_sop_path": False,
         }
+        
+        if self.enable_staging_dir:
+            # keep dynamic link to product name in file path.
+            parms["filename"] = "{root}/`chs('AYON_productName')`/$OS.abc".format(
+                root=hou.text.expandString(self.staging_dir)
+            )
 
         if self.selected_nodes:
             if len(self.selected_nodes) > 1:

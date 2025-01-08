@@ -74,14 +74,20 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
             # Render frame range
             "trange": 1,
             # Redshift ROP settings
-            # keep dynamic link to product name in file path.
-            "RS_outputFileNamePrefix": "{root}/`chs('AYON_productName')`/$OS.$AOV.$F4.{ext}".format(
-                root=hou.text.expandString(self.staging_dir),
-                ext=ext
-            ),
             "RS_outputBeautyAOVSuffix": "beauty",
             "RS_outputFileFormat": ext_format_index[ext],
         }
+
+        if self.enable_staging_dir:
+            # keep dynamic link to product name in file path.
+            parms["RS_outputFileNamePrefix"] = "{root}/`chs('AYON_productName')`/$OS.$AOV.$F4.{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=ext
+            )
+            parms["RS_archive_file"] = "{root}/`chs('AYON_productName')`/rs/$OS.$F4.rs".format(
+                root=hou.text.expandString(self.staging_dir)
+            )
+
         if ext == "exr":
             parms["RS_outputMultilayerMode"] = multilayer_mode_index[multi_layered_mode]
             parms["RS_aovMultipart"] = multipart
@@ -93,11 +99,6 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
                 if node.type().name() == "cam":
                     camera = node.path()
             parms["RS_renderCamera"] = camera or ""
-
-        # keep dynamic link to product name in file path.
-        parms["RS_archive_file"] = "{root}/`chs('AYON_productName')`/rs/$OS.$F4.rs".format(
-            root=hou.text.expandString(self.staging_dir)
-        )
 
         if pre_create_data.get("render_target") == "farm_split":
             parms["RS_archive_enable"] = 1

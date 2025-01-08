@@ -56,12 +56,6 @@ class CreateReview(plugin.HoudiniCreator):
         frame_range = hou.playbar.frameRange()
 
         parms = {
-            # keep dynamic link to product name in file path.
-            "picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(self.staging_dir),
-                ext=pre_create_data.get("image_format") or "png"
-            ),
-
             "trange": 1,
 
             # Unlike many other ROP nodes the opengl node does not default
@@ -70,6 +64,12 @@ class CreateReview(plugin.HoudiniCreator):
             "f1": frame_range[0],
             "f2": frame_range[1],
         }
+        if self.enable_staging_dir:
+            # keep dynamic link to product name in file path.
+            parms["picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=pre_create_data.get("image_format") or "png"
+            )
 
         override_resolution = pre_create_data.get("override_resolution")
         if override_resolution:

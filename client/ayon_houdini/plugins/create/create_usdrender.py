@@ -83,10 +83,11 @@ class CreateUSDRender(plugin.HoudiniCreator):
             # folder to our choice. The
             # `__render__.usd` (default name, defined by `lopoutput` parm)
             # in that folder will then be the file to render.
-            # keep dynamic link to product name in file path.
-            parms["savetodirectory_directory"] = "{root}/`chs('AYON_productName')`/usd/$HIPNAME/$OS".format(
-                root=hou.text.expandString(self.staging_dir)
-            )
+            if self.enable_staging_dir:
+                # keep dynamic link to product name in file path.
+                parms["savetodirectory_directory"] = "{root}/`chs('AYON_productName')`/usd/$HIPNAME/$OS".format(
+                    root=hou.text.expandString(self.staging_dir)
+                )
             parms["lopoutput"] = "__render__.usd"
             parms["allframesatonce"] = True
 

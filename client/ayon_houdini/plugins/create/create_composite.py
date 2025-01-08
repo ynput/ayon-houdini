@@ -29,12 +29,13 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
         parms = {
             "trange": 1,
+        }
+        if self.enable_staging_dir:
             # keep dynamic link to product name in file path.
-            "copoutput": "{root}/`chs('AYON_productName')`/$OS.$F4{ext}".format(
+            parms["copoutput"] = "{root}/`chs('AYON_productName')`/$OS.$F4{ext}".format(
                 root=hou.text.expandString(self.staging_dir),
                 ext=self.ext
-            ),
-        }
+            )
 
         if self.selected_nodes:
             if len(self.selected_nodes) > 1:

@@ -45,13 +45,15 @@ class CreateArnoldAss(plugin.HoudiniCreator):
             # Render frame range
             "trange": 1,
             # Arnold ROP settings
-            # keep dynamic link to product name in file path.
-            "ar_ass_file": "{root}/`chs('AYON_productName')`/$OS.$F4{ext}".format(
-                root=hou.text.expandString(self.staging_dir),
-                ext=self.ext
-            ),
             "ar_ass_export_enable": 1
         }
+        
+        if self.enable_staging_dir:            
+            # keep dynamic link to product name in file path.
+            parms["ar_ass_file"] = "{root}/`chs('AYON_productName')`/$OS.$F4{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=self.ext
+            )
 
         instance_node.setParms(parms)
 

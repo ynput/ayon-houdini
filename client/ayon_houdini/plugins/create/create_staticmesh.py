@@ -37,10 +37,6 @@ class CreateStaticMesh(plugin.HoudiniCreator):
         # prepare parms
         parms = {
             "startnode": self.get_selection(),
-            # keep dynamic link to product name in file path.
-            "sopoutput": "{root}/`chs('AYON_productName')`/$OS.fbx".format(
-                root=hou.text.expandString(self.staging_dir)
-            ),
             # vertex cache format
             "vcformat": pre_create_data.get("vcformat"),
             "convertunits": pre_create_data.get("convertunits"),
@@ -48,6 +44,11 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             "trange": 1,
             "createsubnetroot": pre_create_data.get("createsubnetroot")
         }
+        if self.enable_staging_dir:
+            # keep dynamic link to product name in file path.
+            parms["sopoutput"] = "{root}/`chs('AYON_productName')`/$OS.fbx".format(
+                root=hou.text.expandString(self.staging_dir)
+            )
 
         # set parms
         instance_node.setParms(parms)

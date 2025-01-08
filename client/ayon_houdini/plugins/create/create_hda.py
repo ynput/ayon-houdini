@@ -243,7 +243,7 @@ class CreateHDA(plugin.HoudiniCreator):
             hda_node = to_hda.createDigitalAsset(
                 name=type_name,
                 description=node_name,
-                hda_file_name="{}/HDAs/{}.hda".format(self.staging_dir, node_name),
+                hda_file_name="{}/HDAs/{}.hda".format(self.staging_dir, node_name) if self.enable_staging_dir else None,
                 ignore_external_references=True,
                 min_num_inputs=0,
                 max_num_inputs=len(to_hda.inputs()) or 1,

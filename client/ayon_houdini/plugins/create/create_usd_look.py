@@ -36,16 +36,17 @@ class CreateUSDLook(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
 
         parms = {
-            # keep dynamic link to product name in file path.
-            "lopoutput": "{root}/`chs('AYON_productName')`/$OS.usd".format(
-                root=hou.text.expandString(self.staging_dir)
-            ),
             "enableoutputprocessor_simplerelativepaths": False,
 
             # Set the 'default prim' by default to the folder name being
             # published to
             "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
         }
+        if self.enable_staging_dir:
+            # keep dynamic link to product name in file path.
+            parms["lopoutput"] = "{root}/`chs('AYON_productName')`/$OS.usd".format(
+                root=hou.text.expandString(self.staging_dir)
+            )
 
         if self.selected_nodes:
             parms["loppath"] = self.selected_nodes[0].path()

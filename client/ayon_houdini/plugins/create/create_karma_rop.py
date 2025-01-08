@@ -36,21 +36,24 @@ class CreateKarmaROP(plugin.HoudiniCreator):
         parms = {
             # Render Frame Range
             "trange": 1,
-            # Karma ROP Setting
-            # keep dynamic link to product name in file paths.
-            "picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(self.staging_dir),
-                ext=pre_create_data.get("image_format")
-            ),
-            # Karma Checkpoint Setting
-            "productName": "{root}/`chs('AYON_productName')`/checkpoint/$OS.$F4.checkpoint".format(
-                root=hou.text.expandString(self.staging_dir)
-            ),
-            # USD Output Directory
-            "savetodirectory": "{root}/`chs('AYON_productName')`/usd/$OS_$RENDERID".format(
-                root=hou.text.expandString(self.staging_dir)
-            ),
         }
+        if self.enable_staging_dir:
+            parms.update({
+                # Karma ROP Setting
+                # keep dynamic link to product name in file paths.
+                "picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                    root=hou.text.expandString(self.staging_dir),
+                    ext=pre_create_data.get("image_format")
+                ),
+                # Karma Checkpoint Setting
+                "productName": "{root}/`chs('AYON_productName')`/checkpoint/$OS.$F4.checkpoint".format(
+                    root=hou.text.expandString(self.staging_dir)
+                ),
+                # USD Output Directory
+                "savetodirectory": "{root}/`chs('AYON_productName')`/usd/$OS_$RENDERID".format(
+                    root=hou.text.expandString(self.staging_dir)
+                )
+            })
 
         res_x = pre_create_data.get("res_x")
         res_y = pre_create_data.get("res_y")

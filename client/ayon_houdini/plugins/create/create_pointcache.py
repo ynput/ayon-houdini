@@ -38,12 +38,14 @@ class CreatePointCache(plugin.HoudiniCreator):
             "path_attrib": "path",
             "prim_to_detail_pattern": "cbId",
             "format": 2,
-            "facesets": 0,
+            "facesets": 0
+        }
+
+        if self.enable_staging_dir:
             # keep dynamic link to product name in file path.
-            "filename": "{root}/`chs('AYON_productName')`/$OS.abc".format(
+            parms["filename"] = "{root}/`chs('AYON_productName')`/$OS.abc".format(
                 root=hou.text.expandString(self.staging_dir)
             )
-        }
 
         if self.selected_nodes:
             selected_node = self.selected_nodes[0]

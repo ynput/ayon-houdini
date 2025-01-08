@@ -35,20 +35,21 @@ class CreateMantraROP(plugin.HoudiniCreator):
         parms = {
             # Render Frame Range
             "trange": 1,
-            # Mantra ROP Setting
+        }
+        if self.enable_staging_dir:
             # keep dynamic link to product name in file path.
-            "vm_picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+            parms["vm_picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
                 root=hou.text.expandString(self.staging_dir),
                 ext=pre_create_data.get("image_format")
-            ),
-        }
+            )
 
         if pre_create_data.get("render_target") == "farm_split":
             parms["soho_outputmode"] = 1
-            # keep dynamic link to product name in file path.
-            parms["soho_diskfile"] = "{root}/`chs('AYON_productName')`/ifd/$OS.$F4.ifd".format(
-                root=hou.text.expandString(self.staging_dir)
-            )
+            if self.enable_staging_dir:
+                # keep dynamic link to product name in file path.
+                parms["soho_diskfile"] = "{root}/`chs('AYON_productName')`/ifd/$OS.$F4.ifd".format(
+                    root=hou.text.expandString(self.staging_dir)
+                )
 
         if self.selected_nodes:
             # If camera found in selection

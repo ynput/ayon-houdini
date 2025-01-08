@@ -60,10 +60,11 @@ class CreateVrayROP(plugin.HoudiniCreator):
             # Setting render_export_mode to "2" because that's for
             # "Export only" ("1" is for "Export & Render")
             parms["render_export_mode"] = "2"
-            # keep dynamic link to product name in file paths.
-            parms["render_export_filepath"] = "{root}/`chs('AYON_productName')`/vrscene/$OS.$F4.vrscene".format(
-                root=hou.text.expandString(self.staging_dir)
-            ),
+            if self.enable_staging_dir:
+                # keep dynamic link to product name in file paths.
+                parms["render_export_filepath"] = "{root}/`chs('AYON_productName')`/vrscene/$OS.$F4.vrscene".format(
+                    root=hou.text.expandString(self.staging_dir)
+                )
 
         if self.selected_nodes:
             # set up the render camera from the selected node
@@ -87,23 +88,23 @@ class CreateVrayROP(plugin.HoudiniCreator):
             re_path = re_rop.path()
             parms.update({
                 "use_render_channels": 1,
-                # keep dynamic link to product name in file paths.
-                "SettingsOutput_img_file_path": "{root}/`chs('AYON_productName')`/$OS.$AOV.$F4.{ext}".format(
-                    root=hou.text.expandString(self.staging_dir),
-                    ext=pre_create_data.get("image_format")
-                ),
                 "render_network_render_channels": re_path
             })
-
-        else:
-            parms.update({
-                "use_render_channels": 0,
+            if self.enable_staging_dir:
                 # keep dynamic link to product name in file paths.
-                "SettingsOutput_img_file_path": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                parms["SettingsOutput_img_file_path"] = "{root}/`chs('AYON_productName')`/$OS.$AOV.$F4.{ext}".format(
                     root=hou.text.expandString(self.staging_dir),
                     ext=pre_create_data.get("image_format")
-                ),
-            })
+                )
+
+        else:
+            parms["use_render_channels"] = 0
+            if self.enable_staging_dir:
+                # keep dynamic link to product name in file paths.
+                parms["SettingsOutput_img_file_path"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                    root=hou.text.expandString(self.staging_dir),
+                    ext=pre_create_data.get("image_format")
+                )
 
         custom_res = pre_create_data.get("override_resolution")
         if custom_res:

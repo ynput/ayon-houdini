@@ -38,22 +38,24 @@ class CreateArnoldRop(plugin.HoudiniCreator):
         parms = {
             # Render frame range
             "trange": 1,
-
-            # Arnold ROP settings
-            # keep dynamic link to product name in file path.
-            "ar_picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(self.staging_dir),
-                ext=pre_create_data.get("image_format")
-            ),
+            # Arnold ROP settings            
             "ar_exr_half_precision": 1           # half precision
         }
 
+        if self.enable_staging_dir:
+            # keep dynamic link to product name in file path.
+            parms["ar_picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
+                root=hou.text.expandString(self.staging_dir),
+                ext=pre_create_data.get("image_format")
+            )
+
         if pre_create_data.get("render_target") == "farm_split":
             parms["ar_ass_export_enable"] = 1
-            # keep dynamic link to product name in file path.
-            parms["ar_ass_file"] = "{root}/`chs('AYON_productName')`/ass/$OS.$F4.ass".format(
-                root=hou.text.expandString(self.staging_dir)
-            )
+            if self.enable_staging_dir:
+                # keep dynamic link to product name in file path.
+                parms["ar_ass_file"] = "{root}/`chs('AYON_productName')`/ass/$OS.$F4.ass".format(
+                    root=hou.text.expandString(self.staging_dir)
+                )
 
         instance_node.setParms(parms)
 

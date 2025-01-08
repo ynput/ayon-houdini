@@ -23,11 +23,17 @@ class UpdateHoudiniVarcontextModel(BaseSettingsModel):
     )
 
 
-class GeneralSettingsModel(BaseSettingsModel):
-    add_self_publish_button: bool = SettingsField(
-        False,
-        title="Add Self Publish Button"
-    )
+class ROPOutputDirModel(BaseSettingsModel):
+    """ROP Output Directory
+
+    When enabled, this setting defines output paths for ROP nodes,
+    which can be overridden by custom staging directories.
+    Disable it to completely turn off setting default values and 
+    custom staging directories.
+    """
+
+    enabled: bool = SettingsField(title="Enabled")
+
     default_output_dir: str = SettingsField(
         title="Default Output Directory",
         description="This is the initial output directory for newly created "
@@ -35,6 +41,17 @@ class GeneralSettingsModel(BaseSettingsModel):
                     "is generated using the AYON creator. Artists can modify "
                     "this directory after the ROP is created. "
                     "Note: AYON creator will expand any Houdini vars."
+    )
+
+
+class GeneralSettingsModel(BaseSettingsModel):
+    add_self_publish_button: bool = SettingsField(
+        False,
+        title="Add Self Publish Button"
+    )
+    rop_output: ROPOutputDirModel = SettingsField(
+        default_factory=ROPOutputDirModel,
+        title="ROP Output Directory"
     )
     update_houdini_var_context: UpdateHoudiniVarcontextModel = SettingsField(
         default_factory=UpdateHoudiniVarcontextModel,
@@ -44,7 +61,10 @@ class GeneralSettingsModel(BaseSettingsModel):
 
 DEFAULT_GENERAL_SETTINGS = {
     "add_self_publish_button": False,
-    "default_output_dir": "$HIP/ayon",
+    "rop_output": {
+        "enabled": True,
+        "default_output_dir": "$HIP/ayon/"
+    },
     "update_houdini_var_context": {
         "enabled": True,
         "houdini_vars": [
