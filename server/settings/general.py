@@ -29,7 +29,7 @@ class ROPOutputDirModel(BaseSettingsModel):
     When enabled, this setting defines output paths for ROP nodes,
     which can be overridden by custom staging directories.
     Disable it to completely turn off setting default values and 
-    custom staging directories.
+    custom staging directories defined in **ayon+settings://core/tools/publish/custom_staging_dir_profiles**.
     """
 
     enabled: bool = SettingsField(title="Enabled")
