@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Creator plugin to create Karma ROP."""
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import get_custom_staging_dir
+
 from ayon_core.lib import BoolDef, EnumDef, NumberDef
 
 
@@ -38,6 +40,8 @@ class CreateKarmaROP(plugin.HoudiniCreator):
             "trange": 1,
         }
         if self.enable_staging_dir:
+            self.staging_dir = get_custom_staging_dir("render", product_name) or self.staging_dir
+            
             parms.update({
                 # Karma ROP Setting
                 # keep dynamic link to product name in file paths.

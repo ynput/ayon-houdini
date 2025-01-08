@@ -13,6 +13,7 @@ from ayon_core.lib import (
 )
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import get_custom_staging_dir
 
 
 # region assettools
@@ -240,10 +241,15 @@ class CreateHDA(plugin.HoudiniCreator):
                 )
             )
 
+            hda_file_name = None
+            if self.enable_staging_dir:
+                self.staging_dir = get_custom_staging_dir(self.product_type, node_name) or self.staging_dir
+                hda_file_name = "{}/HDAs/{}.hda".format(self.staging_dir, node_name)
+
             hda_node = to_hda.createDigitalAsset(
                 name=type_name,
                 description=node_name,
-                hda_file_name="{}/HDAs/{}.hda".format(self.staging_dir, node_name) if self.enable_staging_dir else None,
+                hda_file_name=hda_file_name,
                 ignore_external_references=True,
                 min_num_inputs=0,
                 max_num_inputs=len(to_hda.inputs()) or 1,

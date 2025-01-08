@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Creator for Unreal Static Meshes."""
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import get_custom_staging_dir
+
 from ayon_core.lib import BoolDef, EnumDef
 
 import hou
@@ -46,6 +48,7 @@ class CreateStaticMesh(plugin.HoudiniCreator):
         }
         if self.enable_staging_dir:
             # keep dynamic link to product name in file path.
+            self.staging_dir = get_custom_staging_dir(self.product_type, product_name) or self.staging_dir
             parms["sopoutput"] = "{root}/`chs('AYON_productName')`/$OS.fbx".format(
                 root=hou.text.expandString(self.staging_dir)
             )

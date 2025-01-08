@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Creator plugin to create Mantra ROP."""
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import get_custom_staging_dir
+
 from ayon_core.lib import EnumDef, BoolDef
 
 
@@ -38,18 +40,18 @@ class CreateMantraROP(plugin.HoudiniCreator):
         }
         if self.enable_staging_dir:
             # keep dynamic link to product name in file path.
+            self.staging_dir = get_custom_staging_dir("render", product_name) or self.staging_dir
+
             parms["vm_picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
                 root=hou.text.expandString(self.staging_dir),
                 ext=pre_create_data.get("image_format")
             )
+            parms["soho_diskfile"] = "{root}/`chs('AYON_productName')`/ifd/$OS.$F4.ifd".format(
+                root=hou.text.expandString(self.staging_dir)
+            )
 
         if pre_create_data.get("render_target") == "farm_split":
-            parms["soho_outputmode"] = 1
-            if self.enable_staging_dir:
-                # keep dynamic link to product name in file path.
-                parms["soho_diskfile"] = "{root}/`chs('AYON_productName')`/ifd/$OS.$F4.ifd".format(
-                    root=hou.text.expandString(self.staging_dir)
-                )
+            parms["soho_outputmode"] = 1              
 
         if self.selected_nodes:
             # If camera found in selection
