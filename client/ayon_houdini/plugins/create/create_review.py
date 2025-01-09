@@ -66,7 +66,7 @@ class CreateReview(plugin.HoudiniCreator):
             "f1": frame_range[0],
             "f2": frame_range[1],
         }
-        if self.enable_staging_dir:
+        if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             self.staging_dir = get_custom_staging_dir(self.product_type, product_name) or self.staging_dir
             parms["picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(

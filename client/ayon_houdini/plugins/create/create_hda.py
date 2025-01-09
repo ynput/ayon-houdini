@@ -242,7 +242,7 @@ class CreateHDA(plugin.HoudiniCreator):
             )
 
             hda_file_name = None
-            if self.enable_staging_dir:
+            if self.enable_staging_path_management:
                 self.staging_dir = get_custom_staging_dir(self.product_type, node_name) or self.staging_dir
                 hda_file_name = "{}/HDAs/{}.hda".format(self.staging_dir, node_name)
 

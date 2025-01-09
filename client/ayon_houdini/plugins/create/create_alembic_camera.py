@@ -38,7 +38,7 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
             "use_sop_path": False,
         }
         
-        if self.enable_staging_dir:
+        if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             staging_dir = get_custom_staging_dir(self.product_type, product_name) or self.staging_dir
             parms["filename"] = "{root}/`chs('AYON_productName')`/$OS.abc".format(

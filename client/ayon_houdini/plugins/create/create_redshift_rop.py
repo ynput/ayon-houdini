@@ -80,7 +80,7 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
             "RS_outputFileFormat": ext_format_index[ext],
         }
 
-        if self.enable_staging_dir:
+        if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             self.staging_dir = get_custom_staging_dir("render", product_name) or self.staging_dir
             

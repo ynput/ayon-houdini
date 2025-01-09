@@ -44,7 +44,7 @@ class CreateArnoldRop(plugin.HoudiniCreator):
             "ar_exr_half_precision": 1           # half precision
         }
 
-        if self.enable_staging_dir:
+        if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             self.staging_dir = get_custom_staging_dir("render", product_name) or self.staging_dir
             

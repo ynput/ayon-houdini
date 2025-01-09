@@ -59,7 +59,7 @@ class CreateVrayROP(plugin.HoudiniCreator):
             "use_render_channels": 0,
         }
 
-        if self.enable_staging_dir:
+        if self.enable_staging_path_management:
             # keep dynamic link to product name in file paths.
             self.staging_dir = get_custom_staging_dir("render", product_name) or self.staging_dir
             
@@ -100,7 +100,7 @@ class CreateVrayROP(plugin.HoudiniCreator):
                 "use_render_channels": 1,
                 "render_network_render_channels": re_path
             })
-            if self.enable_staging_dir:
+            if self.enable_staging_path_management:
                 # keep dynamic link to product name in file paths.
                 parms["SettingsOutput_img_file_path"] = "{root}/`chs('AYON_productName')`/$OS.$AOV.$F4.{ext}".format(
                     root=hou.text.expandString(self.staging_dir),

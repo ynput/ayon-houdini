@@ -85,7 +85,7 @@ class CreateUSDRender(plugin.HoudiniCreator):
             # folder to our choice. The
             # `__render__.usd` (default name, defined by `lopoutput` parm)
             # in that folder will then be the file to render.
-            if self.enable_staging_dir:
+            if self.enable_staging_path_management:
                 # keep dynamic link to product name in file path.
                 self.staging_dir = get_custom_staging_dir("render", product_name) or self.staging_dir
                 parms["savetodirectory_directory"] = "{root}/`chs('AYON_productName')`/usd/$HIPNAME/$OS".format(

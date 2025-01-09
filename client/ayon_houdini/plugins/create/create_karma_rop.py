@@ -39,7 +39,7 @@ class CreateKarmaROP(plugin.HoudiniCreator):
             # Render Frame Range
             "trange": 1,
         }
-        if self.enable_staging_dir:
+        if self.enable_staging_path_management:
             self.staging_dir = get_custom_staging_dir("render", product_name) or self.staging_dir
             
             parms.update({
