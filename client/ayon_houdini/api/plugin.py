@@ -108,7 +108,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
     settings_name = None
     add_publish_button = False
     staging_dir = "$HIP/ayon"
-    enable_staging_dir = True
+    enable_staging_path_management = True
 
     settings_category = SETTINGS_CATEGORY
 
