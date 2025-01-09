@@ -4,8 +4,6 @@ import hou  # noqa
 
 from ayon_core.pipeline import CreatorError
 from ayon_houdini.api import plugin
-from ayon_houdini.api.lib import get_custom_staging_dir
-
 from ayon_core.lib import EnumDef, BoolDef
 
 
@@ -82,14 +80,14 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
 
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
-            self.staging_dir = get_custom_staging_dir("render", product_name) or self.staging_dir
+            staging_dir = self.get_staging_dir("render", product_name)
             
             parms["RS_outputFileNamePrefix"] = "{root}/`chs('AYON_productName')`/$OS.$AOV.$F4.{ext}".format(
-                root=hou.text.expandString(self.staging_dir),
+                root=hou.text.expandString(staging_dir),
                 ext=ext
             )
             parms["RS_archive_file"] = "{root}/`chs('AYON_productName')`/rs/$OS.$F4.rs".format(
-                root=hou.text.expandString(self.staging_dir)
+                root=hou.text.expandString(staging_dir)
             )
 
         if ext == "exr":

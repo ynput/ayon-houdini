@@ -1,6 +1,4 @@
 from ayon_houdini.api import plugin
-from ayon_houdini.api.lib import get_custom_staging_dir
-
 from ayon_core.lib import EnumDef, BoolDef
 
 
@@ -46,15 +44,15 @@ class CreateArnoldRop(plugin.HoudiniCreator):
 
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
-            self.staging_dir = get_custom_staging_dir("render", product_name) or self.staging_dir
+            staging_dir = self.get_staging_dir("render", product_name)
             
             parms["ar_picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(self.staging_dir),
+                root=hou.text.expandString(staging_dir),
                 ext=pre_create_data.get("image_format")
             )
 
             parms["ar_ass_file"] = "{root}/`chs('AYON_productName')`/ass/$OS.$F4.ass".format(
-                root=hou.text.expandString(self.staging_dir)
+                root=hou.text.expandString(staging_dir)
             )
 
         if pre_create_data.get("render_target") == "farm_split":

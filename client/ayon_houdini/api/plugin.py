@@ -20,7 +20,7 @@ from ayon_core.pipeline import (
 )
 from ayon_core.lib import BoolDef
 
-from .lib import imprint, read, lsattr, add_self_publish_button, render_rop
+from .lib import imprint, read, lsattr, add_self_publish_button, render_rop, get_custom_staging_dir
 from .usd import get_ayon_entity_uri_from_representation_context
 
 
@@ -317,6 +317,34 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for key, value in settings.items():
             setattr(self, key, value)
 
+    def get_staging_dir(self, product_type, product_name):
+        """ Get Staging Directory
+
+        Retrieve a custom staging directory for the specified product type and name
+        within the current AYON context.
+
+        This method falls back to the default output path defined in settings
+        `ayon+settings://houdini/general/rop_output/default_output_dir`
+
+        Note:
+            This method is preferred over `super().get_staging_dir(instance)` 
+            because it doesn't fit in all creators where some creators like
+            HDA doesn't access `instance` object and some other creators like
+            Karma render creator should actually get the staging directory of
+            the `render` product type not `karma_rop`.
+        
+        Args:
+            product_type (str): The type of product.
+            product_name (str): The name of the product.
+            context (Optional[dict[str, Union[str, None]]]): Context defined with environment variables.
+
+        Returns:
+            Optional[str]: The computed staging directory path.
+        """
+        
+        return get_custom_staging_dir(
+            product_type, product_name
+        ) or self.staging_dir
 
 class HoudiniLoader(load.LoaderPlugin):
     """Base class for Houdini load plugins."""

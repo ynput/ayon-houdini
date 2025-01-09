@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Creator plugin for creating openGL reviews."""
 from ayon_houdini.api import lib, plugin
-from ayon_houdini.api.lib import get_custom_staging_dir
-
 from ayon_core.lib import EnumDef, BoolDef, NumberDef
 
 import os
@@ -68,9 +66,9 @@ class CreateReview(plugin.HoudiniCreator):
         }
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
-            self.staging_dir = get_custom_staging_dir(self.product_type, product_name) or self.staging_dir
+            staging_dir = self.get_staging_dir(self.product_type, product_name)
             parms["picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(self.staging_dir),
+                root=hou.text.expandString(staging_dir),
                 ext=pre_create_data.get("image_format") or "png"
             )
 

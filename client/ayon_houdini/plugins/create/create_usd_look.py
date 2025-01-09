@@ -3,8 +3,6 @@
 import inspect
 
 from ayon_houdini.api import plugin
-from ayon_houdini.api.lib import get_custom_staging_dir
-
 from ayon_core.lib import EnumDef
 
 import hou
@@ -46,9 +44,9 @@ class CreateUSDLook(plugin.HoudiniCreator):
         }
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
-            self.staging_dir = get_custom_staging_dir(self.product_type, product_name) or self.staging_dir
+            staging_dir = self.get_staging_dir(self.product_type, product_name)
             parms["lopoutput"] = "{root}/`chs('AYON_productName')`/$OS.usd".format(
-                root=hou.text.expandString(self.staging_dir)
+                root=hou.text.expandString(staging_dir)
             )
 
         if self.selected_nodes:
