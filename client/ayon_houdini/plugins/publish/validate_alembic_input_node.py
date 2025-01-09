@@ -41,7 +41,7 @@ class ValidateAlembicInputNode(plugin.HoudiniInstancePlugin):
                 "Ensure a valid SOP output path is set." % node.path()
             )
 
-            return [node.path()]
+            return [node]
 
         if not hasattr(output_node, "geometry"):
             # In the case someone has explicitly set an Object
@@ -63,4 +63,4 @@ class ValidateAlembicInputNode(plugin.HoudiniInstancePlugin):
                 invalid = True
 
         if invalid:
-            return [instance]
+            return [output_node]

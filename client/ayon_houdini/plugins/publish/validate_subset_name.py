@@ -39,16 +39,13 @@ class ValidateSubsetName(plugin.HoudiniInstancePlugin,
 
         invalid = self.get_invalid(instance)
         if invalid:
-            nodes = [n.path() for n in invalid]
             raise PublishValidationError(
                 "See log for details. "
-                "Invalid nodes: {0}".format(nodes)
+                "Invalid ROP node: {0}".format(invalid[0].path())
             )
 
     @classmethod
     def get_invalid(cls, instance):
-
-        invalid = []
 
         rop_node = hou.node(instance.data["instance_node"])
 
@@ -76,13 +73,11 @@ class ValidateSubsetName(plugin.HoudiniInstancePlugin,
         )
 
         if instance.data.get("productName") != product_name:
-            invalid.append(rop_node)
             cls.log.error(
                 "Invalid product name on rop node '%s' should be '%s'.",
                 rop_node.path(), product_name
             )
-
-        return invalid
+            return [rop_node]
 
     @classmethod
     def repair(cls, instance):
