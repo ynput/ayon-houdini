@@ -1628,11 +1628,11 @@ def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail
     return result
 
 
-def get_custom_staging_dir(product_type, product_name) -> "Optional[str]":
+def get_custom_staging_dir(product_type, product_name, context=None) -> "Optional[str]":
     """Get Custom Staging Directory
 
     Retrieve a custom staging directory for the specified product type and name
-    within the current AYON context.
+    within the specified or current AYON context.
 
     This function is primarily used in creator plugins to obtain the custom
     staging directory for the created instance.
@@ -1645,12 +1645,13 @@ def get_custom_staging_dir(product_type, product_name) -> "Optional[str]":
     Args:
         product_type (str): The type of product.
         product_name (str): The name of the product.
+        context (Optional[dict[str, Union[str, None]]]): Context defined with environment variables.
 
     Returns:
         Optional[str]: The computed staging directory path.
     """
 
-    context = get_current_context()
+    context = context or get_current_context()
     project_name = context["project_name"]
     folder_path = context["folder_path"]
     task_name = context["task_name"]
