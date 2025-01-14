@@ -22,7 +22,12 @@ class ShowInUsdview(plugin.HoudiniLoader):
         from pathlib import Path
 
         if platform.system() == "Windows":
-            executable = "usdview.bat"
+            houdiniVersion = os.environ["HOUDINI_VERSION"]
+            major = int(houdiniVersion.split(".")[0])
+            if major >= 20:
+                executable = "usdview.cmd"
+            else:
+                executable = "usdview.bat"
         else:
             executable = "usdview"
 
