@@ -1629,7 +1629,7 @@ def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail
     return result
 
 
-def get_custom_staging_dir(product_type, product_name, context=None) -> "Optional[str]":
+def get_custom_staging_dir(product_type, product_name, context=None, project_settings=None) -> "Optional[str]":
     """Get Custom Staging Directory
 
     Retrieve a custom staging directory for the specified product type and name
@@ -1647,6 +1647,7 @@ def get_custom_staging_dir(product_type, product_name, context=None) -> "Optiona
         product_name (str): The name of the product.
         context (Optional[dict[str, Union[str, None]]]): A dictionary with AYON context.
             it expects keys: `project_name`, `folder_path` and `task_name`
+        project_settings(Dict[str, Any]): Prepared project settings.
 
     Returns:
         Optional[str]: The computed staging directory path.
@@ -1672,7 +1673,8 @@ def get_custom_staging_dir(product_type, product_name, context=None) -> "Optiona
             product_type,
             product_name,
             host_name,
-            always_return_path=False
+            always_return_path=False,
+            project_settings=project_settings
         )
 
     staging_dir_path = None

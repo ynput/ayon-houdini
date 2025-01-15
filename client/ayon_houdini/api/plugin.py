@@ -354,7 +354,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         }
 
         staging_dir = get_custom_staging_dir(
-            product_type, product_name, context
+            product_type, product_name, context, self.project_settings
         ) or self.staging_dir
 
         return staging_dir.replace("\\", "/").rstrip("/")
