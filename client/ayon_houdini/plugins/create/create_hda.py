@@ -179,7 +179,8 @@ class CreateHDA(plugin.HoudiniCreator):
         node_name,
         parent,
         node_type="geometry",
-        pre_create_data=None
+        pre_create_data=None,
+        instance_data=None
     ):
         if pre_create_data is None:
             pre_create_data = {}
@@ -242,7 +243,7 @@ class CreateHDA(plugin.HoudiniCreator):
 
             hda_file_name = None
             if self.enable_staging_path_management:
-                staging_dir = self.get_staging_dir(self.product_type, node_name)
+                staging_dir = self.get_staging_dir(self.product_type, node_name, instance_data)
                 hda_file_name = "{}/HDAs/{}.hda".format(staging_dir, node_name)
 
             hda_node = to_hda.createDigitalAsset(

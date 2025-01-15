@@ -50,9 +50,10 @@ class CreateModel(plugin.HoudiniCreator):
             "format": 2,
             "facesets": 0,
         }
+        
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
-            staging_dir = self.get_staging_dir(self.product_type, product_name)
+            staging_dir = self.get_staging_dir(self.product_type, product_name, instance_data)
             parms["filename"] = "{root}/`chs('AYON_productName')`/$OS.abc".format(
                 root=hou.text.expandString(staging_dir)
             )

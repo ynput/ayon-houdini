@@ -50,7 +50,7 @@ class CreateArnoldAss(plugin.HoudiniCreator):
         
         if self.enable_staging_path_management:            
             # keep dynamic link to product name in file path.
-            staging_dir = self.get_staging_dir(self.product_type, product_name)
+            staging_dir = self.get_staging_dir(self.product_type, product_name, instance_data)
             parms["ar_ass_file"] = "{root}/`chs('AYON_productName')`/$OS.$F4{ext}".format(
                 root=hou.text.expandString(staging_dir),
                 ext=self.ext

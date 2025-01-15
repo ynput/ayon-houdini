@@ -79,7 +79,8 @@ class HoudiniCreatorBase(object):
         node_name,
         parent,
         node_type="geometry",
-        pre_create_data=None
+        pre_create_data=None,
+        instance_data=None
     ):
         """Create node representing instance.
 
@@ -89,6 +90,7 @@ class HoudiniCreatorBase(object):
             parent (str): Name of the parent node.
             node_type (str, optional): Type of the node.
             pre_create_data (Optional[Dict]): Pre create data.
+            instance_data (Optional[Dict]): Instance data.
 
         Returns:
             hou.Node: Newly created instance node.
@@ -131,7 +133,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
                 product_name,
                 "/out",
                 node_type,
-                pre_create_data
+                pre_create_data,
+                instance_data=instance_data
             )
 
             self.customize_node_look(instance_node)
@@ -317,7 +320,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for key, value in settings.items():
             setattr(self, key, value)
 
-    def get_staging_dir(self, product_type, product_name):
+    def get_staging_dir(self, product_type, product_name, instance_data=None):
         """ Get Staging Directory
 
         Retrieve a custom staging directory for the specified product type and name
@@ -328,22 +331,30 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
         Note:
             This method is preferred over `super().get_staging_dir(instance)` 
-            because it doesn't fit in all creators where some creators like
-            HDA doesn't access `instance` object and some other creators like
-            Karma render creator should actually get the staging directory of
-            the `render` product type not `karma_rop`.
+            because it doesn't fit in all creators where 
+            1. Some creators like HDA doesn't access `instance` object
+            2. Some other creators like Karma render creator should actually
+               get the staging directory of the `render` product type not `karma_rop`.
+
+            One downside is that `version` key is not supported in staging dir templates.
         
         Args:
             product_type (str): The type of product.
             product_name (str): The name of the product.
-            context (Optional[dict[str, Union[str, None]]]): Context defined with environment variables.
+            instance_data (Optional[dict[str, Union[str, None]]]): A dictionary with instance data.
 
         Returns:
             Optional[str]: The computed staging directory path.
         """
         
+        context = {
+            "project_name": self.project_name, 
+            "folder_path": instance_data["folderPath"],
+            "task_name": instance_data["task"]
+        }
+
         return get_custom_staging_dir(
-            product_type, product_name
+            product_type, product_name, context
         ) or self.staging_dir
 
 class HoudiniLoader(load.LoaderPlugin):

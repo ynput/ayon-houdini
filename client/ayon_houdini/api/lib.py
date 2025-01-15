@@ -23,6 +23,7 @@ from ayon_core.pipeline import (
     get_current_context,
     get_current_host_name,
     get_staging_dir_info,
+    get_current_project_name,
 )
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.template_data import get_template_data
@@ -1639,13 +1640,13 @@ def get_custom_staging_dir(product_type, product_name, context=None) -> "Optiona
 
     Note:
         This function is preferred over `ayon_core.pipeline.publish.get_instance_staging_dir` 
-        because the `instance` object in creator plugins lacks some necessary data
-        available in the publish process.
+        because the `instance` object in creator plugins doesn't have `context` attribute.
 
     Args:
         product_type (str): The type of product.
         product_name (str): The name of the product.
-        context (Optional[dict[str, Union[str, None]]]): Context defined with environment variables.
+        context (Optional[dict[str, Union[str, None]]]): A dictionary with AYON context.
+            it expects keys: `project_name`, `folder_path` and `task_name`
 
     Returns:
         Optional[str]: The computed staging directory path.
