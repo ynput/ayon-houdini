@@ -353,9 +353,11 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             "task_name": instance_data["task"]
         }
 
-        return get_custom_staging_dir(
+        staging_dir = get_custom_staging_dir(
             product_type, product_name, context
         ) or self.staging_dir
+
+        return staging_dir.replace("\\", "/").rstrip("/")
 
 class HoudiniLoader(load.LoaderPlugin):
     """Base class for Houdini load plugins."""
