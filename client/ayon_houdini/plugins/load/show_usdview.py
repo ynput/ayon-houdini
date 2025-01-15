@@ -1,6 +1,7 @@
 import os
 import platform
 import subprocess
+import hou
 
 from ayon_core.lib.vendor_bin_utils import find_executable
 from ayon_houdini.api import plugin
@@ -22,7 +23,10 @@ class ShowInUsdview(plugin.HoudiniLoader):
         from pathlib import Path
 
         if platform.system() == "Windows":
-            executable = "usdview.bat"
+            if hou.applicationVersion()[0] >= 20:
+                executable = "usdview.cmd"
+            else:
+                executable = "usdview.bat"
         else:
             executable = "usdview"
 
