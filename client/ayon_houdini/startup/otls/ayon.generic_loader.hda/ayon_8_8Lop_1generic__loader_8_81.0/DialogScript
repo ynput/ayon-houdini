@@ -9,10 +9,10 @@
 	""
     }
 
-    inputlabel	1	"Sub-Network Input #1"
-    inputlabel	2	"Sub-Network Input #2"
-    inputlabel	3	"Sub-Network Input #3"
-    inputlabel	4	"Sub-Network Input #4"
+    inputlabel	1	"Input Stage"
+    inputlabel	2	"Input 2"
+    inputlabel	3	"Input 3"
+    inputlabel	4	"Input 4"
 
     groupsimple {
         name    "info2"
