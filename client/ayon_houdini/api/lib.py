@@ -23,7 +23,6 @@ from ayon_core.pipeline import (
     get_current_context,
     get_current_host_name,
     get_staging_dir_info,
-    get_current_project_name,
 )
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.template_data import get_template_data
