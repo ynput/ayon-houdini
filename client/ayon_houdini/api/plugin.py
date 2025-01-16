@@ -320,8 +320,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for key, value in settings.items():
             setattr(self, key, value)
 
-    def get_staging_dir(self, product_type, product_name, instance_data=None):
-        """ Get Staging Directory
+    def get_custom_staging_dir(self, product_type, product_name, instance_data=None):
+        """ Get Custom Staging Directory
 
         Retrieve a custom staging directory for the specified product type and name
         within the current AYON context.

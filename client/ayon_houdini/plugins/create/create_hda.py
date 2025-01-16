@@ -243,7 +243,7 @@ class CreateHDA(plugin.HoudiniCreator):
 
             hda_file_name = None
             if self.enable_staging_path_management:
-                staging_dir = self.get_staging_dir(self.product_type, node_name, instance_data)
+                staging_dir = self.get_custom_staging_dir(self.product_type, node_name, instance_data)
                 hda_file_name = "{}/HDAs/{}.hda".format(staging_dir, node_name)
 
             hda_node = to_hda.createDigitalAsset(

@@ -38,7 +38,7 @@ class CreateKarmaROP(plugin.HoudiniCreator):
             "trange": 1,
         }
         if self.enable_staging_path_management:
-            staging_dir = self.get_staging_dir("render", product_name, instance_data)
+            staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
             
             parms.update({
                 # Karma ROP Setting
