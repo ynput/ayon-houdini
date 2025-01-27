@@ -45,9 +45,7 @@ class CreateUSDLook(plugin.HoudiniCreator):
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["lopoutput"] = "{root}/`chs('AYON_productName')`/$OS.usd".format(
-                root=hou.text.expandString(staging_dir)
-            )
+            parms["lopoutput"] = f"{staging_dir}/$OS.usd"
 
         if self.selected_nodes:
             parms["loppath"] = self.selected_nodes[0].path()

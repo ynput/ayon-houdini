@@ -86,9 +86,8 @@ class CreateUSDRender(plugin.HoudiniCreator):
             if self.enable_staging_path_management:
                 # keep dynamic link to product name in file path.
                 staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
-                parms["savetodirectory_directory"] = "{root}/`chs('AYON_productName')`/usd/$HIPNAME/$OS".format(
-                    root=hou.text.expandString(staging_dir)
-                )
+                parms["savetodirectory_directory"] = f"{staging_dir}/usd/$HIPNAME/$OS"
+                
             parms["lopoutput"] = "__render__.usd"
             parms["allframesatonce"] = True
 

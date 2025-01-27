@@ -82,13 +82,8 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
             # keep dynamic link to product name in file path.
             staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
             
-            parms["RS_outputFileNamePrefix"] = "{root}/`chs('AYON_productName')`/$OS.$AOV.$F4.{ext}".format(
-                root=hou.text.expandString(staging_dir),
-                ext=ext
-            )
-            parms["RS_archive_file"] = "{root}/`chs('AYON_productName')`/rs/$OS.$F4.rs".format(
-                root=hou.text.expandString(staging_dir)
-            )
+            parms["RS_outputFileNamePrefix"] = f"{staging_dir}/$OS.$AOV.$F4.{ext}"
+            parms["RS_archive_file"] = f"{staging_dir}/rs/$OS.$F4.rs"
 
         if ext == "exr":
             parms["RS_outputMultilayerMode"] = multilayer_mode_index[multi_layered_mode]

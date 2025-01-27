@@ -40,13 +40,8 @@ class CreateMantraROP(plugin.HoudiniCreator):
             # keep dynamic link to product name in file path.
             staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
 
-            parms["vm_picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(staging_dir),
-                ext=pre_create_data.get("image_format")
-            )
-            parms["soho_diskfile"] = "{root}/`chs('AYON_productName')`/ifd/$OS.$F4.ifd".format(
-                root=hou.text.expandString(staging_dir)
-            )
+            parms["vm_picture"] = f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}"
+            parms["soho_diskfile"] = f"{staging_dir}/ifd/$OS.$F4.ifd"
 
         if pre_create_data.get("render_target") == "farm_split":
             parms["soho_outputmode"] = 1              

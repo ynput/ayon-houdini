@@ -39,9 +39,7 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["filename"] = "{root}/`chs('AYON_productName')`/$OS.abc".format(
-                root=hou.text.expandString(staging_dir)
-            )
+            parms["filename"] = f"{staging_dir}/$OS.abc"
 
         if self.selected_nodes:
             if len(self.selected_nodes) > 1:

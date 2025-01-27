@@ -46,14 +46,8 @@ class CreateArnoldRop(plugin.HoudiniCreator):
             # keep dynamic link to product name in file path.
             staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
             
-            parms["ar_picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(staging_dir),
-                ext=pre_create_data.get("image_format")
-            )
-
-            parms["ar_ass_file"] = "{root}/`chs('AYON_productName')`/ass/$OS.$F4.ass".format(
-                root=hou.text.expandString(staging_dir)
-            )
+            parms["ar_picture"] = f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}"
+            parms["ar_ass_file"] = f"{staging_dir}/ass/$OS.$F4.ass"
 
         if pre_create_data.get("render_target") == "farm_split":
             parms["ar_ass_export_enable"] = 1

@@ -20,7 +20,12 @@ from ayon_core.pipeline import (
 )
 from ayon_core.lib import BoolDef
 
-from .lib import imprint, read, lsattr, add_self_publish_button, render_rop, get_custom_staging_dir
+from .lib import (
+    imprint, read, lsattr, render_rop,
+    add_self_publish_button,
+    get_custom_staging_dir,
+    expand_houdini_string
+)
 from .usd import get_ayon_entity_uri_from_representation_context
 
 
@@ -302,6 +307,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             "add_self_publish_button", False)
         
         self.enable_staging_path_management = houdini_general_settings["set_rop_output"]["enabled"]
+        self.expand_staging_dir = houdini_general_settings["set_rop_output"]["expand_vars"]
         self.staging_dir = houdini_general_settings["set_rop_output"]["default_output_dir"] or self.staging_dir
 
         # Apply Creator Settings
@@ -356,6 +362,10 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         staging_dir = get_custom_staging_dir(
             product_type, product_name, context, self.project_settings
         ) or self.staging_dir
+
+        if self.expand_staging_dir:
+            # Expand vars only without expanding expressions to keep dynamic link to ROP parameters.
+            staging_dir = expand_houdini_string(staging_dir)
 
         return staging_dir.replace("\\", "/").rstrip("/")
 

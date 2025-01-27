@@ -34,13 +34,22 @@ class ROPOutputDirModel(BaseSettingsModel):
 
     enabled: bool = SettingsField(title="Enabled")
 
+    expand_vars: bool = SettingsField(
+        title="Expand Houdini Variables",
+        description="When enabled, Houdini variables (e.g., `$HIP`) "
+                    "will be expanded, but Houdini expressions "
+                    "(e.g., \`chs('AYON_productName')\`) will remain "
+                    "unexpanded in the `Default Output Directory`."
+    )
+
     default_output_dir: str = SettingsField(
         title="Default Output Directory",
         description="This is the initial output directory for newly created "
                     "AYON ROPs. It serves as a starting point when a new ROP "
                     "is generated using the AYON creator. Artists can modify "
-                    "this directory after the ROP is created. "
-                    "Note: AYON creator will expand any Houdini vars."
+                    "this directory after the ROP is created. It Supports Houdini "
+                    "vars (e.g., `$HIP`) and expressions (e.g., \`chs('AYON_productName')\`)"
+                    " Note: Houdini Expressions will be expanded for HDA products."
     )
 
 
@@ -63,7 +72,8 @@ DEFAULT_GENERAL_SETTINGS = {
     "add_self_publish_button": False,
     "set_rop_output": {
         "enabled": True,
-        "default_output_dir": "$HIP/ayon/"
+        "expand_vars": False,
+        "default_output_dir": "$HIP/ayon/`chs('AYON_productName')`"
     },
     "update_houdini_var_context": {
         "enabled": True,

@@ -38,10 +38,7 @@ class CreateBGEO(plugin.HoudiniCreator):
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["sopoutput"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(staging_dir),
-                ext=pre_create_data.get("bgeo_type") or "bgeo.sc"
-            )
+            parms["sopoutput"] = f"{staging_dir}/$OS.$F4.{pre_create_data['bgeo_type']}"
         
         instance_node.parm("trange").set(1)
         if self.selected_nodes:

@@ -40,9 +40,7 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["RS_archive_file"] = "{root}/`chs('AYON_productName')`/$OS.$F4.rs".format(
-                root=hou.text.expandString(staging_dir)
-            )
+            parms["RS_archive_file"] = f"{staging_dir}/$OS.$F4.rs"
 
         if self.selected_nodes:
             parms["RS_archive_sopPath"] = self.selected_nodes[0].path()

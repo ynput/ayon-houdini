@@ -38,9 +38,7 @@ class CreateVDBCache(plugin.HoudiniCreator):
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file paths.
             staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["sopoutput"] = "{root}/`chs('AYON_productName')`/$OS.$F4.vdb".format(
-                root=hou.text.expandString(staging_dir)
-            )
+            parms["sopoutput"] = f"{staging_dir}/`chs('AYON_productName')`/$OS.$F4.vdb"
 
         if self.selected_nodes:
             parms["soppath"] = self.get_sop_node_path(self.selected_nodes[0])

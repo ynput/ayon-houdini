@@ -13,6 +13,7 @@ from ayon_core.lib import (
 )
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import expand_houdini_string
 
 
 # region assettools
@@ -244,7 +245,9 @@ class CreateHDA(plugin.HoudiniCreator):
             hda_file_name = None
             if self.enable_staging_path_management:
                 staging_dir = self.get_custom_staging_dir(self.product_type, node_name, instance_data)
-                hda_file_name = "{}/HDAs/{}.hda".format(staging_dir, node_name)
+                # Expand any Houdini expressions as the file path in HDA doesn't compute them.
+                staging_dir = expand_houdini_string(staging_dir, r"`[^`]+`")
+                hda_file_name = f"{staging_dir}/{node_name}.hda"
 
             hda_node = to_hda.createDigitalAsset(
                 name=type_name,

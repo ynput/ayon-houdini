@@ -62,13 +62,8 @@ class CreateVrayROP(plugin.HoudiniCreator):
             # keep dynamic link to product name in file paths.
             staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
             
-            parms["SettingsOutput_img_file_path"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(staging_dir),
-                ext=pre_create_data.get("image_format")
-            )
-            parms["render_export_filepath"] = "{root}/`chs('AYON_productName')`/vrscene/$OS.$F4.vrscene".format(
-                root=hou.text.expandString(staging_dir)
-            )
+            parms["SettingsOutput_img_file_path"] = f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}"
+            parms["render_export_filepath"] = f"{staging_dir}/vrscene/$OS.$F4.vrscene"
                 
         if pre_create_data.get("render_target") == "farm_split":
             # Setting render_export_mode to "2" because that's for
@@ -101,10 +96,7 @@ class CreateVrayROP(plugin.HoudiniCreator):
             })
             if self.enable_staging_path_management and staging_dir is not None:
                 # keep dynamic link to product name in file paths.
-                parms["SettingsOutput_img_file_path"] = "{root}/`chs('AYON_productName')`/$OS.$AOV.$F4.{ext}".format(
-                    root=hou.text.expandString(staging_dir),
-                    ext=pre_create_data.get("image_format")
-                )
+                parms["SettingsOutput_img_file_path"] = f"{staging_dir}/$OS.$AOV.$F4.{pre_create_data['image_format']}"
 
         custom_res = pre_create_data.get("override_resolution")
         if custom_res:

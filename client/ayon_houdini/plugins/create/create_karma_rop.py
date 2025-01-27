@@ -43,18 +43,11 @@ class CreateKarmaROP(plugin.HoudiniCreator):
             parms.update({
                 # Karma ROP Setting
                 # keep dynamic link to product name in file paths.
-                "picture": "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                    root=hou.text.expandString(staging_dir),
-                    ext=pre_create_data.get("image_format")
-                ),
+                "picture": f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}",
                 # Karma Checkpoint Setting
-                "productName": "{root}/`chs('AYON_productName')`/checkpoint/$OS.$F4.checkpoint".format(
-                    root=hou.text.expandString(staging_dir)
-                ),
+                "productName": f"{staging_dir}/checkpoint/$OS.$F4.checkpoint",
                 # USD Output Directory
-                "savetodirectory": "{root}/`chs('AYON_productName')`/usd/$OS_$RENDERID".format(
-                    root=hou.text.expandString(staging_dir)
-                )
+                "savetodirectory": f"{staging_dir}/usd/$OS_$RENDERID"
             })
 
         res_x = pre_create_data.get("res_x")

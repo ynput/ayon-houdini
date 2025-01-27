@@ -47,9 +47,7 @@ class CreateStaticMesh(plugin.HoudiniCreator):
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["sopoutput"] = "{root}/`chs('AYON_productName')`/$OS.fbx".format(
-                root=hou.text.expandString(staging_dir)
-            )
+            parms["sopoutput"] = f"{staging_dir}/$OS.fbx"
 
         # set parms
         instance_node.setParms(parms)

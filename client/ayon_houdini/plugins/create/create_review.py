@@ -67,10 +67,7 @@ class CreateReview(plugin.HoudiniCreator):
         if self.enable_staging_path_management:
             # keep dynamic link to product name in file path.
             staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["picture"] = "{root}/`chs('AYON_productName')`/$OS.$F4.{ext}".format(
-                root=hou.text.expandString(staging_dir),
-                ext=pre_create_data.get("image_format") or "png"
-            )
+            parms["picture"] = f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}"
 
         override_resolution = pre_create_data.get("override_resolution")
         if override_resolution:
