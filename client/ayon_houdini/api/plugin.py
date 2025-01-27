@@ -301,8 +301,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         self.add_publish_button = houdini_general_settings.get(
             "add_self_publish_button", False)
         
-        self.enable_staging_path_management = houdini_general_settings["rop_output"]["enabled"]
-        self.staging_dir = houdini_general_settings["rop_output"]["default_output_dir"] or self.staging_dir
+        self.enable_staging_path_management = houdini_general_settings["set_rop_output"]["enabled"]
+        self.staging_dir = houdini_general_settings["set_rop_output"]["default_output_dir"] or self.staging_dir
 
         # Apply Creator Settings
         settings_name = self.settings_name

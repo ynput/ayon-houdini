@@ -24,7 +24,7 @@ class UpdateHoudiniVarcontextModel(BaseSettingsModel):
 
 
 class ROPOutputDirModel(BaseSettingsModel):
-    """ROP Output Directory
+    """Set ROP Output Directory on Create
 
     When enabled, this setting defines output paths for ROP nodes,
     which can be overridden by custom staging directories.
@@ -49,9 +49,9 @@ class GeneralSettingsModel(BaseSettingsModel):
         False,
         title="Add Self Publish Button"
     )
-    rop_output: ROPOutputDirModel = SettingsField(
+    set_rop_output: ROPOutputDirModel = SettingsField(
         default_factory=ROPOutputDirModel,
-        title="ROP Output Directory"
+        title="Set ROP Output Directory on Create"
     )
     update_houdini_var_context: UpdateHoudiniVarcontextModel = SettingsField(
         default_factory=UpdateHoudiniVarcontextModel,
@@ -61,7 +61,7 @@ class GeneralSettingsModel(BaseSettingsModel):
 
 DEFAULT_GENERAL_SETTINGS = {
     "add_self_publish_button": False,
-    "rop_output": {
+    "set_rop_output": {
         "enabled": True,
         "default_output_dir": "$HIP/ayon/"
     },
