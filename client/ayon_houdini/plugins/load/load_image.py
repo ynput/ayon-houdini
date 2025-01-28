@@ -2,10 +2,7 @@ import os
 import re
 import hou
 
-from ayon_core.pipeline import (
-    get_representation_path,
-    AVALON_CONTAINER_ID,
-)
+from ayon_core.pipeline import AVALON_CONTAINER_ID
 from ayon_houdini.api import (
     pipeline,
     plugin,
@@ -63,7 +60,6 @@ class ImageLoader(plugin.HoudiniLoader):
     color = "orange"
 
     def load(self, context, name=None, namespace=None, data=None):
-
         # Format file name, Houdini only wants forward slashes
         path = self.filepath_from_context(context)
         path = self.format_path(path, representation=context["representation"])
@@ -103,7 +99,7 @@ class ImageLoader(plugin.HoudiniLoader):
         node = container["node"]
 
         # Update the file path
-        file_path = get_representation_path(repre_entity)
+        file_path = self.filepath_from_context(context)
         file_path = self.format_path(file_path, repre_entity)
 
         parms = {
@@ -117,7 +113,6 @@ class ImageLoader(plugin.HoudiniLoader):
         node.setParms(parms)
 
     def remove(self, container):
-
         node = container["node"]
 
         # Let's clean up the IMAGES COP2 network

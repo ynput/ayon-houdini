@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Houdini specific Avalon/Pyblish plugin definitions."""
 import sys
+import os
 from abc import (
     ABCMeta
 )
@@ -325,7 +326,27 @@ class HoudiniLoader(load.LoaderPlugin):
         if cls.use_ayon_entity_uri:
             return get_ayon_entity_uri_from_representation_context(context)
 
-        return super(HoudiniLoader, cls).filepath_from_context(context)
+        path = super().filepath_from_context(context)
+
+        # Remap project roots to the relevant environment variables
+        # TODO: Refactor this to more optimal/better code
+        mapping = {}
+        for key, value in os.environ.items():
+            if key.startswith("AYON_PROJECT_ROOT_"):
+                mapping[key] = value
+        if mapping:
+            match_path = path.replace("\\", "/")
+            # Sort by length to ensure that the longest matching key is first
+            # so that the nearest matching root is used
+            for key, value in sorted(mapping.items(),
+                                     key=lambda x: len(x[1]),
+                                     reverse=True):
+                if value and match_path.startswith(value.replace("\\", "/")):
+                    # Replace start of string with the key
+                    path = f"${key}" + path[len(value):]
+                    break
+
+        return path
 
 
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):

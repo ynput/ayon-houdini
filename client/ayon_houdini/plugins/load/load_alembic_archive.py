@@ -1,6 +1,7 @@
-
 import os
-from ayon_core.pipeline import get_representation_path
+
+import hou
+
 from ayon_houdini.api import (
     pipeline,
     plugin
@@ -19,9 +20,6 @@ class AbcArchiveLoader(plugin.HoudiniLoader):
     color = "orange"
 
     def load(self, context, name=None, namespace=None, data=None):
-
-        import hou
-
         # Format file name, Houdini only wants forward slashes
         file_path = self.filepath_from_context(context)
         file_path = os.path.normpath(file_path)
@@ -58,16 +56,15 @@ class AbcArchiveLoader(plugin.HoudiniLoader):
                                      suffix="")
 
     def update(self, container, context):
-        repre_entity = context["representation"]
         node = container["node"]
 
         # Update the file path
-        file_path = get_representation_path(repre_entity)
+        file_path = self.filepath_from_context(context)
         file_path = file_path.replace("\\", "/")
 
         # Update attributes
         node.setParms({"fileName": file_path,
-                       "representation": repre_entity["id"]})
+                       "representation": context["representation"]["id"]})
 
         # Rebuild
         node.parm("buildHierarchy").pressButton()
