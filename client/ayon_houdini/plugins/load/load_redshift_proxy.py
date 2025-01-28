@@ -2,7 +2,6 @@ import os
 import re
 import hou
 
-from ayon_core.pipeline import get_representation_path
 from ayon_core.pipeline.load import LoadError
 
 from ayon_houdini.api import (
@@ -22,7 +21,6 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
     color = "orange"
 
     def load(self, context, name=None, namespace=None, data=None):
-
         # Get the root node
         obj = hou.node("/obj")
 
@@ -76,7 +74,7 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
     def update(self, container, context):
         repre_entity = context["representation"]
         # Update the file path
-        file_path = get_representation_path(repre_entity)
+        file_path = self.filepath_from_context(context)
 
         node = container["node"]
         node.setParms({
@@ -88,7 +86,6 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
         node.setParms({"representation": repre_entity["id"]})
 
     def remove(self, container):
-
         node = container["node"]
         node.destroy()
 
