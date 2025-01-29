@@ -12,7 +12,7 @@ class CreateVrayROP(plugin.HoudiniCreator):
 
     identifier = "io.openpype.creators.houdini.vray_rop"
     label = "VRay ROP"
-    product_type = "vray_rop"
+    product_type = "render"
     icon = "magic"
     ext = "exr"
 
@@ -195,3 +195,6 @@ class CreateVrayROP(plugin.HoudiniCreator):
                     default=False)
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "vray_rop"]
