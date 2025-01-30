@@ -8,7 +8,7 @@ class CreateMantraROP(plugin.HoudiniCreator):
     """Mantra ROP"""
     identifier = "io.openpype.creators.houdini.mantra_rop"
     label = "Mantra ROP"
-    product_type = "mantra_rop"
+    product_type = "render"
     icon = "magic"
 
     # Default render target
@@ -123,3 +123,6 @@ class CreateMantraROP(plugin.HoudiniCreator):
                     default=False),
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "mantra_rop"]

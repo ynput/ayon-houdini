@@ -12,7 +12,7 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
 
     identifier = "io.openpype.creators.houdini.redshift_rop"
     label = "Redshift ROP"
-    product_type = "redshift_rop"
+    product_type = "render"
     icon = "magic"
     ext = "exr"
     multi_layered_mode = "No Multi-Layered EXR File"
@@ -167,3 +167,6 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
                     label="Multi-Layered EXR"),
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "redshift_rop"]

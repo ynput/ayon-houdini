@@ -7,7 +7,7 @@ class CreateArnoldRop(plugin.HoudiniCreator):
 
     identifier = "io.openpype.creators.houdini.arnold_rop"
     label = "Arnold ROP"
-    product_type = "arnold_rop"
+    product_type = "render"
     icon = "magic"
 
     # Default extension
@@ -104,3 +104,6 @@ class CreateArnoldRop(plugin.HoudiniCreator):
                     label="Image Format Options"),
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "arnold_rop"]

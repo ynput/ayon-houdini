@@ -8,7 +8,7 @@ class CreateKarmaROP(plugin.HoudiniCreator):
     """Karma ROP"""
     identifier = "io.openpype.creators.houdini.karma_rop"
     label = "Karma ROP"
-    product_type = "karma_rop"
+    product_type = "render"
     icon = "magic"
 
     # Default render target
@@ -142,3 +142,6 @@ class CreateKarmaROP(plugin.HoudiniCreator):
                     default=False),
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "karma_rop"]
