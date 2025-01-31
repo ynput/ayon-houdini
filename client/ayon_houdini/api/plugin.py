@@ -16,14 +16,14 @@ from ayon_core.pipeline import (
     AYON_INSTANCE_ID,
     AVALON_INSTANCE_ID,
     load,
-    publish
+    publish,
+    get_staging_dir_info,
 )
 from ayon_core.lib import BoolDef
 
 from .lib import (
     imprint, read, lsattr, render_rop,
     add_self_publish_button,
-    get_custom_staging_dir,
     expand_houdini_string
 )
 from .usd import get_ayon_entity_uri_from_representation_context
@@ -326,7 +326,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for key, value in settings.items():
             setattr(self, key, value)
 
-    def get_custom_staging_dir(self, product_type, product_name, instance_data=None):
+    def get_custom_staging_dir(self, product_type, product_name, instance_data):
         """ Get Custom Staging Directory
 
         Retrieve a custom staging directory for the specified product type and name
@@ -347,27 +347,39 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         Args:
             product_type (str): The type of product.
             product_name (str): The name of the product.
-            instance_data (Optional[dict[str, Union[str, None]]]): A dictionary with instance data.
+            instance_data (dict[str, Union[str, None]]): A dictionary with instance data.
 
         Returns:
-            Optional[str]: The computed staging directory path.
+            str: The computed or default staging directory path.
         """
         
-        context = {
-            "project_name": self.project_name, 
-            "folder_path": instance_data["folderPath"],
-            "task_name": instance_data["task"]
-        }
+        folder_path = instance_data["folderPath"]
+        task_name = instance_data["task"]
 
-        staging_dir = get_custom_staging_dir(
-            product_type, product_name, context, self.project_settings
-        ) or self.staging_dir
+        project_entity = self.create_context.get_current_project_entity()
+        folder_entity = self.create_context.get_folder_entity(folder_path)
+        task_entity = self.create_context.get_task_entity(folder_path, task_name)
+
+        staging_dir_info = get_staging_dir_info(
+            project_entity,
+            folder_entity,
+            task_entity,
+            product_type,
+            product_name,
+            self.create_context.host_name,
+            always_return_path=False,
+            project_settings=self.create_context.get_current_project_settings()
+        )
+
+        staging_dir_path = self.staging_dir
+        if staging_dir_info:
+            staging_dir_path = staging_dir_info.directory
 
         if self.expand_staging_dir:
             # Expand vars only without expanding expressions to keep dynamic link to ROP parameters.
-            staging_dir = expand_houdini_string(staging_dir)
+            staging_dir_path = expand_houdini_string(staging_dir_path)
 
-        return staging_dir.replace("\\", "/").rstrip("/")
+        return staging_dir_path.replace("\\", "/").rstrip("/")
 
 class HoudiniLoader(load.LoaderPlugin):
     """Base class for Houdini load plugins."""

@@ -5,7 +5,6 @@ import errno
 import re
 import logging
 import json
-from typing import Optional
 import clique
 from functools import lru_cache
 from contextlib import contextmanager
@@ -22,7 +21,6 @@ from ayon_core.pipeline import (
     registered_host,
     get_current_context,
     get_current_host_name,
-    get_staging_dir_info,
 )
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.template_data import get_template_data
@@ -1626,61 +1624,6 @@ def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail
     result = [collection.format(pattern) for collection in collections]
     result.extend(remainder)
     return result
-
-
-def get_custom_staging_dir(product_type, product_name, context=None, project_settings=None) -> "Optional[str]":
-    """Get Custom Staging Directory
-
-    Retrieve a custom staging directory for the specified product type and name
-    within the specified or current AYON context.
-
-    This function is primarily used in creator plugins to obtain the custom
-    staging directory for the created instance.
-
-    Note:
-        This function is preferred over `ayon_core.pipeline.publish.get_instance_staging_dir` 
-        because the `instance` object in creator plugins doesn't have `context` attribute.
-
-    Args:
-        product_type (str): The type of product.
-        product_name (str): The name of the product.
-        context (Optional[dict[str, Union[str, None]]]): A dictionary with AYON context.
-            it expects keys: `project_name`, `folder_path` and `task_name`
-        project_settings(Dict[str, Any]): Prepared project settings.
-
-    Returns:
-        Optional[str]: The computed staging directory path.
-    """
-
-    context = context or get_current_context()
-    project_name = context["project_name"]
-    folder_path = context["folder_path"]
-    task_name = context["task_name"]
-    host_name = get_current_host_name()
-        
-    project_entity = ayon_api.get_project(project_name)
-
-    folder_entity = ayon_api.get_folder_by_path(project_name, folder_path)
-    task_entity = ayon_api.get_task_by_name(
-        project_name, folder_entity["id"], task_name
-    )
-
-    staging_dir_info = get_staging_dir_info(
-            project_entity,
-            folder_entity,
-            task_entity,
-            product_type,
-            product_name,
-            host_name,
-            always_return_path=False,
-            project_settings=project_settings
-        )
-
-    staging_dir_path = None
-    if staging_dir_info:
-        staging_dir_path = staging_dir_info.directory
-
-    return staging_dir_path
 
 
 def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
