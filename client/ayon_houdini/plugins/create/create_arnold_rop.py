@@ -35,36 +35,27 @@ class CreateArnoldRop(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        ext = pre_create_data.get("image_format")
-
-        filepath = "{renders_dir}{product_name}/{product_name}.$F4.{ext}".format(
-            renders_dir=hou.text.expandString("$HIP/pyblish/renders/"),
-            product_name=product_name,
-            ext=ext,
-        )
         parms = {
             # Render frame range
             "trange": 1,
-
-            # Arnold ROP settings
-            "ar_picture": filepath,
+            # Arnold ROP settings            
             "ar_exr_half_precision": 1           # half precision
-        }
+        }               
 
         if pre_create_data.get("render_target") == "farm_split":
-            ass_filepath = \
-                "{export_dir}{product_name}/{product_name}.$F4.ass".format(
-                    export_dir=hou.text.expandString("$HIP/pyblish/ass/"),
-                    product_name=product_name,
-                )
             parms["ar_ass_export_enable"] = 1
-            parms["ar_ass_file"] = ass_filepath
-
+                
         instance_node.setParms(parms)
 
         # Lock any parameters in this list
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            "ar_picture": f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}",
+            "ar_ass_file": f"{staging_dir}/ass/$OS.$F4.ass" 
+        })
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.

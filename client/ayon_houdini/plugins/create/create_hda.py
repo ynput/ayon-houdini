@@ -13,6 +13,7 @@ from ayon_core.lib import (
 )
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import expand_houdini_string
 
 
 # region assettools
@@ -179,7 +180,8 @@ class CreateHDA(plugin.HoudiniCreator):
         node_name,
         parent,
         node_type="geometry",
-        pre_create_data=None
+        pre_create_data=None,
+        instance_data=None
     ):
         if pre_create_data is None:
             pre_create_data = {}
@@ -240,10 +242,13 @@ class CreateHDA(plugin.HoudiniCreator):
                 )
             )
 
+            # FIXME Support staging dir.
+            hda_file_name = f"$HIP/ayon/HDAs/{node_name}.hda"
+
             hda_node = to_hda.createDigitalAsset(
                 name=type_name,
                 description=node_name,
-                hda_file_name="$HIP/{}.hda".format(node_name),
+                hda_file_name=hda_file_name,
                 ignore_external_references=True,
                 min_num_inputs=0,
                 max_num_inputs=len(to_hda.inputs()) or 1,

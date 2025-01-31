@@ -33,8 +33,6 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
         parms = {
-            "filename": hou.text.expandString(
-                "$HIP/pyblish/{}.abc".format(product_name)),
             "use_sop_path": False,
         }
 
@@ -55,6 +53,9 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
         self.lock_parameters(instance_node, to_lock)
 
         instance_node.parm("trange").set(1)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("filename").set(f"{staging_dir}/$OS.abc")
 
     def get_network_categories(self):
         return [

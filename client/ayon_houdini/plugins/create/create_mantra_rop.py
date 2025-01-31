@@ -32,29 +32,13 @@ class CreateMantraROP(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        ext = pre_create_data.get("image_format")
-
-        filepath = "{renders_dir}{product_name}/{product_name}.$F4.{ext}".format(
-            renders_dir=hou.text.expandString("$HIP/pyblish/renders/"),
-            product_name=product_name,
-            ext=ext,
-        )
-
         parms = {
             # Render Frame Range
             "trange": 1,
-            # Mantra ROP Setting
-            "vm_picture": filepath,
-        }
+        }          
 
         if pre_create_data.get("render_target") == "farm_split":
-            ifd_filepath = \
-                "{export_dir}{product_name}/{product_name}.$F4.ifd".format(
-                    export_dir=hou.text.expandString("$HIP/pyblish/ifd/"),
-                    product_name=product_name,
-                )
-            parms["soho_outputmode"] = 1
-            parms["soho_diskfile"] = ifd_filepath
+            parms["soho_outputmode"] = 1              
 
         if self.selected_nodes:
             # If camera found in selection
@@ -77,6 +61,12 @@ class CreateMantraROP(plugin.HoudiniCreator):
         # Lock some Avalon attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            "vm_picture": f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}",
+            "soho_diskfile": f"{staging_dir}/ifd/$OS.$F4.ifd"
+        })
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.

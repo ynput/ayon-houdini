@@ -35,13 +35,8 @@ class CreateStaticMesh(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
 
         # prepare parms
-        output_path = hou.text.expandString(
-            "$HIP/pyblish/{}.fbx".format(product_name)
-        )
-
         parms = {
             "startnode": self.get_selection(),
-            "sopoutput": output_path,
             # vertex cache format
             "vcformat": pre_create_data.get("vcformat"),
             "convertunits": pre_create_data.get("convertunits"),
@@ -56,6 +51,9 @@ class CreateStaticMesh(plugin.HoudiniCreator):
         # Lock any parameters in this list
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("sopoutput").set(f"{staging_dir}/$OS.fbx")
 
     def get_network_categories(self):
         return [
