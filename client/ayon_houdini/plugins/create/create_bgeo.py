@@ -35,11 +35,6 @@ class CreateBGEO(plugin.HoudiniCreator):
 
         parms = {}
         
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["sopoutput"] = f"{staging_dir}/$OS.$F4.{pre_create_data['bgeo_type']}"
-        
         instance_node.parm("trange").set(1)
         if self.selected_nodes:
             # if selection is on SOP level, use it
@@ -61,6 +56,9 @@ class CreateBGEO(plugin.HoudiniCreator):
                 parms["soppath"] = outputs[0].path()
 
         instance_node.setParms(parms)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("sopoutput").set(f"{staging_dir}/$OS.$F4.{pre_create_data['bgeo_type']}")
 
     def get_instance_attr_defs(self):
         render_target_items = {

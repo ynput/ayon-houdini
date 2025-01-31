@@ -42,10 +42,6 @@ class CreateUSDLook(plugin.HoudiniCreator):
             # published to
             "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
         }
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["lopoutput"] = f"{staging_dir}/$OS.usd"
 
         if self.selected_nodes:
             parms["loppath"] = self.selected_nodes[0].path()
@@ -60,6 +56,9 @@ class CreateUSDLook(plugin.HoudiniCreator):
             "id",
         ]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("lopoutput").set(f"{staging_dir}/$OS.usd")
 
     def get_detail_description(self):
         return inspect.cleandoc("""Publish looks in USD data.

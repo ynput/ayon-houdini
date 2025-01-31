@@ -37,10 +37,6 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
 
         parms = {}
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["RS_archive_file"] = f"{staging_dir}/$OS.$F4.rs"
 
         if self.selected_nodes:
             parms["RS_archive_sopPath"] = self.selected_nodes[0].path()
@@ -50,6 +46,9 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
         # Lock some Avalon attributes
         to_lock = ["productType", "id", "prim_to_detail_pattern"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("RS_archive_file").set(f"{staging_dir}/$OS.$F4.rs")
 
     def get_network_categories(self):
         return [

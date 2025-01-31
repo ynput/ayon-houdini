@@ -242,12 +242,8 @@ class CreateHDA(plugin.HoudiniCreator):
                 )
             )
 
-            hda_file_name = None
-            if self.enable_staging_path_management:
-                staging_dir = self.get_custom_staging_dir(self.product_type, node_name, instance_data)
-                # Expand any Houdini expressions as the file path in HDA doesn't compute them.
-                staging_dir = expand_houdini_string(staging_dir, r"`[^`]+`")
-                hda_file_name = f"{staging_dir}/{node_name}.hda"
+            # FIXME Support staging dir.
+            hda_file_name = f"$HIP/ayon/HDAs/{node_name}.hda"
 
             hda_node = to_hda.createDigitalAsset(
                 name=type_name,

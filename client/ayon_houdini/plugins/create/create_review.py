@@ -64,10 +64,6 @@ class CreateReview(plugin.HoudiniCreator):
             "f1": frame_range[0],
             "f2": frame_range[1],
         }
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["picture"] = f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}"
 
         override_resolution = pre_create_data.get("override_resolution")
         if override_resolution:
@@ -123,6 +119,9 @@ class CreateReview(plugin.HoudiniCreator):
 
         self.lock_parameters(instance_node, to_lock)
     
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("picture").set(f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}")
+
     def get_instance_attr_defs(self):
         render_target_items = {
             "local": "Local machine rendering",

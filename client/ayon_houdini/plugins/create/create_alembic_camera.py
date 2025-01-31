@@ -35,11 +35,6 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
         parms = {
             "use_sop_path": False,
         }
-        
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["filename"] = f"{staging_dir}/$OS.abc"
 
         if self.selected_nodes:
             if len(self.selected_nodes) > 1:
@@ -58,6 +53,9 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
         self.lock_parameters(instance_node, to_lock)
 
         instance_node.parm("trange").set(1)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("filename").set(f"{staging_dir}/$OS.abc")
 
     def get_network_categories(self):
         return [

@@ -44,10 +44,6 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             "trange": 1,
             "createsubnetroot": pre_create_data.get("createsubnetroot")
         }
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["sopoutput"] = f"{staging_dir}/$OS.fbx"
 
         # set parms
         instance_node.setParms(parms)
@@ -55,6 +51,9 @@ class CreateStaticMesh(plugin.HoudiniCreator):
         # Lock any parameters in this list
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("sopoutput").set(f"{staging_dir}/$OS.fbx")
 
     def get_network_categories(self):
         return [

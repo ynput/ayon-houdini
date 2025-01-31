@@ -47,17 +47,15 @@ class CreateArnoldAss(plugin.HoudiniCreator):
             # Arnold ROP settings
             "ar_ass_export_enable": 1
         }
-        
-        if self.enable_staging_path_management:            
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["ar_ass_file"] = f"{staging_dir}/$OS.$F4{self.ext}"
 
         instance_node.setParms(parms)
 
         # Lock any parameters in this list
         to_lock = ["ar_ass_export_enable", "productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+    
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("ar_ass_file").set(f"{staging_dir}/$OS.$F4{self.ext}")
 
     def get_instance_attr_defs(self):
         render_target_items = {

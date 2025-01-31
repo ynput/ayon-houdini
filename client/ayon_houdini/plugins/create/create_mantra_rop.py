@@ -35,13 +35,7 @@ class CreateMantraROP(plugin.HoudiniCreator):
         parms = {
             # Render Frame Range
             "trange": 1,
-        }
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
-
-            parms["vm_picture"] = f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}"
-            parms["soho_diskfile"] = f"{staging_dir}/ifd/$OS.$F4.ifd"
+        }          
 
         if pre_create_data.get("render_target") == "farm_split":
             parms["soho_outputmode"] = 1              
@@ -67,6 +61,12 @@ class CreateMantraROP(plugin.HoudiniCreator):
         # Lock some Avalon attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            "vm_picture": f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}",
+            "soho_diskfile": f"{staging_dir}/ifd/$OS.$F4.ifd"
+        })
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.

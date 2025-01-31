@@ -83,10 +83,6 @@ class CreateUSDRender(plugin.HoudiniCreator):
             # folder to our choice. The
             # `__render__.usd` (default name, defined by `lopoutput` parm)
             # in that folder will then be the file to render.
-            if self.enable_staging_path_management:
-                # keep dynamic link to product name in file path.
-                staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
-                parms["savetodirectory_directory"] = f"{staging_dir}/usd/$HIPNAME/$OS"
                 
             parms["lopoutput"] = "__render__.usd"
             parms["allframesatonce"] = True
@@ -112,6 +108,9 @@ class CreateUSDRender(plugin.HoudiniCreator):
         # Lock some AYON attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("savetodirectory_directory").set(f"{staging_dir}/usd/$HIPNAME/$OS")
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.

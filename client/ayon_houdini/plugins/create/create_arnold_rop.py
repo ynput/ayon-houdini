@@ -40,14 +40,7 @@ class CreateArnoldRop(plugin.HoudiniCreator):
             "trange": 1,
             # Arnold ROP settings            
             "ar_exr_half_precision": 1           # half precision
-        }
-
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
-            
-            parms["ar_picture"] = f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}"
-            parms["ar_ass_file"] = f"{staging_dir}/ass/$OS.$F4.ass"
+        }               
 
         if pre_create_data.get("render_target") == "farm_split":
             parms["ar_ass_export_enable"] = 1
@@ -57,6 +50,12 @@ class CreateArnoldRop(plugin.HoudiniCreator):
         # Lock any parameters in this list
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            "ar_picture": f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}",
+            "ar_ass_file": f"{staging_dir}/ass/$OS.$F4.ass" 
+        })
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.

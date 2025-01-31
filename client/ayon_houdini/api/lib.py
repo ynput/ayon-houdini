@@ -1643,3 +1643,17 @@ def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
         return hou.text.expandString(matched_string)
 
     return re.sub(pattern, expand_match, text)
+
+
+@contextmanager
+def set_pwd(node):
+    """Set Pwd
+
+    wrapper around `hou.setPwd` to support using `with` statement.
+    """
+    original = hou.pwd()
+    try:
+        hou.setPwd(node)
+        yield
+    finally:
+        hou.setPwd(original)

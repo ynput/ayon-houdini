@@ -37,18 +37,6 @@ class CreateKarmaROP(plugin.HoudiniCreator):
             # Render Frame Range
             "trange": 1,
         }
-        if self.enable_staging_path_management:
-            staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
-            
-            parms.update({
-                # Karma ROP Setting
-                # keep dynamic link to product name in file paths.
-                "picture": f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}",
-                # Karma Checkpoint Setting
-                "productName": f"{staging_dir}/checkpoint/$OS.$F4.checkpoint",
-                # USD Output Directory
-                "savetodirectory": f"{staging_dir}/usd/$OS_$RENDERID"
-            })
 
         res_x = pre_create_data.get("res_x")
         res_y = pre_create_data.get("res_y")
@@ -79,6 +67,17 @@ class CreateKarmaROP(plugin.HoudiniCreator):
         # Lock some Avalon attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            # Karma ROP Setting
+            # keep dynamic link to product name in file paths.
+            "picture": f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}",
+            # Karma Checkpoint Setting
+            "productName": f"{staging_dir}/checkpoint/$OS.$F4.checkpoint",
+            # USD Output Directory
+            "savetodirectory": f"{staging_dir}/usd/$OS_$RENDERID"
+        })
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.

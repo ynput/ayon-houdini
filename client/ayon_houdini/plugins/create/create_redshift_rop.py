@@ -78,13 +78,6 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
             "RS_outputFileFormat": ext_format_index[ext],
         }
 
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
-            
-            parms["RS_outputFileNamePrefix"] = f"{staging_dir}/$OS.$AOV.$F4.{ext}"
-            parms["RS_archive_file"] = f"{staging_dir}/rs/$OS.$F4.rs"
-
         if ext == "exr":
             parms["RS_outputMultilayerMode"] = multilayer_mode_index[multi_layered_mode]
             parms["RS_aovMultipart"] = multipart
@@ -105,6 +98,12 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
         # Lock some Avalon attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            "RS_outputFileNamePrefix": f"{staging_dir}/$OS.$AOV.$F4.{pre_create_data['image_format']}",
+            "RS_archive_file": f"{staging_dir}/rs/$OS.$F4.rs"
+        })
 
     def remove_instances(self, instances):
         for instance in instances:

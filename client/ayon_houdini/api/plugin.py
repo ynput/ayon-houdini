@@ -17,14 +17,14 @@ from ayon_core.pipeline import (
     AVALON_INSTANCE_ID,
     load,
     publish,
-    get_staging_dir_info,
 )
 from ayon_core.lib import BoolDef
 
 from .lib import (
     imprint, read, lsattr, render_rop,
     add_self_publish_button,
-    expand_houdini_string
+    expand_houdini_string,
+    set_pwd,
 )
 from .usd import get_ayon_entity_uri_from_representation_context
 
@@ -114,7 +114,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
     selected_nodes = []
     settings_name = None
     add_publish_button = False
-    staging_dir = "$HIP/ayon"
+    default_staging_dir = "$HIP/ayon"
     enable_staging_path_management = True
 
     settings_category = SETTINGS_CATEGORY
@@ -152,6 +152,17 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
                 product_name,
                 instance_data,
                 self)
+            
+            if self.enable_staging_path_management:
+                staging_dir = self.get_staging_dir(instance)
+
+                with set_pwd(instance_node):
+                    if self.expand_staging_dir:
+                        # Expand vars only without expanding expressions to keep dynamic link to ROP parameters.
+                        staging_dir = expand_houdini_string(staging_dir)
+
+                    self.set_node_staging_dir(instance_node, staging_dir, instance, pre_create_data)
+
             self._add_instance_to_context(instance)
             self.imprint(instance_node, instance.data_to_store())
 
@@ -308,7 +319,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         
         self.enable_staging_path_management = houdini_general_settings["set_rop_output"]["enabled"]
         self.expand_staging_dir = houdini_general_settings["set_rop_output"]["expand_vars"]
-        self.staging_dir = houdini_general_settings["set_rop_output"]["default_output_dir"] or self.staging_dir
+        self.default_staging_dir = houdini_general_settings["set_rop_output"]["default_output_dir"] or self.default_staging_dir
 
         # Apply Creator Settings
         settings_name = self.settings_name
@@ -326,60 +337,42 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for key, value in settings.items():
             setattr(self, key, value)
 
-    def get_custom_staging_dir(self, product_type, product_name, instance_data):
-        """ Get Custom Staging Directory
+    def get_staging_dir(self, instance):
+        """Get Staging Dir
 
-        Retrieve a custom staging directory for the specified product type and name
-        within the current AYON context.
+        Return the staging dir and persistence from instance.
 
         This method falls back to the default output path defined in settings
         `ayon+settings://houdini/general/rop_output/default_output_dir`
 
-        Note:
-            This method is preferred over `super().get_staging_dir(instance)` 
-            because it doesn't fit in all creators where 
-            1. Some creators like HDA doesn't access `instance` object
-            2. Some other creators like Karma render creator should actually
-               get the staging directory of the `render` product type not `karma_rop`.
-
-            One downside is that `version` key is not supported in staging dir templates.
-        
         Args:
-            product_type (str): The type of product.
-            product_name (str): The name of the product.
-            instance_data (dict[str, Union[str, None]]): A dictionary with instance data.
+            instance (CreatedInstance): Instance for which should be staging
+                dir gathered.
 
         Returns:
-            str: The computed or default staging directory path.
+            str: Staging dir path
         """
-        
-        folder_path = instance_data["folderPath"]
-        task_name = instance_data["task"]
 
-        project_entity = self.create_context.get_current_project_entity()
-        folder_entity = self.create_context.get_folder_entity(folder_path)
-        task_entity = self.create_context.get_task_entity(folder_path, task_name)
+        staging_dir_info = super(HoudiniCreator, self).get_staging_dir(instance)
 
-        staging_dir_info = get_staging_dir_info(
-            project_entity,
-            folder_entity,
-            task_entity,
-            product_type,
-            product_name,
-            self.create_context.host_name,
-            always_return_path=False,
-            project_settings=self.create_context.get_current_project_settings()
-        )
-
-        staging_dir_path = self.staging_dir
-        if staging_dir_info:
+        staging_dir_path =  self.default_staging_dir        
+        if staging_dir_info is not None:
             staging_dir_path = staging_dir_info.directory
-
-        if self.expand_staging_dir:
-            # Expand vars only without expanding expressions to keep dynamic link to ROP parameters.
-            staging_dir_path = expand_houdini_string(staging_dir_path)
-
+    
         return staging_dir_path.replace("\\", "/").rstrip("/")
+
+    def set_node_staging_dir(self, node: hou.Node, staging_dir: str, instance: CreatedInstance, pre_create_data: dict):
+        """Set Node Staging Dir
+
+        Args:
+            node (hou.Node): Houdini node to set its output directory.
+            staging_dir (str): Staging output directory.
+            instance (CreatedInstance): Instance object associated with the given node.
+            pre_create_data(dict): Data based on pre creation attributes.
+        """
+
+        pass
+
 
 class HoudiniLoader(load.LoaderPlugin):
     """Base class for Houdini load plugins."""

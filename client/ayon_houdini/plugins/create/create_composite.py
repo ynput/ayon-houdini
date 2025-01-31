@@ -30,10 +30,6 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
         parms = {
             "trange": 1,
         }
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["copoutput"] = f"{staging_dir}/$OS.$F4{self.ext}"
 
         if self.selected_nodes:
             if len(self.selected_nodes) > 1:
@@ -51,6 +47,9 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
         # Lock any parameters in this list
         to_lock = ["prim_to_detail_pattern"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("copoutput").set(f"{staging_dir}/$OS.$F4{self.ext}")
 
     def get_network_categories(self):
         return [

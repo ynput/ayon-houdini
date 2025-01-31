@@ -56,15 +56,7 @@ class CreateVrayROP(plugin.HoudiniCreator):
             "SettingsEXR_bits_per_channel": "16",   # half precision
             "use_render_channels": 0,
         }
-
-        staging_dir = None
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file paths.
-            staging_dir = self.get_custom_staging_dir("render", product_name, instance_data)
-            
-            parms["SettingsOutput_img_file_path"] = f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}"
-            parms["render_export_filepath"] = f"{staging_dir}/vrscene/$OS.$F4.vrscene"
-                
+       
         if pre_create_data.get("render_target") == "farm_split":
             # Setting render_export_mode to "2" because that's for
             # "Export only" ("1" is for "Export & Render")
@@ -94,9 +86,6 @@ class CreateVrayROP(plugin.HoudiniCreator):
                 "use_render_channels": 1,
                 "render_network_render_channels": re_path
             })
-            if self.enable_staging_path_management and staging_dir is not None:
-                # keep dynamic link to product name in file paths.
-                parms["SettingsOutput_img_file_path"] = f"{staging_dir}/$OS.$AOV.$F4.{pre_create_data['image_format']}"
 
         custom_res = pre_create_data.get("override_resolution")
         if custom_res:
@@ -107,6 +96,15 @@ class CreateVrayROP(plugin.HoudiniCreator):
         # lock parameters from AVALON
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("render_export_filepath").set(f"{staging_dir}/vrscene/$OS.$F4.vrscene")
+        
+        if pre_create_data.get("render_element_enabled", True):
+            node.parm("SettingsOutput_img_file_path").set(f"{staging_dir}/$OS.$AOV.$F4.{pre_create_data['image_format']}") 
+        else:
+             node.parm("SettingsOutput_img_file_path").set(f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}")
+
 
     def remove_instances(self, instances):
         for instance in instances:

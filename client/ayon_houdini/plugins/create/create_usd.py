@@ -35,10 +35,6 @@ class CreateUSD(plugin.HoudiniCreator):
         parms = {
             "enableoutputprocessor_simplerelativepaths": False,
         }
-        if self.enable_staging_path_management:
-            # keep dynamic link to product name in file path.
-            staging_dir = self.get_custom_staging_dir(self.product_type, product_name, instance_data)
-            parms["lopoutput"] = f"{staging_dir}/$OS.usd"
 
         if self.selected_nodes:
             parms["loppath"] = self.selected_nodes[0].path()
@@ -53,6 +49,9 @@ class CreateUSD(plugin.HoudiniCreator):
             "id",
         ]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("lopoutput").set(f"{staging_dir}/$OS.usd")
 
     def get_network_categories(self):
         return [
