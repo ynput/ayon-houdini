@@ -24,7 +24,6 @@ from .lib import (
     imprint, read, lsattr, render_rop,
     add_self_publish_button,
     expand_houdini_string,
-    set_pwd,
 )
 from .usd import get_ayon_entity_uri_from_representation_context
 
@@ -156,7 +155,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             if self.enable_staging_path_management:
                 staging_dir = self.get_staging_dir(instance)
 
-                with set_pwd(instance_node):
+                with hou.ScriptEvalContext(instance_node):
                     if self.expand_staging_dir:
                         # Expand vars only without expanding expressions to keep dynamic link to ROP parameters.
                         staging_dir = expand_houdini_string(staging_dir)
