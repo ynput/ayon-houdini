@@ -73,7 +73,7 @@ DEFAULT_GENERAL_SETTINGS = {
     "set_rop_output": {
         "enabled": True,
         "expand_vars": False,
-        "default_output_dir": "$HIP/ayon/`chs('AYON_productName')`"
+        "default_output_dir": "$HIP/ayon/`chs(\"AYON_productName\")`"
     },
     "update_houdini_var_context": {
         "enabled": True,
