@@ -155,12 +155,12 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             if self.enable_staging_path_management:
                 staging_dir = self.get_staging_dir(instance)
 
-                with hou.ScriptEvalContext(instance_node):
-                    if self.expand_staging_dir:
+                if self.expand_staging_dir:
+                    with hou.ScriptEvalContext(instance_node):
                         # Expand vars only without expanding expressions to keep dynamic link to ROP parameters.
                         staging_dir = expand_houdini_string(staging_dir)
 
-                    self.set_node_staging_dir(instance_node, staging_dir, instance, pre_create_data)
+                self.set_node_staging_dir(instance_node, staging_dir, instance, pre_create_data)
 
             self._add_instance_to_context(instance)
             self.imprint(instance_node, instance.data_to_store())
