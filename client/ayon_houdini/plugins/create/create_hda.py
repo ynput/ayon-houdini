@@ -284,13 +284,18 @@ class CreateHDA(plugin.HoudiniCreator):
         return hda_node
 
     def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
-        staging_dir = expand_houdini_string(staging_dir, r"`[^`]+`")
+        
+        with hou.ScriptEvalContext(node):
+            staging_dir = expand_houdini_string(staging_dir, r"`[^`]+`")
 
         hda_file_name = f"{staging_dir}/{node.name()}.hda"
 
         hda_def = node.type().definition()
         hda_def.save(hda_file_name, node)
-        hou.hda.installFile(hda_file_name, change_oplibraries_file=True)
+        hou.hda.installFile(hda_file_name)
+
+        # Remove the embedded HDA.
+        hda_def.destroy()
 
     def get_network_categories(self):
         # Houdini allows creating sub-network nodes inside
