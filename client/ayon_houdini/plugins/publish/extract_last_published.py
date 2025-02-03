@@ -54,7 +54,9 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
                            "last version published files.")
             return
 
-        staging_dir, expected_filenames = self.get_expected_files_and_staging_dir(instance)
+        staging_dir, expected_filenames = (
+            self.get_expected_files_and_staging_dir(instance)
+        )
 
         os.makedirs(staging_dir, exist_ok=True)
 

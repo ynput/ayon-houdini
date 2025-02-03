@@ -1543,7 +1543,8 @@ def show_node_parmeditor(node):
         node (hou.Node): node instance
     """
 
-    # Check if there's a floating parameter editor pane with its node set to the specified node.
+    # Check if there's a floating parameter editor pane with its node
+    #   set to the specified node.
     for tab in hou.ui.paneTabs():
         if (
             tab.type() == hou.paneTabType.Parm
@@ -1617,7 +1618,10 @@ def is_version_up_workfile_menu_enabled() -> bool:
     return False
 
 
-def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail} [{ranges}]") -> list[str]:
+def format_as_collections(
+    files: list[str],
+    pattern: str = "{head}{padding}{tail} [{ranges}]"
+) -> list[str]:
     """Return list of files as formatted sequence collections."""
 
     collections, remainder = clique.assemble(files)

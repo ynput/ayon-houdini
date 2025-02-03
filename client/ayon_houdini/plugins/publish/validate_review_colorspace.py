@@ -97,10 +97,11 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
 
                 raise PublishValidationError(
                     "Invalid value: Colorspace name doesn't match"
-                    "the Colorspace specified in settings."
+                    " the Colorspace specified in settings."
                 )
-            
-        # TODO: Check if `ociodisplay` and `ocioview` are the same as the default display and view.
+
+        # TODO: Check if `ociodisplay` and `ocioview` are the same as the
+        #   default display and view.
         # Should be the default value specified in settings?
         # OR Should be the current/default value specified in the hip file?
         elif colorcorrect == "ocioview":

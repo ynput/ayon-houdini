@@ -86,8 +86,9 @@ class CollectArnoldROPRenderProducts(plugin.HoudiniInstancePlugin):
                 prefix=default_prefix, suffix=label
             )
             render_products.append(aov_product)
-            files_by_aov[label] = self.generate_expected_files(instance,
-                                                               aov_product)
+            files_by_aov[label] = self.generate_expected_files(
+                instance, aov_product
+            )
 
             # Set to False as soon as we have a separated aov.
             multipartExr = False

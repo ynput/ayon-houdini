@@ -12,8 +12,8 @@ class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
     """Validate `WaitForRendertoComplete` is enabled.
 
     Disabling `WaitForRendertoComplete` cause the local render to fail
-    as the publish execution continues while the render may not be finished yet.
-
+    as the publish execution continues while the render may not be
+    finished yet.
     """
 
     order = pyblish.api.ValidatorOrder
@@ -29,10 +29,12 @@ class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
                 f"Skipping instance without instance node: {instance}"
             )
             return
+
         if instance.data["creator_attributes"].get("render_target") != "local":
             # This validator should work only with local render target.
             self.log.debug(
-                "Skipping Validator, Render target is not 'Local machine rendering'"
+                "Skipping Validator, Render target"
+                " is not 'Local machine rendering'"
             )
             return
 
@@ -40,8 +42,10 @@ class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
         if invalid:
             rop = invalid[0]
             raise PublishValidationError(
-                ("ROP node '{}' has 'Wait For Render to Complete' parm disabled."
-                 "Please, enable it.".format(rop.path())),
+                (
+                    f"ROP node '{rop.path()}' has 'Wait For Render"
+                    " to Complete' parm disabled.Please, enable it."
+                ),
                 title=self.label
             )
 

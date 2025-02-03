@@ -62,9 +62,10 @@ class ValidateUSDAssetContributionDefaultPrim(plugin.HoudiniInstancePlugin,
         folder_name = instance.data["folderPath"].rsplit("/", 1)[-1]
         if not default_prim.lstrip("/") == folder_name:
             raise PublishValidationError(
-                f"Default prim specified on ROP node does not match the "
-                f"asset's folder name: '{default_prim}' "
-                f"(should be: '/{folder_name}')",
+                f"Default prim specified on ROP node does not match the"
+                f" asset's folder name: '{default_prim}'"
+                f" (should be: '/{folder_name}')"
+                ,
                 description=self.get_description()
             )
 
@@ -88,8 +89,8 @@ class ValidateUSDAssetContributionDefaultPrim(plugin.HoudiniInstancePlugin,
         return inspect.cleandoc(
             """### Default primitive not set to current asset
 
-            The USD instance has **USD Contribution** enabled and is set to 
-            initialize as **asset**. The asset requires a default root 
+            The USD instance has **USD Contribution** enabled and is set to
+            initialize as **asset**. The asset requires a default root
             primitive with the name of the folder it's related to.
 
             For example, you're working in `/asset/char_hero` then the

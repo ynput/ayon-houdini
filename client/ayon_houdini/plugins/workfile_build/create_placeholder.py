@@ -38,7 +38,10 @@ class HoudiniPlaceholderCreatePlugin(
         create_context = CreateContext(registered_host())
         creator = create_context.creators.get(placeholder_data["creator"])
         product_type = creator.product_type
-        node_name = "{}_{}".format(self.identifier.replace(".", "_"), product_type)
+        node_name = "{}_{}".format(
+            self.identifier.replace(".", "_"),
+            product_type
+        )
 
         return node_name
 
