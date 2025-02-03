@@ -99,12 +99,14 @@ class CreateVrayROP(plugin.HoudiniCreator):
 
     def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
         node.parm("render_export_filepath").set(f"{staging_dir}/vrscene/$OS.$F4.vrscene")
-        
-        if pre_create_data.get("render_element_enabled", True):
-            node.parm("SettingsOutput_img_file_path").set(f"{staging_dir}/$OS.$AOV.$F4.{pre_create_data['image_format']}") 
-        else:
-             node.parm("SettingsOutput_img_file_path").set(f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}")
 
+        image_format = pre_create_data["image_format"]
+        aov_value = ""
+        if pre_create_data.get("render_element_enabled", True):
+            aov_value = ".$AOV"
+        node.parm("SettingsOutput_img_file_path").set(
+            f"{staging_dir}/$OS{aov_value}.$F4.{image_format}"
+        )
 
     def remove_instances(self, instances):
         for instance in instances:
