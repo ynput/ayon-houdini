@@ -118,7 +118,6 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             ext = aov_filepaths[0].split(".")[-1]
 
             # Decide if instance is reviewable
-            preview = False
             if instance.data.get("multipartExr", False):
                 # Add preview tag because its multipartExr.
                 preview = True
@@ -210,7 +209,6 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 ("use_legacy_for_renders not found in project settings. "
                  "Using legacy product name for renders. Please update "
                  "your ayon-core version."), DeprecationWarning)
-            use_legacy_product_name = True
 
         if use_legacy_product_name:
             return _get_legacy_product_name_and_group(
