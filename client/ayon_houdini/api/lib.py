@@ -906,7 +906,7 @@ def set_review_color_space(node, review_color_space="", log=None):
     If review_color_space is empty, a default colorspace corresponding to
     the display & view of the current Houdini session will be used.
 
-    Note: 
+    Note:
         This function expects nodes of type `opengl` or `flipbook`.
 
     Args:
@@ -1569,7 +1569,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
     """Connect the given file parm to a generic loader.
     If the parm is already connected to a generic loader node, go to that node.
     """
-    
+
     from .pipeline import get_or_create_avalon_container
 
     referenced_parm = file_parm.getReferencedParm()
@@ -1583,7 +1583,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
 
     # Create a generic loader node and reference its file parm
     main_container = get_or_create_avalon_container()
-    
+
     node_name = f"{file_parm.node().name()}_{file_parm.name()}_loader"
     load_node = main_container.createNode("ayon::generic_loader",
                                           node_name=node_name)
@@ -1619,7 +1619,7 @@ def is_version_up_workfile_menu_enabled() -> bool:
 
 def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail} [{ranges}]") -> list[str]:
     """Return list of files as formatted sequence collections."""
-    
+
     collections, remainder = clique.assemble(files)
     result = [collection.format(pattern) for collection in collections]
     result.extend(remainder)

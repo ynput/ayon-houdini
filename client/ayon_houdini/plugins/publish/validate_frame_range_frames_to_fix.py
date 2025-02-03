@@ -11,7 +11,7 @@ from ayon_houdini.api import plugin
 class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
     """Validate Frame Range Frames to Fix.
 
-    This validator checks if the rop node covers the entire frame 
+    This validator checks if the rop node covers the entire frame
     range, including any frames that require correction.
     It also verifies the absence of gaps within the specified frames to fix.
     """
@@ -78,7 +78,7 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
                 f"{fix_frame_end}."
             )
             invalid_range = True
-            
+
         if invalid_range:
             raise PublishValidationError(
                 "Invalid Rop Frame Range",

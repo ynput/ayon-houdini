@@ -22,7 +22,6 @@ class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
     actions = [RepairAction]
 
     def process(self, instance):
-
         if not instance.data.get("instance_node"):
             # Ignore instances without an instance node
             # e.g. in memory bootstrap instances
@@ -30,7 +29,6 @@ class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
                 f"Skipping instance without instance node: {instance}"
             )
             return
-        
         if instance.data["creator_attributes"].get("render_target") != "local":
             # This validator should work only with local render target.
             self.log.debug(
@@ -49,11 +47,10 @@ class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
 
     @classmethod
     def get_invalid(cls, instance):
-
         rop = hou.node(instance.data["instance_node"])
         if not rop.evalParm("soho_foreground"):
             return [rop]
-        
+
     @classmethod
     def repair(cls, instance):
         """Enable WaitForRendertoComplete. """

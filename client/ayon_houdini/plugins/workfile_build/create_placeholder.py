@@ -33,7 +33,7 @@ class HoudiniPlaceholderCreatePlugin(
 
     def get_placeholder_options(self, options=None):
         return self.get_create_plugin_options(options)
-    
+
     def get_placeholder_node_name(self, placeholder_data):
         create_context = CreateContext(registered_host())
         creator = create_context.creators.get(placeholder_data["creator"])
@@ -53,4 +53,3 @@ class HoudiniPlaceholderCreatePlugin(
             )
 
         return output
-    

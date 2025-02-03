@@ -91,11 +91,11 @@ class ValidateUSDAssetContributionDefaultPrim(plugin.HoudiniInstancePlugin,
             The USD instance has **USD Contribution** enabled and is set to 
             initialize as **asset**. The asset requires a default root 
             primitive with the name of the folder it's related to.
-            
+
             For example, you're working in `/asset/char_hero` then the
             folder's name is `char_hero`. For the asset hence all prims should
             live under `/char_hero` root primitive.
-            
+
             This validation solely ensures the **default primitive** on the ROP
             node is set to match the folder name.
             """

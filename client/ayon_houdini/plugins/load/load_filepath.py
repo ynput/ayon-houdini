@@ -37,7 +37,6 @@ class FilePathLoader(plugin.HoudiniLoader):
         hda_utils.set_node_representation_from_context(node, context)
 
     def update(self, container, context):
-
         # First we handle backwards compatibility where this loader still
         # loaded using a `null` node instead of the `ayon::generic_loader`
         node = container["node"]

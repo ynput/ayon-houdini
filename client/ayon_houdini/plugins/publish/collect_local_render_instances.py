@@ -93,7 +93,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             dynamic_data = {}
             if aov_name:
                 dynamic_data["aov"] = aov_name
-                
+
             if instance.data.get("renderlayer"):
                 dynamic_data["renderlayer"] = instance.data["renderlayer"]
 
@@ -172,7 +172,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
 
     def _get_product_name_and_group(self, instance, product_type, dynamic_data):
         """Get product name and group
-        
+
         This method matches the logic in farm that gets
          `product_name` and `group_name` respecting
          `use_legacy_product_names_for_renders` logic in core settings.

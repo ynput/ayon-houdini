@@ -118,7 +118,7 @@ soptoolutils.genericTool(kwargs, \'$HDA_NAME\')]]></script>
 </tool>
 </shelfDocument>
         """
-        
+
         nodetype_category_name = hda_def.nodeType().category().name()
         context = context_dict[nodetype_category_name]
         util = utils_dict[nodetype_category_name]
