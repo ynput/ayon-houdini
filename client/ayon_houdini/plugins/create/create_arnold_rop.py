@@ -40,7 +40,7 @@ class CreateArnoldRop(plugin.HoudiniCreator):
             "trange": 1,
             # Arnold ROP settings            
             "ar_exr_half_precision": 1           # half precision
-        }               
+        }
 
         if pre_create_data.get("render_target") == "farm_split":
             parms["ar_ass_export_enable"] = 1

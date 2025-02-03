@@ -56,7 +56,7 @@ class CreateVrayROP(plugin.HoudiniCreator):
             "SettingsEXR_bits_per_channel": "16",   # half precision
             "use_render_channels": 0,
         }
-       
+
         if pre_create_data.get("render_target") == "farm_split":
             # Setting render_export_mode to "2" because that's for
             # "Export only" ("1" is for "Export & Render")

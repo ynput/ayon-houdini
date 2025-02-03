@@ -354,13 +354,18 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
         staging_dir_info = super(HoudiniCreator, self).get_staging_dir(instance)
 
-        staging_dir_path =  self.default_staging_dir        
+        staging_dir_path = self.default_staging_dir        
         if staging_dir_info is not None:
             staging_dir_path = staging_dir_info.directory
     
         return staging_dir_path.replace("\\", "/").rstrip("/")
 
-    def set_node_staging_dir(self, node: hou.Node, staging_dir: str, instance: CreatedInstance, pre_create_data: dict):
+    def set_node_staging_dir(
+            self, node: hou.Node,
+            staging_dir: str,
+            instance: CreatedInstance,
+            pre_create_data: dict
+    ):
         """Set Node Staging Dir
 
         Args:
@@ -368,6 +373,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             staging_dir (str): Staging output directory.
             instance (CreatedInstance): Instance object associated with the given node.
             pre_create_data(dict): Data based on pre creation attributes.
+
         """
 
         pass
