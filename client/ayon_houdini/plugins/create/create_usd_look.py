@@ -91,7 +91,7 @@ class CreateUSDLook(plugin.HoudiniCreator):
                     label="Render target",
                     default=self.render_target)
         ]
-    
+
     def get_pre_create_attr_defs(self):
         attrs = super().get_pre_create_attr_defs()
         return attrs + self.get_instance_attr_defs()

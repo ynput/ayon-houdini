@@ -17,7 +17,7 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
     The files from last published are based on files which will be
     extended/fixed for specific frames.
 
-    NOTE: 
+    NOTE:
         This plugin is closely taken from ayon-nuke.
         It contains some Houdini addon specific logic as various addons may
           have unique methods for managing `staging_dir`, `expectedFiles`
@@ -37,7 +37,7 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
         if not frames_to_fix:
             self.log.debug("Skipping, No frames to fix.")
             return
-        
+
         if not instance.data.get("integrate", True):
             self.log.debug("Skipping collecting frames to fix data for "
                            "instance because instance is set to not integrate")
@@ -54,14 +54,16 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
                            "last version published files.")
             return
 
-        staging_dir, expected_filenames = self.get_expected_files_and_staging_dir(instance)
+        staging_dir, expected_filenames = (
+            self.get_expected_files_and_staging_dir(instance)
+        )
 
         os.makedirs(staging_dir, exist_ok=True)
 
         expected_and_frames = collect_frames(expected_filenames)
         frames_and_expected = {v: k for k, v in expected_and_frames.items()}
         frames_to_fix = clique.parse(frames_to_fix, "{ranges}")
-        
+
         anatomy = instance.context.data["anatomy"]
 
         # TODO: This currently copies ALL frames from the last version instead
@@ -78,7 +80,7 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             target_file_name = frames_and_expected.get(frame)
             if not target_file_name:
                 continue
-            
+
             out_path = os.path.join(staging_dir, target_file_name)
 
             # Copy only the frames that we won't render.

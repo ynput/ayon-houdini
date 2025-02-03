@@ -118,7 +118,7 @@ soptoolutils.genericTool(kwargs, \'$HDA_NAME\')]]></script>
 </tool>
 </shelfDocument>
         """
-        
+
         nodetype_category_name = hda_def.nodeType().category().name()
         context = context_dict[nodetype_category_name]
         util = utils_dict[nodetype_category_name]
@@ -199,7 +199,10 @@ class CreateHDA(plugin.HoudiniCreator):
                 use_promote_spare_parameters = False
 
             # If only a single subnet is selected, turn that into the HDA.
-            elif one_node_selected and first_selected_node.type().name() == "subnet":
+            elif (
+                one_node_selected
+                and first_selected_node.type().name() == "subnet"
+            ):
                 to_hda = first_selected_node
                 to_hda.setName("{}_subnet".format(node_name), unique_name=True)
 
@@ -231,7 +234,8 @@ class CreateHDA(plugin.HoudiniCreator):
                 raise CreatorError(
                     "cannot create hda from node {}".format(to_hda))
 
-            # Pick a unique type name for HDA product per folder path per project.
+            # Pick a unique type name for HDA product per folder path
+            #   per project.
             type_name = (
                 "{project_name}{folder_path}_{node_name}".format(
                     project_name=get_current_project_name(),
