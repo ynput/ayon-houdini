@@ -55,16 +55,7 @@ class CreateReview(plugin.HoudiniCreator):
 
         frame_range = hou.playbar.frameRange()
 
-        filepath = "{root}/{product_name}/{product_name}.$F4.{ext}".format(
-            root=hou.text.expandString("$HIP/pyblish"),
-            # keep dynamic link to product name
-            product_name="`chs(\"AYON_productName\")`",
-            ext=pre_create_data.get("image_format") or "png"
-        )
-
         parms = {
-            "picture": filepath,
-
             "trange": 1,
 
             # Unlike many other ROP nodes the opengl node does not default
@@ -128,6 +119,9 @@ class CreateReview(plugin.HoudiniCreator):
 
         self.lock_parameters(instance_node, to_lock)
     
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        node.parm("picture").set(f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}")
+
     def get_instance_attr_defs(self):
         render_target_items = {
             "local": "Local machine rendering",

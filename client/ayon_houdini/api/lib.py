@@ -1624,3 +1624,22 @@ def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail
     result = [collection.format(pattern) for collection in collections]
     result.extend(remainder)
     return result
+
+
+def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
+    """Expand Houdini String with More Control
+
+    This feature applies the `hou.text.expandString` function selectively.
+    Sometimes, we need to expand only Houdini variables like `$HIP`.
+    Other times, we want to expand only Houdini expressions, such as `chs('AYON_productName')`.
+
+    Example Patterns:
+        r"\$[a-zA-Z0-9_]+"  ➜ Any sub string that starts by a `$` sign followed by letters, numbders and underscores.
+        r"`[^`]+`"  ➜ Any substring enclosed backticks.
+    """
+
+    def expand_match(match):
+        matched_string  = match.group(0)
+        return hou.text.expandString(matched_string)
+
+    return re.sub(pattern, expand_match, text)
