@@ -1,3 +1,5 @@
+import hou
+
 from ayon_core.pipeline import (
     AVALON_CONTAINER_ID,
 )
@@ -24,7 +26,6 @@ class USDReferenceLoader(plugin.HoudiniLoader):
     use_ayon_entity_uri = False
 
     def load(self, context, name=None, namespace=None, data=None):
-        import hou
 
         # Format file name, Houdini only wants forward slashes
         file_path = self.filepath_from_context(context)

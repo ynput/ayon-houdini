@@ -1,7 +1,8 @@
 import os
 import re
 
-from ayon_core.pipeline import get_representation_path
+import hou
+
 from ayon_houdini.api import (
     pipeline,
     plugin
@@ -19,9 +20,6 @@ class VdbLoader(plugin.HoudiniLoader):
     color = "orange"
 
     def load(self, context, name=None, namespace=None, data=None):
-
-        import hou
-
         # Get the root node
         obj = hou.node("/obj")
 
@@ -91,7 +89,7 @@ class VdbLoader(plugin.HoudiniLoader):
             return
 
         # Update the file path
-        file_path = get_representation_path(repre_entity)
+        file_path = self.filepath_from_context(context)
         file_path = self.format_path(file_path, repre_entity)
 
         file_node.setParms({"file": file_path})
@@ -100,7 +98,6 @@ class VdbLoader(plugin.HoudiniLoader):
         node.setParms({"representation": repre_entity["id"]})
 
     def remove(self, container):
-
         node = container["node"]
         node.destroy()
 

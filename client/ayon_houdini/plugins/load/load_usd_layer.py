@@ -1,3 +1,5 @@
+import hou
+
 from ayon_core.pipeline import (
     AVALON_CONTAINER_ID,
 )
@@ -24,8 +26,6 @@ class USDSublayerLoader(plugin.HoudiniLoader):
     use_ayon_entity_uri = False
 
     def load(self, context, name=None, namespace=None, data=None):
-        import hou
-
         # Format file name, Houdini only wants forward slashes
         file_path = self.filepath_from_context(context)
         file_path = file_path.replace("\\", "/")
@@ -76,7 +76,6 @@ class USDSublayerLoader(plugin.HoudiniLoader):
         node.parm("reload").pressButton()
 
     def remove(self, container):
-
         node = container["node"]
         node.destroy()
 
