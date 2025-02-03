@@ -42,10 +42,8 @@ class ValidateWaitForRender(plugin.HoudiniInstancePlugin):
         if invalid:
             rop = invalid[0]
             raise PublishValidationError(
-                (
-                    f"ROP node '{rop.path()}' has 'Wait For Render"
-                    " to Complete' parm disabled.Please, enable it."
-                ),
+                f"ROP node '{rop.path()}' has 'Wait For Render"
+                " to Complete' parm disabled.Please, enable it.",
                 title=self.label
             )
 
