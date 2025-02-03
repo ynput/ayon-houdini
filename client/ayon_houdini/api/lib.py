@@ -1596,7 +1596,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
     expression = rf'chs\(\"{relative_path}/file\"\)'  # noqa
     hou.hscript(
         'opparm -r'
-        f' {file_parm.node().path()} {file_parm.name()} \`{expression}\`'  # noqa W605
+        f' {file_parm.node().path()} {file_parm.name()} \\`{expression}\\`'
     )
     show_node_parmeditor(load_node)
 
