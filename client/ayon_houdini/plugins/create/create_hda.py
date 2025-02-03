@@ -242,16 +242,13 @@ class CreateHDA(plugin.HoudiniCreator):
                 )
             )
 
-            # FIXME Support staging dir.
-            hda_file_name = f"$HIP/ayon/HDAs/{node_name}.hda"
-
             hda_node = to_hda.createDigitalAsset(
                 name=type_name,
                 description=node_name,
-                hda_file_name=hda_file_name,
                 ignore_external_references=True,
                 min_num_inputs=0,
                 max_num_inputs=len(to_hda.inputs()) or 1,
+                save_as_embedded=True,
             )
 
             if use_promote_spare_parameters:
@@ -285,6 +282,15 @@ class CreateHDA(plugin.HoudiniCreator):
             set_tool_submenu(hda_def, "AYON/{}".format(self.project_name))
 
         return hda_node
+
+    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+        staging_dir = expand_houdini_string(staging_dir, r"`[^`]+`")
+
+        hda_file_name = f"{staging_dir}/{node.name()}.hda"
+
+        hda_def = node.type().definition()
+        hda_def.save(hda_file_name, node)
+        hou.hda.installFile(hda_file_name, change_oplibraries_file=True)
 
     def get_network_categories(self):
         # Houdini allows creating sub-network nodes inside
