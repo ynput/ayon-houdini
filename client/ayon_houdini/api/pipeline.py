@@ -92,7 +92,11 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             hdefereval.executeDeferred(shelves.generate_shelves)
             hdefereval.executeDeferred(creator_node_shelves.install)
             if env_value_to_bool("AYON_WORKFILE_TOOL_ON_START"):
-                hdefereval.executeDeferred(lambda: host_tools.show_workfiles(parent=hou.qt.mainWindow()))
+                hdefereval.executeDeferred(
+                    lambda: host_tools.show_workfiles(
+                        parent=hou.qt.mainWindow()
+                    )
+                )
 
     def workfile_has_unsaved_changes(self):
         return hou.hipFile.hasUnsavedChanges()

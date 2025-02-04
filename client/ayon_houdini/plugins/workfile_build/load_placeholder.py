@@ -29,9 +29,8 @@ class HoudiniPlaceholderLoadPlugin(
 
     def get_placeholder_options(self, options=None):
         return self.get_load_plugin_options(options)
-    
-    def get_placeholder_node_name(self, placeholder_data):
 
+    def get_placeholder_node_name(self, placeholder_data):
         node_name = "{}_{}".format(
             self.identifier.replace(".", "_"),
             placeholder_data["product_name"]
@@ -41,7 +40,7 @@ class HoudiniPlaceholderLoadPlugin(
     def collect_placeholders(self):
         output = []
         load_placeholders = self.collect_scene_placeholders()
-        
+
         for node in load_placeholders:
             placeholder_data = read(node)
             output.append(
@@ -49,4 +48,3 @@ class HoudiniPlaceholderLoadPlugin(
             )
 
         return output
-    

@@ -88,21 +88,22 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
                     .format(rop_node.path())
                 )
 
-            # If `ayon+settings://houdini/imageio/workfile` is enabled 
+            # If `ayon+settings://houdini/imageio/workfile` is enabled
             # and the Review colorspace setting is empty, then this check
-            # should verify if the `current_color_space` setting equals 
+            # should verify if the `current_color_space` setting equals
             # the default colorspace value.
             if self.review_color_space and \
                     self.review_color_space != current_color_space:
 
                 raise PublishValidationError(
                     "Invalid value: Colorspace name doesn't match"
-                    "the Colorspace specified in settings."
+                    " the Colorspace specified in settings."
                 )
-            
-        # TODO: Check if `ociodisplay` and `ocioview` are the same as the default display and view.
+
+        # TODO: Check if `ociodisplay` and `ocioview` are the same as the
+        #   default display and view.
         # Should be the default value specified in settings?
-        # OR Should be the current/default value specified in the hip file? 
+        # OR Should be the current/default value specified in the hip file?
         elif colorcorrect == "ocioview":
             # For flipbook nodes only.
             pass

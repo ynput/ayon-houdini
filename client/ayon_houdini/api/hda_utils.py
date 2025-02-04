@@ -684,7 +684,7 @@ class SelectProductDialog(QtWidgets.QDialog):
             "usd",
         ]
 
-    def on_product_type_changed(self, product_type: str):  
+    def on_product_type_changed(self, product_type: str):
         self.set_product_type(product_type)
 
     def set_product_type(self, product_type: str):
@@ -707,7 +707,6 @@ class SelectProductDialog(QtWidgets.QDialog):
             self.products_widget.setCurrentItem(matching_items[0])
 
     def get_available_products(self, product_type):
-        
         if product_type == "*":
             product_type = ""
 
@@ -739,11 +738,11 @@ def select_product_name(node):
                                                 fields={"id"})
     if not folder_entity:
         return
-          
+
     dialog = SelectProductDialog(
         project_name,
         folder_entity["id"],
-        parent=lib.get_main_window() 
+        parent=lib.get_main_window()
     )
     dialog.set_selected_product_name(product_parm.eval())
 
