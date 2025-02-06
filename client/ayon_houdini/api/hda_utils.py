@@ -202,7 +202,7 @@ def get_representation_path(
     if use_ayon_entity_uri:
         path = get_ayon_entity_uri_from_representation_context(context)
     else:
-        path = _get_filepath_from_context(context)
+        path = get_filepath_from_context(context)
         # Load fails on UNC paths with backslashes and also
         # fails to resolve @sourcename var with backslashed
         # paths correctly. So we force forward slashes
@@ -228,7 +228,7 @@ def _remove_format_spec(template: str, key: str) -> str:
     return re.sub(pattern, r"\1\2", template)
 
 
-def _get_filepath_from_context(context: dict):
+def get_filepath_from_context(context: dict):
     """Format file path for sequence with $F or <UDIM>."""
     # The path is either a single file or sequence in a folder.
     # Format frame as $F and udim as <UDIM>
