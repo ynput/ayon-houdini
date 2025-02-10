@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Houdini specific Avalon/Pyblish plugin definitions."""
-import sys
-from abc import (
-    ABCMeta
-)
-import six
+"""Houdini specific AYON/Pyblish plugin definitions."""
 import hou
 
 import clique
@@ -101,7 +96,6 @@ class HoudiniCreatorBase(object):
         return instance_node
 
 
-@six.add_metaclass(ABCMeta)
 class HoudiniCreator(Creator, HoudiniCreatorBase):
     """Base class for most of the Houdini creator plugins."""
     selected_nodes = []
@@ -150,11 +144,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
             return instance
 
-        except hou.Error as er:
-            six.reraise(
-                CreatorError,
-                CreatorError("Creator error: {}".format(er)),
-                sys.exc_info()[2])
+        except hou.Error as exc:
+            raise CreatorError(f"Creator error: {exc}") from exc
 
     def lock_parameters(self, node, parameters):
         """Lock list of specified parameters on the node.
