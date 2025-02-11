@@ -25,8 +25,6 @@ class CreateKarmaROP(plugin.HoudiniCreator):
                 creator_attributes[key] = pre_create_data[key]
 
         instance_data.update({"node_type": "karma"})
-        # Add chunk size attribute
-        instance_data["chunkSize"] = 10
 
         instance = super(CreateKarmaROP, self).create(
             product_name,
@@ -37,11 +35,8 @@ class CreateKarmaROP(plugin.HoudiniCreator):
 
         ext = pre_create_data.get("image_format")
 
-        filepath = "{renders_dir}{product_name}/{product_name}.$F4.{ext}".format(
-            renders_dir=hou.text.expandString("$HIP/pyblish/renders/"),
-            product_name=product_name,
-            ext=ext,
-        )
+        renders_dir = hou.text.expandString("$HIP/pyblish/renders/")
+        filepath = f"{renders_dir}{product_name}/{product_name}.$F4.{ext}"
         checkpoint = "{cp_dir}{product_name}.$F4.checkpoint".format(
             cp_dir=hou.text.expandString("$HIP/pyblish/"),
             product_name=product_name

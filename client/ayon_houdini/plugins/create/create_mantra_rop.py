@@ -24,8 +24,6 @@ class CreateMantraROP(plugin.HoudiniCreator):
                 creator_attributes[key] = pre_create_data[key]
 
         instance_data.update({"node_type": "ifd"})
-        # Add chunk size attribute
-        instance_data["chunkSize"] = 10
 
         instance = super(CreateMantraROP, self).create(
             product_name,
@@ -36,11 +34,8 @@ class CreateMantraROP(plugin.HoudiniCreator):
 
         ext = pre_create_data.get("image_format")
 
-        filepath = "{renders_dir}{product_name}/{product_name}.$F4.{ext}".format(
-            renders_dir=hou.text.expandString("$HIP/pyblish/renders/"),
-            product_name=product_name,
-            ext=ext,
-        )
+        renders_dir = hou.text.expandString("$HIP/pyblish/renders/")
+        filepath = f"{renders_dir}{product_name}/{product_name}.$F4.{ext}"
 
         parms = {
             # Render Frame Range
@@ -50,11 +45,10 @@ class CreateMantraROP(plugin.HoudiniCreator):
         }
 
         if pre_create_data.get("render_target") == "farm_split":
-            ifd_filepath = \
-                "{export_dir}{product_name}/{product_name}.$F4.ifd".format(
-                    export_dir=hou.text.expandString("$HIP/pyblish/ifd/"),
-                    product_name=product_name,
-                )
+            export_dir = hou.text.expandString("$HIP/pyblish/ifd/")
+            ifd_filepath = (
+                f"{export_dir}{product_name}/{product_name}.$F4.ifd"
+            )
             parms["soho_outputmode"] = 1
             parms["soho_diskfile"] = ifd_filepath
 

@@ -5,6 +5,8 @@ import errno
 import re
 import logging
 import json
+import clique
+from functools import lru_cache
 from contextlib import contextmanager
 
 import six
@@ -89,7 +91,7 @@ def get_output_parameter(node):
         return node.parm("sopoutput")
     elif node_type == "comp":
         return node.parm("copoutput")
-    elif node_type in {"karma", "opengl"}:
+    elif node_type in {"karma", "opengl", "flipbook"}:
         return node.parm("picture")
     elif node_type == "ifd":  # Mantra
         if node.evalParm("soho_outputmode"):
@@ -896,16 +898,19 @@ def get_current_context_template_data_with_entity_attrs():
     return template_data
 
 
-def set_review_color_space(opengl_node, review_color_space="", log=None):
+def set_review_color_space(node, review_color_space="", log=None):
     """Set ociocolorspace parameter for the given OpenGL node.
 
-    Set `ociocolorspace` parameter of the given OpenGl node
+    Set `ociocolorspace` parameter of the given node
     to to the given review_color_space value.
     If review_color_space is empty, a default colorspace corresponding to
     the display & view of the current Houdini session will be used.
 
+    Note:
+        This function expects nodes of type `opengl` or `flipbook`.
+
     Args:
-        opengl_node (hou.Node): ROP node to set its ociocolorspace parm.
+        node (hou.Node): ROP node to set its ociocolorspace parm.
         review_color_space (str): Colorspace value for ociocolorspace parm.
         log (logging.Logger): Logger to log to.
     """
@@ -913,23 +918,31 @@ def set_review_color_space(opengl_node, review_color_space="", log=None):
     if log is None:
         log = self.log
 
-    # Set Color Correction parameter to OpenColorIO
-    colorcorrect_parm = opengl_node.parm("colorcorrect")
-    if colorcorrect_parm.eval() != 2:
-        colorcorrect_parm.set(2)
-        log.debug(
-            "'Color Correction' parm on '{}' has been set to"
-            " 'OpenColorIO'".format(opengl_node.path())
+    if node.type().name() not in {"opengl", "flipbook"}:
+        log.warning(
+            "Type of given node {} not allowed."
+            " only types `opengl` and `flipbook` are allowed."
+            .format(node.type().name())
         )
 
-    opengl_node.setParms(
+    # Set Color Correction parameter to OpenColorIO
+    colorcorrect_parm = node.parm("colorcorrect")
+    if colorcorrect_parm.evalAsString() != "ocio":
+        idx = colorcorrect_parm.menuItems().index("ocio")
+        colorcorrect_parm.set(idx)
+        log.debug(
+            "'Color Correction' parm on '{}' has been set to '{}'"
+            .format(node.path(), colorcorrect_parm.menuLabels()[idx])
+        )
+
+    node.setParms(
         {"ociocolorspace": review_color_space}
     )
 
     log.debug(
         "'OCIO Colorspace' parm on '{}' has been set to "
         "the view color space '{}'"
-        .format(opengl_node, review_color_space)
+        .format(node.path(), review_color_space)
     )
 
 
@@ -1530,7 +1543,8 @@ def show_node_parmeditor(node):
         node (hou.Node): node instance
     """
 
-    # Check if there's a floating parameter editor pane with its node set to the specified node.
+    # Check if there's a floating parameter editor pane with its node
+    #   set to the specified node.
     for tab in hou.ui.paneTabs():
         if (
             tab.type() == hou.paneTabType.Parm
@@ -1556,7 +1570,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
     """Connect the given file parm to a generic loader.
     If the parm is already connected to a generic loader node, go to that node.
     """
-    
+
     from .pipeline import get_or_create_avalon_container
 
     referenced_parm = file_parm.getReferencedParm()
@@ -1570,7 +1584,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
 
     # Create a generic loader node and reference its file parm
     main_container = get_or_create_avalon_container()
-    
+
     node_name = f"{file_parm.node().name()}_{file_parm.name()}_loader"
     load_node = main_container.createNode("ayon::generic_loader",
                                           node_name=node_name)
@@ -1582,6 +1596,35 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
     expression = rf'chs\(\"{relative_path}/file\"\)'  # noqa
     hou.hscript(
         'opparm -r'
-        f' {file_parm.node().path()} {file_parm.name()} \`{expression}\`'
+        f' {file_parm.node().path()} {file_parm.name()} \\`{expression}\\`'
     )
     show_node_parmeditor(load_node)
+
+
+@lru_cache(1)
+def is_version_up_workfile_menu_enabled() -> bool:
+    """Check if the 'Version Up Workfile' menu should be enabled.
+
+    It's cached because we don't care about updating the menu during the
+    current Houdini session and this allows us to avoid re-querying the
+    project settings each time.
+
+    """
+    project_settings = get_current_project_settings()
+    if project_settings["core"]["tools"]["ayon_menu"].get(
+        "version_up_current_workfile"
+    ):
+        return True
+    return False
+
+
+def format_as_collections(
+    files: list[str],
+    pattern: str = "{head}{padding}{tail} [{ranges}]"
+) -> list[str]:
+    """Return list of files as formatted sequence collections."""
+
+    collections, remainder = clique.assemble(files)
+    result = [collection.format(pattern) for collection in collections]
+    result.extend(remainder)
+    return result

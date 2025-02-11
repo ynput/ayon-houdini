@@ -3,7 +3,9 @@ import hou
 
 import pyblish.api
 
+from ayon_core.pipeline import PublishError
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import format_as_collections
 
 
 class ExtractRender(plugin.HoudiniExtractorPlugin):
@@ -53,14 +55,18 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
                 rop_node.setParms({"runcommand": 1})
 
         if instance.data.get("farm"):
-            self.log.debug("Render should be processed on farm, skipping local render.")
+            self.log.debug(
+                "Render should be processed on farm, skipping local render."
+            )
             return
 
         if creator_attribute.get("render_target") == "local":
-            # FIXME Render the entire frame range if any of the AOVs does not have a
-            # previously rendered version. This situation breaks the publishing.
-            # because There will be missing frames as ROP nodes typically cannot render different
-            #  frame ranges for each AOV; they always use the same frame range for all AOVs.
+            # FIXME Render the entire frame range if any of the AOVs does
+            #   not have a previously rendered version. This situation breaks
+            #   the publishing.
+            # because There will be missing frames as ROP nodes typically
+            #   cannot render different frame ranges for each AOV; they always
+            #   use the same frame range for all AOVs.
             self.render_rop(instance)
 
         # `ExpectedFiles` is a list that includes one dict.
@@ -80,8 +86,15 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             for frame in all_frames
             if not os.path.exists(frame)
         ]
+
         if missing_frames:
-            # TODO: Use user friendly error reporting.
-            raise RuntimeError("Failed to complete render extraction. "
-                               "Missing output files: {}".format(
-                                   missing_frames))
+            # Combine collections for simpler logs of missing files
+            missing_frames  = format_as_collections(missing_frames)
+            missing_frames = "\n ".join(
+                f"- {sequence}" for sequence in missing_frames
+            )
+            raise PublishError(
+                "Failed to complete render extraction.\n"
+                "Please render any missing output files.",
+                detail=f"Missing output files: \n {missing_frames}"
+            )

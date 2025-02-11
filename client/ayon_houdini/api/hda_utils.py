@@ -202,7 +202,7 @@ def get_representation_path(
     if use_ayon_entity_uri:
         path = get_ayon_entity_uri_from_representation_context(context)
     else:
-        path = _get_filepath_from_context(context)
+        path = get_filepath_from_context(context)
         # Load fails on UNC paths with backslashes and also
         # fails to resolve @sourcename var with backslashed
         # paths correctly. So we force forward slashes
@@ -228,7 +228,7 @@ def _remove_format_spec(template: str, key: str) -> str:
     return re.sub(pattern, r"\1\2", template)
 
 
-def _get_filepath_from_context(context: dict):
+def get_filepath_from_context(context: dict):
     """Format file path for sequence with $F or <UDIM>."""
     # The path is either a single file or sequence in a folder.
     # Format frame as $F and udim as <UDIM>
@@ -684,7 +684,7 @@ class SelectProductDialog(QtWidgets.QDialog):
             "usd",
         ]
 
-    def on_product_type_changed(self, product_type: str):  
+    def on_product_type_changed(self, product_type: str):
         self.set_product_type(product_type)
 
     def set_product_type(self, product_type: str):
@@ -707,7 +707,6 @@ class SelectProductDialog(QtWidgets.QDialog):
             self.products_widget.setCurrentItem(matching_items[0])
 
     def get_available_products(self, product_type):
-        
         if product_type == "*":
             product_type = ""
 
@@ -739,11 +738,11 @@ def select_product_name(node):
                                                 fields={"id"})
     if not folder_entity:
         return
-          
+
     dialog = SelectProductDialog(
         project_name,
         folder_entity["id"],
-        parent=lib.get_main_window() 
+        parent=lib.get_main_window()
     )
     dialog.set_selected_product_name(product_parm.eval())
 

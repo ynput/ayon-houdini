@@ -1,11 +1,9 @@
 import os
-import hou
-
 import pyblish.api
 
-from ayon_core.pipeline import publish
+from ayon_core.pipeline import publish, PublishError
 from ayon_houdini.api import plugin
-from ayon_houdini.api.lib import splitext
+from ayon_houdini.api.lib import splitext, format_as_collections
 
 
 class ExtractROP(plugin.HoudiniExtractorPlugin):
@@ -21,6 +19,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         if instance.data.get("farm"):
             self.log.debug("Should be processed on farm, skipping.")
             return
+        creator_attribute = instance.data["creator_attributes"]
 
         files = instance.data["frames"]
         first_file = files[0] if isinstance(files, (list, tuple)) else files
@@ -31,7 +30,12 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        self.render_rop(instance)
+        # Value `local` is used as a fallback if the `render_target`
+        #   key is missing.
+        # This key might be absent because render targets are not
+        #   yet implemented for all product types that use this plugin.
+        if creator_attribute.get("render_target", "local") == "local":
+            self.render_rop(instance)
         self.validate_expected_frames(instance)
 
         # In some cases representation name is not the the extension
@@ -65,12 +69,23 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
             # Single frame
             filenames = [filenames]
 
-        missing_filenames = [
-            filename for filename in filenames
-            if not os.path.isfile(os.path.join(staging_dir, filename))
-        ]
-        if missing_filenames:
-            raise RuntimeError(f"Missing frames: {missing_filenames}")
+        missing_frames = []
+        for filename in filenames:
+            filename = os.path.join(staging_dir, filename)
+            if not os.path.isfile(filename):
+                missing_frames.append(filename)
+
+        if missing_frames:
+            # Combine collections for simpler logs of missing files
+            missing_frames  = format_as_collections(missing_frames)
+            missing_frames = "\n ".join(
+                f"- {sequence}" for sequence in missing_frames
+            )
+            raise PublishError(
+                "Failed to complete render extraction.\n"
+                "Please render any missing output files.",
+                detail=f"Missing output files: \n {missing_frames}"
+            )
 
     def update_representation_data(self,
                                    instance: pyblish.api.Instance,
@@ -79,31 +94,12 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         pass
 
 
-class ExtractOpenGL(ExtractROP,
-                    publish.ColormanagedPyblishPluginMixin):
+class ExtractOpenGLAndFlipbook(ExtractROP,
+                               publish.ColormanagedPyblishPluginMixin):
 
     order = pyblish.api.ExtractorOrder - 0.01
-    label = "Extract OpenGL"
-    families = ["review"]
-
-    def process(self, instance):
-        # This plugin is triggered when marking render as reviewable.
-        # Therefore, this plugin will run over wrong instances.
-        # TODO: Don't run this plugin on wrong instances.
-        # This plugin should run only on review product type
-        # with instance node of opengl type.
-        instance_node = instance.data.get("instance_node")
-        if not instance_node:
-            self.log.debug("Skipping instance without instance node.")
-            return
-
-        rop_node = hou.node(instance_node)
-        if rop_node.type().name() != "opengl":
-            self.log.debug("Skipping OpenGl extraction. Rop node {} "
-                           "is not an OpenGl node.".format(rop_node.path()))
-            return
-
-        super(ExtractOpenGL, self).process(instance)
+    label = "Extract Review (OpenGL & Flipbook)"
+    families = ["rop.opengl"]
 
     def update_representation_data(self,
                                    instance: pyblish.api.Instance,

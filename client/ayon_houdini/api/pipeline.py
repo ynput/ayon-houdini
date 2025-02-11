@@ -92,7 +92,11 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             hdefereval.executeDeferred(shelves.generate_shelves)
             hdefereval.executeDeferred(creator_node_shelves.install)
             if env_value_to_bool("AYON_WORKFILE_TOOL_ON_START"):
-                hdefereval.executeDeferred(lambda: host_tools.show_workfiles(parent=hou.qt.mainWindow()))
+                hdefereval.executeDeferred(
+                    lambda: host_tools.show_workfiles(
+                        parent=hou.qt.mainWindow()
+                    )
+                )
 
     def workfile_has_unsaved_changes(self):
         return hou.hipFile.hasUnsavedChanges()
@@ -112,9 +116,12 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         # Force forwards slashes to avoid segfault
         filepath = filepath.replace("\\", "/")
 
-        hou.hipFile.load(filepath,
-                         suppress_save_prompt=True,
-                         ignore_load_warnings=False)
+        try:
+            hou.hipFile.load(filepath,
+                             suppress_save_prompt=True,
+                             ignore_load_warnings=False)
+        except hou.LoadWarning as exc:
+            log.warning(exc)
 
         return filepath
 
@@ -240,6 +247,7 @@ def containerise(name,
         "namespace": namespace,
         "loader": str(loader),
         "representation": context["representation"]["id"],
+        "project_name": context["project"]["name"]
     }
 
     lib.imprint(container, data)
@@ -281,6 +289,13 @@ def parse_container(container):
                 # not a json
                 pass
         data[name] = value
+
+    # Support project name in container as optional attribute
+    for name in ["project_name"]:
+        parm = container.parm(name)
+        if not parm:
+            continue
+        data[name] = parm.eval()
 
     # Backwards compatibility pre-schemas for containers
     data["schema"] = data.get("schema", "openpype:container-1.0")

@@ -9,6 +9,22 @@ class CreatorModel(BaseSettingsModel):
         default_factory=list,
     )
 
+def review_node_types_enum():
+    return [
+        {"label": "OpenGL", "value": "opengl"},
+        {"label": "Flipbook", "value": "flipbook"}
+    ]
+
+class CreateReviewModel(BaseSettingsModel):
+    enabled: bool = SettingsField(title="Enabled")
+    default_variants: list[str] = SettingsField(
+        title="Default Products",
+        default_factory=list,
+    )
+    node_type: str = SettingsField(
+        title="Default Node Type",
+        enum_resolver=review_node_types_enum,
+    )
 
 class CreateArnoldAssModel(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
@@ -82,8 +98,8 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateRedshiftROP: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Redshift ROP")
-    CreateReview: CreatorModel = SettingsField(
-        default_factory=CreatorModel,
+    CreateReview: CreateReviewModel = SettingsField(
+        default_factory=CreateReviewModel,
         title="Create Review")
     # "-" is not compatible in the new model
     CreateStaticMesh: CreateStaticMeshModel = SettingsField(
@@ -159,7 +175,8 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     },
     "CreateReview": {
         "enabled": True,
-        "default_variants": ["Main"]
+        "default_variants": ["Main"],
+        "node_type": "opengl"
     },
     "CreateStaticMesh": {
         "enabled": True,
