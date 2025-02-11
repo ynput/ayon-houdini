@@ -110,7 +110,7 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             dst_path = dst_path.replace("\\", "/")
 
         # Create destination folder if it doesn't already exist.
-        if not os.path.exists(os.path.dirname(dst_path)):
+        if dst_path and not os.path.exists(os.path.dirname(dst_path)):
             os.makedirs(os.path.dirname(dst_path))
 
         hou.hipFile.save(file_name=dst_path,
