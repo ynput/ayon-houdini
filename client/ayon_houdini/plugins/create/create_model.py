@@ -152,6 +152,3 @@ class CreateModel(plugin.HoudiniCreator):
         attrs = super().get_pre_create_attr_defs()
         # Use same attributes as for instance attributes
         return attrs + self.get_instance_attr_defs()
-
-    def get_publish_families(self):
-        return ["model", "abc"]
