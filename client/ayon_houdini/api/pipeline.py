@@ -108,6 +108,11 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         # Force forwards slashes to avoid segfault
         if dst_path:
             dst_path = dst_path.replace("\\", "/")
+
+        # Create destination folder if it doesn't already exist.
+        if not os.path.exists(os.path.dirname(dst_path)):
+            os.makedirs(os.path.dirname(dst_path))
+
         hou.hipFile.save(file_name=dst_path,
                          save_to_recent_files=True)
         return dst_path
