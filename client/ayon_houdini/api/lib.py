@@ -9,7 +9,6 @@ import clique
 from functools import lru_cache
 from contextlib import contextmanager
 
-import six
 import ayon_api
 
 import hou
@@ -451,7 +450,7 @@ def read(node):
     for parameter in node.spareParms():
         value = parameter.eval()
         # test if value is json encoded dict
-        if isinstance(value, six.string_types) and \
+        if isinstance(value, str) and \
                 value.startswith(JSON_PREFIX):
             try:
                 value = json.loads(value[len(JSON_PREFIX):])
@@ -561,7 +560,7 @@ def get_template_from_value(key, value):
                                    label=key,
                                    num_components=1,
                                    default_value=(value,))
-    elif isinstance(value, six.string_types):
+    elif isinstance(value, str):
         parm = hou.StringParmTemplate(name=key,
                                       label=key,
                                       num_components=1,
