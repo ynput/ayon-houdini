@@ -813,7 +813,7 @@ def get_available_representations(node):
             project_name,
             version_ids={version_entity["id"]},
             fields={"name"},
-            representation_names=representation_filter    
+            representation_names=representation_filter
     )
     representations_names = [n["name"] for n in representations]
     return representations_names
