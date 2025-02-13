@@ -885,11 +885,11 @@ def expression_get_representation_path() -> str:
     use_entity_uri = bool(hou.evalParm("use_ayon_entity_uri"))
     hash_value = project_name, repre_id, use_entity_uri
     if hash_value in cache:
-        return cache[hash_value]
+        return hou.text.expandString(cache[hash_value])
 
     path = get_representation_path(project_name, repre_id, use_entity_uri)
     cache[hash_value] = path
-    return path
+    return hou.text.expandString(path)
 
 # endregion
 
