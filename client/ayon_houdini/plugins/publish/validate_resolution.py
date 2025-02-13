@@ -202,7 +202,7 @@ class ValidateRenderResolution(plugin.HoudiniInstancePlugin,
 
     @classmethod
     def get_expected_resolution(cls, instance):
-        """Return the expected resolution and pixel aspect ratio for the 
+        """Return the expected resolution and pixel aspect ratio for the
         instance based on the task entity or folder entity."""
 
         entity = instance.data.get("taskEntity")
@@ -227,20 +227,20 @@ class ValidateRenderResolution(plugin.HoudiniInstancePlugin,
 
             if prim.IsA(UsdRender.Product):
                 yield UsdRender.Product(prim)
-                
+
     @staticmethod
     def get_description():
         return inspect.cleandoc("""
             ### Render Resolution does not match context
-            
-            The render resolution or pixel aspect ratio does not match the 
-            resolution configured in the project database. Please ensure the 
+
+            The render resolution or pixel aspect ratio does not match the
+            resolution configured in the project database. Please ensure the
             render resolution is set correctly.
-            
+
             #### USD Render Settings
-            
-            In most cases the render resolution is defined via the Render 
+
+            In most cases the render resolution is defined via the Render
             Settings prim in USD, however each Render Product is capable
-            of authoring its own override. The logs will report the exact 
+            of authoring its own override. The logs will report the exact
             attribute path for the mismatching resolution or aspect ratio.
         """)

@@ -19,13 +19,13 @@ class CreateReview(plugin.HoudiniCreator):
 
     # Default render target
     render_target = "local"
-    
-    # TODO: Publish families should reflect the node type, 
-    # such as `rop.flipbook` for flipbook nodes 
+
+    # TODO: Publish families should reflect the node type,
+    # such as `rop.flipbook` for flipbook nodes
     # and `rop.opengl` for OpenGL nodes.
     def get_publish_families(self):
         return ["review", "rop.opengl"]
-    
+
     def apply_settings(self, project_settings):
         super(CreateReview, self).apply_settings(project_settings)
         # workfile settings added in '0.2.13'
@@ -36,7 +36,6 @@ class CreateReview(plugin.HoudiniCreator):
             self.review_color_space = color_settings.get("review_color_space")
 
     def create(self, product_name, instance_data, pre_create_data):
-        
         self.node_type = pre_create_data.get("node_type")
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
@@ -127,7 +126,7 @@ class CreateReview(plugin.HoudiniCreator):
         to_lock = ["id", "productType"]
 
         self.lock_parameters(instance_node, to_lock)
-    
+
     def get_instance_attr_defs(self):
         render_target_items = {
             "local": "Local machine rendering",
@@ -141,7 +140,7 @@ class CreateReview(plugin.HoudiniCreator):
                     label="Render target",
                     default=self.render_target)
         ]
-    
+
     def get_pre_create_attr_defs(self):
         attrs = super().get_pre_create_attr_defs()
 

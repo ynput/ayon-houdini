@@ -15,12 +15,12 @@ class CreateUSDComponentBuilder(plugin.HoudiniCreator):
 
     def get_detail_description(self):
         return inspect.cleandoc("""
-            Creates a USD publish from a Component Output LOP that is part of 
+            Creates a USD publish from a Component Output LOP that is part of
             a solaris component builder network.
-            
-            The created USD will contain the component builder LOPs and all its
-            dependencies inside the single product.
-            
+
+            The created USD will contain the component builder LOPs and all
+            its dependencies inside the single product.
+
             To use it, select a Component Output LOP and click "Create" for
             this creator. It will generate an instance for each selected
             Component Output LOP.
@@ -29,7 +29,7 @@ class CreateUSDComponentBuilder(plugin.HoudiniCreator):
     def create(self, product_name, instance_data, pre_create_data):
         nodes = hou.selectedNodes()
         builders = [
-            node for node in nodes 
+            node for node in nodes
             if node.type().nameWithCategory() == "Lop/componentoutput"
         ]
         for builder in builders:
