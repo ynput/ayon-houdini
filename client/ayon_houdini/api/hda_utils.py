@@ -789,6 +789,11 @@ def get_available_representations(node):
                               "Make sure to set a valid version number.")
         return
 
+    representation_filter = None
+    filter_parm = node.parm("representation_filter")
+    if filter_parm and not filter_parm.isDisabled() and filter_parm.eval():
+        representation_filter = filter_parm.eval().split(" ")
+
     folder_entity = get_folder_by_path(
         project_name,
         folder_path=folder_path,
@@ -807,7 +812,8 @@ def get_available_representations(node):
     representations = get_representations(
             project_name,
             version_ids={version_entity["id"]},
-            fields={"name"}
+            fields={"name"},
+            representation_names=representation_filter
     )
     representations_names = [n["name"] for n in representations]
     return representations_names
@@ -831,6 +837,8 @@ def set_to_latest_version(node):
     representations = get_available_representations(node)
     if representations:
         node.parm("representation_name").set(representations[0])
+    else:
+        node.parm("representation_name").set("")
 
 
 # region Parm Expressions

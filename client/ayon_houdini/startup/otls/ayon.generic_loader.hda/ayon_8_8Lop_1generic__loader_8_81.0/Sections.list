@@ -7,10 +7,9 @@ TypePropertiesOptions	TypePropertiesOptions
 Tools.shelf	Tools.shelf
 Help	Help
 IconImage	IconImage
-MessageNodes	MessageNodes
 PythonModule	PythonModule
 OnCreated	OnCreated
-OnNameChanged	OnNameChanged
 OnLoaded	OnLoaded
+OnDeleted	OnDeleted
+OnNameChanged	OnNameChanged
 ExtraFileOptions	ExtraFileOptions
-AYON__icon.png	AYON_icon.png
