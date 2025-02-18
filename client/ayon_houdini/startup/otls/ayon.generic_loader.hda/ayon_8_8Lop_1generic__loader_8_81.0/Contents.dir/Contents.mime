@@ -5,7 +5,7 @@ Content-Type: multipart/mixed; boundary="HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F4
 Content-Disposition: attachment; filename="node_type"
 Content-Type: text/plain
 
-Sop
+Lop
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.init"
@@ -18,11 +18,10 @@ matchesdef = 0
 Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
-sopflags sopflags = 
 comment ""
-position 6.88107 -9.42883
+position 7.3187 -12.7136
 connectornextid 0
-flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
@@ -70,11 +69,10 @@ matchesdef = 1
 Content-Disposition: attachment; filename="hdaroot/output0.def"
 Content-Type: text/plain
 
-sopflags sopflags = 
 comment ""
-position 0 3.9
+position -1.11759e-08 3.9103
 connectornextid 0
-flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on
+flags =  lock off model off template off footprint off xray off bypass off display off render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
@@ -103,6 +101,7 @@ Content-Type: text/plain
 {
 version 0.8
 outputidx	[ 0	locks=0 ]	(	0	)
+modifiedprims	[ 0	locks=0 ]	(	"`lopinputprims(\".\", 0)`"	)
 }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
