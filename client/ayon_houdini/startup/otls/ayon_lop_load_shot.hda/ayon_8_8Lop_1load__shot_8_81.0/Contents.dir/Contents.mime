@@ -31,9 +31,9 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position 5.6226 -8.58632
+position -2.36203 0.655861
 connectornextid 0
-flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
@@ -196,14 +196,14 @@ Content-Type: text/plain
       righttype = extend
       flags = 0
       start = 40
-      segment { length = 0 expr = ch(\"../mute1\") }
+      segment { length = 0 expr = ch(\"../mute\") }
     }
     channel timeoffset1 {
       lefttype = extend
       righttype = extend
       flags = 0
       start = 40
-      segment { length = 0 expr = ch(\"../timeoffset1\") }
+      segment { length = 0 expr = ch(\"../timeoffset\") }
     }
     channel timescale1 {
       lefttype = extend
@@ -211,7 +211,7 @@ Content-Type: text/plain
       default = 1
       flags = 0
       start = 40
-      segment { length = 0 value = 1 1 expr = ch(\"../timescale1\") }
+      segment { length = 0 value = 1 1 expr = ch(\"../timescale\") }
     }
   }
 
@@ -419,6 +419,14 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../representation\") language = python }
     }
+    channel nodes_referencing_file {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" language = python }
+    }
     channel project_name {
       lefttype = extend
       righttype = extend
@@ -494,14 +502,6 @@ Content-Type: text/plain
       flags = 0
       start = 40
       segment { length = 0 expr = ch(\"../show_pipeline_parms\") }
-    }
-    channel nodes_referencing_file {
-      lefttype = extend
-      righttype = extend
-      defaultString = \"\"
-      flags = 0
-      start = 40
-      segment { length = 0 expr = "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" language = python }
     }
   }
 

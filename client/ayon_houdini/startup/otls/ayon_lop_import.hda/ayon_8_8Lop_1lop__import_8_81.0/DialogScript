@@ -21,7 +21,7 @@
         parmtag { "script_callback_language" "python" }
 
         parm {
-            name    "assetinfo_labelparm"
+            name    "assetinfo"
             label   "Heading"
             type    label
             default { "Choose Product" }
@@ -46,7 +46,7 @@
             parmtag { "script_action_icon" "BUTTONS_reselect" }
         }
         parm {
-            name    "labelparm"
+            name    "folder_name"
             label   "Folder Name"
             type    label
             default { "`strsplit(chs(\"folder_path\"), \"/\", -1)`" }
@@ -125,7 +125,7 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
-            name    "primpath1"
+            name    "primpath"
             label   "Primitive Root"
             type    string
             joinnext
@@ -149,7 +149,7 @@
                 "`chs(\"folder_name\")`"        "Folder Name\n    (Use for \"Asset Build\" workflow)"
                 "`chs(\"folder_path\")`/$OS"    "Folder Path with Node Name\n    (Use for \"Shot\" or \"Scene Assembly\" workflow)"
             }
-            parmtag { "script_callback" "parm = kwargs[\"node\"].parm(\"primpath1\"); parm.revertToDefaults(); parm.set(kwargs[\"script_value0\"])" }
+            parmtag { "script_callback" "parm = kwargs[\"node\"].parm(\"primpath\"); parm.revertToDefaults(); parm.set(kwargs[\"script_value\"])" }
             parmtag { "script_callback_language" "python" }
         }
         groupcollapsible {
@@ -157,7 +157,7 @@
             label   "Load Options"
 
             parm {
-                name    "reftype1"
+                name    "reftype"
                 label   "Reference Type"
                 type    string
                 default { "file" }
@@ -169,7 +169,7 @@
                 parmtag { "script_callback_language" "python" }
             }
             parm {
-                name    "instanceable1"
+                name    "instanceable"
                 label   "Make Instanceable"
                 type    toggle
                 default { "off" }
@@ -177,11 +177,11 @@
                 parmtag { "script_callback_language" "python" }
             }
             parm {
-                name    "filerefprim1"
+                name    "filerefprim"
                 label   "Reference Primitive"
                 type    string
                 default { "automaticPrim" }
-                hidewhen "{ reftype1 == prim } { reftype1 == inherit } { reftype1 == specialize }"
+                hidewhen "{ reftype == prim } { reftype == inherit } { reftype == specialize }"
                 menu {
                     "automaticPrim" "Reference Automatically Chosen Primitive"
                     "defaultPrim"   "Reference Default Primitive"
@@ -191,11 +191,11 @@
                 parmtag { "script_callback_language" "python" }
             }
             parm {
-                name    "filerefprimpath1"
+                name    "filerefprimpath"
                 label   "Reference Primitive Path"
                 type    string
                 default { "" }
-                disablewhen "{ filerefprim1 != \"\" reftype1 != prim reftype1 != inherit reftype1 != specialize }"
+                disablewhen "{ filerefprim != \"\" reftype != prim reftype != inherit reftype != specialize }"
                 parmtag { "autoscope" "0000000000000000" }
                 parmtag { "script_action" "import loputils\nnode = kwargs['node']\nparm = kwargs['parmtuple'][0]\nreftype = node.evalParm(parm.name().replace(\n    'filerefprimpath', 'reftype'))\nif reftype in ('prim', 'inherit', 'specialize'):\n    prims = loputils.selectPrimsInParm(kwargs, True)\nelse:\n    parm = node.parm(parm.name().replace(\n       'filerefprimpath', 'filepath'))\n    prims = loputils.selectPrimsInParmFromFile(kwargs, False,\n        parm.evalAsString().strip('\\'\"'))" }
                 parmtag { "script_action_help" "Select a primitive from a primitive picker dialog." }
@@ -204,7 +204,7 @@
                 parmtag { "sidefx::usdpathtype" "prim" }
             }
             parm {
-                name    "timeoffset1"
+                name    "timeoffset"
                 label   "Time Offset (in Frames)"
                 type    float
                 default { "0" }
@@ -213,7 +213,7 @@
                 parmtag { "script_callback_language" "python" }
             }
             parm {
-                name    "timescale1"
+                name    "timescale"
                 label   "Time Scale"
                 type    float
                 default { "1" }
