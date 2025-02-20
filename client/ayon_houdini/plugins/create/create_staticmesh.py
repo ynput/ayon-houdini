@@ -63,7 +63,7 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             hou.objNodeTypeCategory(),
             hou.sopNodeTypeCategory()
         ]
-    
+
     def get_instance_attr_defs(self):
         render_target_items = {
             "local": "Local machine rendering",

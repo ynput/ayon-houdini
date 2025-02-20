@@ -85,7 +85,9 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
             "RS_outputFileFormat": ext_format_index[ext],
         }
         if ext == "exr":
-            parms["RS_outputMultilayerMode"] = multilayer_mode_index[multi_layered_mode]
+            parms["RS_outputMultilayerMode"] = (
+                multilayer_mode_index[multi_layered_mode]
+            )
             parms["RS_aovMultipart"] = multipart
 
         if self.selected_nodes:

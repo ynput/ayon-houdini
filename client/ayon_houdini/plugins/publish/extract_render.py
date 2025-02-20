@@ -55,14 +55,18 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
                 rop_node.setParms({"runcommand": 1})
 
         if instance.data.get("farm"):
-            self.log.debug("Render should be processed on farm, skipping local render.")
+            self.log.debug(
+                "Render should be processed on farm, skipping local render."
+            )
             return
 
         if creator_attribute.get("render_target") == "local":
-            # FIXME Render the entire frame range if any of the AOVs does not have a
-            # previously rendered version. This situation breaks the publishing.
-            # because There will be missing frames as ROP nodes typically cannot render different
-            #  frame ranges for each AOV; they always use the same frame range for all AOVs.
+            # FIXME Render the entire frame range if any of the AOVs does
+            #   not have a previously rendered version. This situation breaks
+            #   the publishing.
+            # because There will be missing frames as ROP nodes typically
+            #   cannot render different frame ranges for each AOV; they always
+            #   use the same frame range for all AOVs.
             self.render_rop(instance)
 
         # `ExpectedFiles` is a list that includes one dict.
@@ -86,7 +90,9 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
         if missing_frames:
             # Combine collections for simpler logs of missing files
             missing_frames  = format_as_collections(missing_frames)
-            missing_frames = "\n ".join(f"- {sequence}" for sequence in missing_frames)
+            missing_frames = "\n ".join(
+                f"- {sequence}" for sequence in missing_frames
+            )
             raise PublishError(
                 "Failed to complete render extraction.\n"
                 "Please render any missing output files.",

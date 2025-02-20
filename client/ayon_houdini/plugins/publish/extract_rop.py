@@ -30,9 +30,10 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         )
         ext = ext.lstrip(".")
 
-        # Value `local` is used as a fallback if the `render_target` key is missing.
-        # This key might be absent because render targets are not yet implemented
-        #  for all product types that use this plugin.
+        # Value `local` is used as a fallback if the `render_target`
+        #   key is missing.
+        # This key might be absent because render targets are not
+        #   yet implemented for all product types that use this plugin.
         if creator_attribute.get("render_target", "local") == "local":
             self.render_rop(instance)
         self.validate_expected_frames(instance)
@@ -77,7 +78,9 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
         if missing_frames:
             # Combine collections for simpler logs of missing files
             missing_frames  = format_as_collections(missing_frames)
-            missing_frames = "\n ".join(f"- {sequence}" for sequence in missing_frames)
+            missing_frames = "\n ".join(
+                f"- {sequence}" for sequence in missing_frames
+            )
             raise PublishError(
                 "Failed to complete render extraction.\n"
                 "Please render any missing output files.",

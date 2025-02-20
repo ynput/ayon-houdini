@@ -33,7 +33,11 @@ class SaveCurrentScene(plugin.HoudiniContextPlugin):
     def get_error_description(self):
         return inspect.cleandoc(
             """### Scene File Name Changed During Publishing
-            This error occurs when you validate the scene and then save it as a new file manually, or if you open a new file and continue publishing.
-            Please reset the publisher and publish without changing the scene file midway.
+            This error occurs when you validate the scene and then save it as
+            a new file manually, or if you open a new file and continue
+            publishing.
+
+            Please reset the publisher and publish without changing
+            the scene file midway.
             """
         )
