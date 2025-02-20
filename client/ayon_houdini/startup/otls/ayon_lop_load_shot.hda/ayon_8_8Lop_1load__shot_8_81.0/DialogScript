@@ -21,7 +21,7 @@
         parmtag { "script_callback_language" "python" }
 
         parm {
-            name    "assetinfo_labelparm"
+            name    "assetinfo"
             label   "Heading"
             type    label
             default { "Choose Product" }
@@ -129,7 +129,7 @@
             label   "Load Options"
 
             parm {
-                name    "mute1"
+                name    "mute"
                 label   "Mute Layer"
                 type    toggle
                 default { "off" }
@@ -137,7 +137,7 @@
                 parmtag { "script_callback_language" "python" }
             }
             parm {
-                name    "timeoffset1"
+                name    "timeoffset"
                 label   "Time Offset (in Frames)"
                 type    float
                 default { "0" }
@@ -146,7 +146,7 @@
                 parmtag { "script_callback_language" "python" }
             }
             parm {
-                name    "timescale1"
+                name    "timescale"
                 label   "Time Scale"
                 type    float
                 default { "1" }
