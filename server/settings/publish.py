@@ -15,14 +15,6 @@ class CollectAssetHandlesModel(BaseSettingsModel):
         title="Use asset handles")
 
 
-class CollectChunkSizeModel(BaseSettingsModel):
-    """Collect Chunk Size."""
-    enabled: bool = SettingsField(title="Enabled")
-    optional: bool = SettingsField(title="Optional")
-    chunk_size: int = SettingsField(
-        title="Frames Per Task")
-
-
 class AOVFilterSubmodel(BaseSettingsModel):
     """You should use the same host name you are using for Houdini."""
     host_name: str = SettingsField("", title="Houdini Host name")
@@ -132,10 +124,6 @@ class PublishPluginsModel(BaseSettingsModel):
         title="Collect Asset Handles",
         section="Collectors"
     )
-    CollectChunkSize: CollectChunkSizeModel = SettingsField(
-        default_factory=CollectChunkSizeModel,
-        title="Collect Chunk Size"
-    )
     CollectFilesForCleaningUp: CollectFilesForCleaningUpModel = SettingsField(
         default_factory=CollectFilesForCleaningUpModel,
         title="Collect Files For Cleaning Up."
@@ -194,11 +182,6 @@ class PublishPluginsModel(BaseSettingsModel):
 DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     "CollectAssetHandles": {
         "use_asset_handles": True
-    },
-    "CollectChunkSize": {
-        "enabled": True,
-        "optional": True,
-        "chunk_size": 999999
     },
     "CollectFilesForCleaningUp": {
         "enabled": False,
