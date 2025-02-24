@@ -37,6 +37,11 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
         # Imprint the value onto existing attributes instead
         # of trying to force create them because the HDA already
         # contains the attributes
+
+        # Do not store product name - it's dynamically computed
+        values.pop("productName", None)
+        values.pop("AYON_productName", None)
+
         for key, value in values.items():
             parm = node.parm(key)
             if parm:
