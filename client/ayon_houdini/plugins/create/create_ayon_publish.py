@@ -17,7 +17,7 @@ def monkeypatch_attribute(obj, name, value):
 
 
 class CreateAyonPublishROP(plugin.HoudiniCreator):
-    """Universal Scene Description"""
+    """Creator plugin for creating publishes."""
 
     identifier = "io.ayon.creators.houdini.rop_publish"
     label = "AYON Publish"
