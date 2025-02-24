@@ -78,8 +78,7 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
             ext = lib.splitext(
                 filepaths[0],
                 allowed_multidot_extensions=self.multidot_extensions,
-            )[-1]
-            ext_no_dot = ext[1:]
+            )[-1].strip(".")
 
             # representation files must be single `str` if single file
             # and also must be the filename, not full path
@@ -88,8 +87,8 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
                 filenames = filenames[0]
 
             representation = {
-                "name": ext_no_dot,
-                "ext": ext_no_dot,
+                "name": ext,
+                "ext": ext,
                 "files": filenames,
                 "stagingDir": os.path.dirname(filepaths[0]),
             }
