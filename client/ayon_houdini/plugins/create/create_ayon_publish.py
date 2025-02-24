@@ -19,7 +19,7 @@ def monkeypatch_attribute(obj, name, value):
 class CreateAyonPublishROP(plugin.HoudiniCreator):
     """Universal Scene Description"""
 
-    identifier = "io.openpype.creators.houdini.rop_publish"
+    identifier = "io.ayon.creators.houdini.rop_publish"
     label = "AYON Publish"
     product_type = "rop_publish"  # TODO: Come up with better name
     icon = "cubes"
