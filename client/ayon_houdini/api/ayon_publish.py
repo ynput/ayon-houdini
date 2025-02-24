@@ -42,6 +42,7 @@ def publish(node_path: str):
 
     # filter out the increment plugin because it will cause our export to
     # get out of sync with nodes running later downstream
+    # TODO: Implement more optimal way to filter out the workfile increment
     filtered_plugins = [
         plugin
         for plugin in pyblish_plugins
