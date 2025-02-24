@@ -776,20 +776,6 @@
             invisible
             default { "pyblish.avalon.instance" }
         }
-        parm {
-            name    "AYON_productName"
-            label   "AYON_productName"
-            type    string
-            invisible
-            default { "rop_publishMain" }
-        }
-        parm {
-            name    "from_node"
-            label   "from_node"
-            type    toggle
-            invisible
-            default { "0" }
-        }
     }
 
 }
