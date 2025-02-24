@@ -21,7 +21,7 @@
         parmtag { "script_callback_language" "python" }
 
         parm {
-            name    "assetinfo_labelparm"
+            name    "assetinfo"
             label   "Heading"
             type    label
             default { "Choose Product" }
@@ -32,6 +32,7 @@
             label   "Project"
             type    string
             default { "$AYON_PROJECT_NAME" }
+            parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_folder_path;select_folder_path(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
         }
@@ -40,17 +41,25 @@
             label   "Folder Path"
             type    string
             default { "$AYON_FOLDER_PATH" }
+            parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_folder_path;select_folder_path(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
+        }
+        parm {
+            name    "folder_name"
+            label   "Folder Name"
+            type    label
+            default { "`strsplit(chs(\"folder_path\"), \"/\", -1)`" }
+            parmtag { "autoscope" "0000000000000000" }
         }
         parm {
             name    "product_name"
             label   "Product"
             type    string
             default { "usdShot" }
+            parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_product_name;select_product_name(kwargs['node'])" }
             parmtag { "script_action_icon" "BUTTONS_reselect" }
-            parmtag { "script_callback" "hou.phm().set_to_latest_version(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
         }
         parm {
@@ -58,24 +67,22 @@
             label   "Version"
             type    string
             default { "" }
-            disablewhen "{ representation_old == \"\" }"
             menureplace {
-                [ "versions = hou.phm().get_available_versions(kwargs['node'])" ]
-                [ "" ]
-                [ "result = []" ]
-                [ "for version in versions:" ]
-                [ "    result.append(str(version))" ]
-                [ "    result.append(f\"v{version:03d}\")" ]
-                [ "    " ]
-                [ "return result" ]
-                language python
+                [ "opmenu -l -a generic_loader version" ]
             }
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "representation_name"
             label   "Representation"
             type    string
             default { "usd" }
+            menureplace {
+                [ "opmenu -l -a generic_loader representation_name" ]
+            }
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "clear_cache"
@@ -83,7 +90,7 @@
             type    button
             default { "0" }
             help    "The load logic uses expressions that cache into the current session to avoid continuously requeryin the database. This clear that cache to enforce a full refresh of the expressions."
-            parmtag { "script_callback" "hou.phm().expression_clear_cache()" }
+            parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_callback_language" "python" }
         }
         parm {
@@ -93,6 +100,23 @@
             default { "" }
         }
         parm {
+            name    "file"
+            label   "File"
+            type    string
+            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_path()" python ] }
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "use_ayon_entity_uri"
+            label   "Use AYON Entity URI"
+            type    toggle
+            default { "off" }
+            help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
             name    "reload"
             label   "Reload Files"
             type    button
@@ -100,26 +124,12 @@
             parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_callback_language" "python" }
         }
-        parm {
-            name    "file"
-            label   "File"
-            type    string
-            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_path()" python ] }
-            parmtag { "script_callback_language" "python" }
-        }
-        parm {
-            name    "use_ayon_entity_uri"
-            label   "Use AYON Entity URI"
-            type    toggle
-            default { "0" }
-            help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
-        }
         groupcollapsible {
             name    "extra_options"
             label   "Load Options"
 
             parm {
-                name    "mute1"
+                name    "mute"
                 label   "Mute Layer"
                 type    toggle
                 default { "off" }
@@ -127,7 +137,7 @@
                 parmtag { "script_callback_language" "python" }
             }
             parm {
-                name    "timeoffset1"
+                name    "timeoffset"
                 label   "Time Offset (in Frames)"
                 type    float
                 default { "0" }
@@ -136,7 +146,7 @@
                 parmtag { "script_callback_language" "python" }
             }
             parm {
-                name    "timescale1"
+                name    "timescale"
                 label   "Time Scale"
                 type    float
                 default { "1" }
@@ -156,9 +166,8 @@
             name    "show_thumbnail"
             label   "Show Entity Thumbnail"
             type    toggle
-            joinnext
-            default { "0" }
-            parmtag { "script_callback" "hou.phm().on_thumbnail_show_changed(kwargs['node'])" }
+            default { "off" }
+            parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_callback_language" "python" }
         }
         parm {
@@ -213,7 +222,9 @@
             name    "show_pipeline_parms"
             label   "Show Pipeline Parms"
             type    toggle
-            default { "0" }
+            default { "off" }
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
         }
     }
 
@@ -251,6 +262,8 @@
             label   "Representation ID"
             type    string
             default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_id()" python ] }
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
         }
         parm {
             name    "version_name"

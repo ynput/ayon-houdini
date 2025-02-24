@@ -12,8 +12,6 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
         "camera",
         "vdbcache",
         "imagesequence",
-        "usd",
-        "usdrender",
         "redshiftproxy",
         "staticMesh",
         "model",
@@ -68,7 +66,8 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
 
         else:
             raise KnownPublishError(
-                "ROP node type '{}' is not supported.".format(node_type)
+                f"ROP node type '{node_type}' is not supported"
+                f" for product type '{instance.data['product_type']}'"
             )
 
         if not out_node:

@@ -24,7 +24,7 @@ class ValidateSopOutputNode(plugin.HoudiniInstancePlugin):
     """
 
     order = pyblish.api.ValidatorOrder
-    families = ["pointcache", "vdbcache", "model"]
+    families = ["pointcache", "vdbcache", "abc"]
     label = "Validate Output Node (SOP)"
     actions = [SelectROPAction, SelectInvalidAction]
 
@@ -33,8 +33,11 @@ class ValidateSopOutputNode(plugin.HoudiniInstancePlugin):
         invalid = self.get_invalid(instance)
         if invalid:
             raise PublishValidationError(
-                "Output node(s) are incorrect",
-                title="Invalid output node(s)"
+                "Output node(s) are incorrect.",
+                detail=(
+                    "Incorrect output SOP path on Rop(s)"
+                    f"\n\n - {invalid[0].path()}"
+                )
             )
 
     @classmethod
@@ -65,9 +68,9 @@ class ValidateSopOutputNode(plugin.HoudiniInstancePlugin):
         # the isinstance check above should be stricter than this category
         if output_node.type().category().name() != "Sop":
             raise PublishValidationError(
-                ("Output node {} is not of category Sop. "
-                 "This is a bug.").format(output_node.path()),
-                title=cls.label)
+                f"Output node {output_node.path()} is not of category Sop.",
+                title=cls.label
+            )
 
         # Ensure the node is cooked and succeeds to cook so we can correctly
         # check for its geometry data.
@@ -76,9 +79,10 @@ class ValidateSopOutputNode(plugin.HoudiniInstancePlugin):
             try:
                 output_node.cook()
             except hou.Error as exc:
-                cls.log.error("Cook failed: %s" % exc)
-                cls.log.error(output_node.errors()[0])
-                return [output_node]
+                raise PublishValidationError(
+                    f"Failed to cook node: {output_node.path()}.",
+                    detail=str(exc)
+                )
 
         # Ensure the output node has at least Geometry data
         if not output_node.geometry():

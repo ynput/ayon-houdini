@@ -161,8 +161,8 @@ def get_or_create_shelf(shelf_label):
 
 
 def get_or_create_tool(tool_definition, shelf, template_data):
-    """This function verifies if the tool exists and updates it. If not, creates
-    a new one.
+    """This function verifies if the tool exists and updates it. If not,
+    creates a new one.
 
     Arguments:
         tool_definition (dict): Dict with label, script, icon and help

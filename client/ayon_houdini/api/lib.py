@@ -5,9 +5,10 @@ import errno
 import re
 import logging
 import json
+import clique
+from functools import lru_cache
 from contextlib import contextmanager
 
-import six
 import ayon_api
 
 import hou
@@ -92,7 +93,7 @@ def get_output_parameter(node):
     elif node_type == "fetch":
         fetched_node = hou.node(node.parm("source").eval())
         return get_output_parameter(fetched_node)
-    elif node_type in {"karma", "opengl"}:
+    elif node_type in {"karma", "opengl", "flipbook"}:
         return node.parm("picture")
     elif node_type == "ifd":  # Mantra
         if node.evalParm("soho_outputmode"):
@@ -239,9 +240,8 @@ def validate_fps():
             dialog = PopupUpdateKeys(parent=parent)
             dialog.setModal(True)
             dialog.setWindowTitle("Houdini scene does not match project FPS")
-            dialog.set_message(
-                "Scene %i FPS does not match project %i FPS" % (current_fps, fps)
-            )
+            dialog.set_message("Scene %i FPS does not match project %i FPS" %
+                              (current_fps, fps))
             dialog.set_button_text("Fix")
 
             # on_show is the Fix button clicked callback
@@ -279,21 +279,18 @@ def render_rop(ropnode, frame_range=None):
 
     # Render
     try:
-        ropnode.render(
-            verbose=verbose,
-            # Allow Deadline to capture completion percentage
-            output_progress=verbose,
-            # Render only this node
-            # (do not render any of its dependencies)
-            ignore_inputs=True,
-            frame_range=frame_range,
-        )
+        ropnode.render(verbose=verbose,
+                       # Allow Deadline to capture completion percentage
+                       output_progress=verbose,
+                       # Render only this node
+                       # (do not render any of its dependencies)
+                       ignore_inputs=True,
+                       frame_range=frame_range)
     except hou.Error as exc:
         # The hou.Error is not inherited from a Python Exception class,
         # so we explicitly capture the houdini error, otherwise pyblish
         # will remain hanging.
         import traceback
-
         traceback.print_exc()
         raise RuntimeError("Render failed: {0}".format(exc))
 
@@ -456,9 +453,10 @@ def read(node):
     for parameter in node.spareParms():
         value = parameter.eval()
         # test if value is json encoded dict
-        if isinstance(value, six.string_types) and value.startswith(JSON_PREFIX):
+        if isinstance(value, str) and \
+                value.startswith(JSON_PREFIX):
             try:
-                value = json.loads(value[len(JSON_PREFIX) :])
+                value = json.loads(value[len(JSON_PREFIX):])
             except json.JSONDecodeError:
                 # not a json
                 pass
@@ -552,26 +550,30 @@ def get_main_window():
 
 def get_template_from_value(key, value):
     if isinstance(value, float):
-        parm = hou.FloatParmTemplate(
-            name=key, label=key, num_components=1, default_value=(value,)
-        )
+        parm = hou.FloatParmTemplate(name=key,
+                                     label=key,
+                                     num_components=1,
+                                     default_value=(value,))
     elif isinstance(value, bool):
-        parm = hou.ToggleParmTemplate(name=key, label=key, default_value=value)
+        parm = hou.ToggleParmTemplate(name=key,
+                                      label=key,
+                                      default_value=value)
     elif isinstance(value, int):
-        parm = hou.IntParmTemplate(
-            name=key, label=key, num_components=1, default_value=(value,)
-        )
-    elif isinstance(value, six.string_types):
-        parm = hou.StringParmTemplate(
-            name=key, label=key, num_components=1, default_value=(value,)
-        )
+        parm = hou.IntParmTemplate(name=key,
+                                   label=key,
+                                   num_components=1,
+                                   default_value=(value,))
+    elif isinstance(value, str):
+        parm = hou.StringParmTemplate(name=key,
+                                      label=key,
+                                      num_components=1,
+                                      default_value=(value,))
     elif isinstance(value, (dict, list, tuple)):
-        parm = hou.StringParmTemplate(
-            name=key,
-            label=key,
-            num_components=1,
-            default_value=(JSON_PREFIX + json.dumps(value),),
-        )
+        parm = hou.StringParmTemplate(name=key,
+                                      label=key,
+                                      num_components=1,
+                                      default_value=(
+                                          JSON_PREFIX + json.dumps(value),))
     else:
         raise TypeError("Unsupported type: %r" % type(value))
 
@@ -608,7 +610,9 @@ def get_frame_data(node, log=None):
     data = {}
 
     if node.parm("trange") is None:
-        log.debug("Node has no 'trange' parameter: {}".format(node.path()))
+        log.debug(
+            "Node has no 'trange' parameter: {}".format(node.path())
+        )
         return data
 
     if node.evalParm("trange") == 0:
@@ -645,7 +649,7 @@ def splitext(name, allowed_multidot_extensions):
 
     for ext in allowed_multidot_extensions:
         if name.endswith(ext):
-            return name[: -len(ext)], ext
+            return name[:-len(ext)], ext
 
     return os.path.splitext(name)
 
@@ -703,7 +707,7 @@ def get_color_management_preferences():
     preferences = {
         "config": hou.Color.ocio_configPath(),
         "display": hou.Color.ocio_defaultDisplay(),
-        "view": hou.Color.ocio_defaultView(),
+        "view": hou.Color.ocio_defaultView()
     }
 
     # Note: For whatever reason they are cases where `view` may be an empty
@@ -713,24 +717,21 @@ def get_color_management_preferences():
     if preferences["config"] and not preferences["view"]:
         log.debug(
             "Houdini `hou.Color.ocio_defaultView()` returned empty value."
-            " Falling back to `PyOpenColorIO` to get the default view."
-        )
+            " Falling back to `PyOpenColorIO` to get the default view.")
         try:
             import PyOpenColorIO
         except ImportError:
             log.warning(
                 "Unable to workaround empty return value of "
                 "`hou.Color.ocio_defaultView()` because `PyOpenColorIO` is "
-                "not available."
-            )
+                "not available.")
             return preferences
 
         config_path = preferences["config"]
         config = PyOpenColorIO.Config.CreateFromFile(config_path)
         display = config.getDefaultDisplay()
-        assert (
-            display == preferences["display"]
-        ), "Houdini default OCIO display must match config default display"
+        assert display == preferences["display"], \
+            "Houdini default OCIO display must match config default display"
         view = config.getDefaultView(display)
         preferences["display"] = display
         preferences["view"] = view
@@ -764,7 +765,8 @@ def get_obj_node_output(obj_node):
         return outputs[0]
 
     else:
-        return min(outputs, key=lambda node: node.evalParm("outputidx"))
+        return min(outputs,
+                   key=lambda node: node.evalParm('outputidx'))
 
 
 def get_output_children(output_node, include_sops=True):
@@ -779,7 +781,8 @@ def get_output_children(output_node, include_sops=True):
         for child in output_node.children():
             out_list += get_output_children(child, include_sops=include_sops)
 
-    elif include_sops and output_node.childTypeCategory() == hou.sopNodeTypeCategory():
+    elif include_sops and \
+            output_node.childTypeCategory() == hou.sopNodeTypeCategory():
         out = get_obj_node_output(output_node)
         if out:
             out_list += [out]
@@ -798,7 +801,7 @@ def get_resolution_from_entity(entity):
 
     """
     if not entity or "attrib" not in entity:
-        raise ValueError(f'Entity is not valid: "{entity}"')
+        raise ValueError(f"Entity is not valid: \"{entity}\"")
 
     attributes = entity["attrib"]
     resolution_width = attributes.get("resolutionWidth")
@@ -827,20 +830,20 @@ def set_camera_resolution(camera, entity=None):
     resolution = get_resolution_from_entity(entity)
 
     if resolution:
-        print(
-            "Setting camera resolution: {} -> {}x{}".format(
-                camera.name(), resolution[0], resolution[1]
-            )
-        )
+        print("Setting camera resolution: {} -> {}x{}".format(
+            camera.name(), resolution[0], resolution[1]
+        ))
         camera.parm("resx").set(resolution[0])
         camera.parm("resy").set(resolution[1])
 
 
 def get_camera_from_container(container):
-    """Get camera from container node."""
+    """Get camera from container node. """
 
     cameras = container.recursiveGlob(
-        "*", filter=hou.nodeTypeFilter.ObjCamera, include_subnets=False
+        "*",
+        filter=hou.nodeTypeFilter.ObjCamera,
+        include_subnets=False
     )
 
     assert len(cameras) == 1, "Camera instance must have only one camera"
@@ -897,16 +900,19 @@ def get_current_context_template_data_with_entity_attrs():
     return template_data
 
 
-def set_review_color_space(opengl_node, review_color_space="", log=None):
+def set_review_color_space(node, review_color_space="", log=None):
     """Set ociocolorspace parameter for the given OpenGL node.
 
-    Set `ociocolorspace` parameter of the given OpenGl node
+    Set `ociocolorspace` parameter of the given node
     to to the given review_color_space value.
     If review_color_space is empty, a default colorspace corresponding to
     the display & view of the current Houdini session will be used.
 
+    Note:
+        This function expects nodes of type `opengl` or `flipbook`.
+
     Args:
-        opengl_node (hou.Node): ROP node to set its ociocolorspace parm.
+        node (hou.Node): ROP node to set its ociocolorspace parm.
         review_color_space (str): Colorspace value for ociocolorspace parm.
         log (logging.Logger): Logger to log to.
     """
@@ -914,20 +920,31 @@ def set_review_color_space(opengl_node, review_color_space="", log=None):
     if log is None:
         log = self.log
 
-    # Set Color Correction parameter to OpenColorIO
-    colorcorrect_parm = opengl_node.parm("colorcorrect")
-    if colorcorrect_parm.eval() != 2:
-        colorcorrect_parm.set(2)
-        log.debug(
-            "'Color Correction' parm on '{}' has been set to"
-            " 'OpenColorIO'".format(opengl_node.path())
+    if node.type().name() not in {"opengl", "flipbook"}:
+        log.warning(
+            "Type of given node {} not allowed."
+            " only types `opengl` and `flipbook` are allowed."
+            .format(node.type().name())
         )
 
-    opengl_node.setParms({"ociocolorspace": review_color_space})
+    # Set Color Correction parameter to OpenColorIO
+    colorcorrect_parm = node.parm("colorcorrect")
+    if colorcorrect_parm.evalAsString() != "ocio":
+        idx = colorcorrect_parm.menuItems().index("ocio")
+        colorcorrect_parm.set(idx)
+        log.debug(
+            "'Color Correction' parm on '{}' has been set to '{}'"
+            .format(node.path(), colorcorrect_parm.menuLabels()[idx])
+        )
+
+    node.setParms(
+        {"ociocolorspace": review_color_space}
+    )
 
     log.debug(
         "'OCIO Colorspace' parm on '{}' has been set to "
-        "the view color space '{}'".format(opengl_node, review_color_space)
+        "the view color space '{}'"
+        .format(node.path(), review_color_space)
     )
 
 
@@ -937,9 +954,8 @@ def get_context_var_changes():
     houdini_vars_to_update = {}
 
     project_settings = get_current_project_settings()
-    houdini_vars_settings = project_settings["houdini"]["general"][
-        "update_houdini_var_context"
-    ]
+    houdini_vars_settings = \
+        project_settings["houdini"]["general"]["update_houdini_var_context"]
 
     if not houdini_vars_settings["enabled"]:
         return houdini_vars_to_update
@@ -960,7 +976,10 @@ def get_context_var_changes():
         var = item["var"].strip().upper()
 
         # get and resolve template in value
-        item_value = StringTemplate.format_template(item["value"], template_data)
+        item_value = StringTemplate.format_template(
+            item["value"],
+            template_data
+        )
 
         if var == "JOB" and item_value == "":
             # sync $JOB to $HIP if $JOB is empty
@@ -973,9 +992,7 @@ def get_context_var_changes():
 
         if current_value != item_value:
             houdini_vars_to_update[var] = (
-                current_value,
-                item_value,
-                item["is_directory"],
+                current_value, item_value, item["is_directory"]
             )
 
     return houdini_vars_to_update
@@ -1078,14 +1095,16 @@ def self_publish():
         "Add Publish Comment",
         buttons=("Publish", "Cancel"),
         title="Publish comment",
-        close_choice=1,
+        close_choice=1
     )
 
     if result:
         return
 
     current_node = hou.node(".")
-    inputs_paths = find_rop_input_dependencies(current_node.inputDependencies())
+    inputs_paths = find_rop_input_dependencies(
+        current_node.inputDependencies()
+    )
     inputs_paths.append(current_node.path())
 
     host = registered_host()
@@ -1109,9 +1128,9 @@ def add_self_publish_button(node):
         "ayon_self_publish",
         "{} Publish".format(label),
         script_callback="from ayon_houdini.api.lib import "
-        "self_publish; self_publish()",
+                        "self_publish; self_publish()",
         script_callback_language=hou.scriptLanguage.Python,
-        join_with_next=True,
+        join_with_next=True
     )
 
     template = node.parmTemplateGroup()
@@ -1146,11 +1165,10 @@ def get_scene_viewer(visible_only=True):
 
 
 def sceneview_snapshot(
-    sceneview,
-    filepath="$HIP/thumbnails/$HIPNAME.$F4.jpg",
-    frame_start=None,
-    frame_end=None,
-):
+        sceneview,
+        filepath="$HIP/thumbnails/$HIPNAME.$F4.jpg",
+        frame_start=None,
+        frame_end=None):
     """Take a snapshot of your scene view.
 
     It takes snapshot of your scene view for the given frame range.
@@ -1189,7 +1207,8 @@ def sceneview_snapshot(
         frame_end = frame_start
 
     if not isinstance(sceneview, hou.SceneViewer):
-        log.debug("Wrong Input. {} is not of type hou.SceneViewer.".format(sceneview))
+        log.debug("Wrong Input. {} is not of type hou.SceneViewer."
+                  .format(sceneview))
         return
     viewport = sceneview.curViewport()
 
@@ -1202,7 +1221,7 @@ def sceneview_snapshot(
 
 
 def get_background_images(node, raw=False):
-    """ "Return background images defined inside node.
+    """Return background images defined inside node.
 
     Similar to `nodegraphutils.saveBackgroundImages` but this method also
     allows to retrieve the data as JSON encodable data instead of
@@ -1210,9 +1229,8 @@ def get_background_images(node, raw=False):
     """
 
     def _parse(image_data):
-        image = hou.NetworkImage(
-            image_data["path"], hou.BoundingRect(*image_data["rect"])
-        )
+        image = hou.NetworkImage(image_data["path"],
+                                 hou.BoundingRect(*image_data["rect"]))
         if "relativetopath" in image_data:
             image.setRelativeToPath(image_data["relativetopath"])
         if "brightness" in image_data:
@@ -1267,7 +1285,8 @@ def set_background_images(node, images):
 
     with hou.undos.group("Edit Background Images"):
         if images:
-            assert all(isinstance(image, (dict, hou.NetworkImage)) for image in images)
+            assert all(isinstance(image, (dict, hou.NetworkImage))
+                       for image in images)
             data = json.dumps([_serialize(image) for image in images])
             node.setUserData("backgroundimages", data)
         else:
@@ -1307,7 +1326,7 @@ def set_node_thumbnail(node, image_path, rect=None):
             for index, image in enumerate(images)
             if image.relativeToPath() == node_path
         ),
-        (None, None),
+        (None, None)
     )
     if image_path is None:
         # Remove image if it exists
@@ -1348,7 +1367,9 @@ def remove_all_thumbnails(node):
     parent = node.parent()
     images = get_background_images(parent)
     node_path = node.path()
-    images = [image for image in images if image.relativeToPath() != node_path]
+    images = [
+        image for image in images if image.relativeToPath() != node_path
+    ]
     set_background_images(parent, images)
 
 
@@ -1452,7 +1473,9 @@ def prompt_reset_context():
     get matched to the new context.
     """
     # TODO: Cleanup this prototyped mess of imports and odd dialog
-    from ayon_core.tools.attribute_defs.dialog import AttributeDefinitionsDialog
+    from ayon_core.tools.attribute_defs.dialog import (
+        AttributeDefinitionsDialog
+    )
     from ayon_core.style import load_stylesheet
     from ayon_core.lib import BoolDef, UILabelDef
 
@@ -1464,19 +1487,24 @@ def prompt_reset_context():
                 "Would you like to update some settings to the new context?\n"
             )
         ),
-        BoolDef("fps", label="FPS", tooltip="Reset workfile FPS", default=True),
+        BoolDef(
+            "fps",
+            label="FPS",
+            tooltip="Reset workfile FPS",
+            default=True
+        ),
         BoolDef(
             "frame_range",
             label="Frame Range",
             tooltip="Reset workfile start and end frame ranges",
-            default=True,
+            default=True
         ),
         BoolDef(
             "instances",
             label="Publish instances",
             tooltip="Update all publish instance's folder and task to match "
-            "the new folder and task",
-            default=True,
+                    "the new folder and task",
+            default=True
         ),
     ]
 
@@ -1488,7 +1516,10 @@ def prompt_reset_context():
 
     options = dialog.get_values()
     if options["fps"] or options["frame_range"]:
-        reset_framerange(fps=options["fps"], frame_range=options["frame_range"])
+        reset_framerange(
+            fps=options["fps"],
+            frame_range=options["frame_range"]
+        )
 
     if options["instances"]:
         update_content_on_context_change()
@@ -1497,7 +1528,9 @@ def prompt_reset_context():
 
 
 def start_workfile_template_builder():
-    from .workfile_template_builder import build_workfile_template
+    from .workfile_template_builder import (
+        build_workfile_template
+    )
 
     log.info("Starting workfile template builder...")
     try:
@@ -1513,7 +1546,8 @@ def show_node_parmeditor(node):
         node (hou.Node): node instance
     """
 
-    # Check if there's a floating parameter editor pane with its node set to the specified node.
+    # Check if there's a floating parameter editor pane with its node
+    #   set to the specified node.
     for tab in hou.ui.paneTabs():
         if (
             tab.type() == hou.paneTabType.Parm
@@ -1539,7 +1573,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
     """Connect the given file parm to a generic loader.
     If the parm is already connected to a generic loader node, go to that node.
     """
-    
+
     from .pipeline import get_or_create_avalon_container
 
     referenced_parm = file_parm.getReferencedParm()
@@ -1553,7 +1587,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
 
     # Create a generic loader node and reference its file parm
     main_container = get_or_create_avalon_container()
-    
+
     node_name = f"{file_parm.node().name()}_{file_parm.name()}_loader"
     load_node = main_container.createNode("ayon::generic_loader",
                                           node_name=node_name)
@@ -1565,6 +1599,35 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
     expression = rf'chs\(\"{relative_path}/file\"\)'  # noqa
     hou.hscript(
         'opparm -r'
-        f' {file_parm.node().path()} {file_parm.name()} \`{expression}\`'
+        f' {file_parm.node().path()} {file_parm.name()} \\`{expression}\\`'
     )
     show_node_parmeditor(load_node)
+
+
+@lru_cache(1)
+def is_version_up_workfile_menu_enabled() -> bool:
+    """Check if the 'Version Up Workfile' menu should be enabled.
+
+    It's cached because we don't care about updating the menu during the
+    current Houdini session and this allows us to avoid re-querying the
+    project settings each time.
+
+    """
+    project_settings = get_current_project_settings()
+    if project_settings["core"]["tools"]["ayon_menu"].get(
+        "version_up_current_workfile"
+    ):
+        return True
+    return False
+
+
+def format_as_collections(
+    files: list[str],
+    pattern: str = "{head}{padding}{tail} [{ranges}]"
+) -> list[str]:
+    """Return list of files as formatted sequence collections."""
+
+    collections, remainder = clique.assemble(files)
+    result = [collection.format(pattern) for collection in collections]
+    result.extend(remainder)
+    return result

@@ -1,6 +1,6 @@
 import inspect
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import pyblish.api
 import clique
@@ -91,11 +91,11 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
         )
 
     @classmethod
-    def get_invalid(cls, context) -> "List[hou.Node]":
+    def get_invalid(cls, context) -> "Optional[List[hou.Node]]":
         # Get instances matching this plugin families
         instances = pyblish.api.instances_by_plugin(list(context), cls)
         if not instances:
-            return []
+            return
 
         # Get expected rendered filepaths
         paths_to_instance_id = defaultdict(list)
@@ -119,7 +119,7 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
                 invalid_paths.append(path)
 
         if not invalid_instance_ids:
-            return []
+            return
 
         # Log invalid sequences as single collection
         collections, remainder = clique.assemble(invalid_paths)
@@ -142,15 +142,15 @@ class ValidateRenderProductPathsUnique(plugin.HoudiniContextPlugin,
     def get_description(self):
         return inspect.cleandoc(
             """### Output paths overwrite each other
-            
+
             Multiple instances output to the same path. This can cause each
             render to overwrite the other providing unexpected results.
-            
+
             Update the output paths to be unique across all instances.
-            
+
             It may be the case that a single instance outputs multiple files
             that overwrite each other, like separate AOV outputs from one ROP.
-            In that case it may be necessary to update the individual AOV 
+            In that case it may be necessary to update the individual AOV
             output paths, instead of outputs between separate instances.
             """
         )

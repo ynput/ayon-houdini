@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Creator plugin for creating Arnold ASS files."""
 from ayon_houdini.api import plugin
-from ayon_core.lib import BoolDef
+from ayon_core.lib import EnumDef
 
 
 class CreateArnoldAss(plugin.HoudiniCreator):
@@ -17,13 +17,16 @@ class CreateArnoldAss(plugin.HoudiniCreator):
     # will override it by the value in the project settings
     ext = ".ass"
 
+    # Default render target
+    render_target = "local"
+
     def create(self, product_name, instance_data, pre_create_data):
         import hou
 
         instance_data.update({"node_type": "arnold"})
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
-        creator_attributes["farm"] = pre_create_data["farm"]
+        creator_attributes["render_target"] = pre_create_data["render_target"]
 
         instance = super(CreateArnoldAss, self).create(
             product_name,
@@ -57,10 +60,17 @@ class CreateArnoldAss(plugin.HoudiniCreator):
         self.lock_parameters(instance_node, to_lock)
 
     def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+        }
+
         return [
-            BoolDef("farm",
-                    label="Submitting to Farm",
-                    default=False)
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
         ]
 
     def get_pre_create_attr_defs(self):

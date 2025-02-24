@@ -26,9 +26,12 @@ class ValidateAbcPrimitiveToDetail(plugin.HoudiniInstancePlugin):
         invalid = self.get_invalid(instance)
         if invalid:
             raise PublishValidationError(
-                ("Primitives found with inconsistent primitive "
-                 "to detail attributes. See log."),
-                title=self.label
+                "Primitives found with inconsistent primitive "
+                "to detail attributes.",
+                detail=(
+                    "See log for more info."
+                    f"Incorrect Rop(s)\n\n - {invalid[0].path()}"
+                )
             )
 
     @classmethod
@@ -42,7 +45,7 @@ class ValidateAbcPrimitiveToDetail(plugin.HoudiniInstancePlugin):
                 "Ensure a valid SOP output path is set." % rop_node.path()
             )
 
-            return [rop_node.path()]
+            return [rop_node]
 
         pattern = rop_node.parm("prim_to_detail_pattern").eval().strip()
         if not pattern:
@@ -67,7 +70,7 @@ class ValidateAbcPrimitiveToDetail(plugin.HoudiniInstancePlugin):
                 "value set, but 'Build Hierarchy from Attribute'"
                 "is enabled."
             )
-            return [rop_node.path()]
+            return [rop_node]
 
         # Let's assume each attribute is explicitly named for now and has no
         # wildcards for Primitive to Detail. This simplifies the check.
@@ -103,7 +106,7 @@ class ValidateAbcPrimitiveToDetail(plugin.HoudiniInstancePlugin):
                 "Geometry Primitives are missing "
                 "path attribute: `%s`" % path_attr
             )
-            return [output_node.path()]
+            return [output_node]
 
         # Ensure at least a single string value is present
         if not attrib.strings():
@@ -111,7 +114,7 @@ class ValidateAbcPrimitiveToDetail(plugin.HoudiniInstancePlugin):
                 "Primitive path attribute has no "
                 "string values: %s" % path_attr
             )
-            return [output_node.path()]
+            return [output_node]
 
         paths = None
         for attr in pattern.split(" "):
@@ -147,4 +150,4 @@ class ValidateAbcPrimitiveToDetail(plugin.HoudiniInstancePlugin):
                         "Path has multiple values: %s (path: %s)"
                         % (list(values), path)
                     )
-                    return [output_node.path()]
+                    return [output_node]

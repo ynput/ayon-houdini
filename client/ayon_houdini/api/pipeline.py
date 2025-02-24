@@ -92,7 +92,11 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             hdefereval.executeDeferred(shelves.generate_shelves)
             hdefereval.executeDeferred(creator_node_shelves.install)
             if env_value_to_bool("AYON_WORKFILE_TOOL_ON_START"):
-                hdefereval.executeDeferred(lambda: host_tools.show_workfiles(parent=hou.qt.mainWindow()))
+                hdefereval.executeDeferred(
+                    lambda: host_tools.show_workfiles(
+                        parent=hou.qt.mainWindow()
+                    )
+                )
 
     def workfile_has_unsaved_changes(self):
         return hou.hipFile.hasUnsavedChanges()
@@ -243,6 +247,7 @@ def containerise(name,
         "namespace": namespace,
         "loader": str(loader),
         "representation": context["representation"]["id"],
+        "project_name": context["project"]["name"]
     }
 
     lib.imprint(container, data)
@@ -285,6 +290,13 @@ def parse_container(container):
                 pass
         data[name] = value
 
+    # Support project name in container as optional attribute
+    for name in ["project_name"]:
+        parm = container.parm(name)
+        if not parm:
+            continue
+        data[name] = parm.eval()
+
     # Backwards compatibility pre-schemas for containers
     data["schema"] = data.get("schema", "openpype:container-1.0")
 
@@ -309,6 +321,9 @@ def ls():
                             # sortable due to not supporting greater
                             # than comparisons
                             key=lambda node: node.path()):
+        if not container.isEditableInsideLockedHDA():
+            continue
+
         yield parse_container(container)
 
 
