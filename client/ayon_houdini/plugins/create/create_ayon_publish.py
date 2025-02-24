@@ -1,9 +1,19 @@
-# -*- coding: utf-8 -*-
-"""Creator plugin for creating pubs."""
-from ayon_houdini.api import plugin, lib
 import json
+import contextlib
+
+from ayon_houdini.api import plugin, lib
 
 import hou
+
+
+@contextlib.contextmanager
+def monkeypatch_attribute(obj, name, value):
+    original_value = getattr(obj, name)
+    try:
+        setattr(obj, name, value)
+        yield
+    finally:
+        setattr(obj, name, original_value)
 
 
 class CreateAyonPublishROP(plugin.HoudiniCreator):
@@ -48,7 +58,6 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
             "task",
             "creator_attributes",
             "publish_attributes",
-            "AYON_productName",
         ]
         result = {}
         for attr in attributes:
@@ -67,4 +76,20 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
         for key in ["creator_attributes", "publish_attributes"]:
             if not result[key]:
                 result[key] = {}
+
+        # Compute product name
+        # TODO: Preferably we wouldn't need to monkeypatch this but have
+        #  ayon-core automatically be able to update and re-compute the
+        #  product name if a custom product type is set for the instance.
+        folder_path: str = result["folderPath"]
+        task_name: str = result["task"]
+        product_type: str = result["productType"]
+        with monkeypatch_attribute(self, "product_type", product_type):
+            result["productName"] = self.get_product_name(
+                self.create_context.get_current_project_name(),
+                self.create_context.get_folder_entity(folder_path),
+                self.create_context.get_task_entity(folder_path, task_name),
+                variant=result["variant"],
+            )
+
         return result
