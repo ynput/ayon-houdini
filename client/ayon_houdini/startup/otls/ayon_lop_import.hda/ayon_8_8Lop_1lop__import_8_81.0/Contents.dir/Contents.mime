@@ -195,7 +195,7 @@ Content-Type: text/plain
       defaultString = \"/character\"
       flags = 0
       start = 40
-      segment { length = 0 expr = chs(\"../primpath\") }
+      segment { length = 0 expr = chs(\"../primpath1\") }
     }
     channel reftype1 {
       lefttype = extend
@@ -203,14 +203,14 @@ Content-Type: text/plain
       defaultString = \"file\"
       flags = 0
       start = 40
-      segment { length = 0 expr = chs(\"../reftype\") }
+      segment { length = 0 expr = chs(\"../reftype1\") }
     }
     channel instanceable1 {
       lefttype = extend
       righttype = extend
       flags = 0
       start = 40
-      segment { length = 0 expr = ch(\"../instanceable\") }
+      segment { length = 0 expr = ch(\"../instanceable1\") }
     }
     channel filerefprim1 {
       lefttype = extend
@@ -218,7 +218,7 @@ Content-Type: text/plain
       defaultString = \"automaticPrim\"
       flags = 0
       start = 40
-      segment { length = 0 expr = chs(\"../filerefprim\") }
+      segment { length = 0 expr = chs(\"../filerefprim1\") }
     }
     channel filerefprimpath1 {
       lefttype = extend
@@ -226,14 +226,14 @@ Content-Type: text/plain
       defaultString = \"\"
       flags = 0
       start = 40
-      segment { length = 0 expr = chs(\"../filerefprimpath\") }
+      segment { length = 0 expr = chs(\"../filerefprimpath1\") }
     }
     channel timeoffset1 {
       lefttype = extend
       righttype = extend
       flags = 0
       start = 40
-      segment { length = 0 expr = ch(\"../timeoffset\") }
+      segment { length = 0 expr = ch(\"../timeoffset1\") }
     }
     channel timescale1 {
       lefttype = extend
@@ -241,7 +241,7 @@ Content-Type: text/plain
       default = 1
       flags = 0
       start = 40
-      segment { length = 0 value = 1 1 expr = ch(\"../timescale\") }
+      segment { length = 0 value = 1 1 expr = ch(\"../timescale1\") }
     }
     channel reload {
       lefttype = extend
@@ -465,14 +465,6 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../representation\") language = python }
     }
-    channel nodes_referencing_file {
-      lefttype = extend
-      righttype = extend
-      defaultString = \"\"
-      flags = 0
-      start = 40
-      segment { length = 0 expr = "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" language = python }
-    }
     channel project_name {
       lefttype = extend
       righttype = extend
@@ -578,6 +570,14 @@ Content-Type: text/plain
       flags = 0
       start = 40
       segment { length = 0 expr = chs(\"../representation_name\") }
+    }
+    channel nodes_referencing_file {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" language = python }
     }
   }
 
