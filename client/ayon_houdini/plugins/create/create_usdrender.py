@@ -25,7 +25,7 @@ class CreateUSDRender(plugin.HoudiniCreator):
     """USD Render ROP in /stage"""
     identifier = "io.openpype.creators.houdini.usdrender"
     label = "USD Render"
-    product_type = "usdrender"
+    product_type = "render"
     icon = "magic"
     description = "Create USD Render"
 
@@ -161,3 +161,6 @@ class CreateUSDRender(plugin.HoudiniCreator):
         ]
 
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "usdrender"]
