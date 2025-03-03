@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Creator for Unreal Static Meshes."""
+"""Creator plugin for creating Model product type as FBX."""
 from ayon_houdini.api import plugin
 from ayon_core.lib import BoolDef, EnumDef
 
 import hou
 
 
-class CreateStaticMesh(plugin.HoudiniCreator):
+class CreateModelFBX(plugin.HoudiniCreator):
     """Static Meshes as FBX. """
 
     identifier = "io.openpype.creators.houdini.staticmesh.fbx"
@@ -29,7 +29,7 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             "creator_attributes", dict())
         creator_attributes["render_target"] = pre_create_data["render_target"]
 
-        instance = super(CreateStaticMesh, self).create(
+        instance = super(CreateModelFBX, self).create(
             product_name,
             instance_data,
             pre_create_data)
@@ -138,7 +138,7 @@ class CreateStaticMesh(plugin.HoudiniCreator):
         The default prodcut name templates for Unreal include {asset} and thus
         we should pass that along as dynamic data.
         """
-        dynamic_data = super(CreateStaticMesh, self).get_dynamic_data(
+        dynamic_data = super(CreateModelFBX, self).get_dynamic_data(
             project_name,
             folder_entity,
             task_entity,

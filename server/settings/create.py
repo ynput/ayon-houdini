@@ -9,6 +9,13 @@ class CreatorModel(BaseSettingsModel):
         default_factory=list,
     )
 
+class CreatorModelFBX(BaseSettingsModel):
+    enabled: bool = SettingsField(title="Enabled")
+    default_variants: list[str] = SettingsField(
+        title="Default Products",
+        default_factory=list,
+    )
+
 def review_node_types_enum():
     return [
         {"label": "OpenGL", "value": "opengl"},
@@ -86,6 +93,9 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateModel: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Model")
+    CreateModelFBX: CreatorModelFBX = SettingsField(
+        default_factory=CreatorModelFBX,
+        title="Create Model FBX")    
     CreatePointCache: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create PointCache (Abc)")
@@ -157,6 +167,10 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
         "enabled": True,
         "default_variants": ["Main"]
     },
+    "CreateModelFBX": {
+        "enabled": True,
+        "default_variants": ["Main"]
+    },    
     "CreatePointCache": {
         "enabled": True,
         "default_variants": ["Main"]
