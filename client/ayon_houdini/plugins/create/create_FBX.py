@@ -196,10 +196,6 @@ class createStaticMesh(CreateFBX):
     """Static Meshes as FBX. """
 
     identifier = "io.openpype.creators.houdini.staticmesh.fbx"
-    label = "staticMesh (FBX)A"
+    label = "staticMesh (FBX)"
     product_type = "staticMesh"
     icon = "cube"
-    default_variants = ["Main"]
-
-    # Default render target
-    render_target = "local"
