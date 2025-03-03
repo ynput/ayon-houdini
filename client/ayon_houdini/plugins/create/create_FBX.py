@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Creator plugin for creating Model product type as FBX."""
+"""Creator plugins for FBX, like static mesh and model products"""
 from ayon_houdini.api import plugin
 from ayon_core.lib import BoolDef, EnumDef
 
@@ -9,7 +9,7 @@ import hou
 class CreateFBX(plugin.HoudiniCreator):
     """Model as FBX. """
 
-    identifier = "io.openpype.creators.houdini.modelFBX.fbx"
+    identifier = "io.ayon.creators.houdini.model.fbx"
     label = "model (FBX)A"
     product_type = "model"
     icon = "cube"
@@ -28,7 +28,7 @@ class CreateFBX(plugin.HoudiniCreator):
             "creator_attributes", dict())
         creator_attributes["render_target"] = pre_create_data["render_target"]
 
-        instance = super(CreateFBX, self).create(
+        instance = super().create(
             product_name,
             instance_data,
             pre_create_data)
@@ -107,7 +107,7 @@ class CreateFBX(plugin.HoudiniCreator):
                                         "FBX unit of centimeters.",
                                 default=False,
                                 label="Convert Units")
-        format_ASCII = BoolDef("exportkind",
+        format_ascii = BoolDef("exportkind",
                                tooltip="ASCII format or not",
                                default=True,
                                label="ASCII format")
@@ -121,7 +121,7 @@ class CreateFBX(plugin.HoudiniCreator):
                               label="single frame")
         
         return attrs + [
-            createsubnetroot, vcformat, convert_units, format_ASCII, singleframe
+            createsubnetroot, vcformat, convert_units, format_ascii, singleframe
         ] + self.get_instance_attr_defs()
 
     def get_dynamic_data(
@@ -137,7 +137,7 @@ class CreateFBX(plugin.HoudiniCreator):
         The default prodcut name templates for Unreal include {asset} and thus
         we should pass that along as dynamic data.
         """
-        dynamic_data = super(CreateFBX, self).get_dynamic_data(
+        dynamic_data = super().get_dynamic_data(
             project_name,
             folder_entity,
             task_entity,
@@ -190,7 +190,8 @@ class CreateFBX(plugin.HoudiniCreator):
             )
 
         return selection
-    
+
+
 class createStaticMesh(CreateFBX):
     """Static Meshes as FBX. """
 

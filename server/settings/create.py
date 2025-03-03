@@ -9,12 +9,14 @@ class CreatorModel(BaseSettingsModel):
         default_factory=list,
     )
 
+
 class CreatorModelFBX(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
     default_variants: list[str] = SettingsField(
         title="Default Products",
         default_factory=list,
     )
+
 
 def review_node_types_enum():
     return [
