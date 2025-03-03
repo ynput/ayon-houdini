@@ -50,7 +50,7 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             "convertunits": pre_create_data.get("convertunits"),
             # set render range to use frame range start-end frame
             "trange": pre_create_data.get("trange"),
-            "createsubnetroot": pre_create_data.get("createsubnetroot")
+            "createsubnetroot": pre_create_data.get("createsubnetroot"),
             "exportkind": pre_create_data.get("exportkind")
         }
 
