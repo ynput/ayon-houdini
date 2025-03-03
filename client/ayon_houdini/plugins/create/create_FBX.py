@@ -6,14 +6,13 @@ from ayon_core.lib import BoolDef, EnumDef
 import hou
 
 
-class CreateModelFBX(plugin.HoudiniCreator):
-    """Static Meshes as FBX. """
+class CreateFBX(plugin.HoudiniCreator):
+    """Model as FBX. """
 
     identifier = "io.openpype.creators.houdini.modelFBX.fbx"
-    label = "Model (FBX)"
+    label = "model (FBX)A"
     product_type = "model"
     icon = "cube"
-
     default_variants = ["Main"]
 
     # Default render target
@@ -29,7 +28,7 @@ class CreateModelFBX(plugin.HoudiniCreator):
             "creator_attributes", dict())
         creator_attributes["render_target"] = pre_create_data["render_target"]
 
-        instance = super(CreateModelFBX, self).create(
+        instance = super(CreateFBX, self).create(
             product_name,
             instance_data,
             pre_create_data)
@@ -138,7 +137,7 @@ class CreateModelFBX(plugin.HoudiniCreator):
         The default prodcut name templates for Unreal include {asset} and thus
         we should pass that along as dynamic data.
         """
-        dynamic_data = super(CreateModelFBX, self).get_dynamic_data(
+        dynamic_data = super(CreateFBX, self).get_dynamic_data(
             project_name,
             folder_entity,
             task_entity,
@@ -191,3 +190,15 @@ class CreateModelFBX(plugin.HoudiniCreator):
             )
 
         return selection
+    
+class createStaticMesh(CreateFBX):
+    """Static Meshes as FBX. """
+
+    identifier = "io.openpype.creators.houdini.staticmesh.fbx"
+    label = "staticMesh (FBX)A"
+    product_type = "staticMesh"
+    icon = "cube"
+    default_variants = ["Main"]
+
+    # Default render target
+    render_target = "local"
