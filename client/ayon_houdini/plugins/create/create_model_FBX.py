@@ -9,7 +9,7 @@ import hou
 class CreateModelFBX(plugin.HoudiniCreator):
     """Static Meshes as FBX. """
 
-    identifier = "io.openpype.creators.houdini.staticmesh.fbx"
+    identifier = "io.openpype.creators.houdini.modelFBX.fbx"
     label = "Model (FBX)"
     product_type = "model"
     icon = "cube"
