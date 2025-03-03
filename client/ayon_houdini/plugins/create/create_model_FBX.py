@@ -10,14 +10,17 @@ class CreateStaticMesh(plugin.HoudiniCreator):
     """Static Meshes as FBX. """
 
     identifier = "io.openpype.creators.houdini.staticmesh.fbx"
-    label = "Static Mesh (FBX)"
-    product_type = "staticMesh"
-    icon = "fa5s.cubes"
+    label = "Model (FBX)"
+    product_type = "model"
+    icon = "cube"
 
     default_variants = ["Main"]
 
     # Default render target
     render_target = "local"
+
+    def get_publish_families(self):
+        return ["fbx", "model"]
 
     def create(self, product_name, instance_data, pre_create_data):
 
@@ -46,8 +49,9 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             "vcformat": pre_create_data.get("vcformat"),
             "convertunits": pre_create_data.get("convertunits"),
             # set render range to use frame range start-end frame
-            "trange": 1,
+            "trange": pre_create_data.get("trange"),
             "createsubnetroot": pre_create_data.get("createsubnetroot")
+            "exportkind": pre_create_data.get("exportkind")
         }
 
         # set parms
@@ -104,9 +108,21 @@ class CreateStaticMesh(plugin.HoudiniCreator):
                                         "FBX unit of centimeters.",
                                 default=False,
                                 label="Convert Units")
-
+        format_ASCII = BoolDef("exportkind",
+                               tooltip="ASCII format or not",
+                               default=True,
+                               label="ASCII format")
+        singleframe = EnumDef("trange",
+                              tooltip="single frame or sequence",
+                              items={
+                                  0: "single frame",
+                                  1: "frame range"
+                              },
+                              default=0,
+                              label="single frame")
+        
         return attrs + [
-            createsubnetroot, vcformat, convert_units
+            createsubnetroot, vcformat, convert_units, format_ASCII, singleframe
         ] + self.get_instance_attr_defs()
 
     def get_dynamic_data(
