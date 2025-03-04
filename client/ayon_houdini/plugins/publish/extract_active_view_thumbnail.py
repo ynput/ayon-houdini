@@ -15,7 +15,7 @@ class ExtractActiveViewThumbnail(plugin.HoudiniExtractorPlugin,
     publishing as a fallback.
 
     """
-    order = pyblish.api.ExtractorOrder + 0.49
+    order = pyblish.api.ExtractorOrder + 0.25
     label = "Extract Active View Thumbnail"
     families = ["workfile"]
 
