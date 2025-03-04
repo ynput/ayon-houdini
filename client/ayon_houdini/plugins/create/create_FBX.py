@@ -10,7 +10,7 @@ class CreateFBX(plugin.HoudiniCreator):
     """Model as FBX. """
 
     identifier = "io.ayon.creators.houdini.model.fbx"
-    label = "model (FBX)A"
+    label = "model (FBX)"
     product_type = "model"
     icon = "cube"
     default_variants = ["Main"]
