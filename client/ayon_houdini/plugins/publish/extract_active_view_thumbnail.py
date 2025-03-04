@@ -51,9 +51,11 @@ class ExtractActiveViewThumbnail(plugin.HoudiniExtractorPlugin,
                            " because no scene view was detected.")
             return
 
-        with tempfile.NamedTemporaryFile("w", suffix=".jpg", delete=False) as tmp:
-            lib.sceneview_snapshot(sceneview, tmp.name)
+        with tempfile.NamedTemporaryFile(
+            "w", suffix=".jpg", delete=False
+        ) as tmp:
             thumbnail_path = tmp.name
+        lib.sceneview_snapshot(sceneview, thumbnail_path)
 
         instance.context.data["cleanupFullPaths"].append(thumbnail_path)
         return thumbnail_path

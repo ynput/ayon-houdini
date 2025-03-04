@@ -2,6 +2,18 @@ MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY"
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename=".OPfallbacks"
+Content-Type: application/external-reference
+
+.OPfallbacks
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename=".OPdummydefs"
+Content-Type: application/external-reference
+
+.OPdummydefs
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="node_type"
 Content-Type: text/plain
 
@@ -19,9 +31,9 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position -4.13562 1.50033
+position -2.36203 0.655861
 connectornextid 0
-flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
@@ -35,7 +47,7 @@ stat
 {
   create -1
   modify -1
-  author User@HP-Z820-03
+  author Mustafa_Taher@Major-Kalawy
   access 0777
 }
 color UT_Color RGB 0.8 0.8 0.8 
@@ -351,13 +363,213 @@ Content-Type: text/plain
 }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/generic_loader.init"
+Content-Type: text/plain
+
+type = ayon::generic_loader::1.0
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/generic_loader.def"
+Content-Type: text/plain
+
+comment ""
+position 1.81174 2.49292
+connectornextid 0
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+outputsNamed3
+{
+}
+inputsNamed3
+{
+}
+inputs
+{
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/generic_loader.chn"
+Content-Type: text/plain
+
+{
+    channel file {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = ch(\"../file\") language = python }
+    }
+    channel representation {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = ch(\"../representation\") language = python }
+    }
+    channel project_name {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"$AYON_PROJECT_NAME\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../project_name\") }
+    }
+    channel folder_path {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"$AYON_FOLDER_PATH\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../folder_path\") }
+    }
+    channel folder_name {
+      lefttype = extend
+      righttype = extend
+      defaultString = "(strsplit(chs(\"folder_path\"), \"/\", -1))"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../folder_name\") }
+    }
+    channel product_name {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../product_name\") }
+    }
+    channel version {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../version\") }
+    }
+    channel representation_name {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../representation_name\") }
+    }
+    channel clear_cache {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      start = 40
+      segment { length = 0 expr = ch(\"../clear_cache\") }
+    }
+    channel use_ayon_entity_uri {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      start = 40
+      segment { length = 0 expr = ch(\"../use_ayon_entity_uri\") }
+    }
+    channel show_thumbnail {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      start = 40
+      segment { length = 0 expr = ch(\"../show_thumbnail\") }
+    }
+    channel show_pipeline_parms {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      start = 40
+      segment { length = 0 expr = ch(\"../show_pipeline_parms\") }
+    }
+    channel nodes_referencing_file {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" language = python }
+    }
+  }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/generic_loader.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+info2	[ 0	locks=0 ]	(	0	)
+assetinfo_labelparm	[ 0	locks=0 ]	(	"Choose Product"	)
+project_name	[ 0	locks=0 ]	(	[ project_name	$AYON_PROJECT_NAME ] 	)
+folder_path	[ 0	locks=0 ]	(	[ folder_path	$AYON_FOLDER_PATH ] 	)
+folder_name	[ 0	locks=0 ]	(	[ folder_name	"`strsplit(chs(\"folder_path\"), \"/\", -1)`" ] 	)
+product_name	[ 0	locks=0 ]	(	[ product_name	"" ] 	)
+version	[ 0	locks=0 ]	(	[ version	"" ] 	)
+representation_name	[ 0	locks=0 ]	(	[ representation_name	"" ] 	)
+enable_repre_filter	[ 0	locks=0 ]	(	"on"	)
+representation_filter	[ 0	locks=0 ]	(	"usd usda usdlc usdnc abc"	)
+clear_cache	[ 0	locks=0 ]	(	[ clear_cache	0 ] 	)
+sepparm	[ 0	locks=0 ]	(	)
+file	[ 0	locks=1 ]	(	[ file	"from ayon_houdini.api import hda_utils
+return hda_utils.expression_get_representation_path()" ] 	)
+use_ayon_entity_uri	[ 0	locks=0 ]	(	[ use_ayon_entity_uri	0 ] 	)
+info_display2	[ 0	locks=0 ]	(	0	)
+show_thumbnail	[ 0	locks=0 ]	(	[ show_thumbnail	0 ] 	)
+thumbnail_size	[ 0	locks=0 ]	(	2	)
+thumbnail_cache_dir	[ 0	locks=0 ]	(	$JOB/.houdini_loader_thumbnails	)
+thumbnail_padding	[ 0	locks=0 ]	(	1	)
+thumbnail_offset	[ 0	locks=0 ]	(	0	0.35	)
+update_thumbnail	[ 0	locks=0 ]	(	0	)
+show_pipeline_parms	[ 0	locks=0 ]	(	[ show_pipeline_parms	0 ] 	)
+ayon_folder0	[ 0	locks=0 ]	(	0	)
+name	[ 0	locks=0 ]	(	$OS	)
+namespace	[ 0	locks=0 ]	(	`opfullpath(\".\")`	)
+loader	[ 0	locks=0 ]	(	FilePathLoader	)
+id	[ 0	locks=0 ]	(	pyblish.avalon.container	)
+representation	[ 0	locks=0 ]	(	[ representation	"from ayon_houdini.api import hda_utils
+return hda_utils.expression_get_representation_id()" ] 	)
+version_name	[ 0	locks=0 ]	(	""	)
+subset_name	[ 0	locks=0 ]	(	`chs(\"product_name\")`	)
+nodes_referencing_file	[ 0	locks=0 ]	(	[ nodes_referencing_file	"\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" ] 	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/generic_loader.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	},
+	"nodeshape":{
+		"type":"string",
+		"value":"null"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.order"
 Content-Type: text/plain
 
-3
+4
 output0
 sublayer
 warn_no_representation_set
+generic_loader
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
 Content-Disposition: attachment; filename="hdaroot.net"

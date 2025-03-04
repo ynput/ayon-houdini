@@ -22,6 +22,9 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
     Then we will retrieve the task's handles to compute
     the exclusive frame range and actual handle ranges.
     """
+    # TODO: This also validates against model products, even though those
+    #  should export a single frame regardless so maybe it's redundantly
+    #  validating?
 
     # This specific order value is used so that
     # this plugin runs after CollectAnatomyInstanceData

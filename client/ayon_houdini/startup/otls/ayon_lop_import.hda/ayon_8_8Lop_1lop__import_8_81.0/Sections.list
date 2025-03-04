@@ -9,9 +9,8 @@ Help	Help
 IconImage	IconImage
 MessageNodes	MessageNodes
 PythonModule	PythonModule
-OnDeleted	OnDeleted
+OnCreated	OnCreated
 OnNameChanged	OnNameChanged
 OnLoaded	OnLoaded
-OnCreated	OnCreated
 ExtraFileOptions	ExtraFileOptions
 AYON__icon.png	AYON_icon.png
