@@ -199,3 +199,7 @@ class createStaticMesh(CreateFBX):
     label = "staticMesh (FBX)"
     product_type = "staticMesh"
     icon = "cube"
+
+    def get_publish_families(self):
+        return ["fbx", "staticMesh"]
+
