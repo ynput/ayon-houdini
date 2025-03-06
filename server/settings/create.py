@@ -86,8 +86,8 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateModel: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Model")
-    CreateModelFBX: CreatorModelFBX = SettingsField(
-        default_factory=CreatorModelFBX,
+    CreateModelFBX: CreatorModel= SettingsField(
+        default_factory=CreatorModel,
         title="Create Model FBX")    
     CreatePointCache: CreatorModel = SettingsField(
         default_factory=CreatorModel,
