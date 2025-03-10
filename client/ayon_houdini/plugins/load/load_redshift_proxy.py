@@ -93,9 +93,6 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
     def format_path(path, representation):
         """Format file path correctly for single redshift proxy
         or redshift proxy sequence."""
-        if not os.path.exists(path):
-            raise RuntimeError("Path does not exist: %s" % path)
-
         is_sequence = bool(representation["context"].get("frame"))
         # The path is either a single file or sequence in a folder.
         if is_sequence:
