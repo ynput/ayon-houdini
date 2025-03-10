@@ -316,6 +316,17 @@ class HoudiniLoader(load.LoaderPlugin):
     collapse_paths_to_root_vars = False
 
     @classmethod
+    def apply_settings(cls, project_settings):
+        # Prepare collapsible variable mapping using entries in `os.environ`
+        # that are set to the project root paths
+        cls.collapse_paths_to_root_vars: bool = (
+            project_settings["houdini"]["load"]
+            .get("collapse_path_to_project_root_vars", False)
+        )
+
+        super().apply_settings(project_settings)
+
+    @classmethod
     def _get_collapsible_vars(cls) -> Dict[str, str]:
         """Return which variables keys may be collapsed to if path starts with
         the values."""
