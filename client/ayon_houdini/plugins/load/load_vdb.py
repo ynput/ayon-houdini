@@ -60,9 +60,6 @@ class VdbLoader(plugin.HoudiniLoader):
     @staticmethod
     def format_path(path, representation):
         """Format file path correctly for single vdb or vdb sequence."""
-        if not os.path.exists(path):
-            raise RuntimeError("Path does not exist: %s" % path)
-
         is_sequence = bool(representation["context"].get("frame"))
         # The path is either a single file or sequence in a folder.
         if not is_sequence:
