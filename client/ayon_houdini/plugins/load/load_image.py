@@ -129,9 +129,6 @@ class ImageLoader(plugin.HoudiniLoader):
     @staticmethod
     def format_path(path, representation):
         """Format file path correctly for single image or sequence."""
-        if not os.path.exists(path):
-            raise RuntimeError("Path does not exist: %s" % path)
-
         ext = os.path.splitext(path)[-1]
 
         is_sequence = bool(representation["context"].get("frame"))

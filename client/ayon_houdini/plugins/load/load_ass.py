@@ -70,9 +70,6 @@ class AssLoader(plugin.HoudiniLoader):
 
         """
         path = self.filepath_from_context(context)
-        if not os.path.exists(path):
-            raise RuntimeError("Path does not exist: {}".format(path))
-
         is_sequence = bool(context["representation"]["context"].get("frame"))
         # The path is either a single file or sequence in a folder.
         if is_sequence:
