@@ -116,7 +116,6 @@ class CreateFBX(plugin.HoudiniCreator):
             vcformat,
             convert_units,
             format_ascii,
-            singleframe,
         ] + self.get_instance_attr_defs()
 
     def get_dynamic_data(
