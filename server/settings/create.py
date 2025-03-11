@@ -163,7 +163,7 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     "CreateModelFBX": {
         "enabled": True,
         "default_variants": ["Main"]
-    },    
+    },
     "CreatePointCache": {
         "enabled": True,
         "default_variants": ["Main"]
