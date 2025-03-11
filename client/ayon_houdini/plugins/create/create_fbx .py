@@ -119,7 +119,10 @@ class CreateFBX(plugin.HoudiniCreator):
                               },
                               default=0,
                               label="single frame")
-        
+        return attrs + [
+            createsubnetroot, vcformat, convert_units,
+            format_ascii, singleframe,
+        ] + self.get_instance_attr_defs()
         return attrs + [
             createsubnetroot, vcformat, convert_units, format_ascii, singleframe
         ] + self.get_instance_attr_defs()
