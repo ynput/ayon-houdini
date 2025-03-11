@@ -88,7 +88,7 @@ class CreatePluginsModel(BaseSettingsModel):
         title="Create Model")
     CreateModelFBX: CreatorModel= SettingsField(
         default_factory=CreatorModel,
-        title="Create Model FBX")    
+        title="Create Model FBX")
     CreatePointCache: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create PointCache (Abc)")
@@ -163,7 +163,7 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     "CreateModelFBX": {
         "enabled": True,
         "default_variants": ["Main"]
-    },    
+    },
     "CreatePointCache": {
         "enabled": True,
         "default_variants": ["Main"]
