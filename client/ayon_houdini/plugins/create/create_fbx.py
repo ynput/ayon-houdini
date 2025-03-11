@@ -111,14 +111,6 @@ class CreateFBX(plugin.HoudiniCreator):
                                tooltip="ASCII format or not",
                                default=True,
                                label="ASCII format")
-        singleframe = EnumDef("trange",
-                              tooltip="single frame or sequence",
-                              items={
-                                  0: "single frame",
-                                  1: "frame range"
-                              },
-                              default=0,
-                              label="single frame")
         return attrs + [
             createsubnetroot,
             vcformat,
