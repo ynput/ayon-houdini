@@ -48,7 +48,7 @@ class CreateFBX(plugin.HoudiniCreator):
             "vcformat": pre_create_data.get("vcformat"),
             "convertunits": pre_create_data.get("convertunits"),
             # set render range to use frame range start-end frame
-            "trange": pre_create_data.get("trange"),
+            "trange": 1,
             "createsubnetroot": pre_create_data.get("createsubnetroot"),
             "exportkind": pre_create_data.get("exportkind")
         }
@@ -107,10 +107,13 @@ class CreateFBX(plugin.HoudiniCreator):
                                         "FBX unit of centimeters.",
                                 default=False,
                                 label="Convert Units")
-        format_ascii = BoolDef("exportkind",
-                               tooltip="ASCII format or not",
-                               default=True,
-                               label="ASCII format")
+        format_ascii = EnumDef("exportkind",
+                               items={
+                                   0: "Binary",
+                                   1: "ASCII"
+                               },
+                               default=0,
+                               label="Export Format")
         return attrs + [
             createsubnetroot,
             vcformat,
