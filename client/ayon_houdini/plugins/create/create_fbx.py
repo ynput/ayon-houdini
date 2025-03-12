@@ -7,7 +7,7 @@ import hou
 
 
 class CreateFBX(plugin.HoudiniCreator):
-    """Model as FBX. """
+    """Model as FBX."""
 
     identifier = "io.ayon.creators.houdini.model.fbx"
     label = "model (FBX)"
