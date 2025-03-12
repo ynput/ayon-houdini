@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Collector plugin for frames data on ROP instances."""
+from __future__ import annotations
+
 import pyblish.api
 from ayon_core.lib import BoolDef
 from ayon_core.pipeline import AYONPyblishPluginMixin
@@ -33,7 +35,15 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
     label = "Collect Task Handles"
     use_asset_handles = True
 
+    ignore_product_types: set[str] = {"rig"}
+
     def process(self, instance):
+
+        # Do no check asset handles for products that are essentially not
+        # intended to be time-based
+        if instance.data.get("productType") in self.ignore_product_types:
+            return
+
         # Only process instances without already existing handles data
         # but that do have frameStartHandle and frameEndHandle defined
         # like the data collected from CollectRopFrameRange
@@ -116,7 +126,13 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
         )
 
     @classmethod
-    def get_attribute_defs(cls):
+    def get_attr_defs_for_instance(cls, create_context, instance):
+        if not cls.instance_matches_plugin_families(instance):
+            return []
+
+        if instance.data.get("productType") in cls.ignore_product_types:
+            return []
+
         return [
             BoolDef("use_handles",
                     tooltip="Disable this if you want the publisher to"
