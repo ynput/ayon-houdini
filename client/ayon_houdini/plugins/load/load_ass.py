@@ -70,16 +70,16 @@ class AssLoader(plugin.HoudiniLoader):
 
         """
         path = self.filepath_from_context(context)
-        is_sequence = bool(context["representation"]["context"].get("frame"))
         # The path is either a single file or sequence in a folder.
+        is_sequence = bool(context["representation"]["context"].get("frame"))
         if is_sequence:
-            dir_path, file_name = os.path.split(path)
-            path = os.path.join(
-                dir_path,
-                re.sub(r"(.*)\.(\d+)\.(ass.*)", "\\1.$F4.\\3", file_name)
-            )
+            folder, filename = os.path.split(path)
+            filename = re.sub(r"(.*)\.(\d+)\.(ass.*)", "\\1.$F4.\\3", filename)
+            path = os.path.join(folder, filename)
 
-        return os.path.normpath(path).replace("\\", "/")
+        path = os.path.normpath(path)
+        path = path.replace("\\", "/")
+        return path
 
     def switch(self, container, context):
         self.update(container, context)

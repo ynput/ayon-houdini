@@ -60,19 +60,16 @@ class VdbLoader(plugin.HoudiniLoader):
     @staticmethod
     def format_path(path, representation):
         """Format file path correctly for single vdb or vdb sequence."""
-        is_sequence = bool(representation["context"].get("frame"))
         # The path is either a single file or sequence in a folder.
-        if not is_sequence:
-            filename = path
-        else:
-            filename = re.sub(r"(.*)\.(\d+)\.vdb$", "\\1.$F4.vdb", path)
+        is_sequence = bool(representation["context"].get("frame"))
+        if is_sequence:
+            folder, filename = os.path.split(path)
+            filename = re.sub(r"(.*)\.(\d+)\.vdb$", "\\1.$F4.vdb", filename)
+            path = os.path.join(folder, filename)
 
-            filename = os.path.join(path, filename)
-
-        filename = os.path.normpath(filename)
-        filename = filename.replace("\\", "/")
-
-        return filename
+        path = os.path.normpath(path)
+        path = path.replace("\\", "/")
+        return path
 
     def update(self, container, context):
         repre_entity = context["representation"]

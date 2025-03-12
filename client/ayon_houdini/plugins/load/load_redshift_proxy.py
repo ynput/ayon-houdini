@@ -93,15 +93,13 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
     def format_path(path, representation):
         """Format file path correctly for single redshift proxy
         or redshift proxy sequence."""
-        is_sequence = bool(representation["context"].get("frame"))
         # The path is either a single file or sequence in a folder.
+        is_sequence = bool(representation["context"].get("frame"))
         if is_sequence:
-            filename = re.sub(r"(.*)\.(\d+)\.(rs.*)", "\\1.$F4.\\3", path)
-            filename = os.path.join(path, filename)
-        else:
-            filename = path
+            folder, filename = os.path.split(path)
+            filename = re.sub(r"(.*)\.(\d+)\.(rs.*)", "\\1.$F4.\\3", filename)
+            path = os.path.join(folder, filename)
 
-        filename = os.path.normpath(filename)
-        filename = filename.replace("\\", "/")
-
-        return filename
+        path = os.path.normpath(path)
+        path = path.replace("\\", "/")
+        return path
