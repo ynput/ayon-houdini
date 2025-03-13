@@ -50,14 +50,14 @@ class CreateStaticMeshModel(BaseSettingsModel):
 
 def redshift_multi_layered_mode_enum():
     return [
-        {"label": "No Multi-Layered EXR File", "value": "0"},
-        {"label": "Full Multi-Layered EXR File", "value": "1"}
+        {"label": "No Multi-Layered EXR File", "value": "1"},
+        {"label": "Full Multi-Layered EXR File", "value": "2"}
     ]
 
 
 class CreateRedshiftROPModel(CreatorModel):
     multi_layered_mode: str = SettingsField(
-        "0",
+        "1",
         title="Multi Layered Mode",
         description=(
             "Default Multi Layered Mode when creating a new Redshift ROP"
@@ -190,7 +190,7 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     "CreateRedshiftROP": {
         "enabled": True,
         "default_variants": ["Main"],
-        "multi_layered_mode": "0"
+        "multi_layered_mode": "1"
     },
     "CreateReview": {
         "enabled": True,

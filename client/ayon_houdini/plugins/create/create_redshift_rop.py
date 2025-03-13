@@ -15,7 +15,7 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
     product_type = "redshift_rop"
     icon = "magic"
     ext = "exr"
-    multi_layered_mode = "0"  # No Multi-Layered EXR File
+    multi_layered_mode = "1"  # No Multi-Layered EXR File
 
     # Default render target
     render_target = "farm_split"
@@ -153,8 +153,8 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
         ]
 
         multi_layered_mode = [
-            {"value": "0", "label": "No Multi-Layered EXR File"},
-            {"value": "1", "label": "Full Multi-Layered EXR File"},
+            {"value": "1", "label": "No Multi-Layered EXR File"},
+            {"value": "2", "label": "Full Multi-Layered EXR File"},
         ]
 
         attrs = super(CreateRedshiftROP, self).get_pre_create_attr_defs()
