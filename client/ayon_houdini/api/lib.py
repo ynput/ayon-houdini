@@ -5,10 +5,13 @@ import errno
 import re
 import logging
 import json
+import clique
+from functools import lru_cache
 from contextlib import contextmanager
 
-import six
 import ayon_api
+
+import hou
 
 from ayon_core.lib import StringTemplate
 from ayon_core.settings import get_current_project_settings
@@ -26,8 +29,6 @@ from ayon_core.pipeline.workfile.workfile_template_builder import (
 )
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
-
-import hou
 
 
 self = sys.modules[__name__]
@@ -89,7 +90,7 @@ def get_output_parameter(node):
         return node.parm("sopoutput")
     elif node_type == "comp":
         return node.parm("copoutput")
-    elif node_type in {"karma", "opengl"}:
+    elif node_type in {"karma", "opengl", "flipbook"}:
         return node.parm("picture")
     elif node_type == "ifd":  # Mantra
         if node.evalParm("soho_outputmode"):
@@ -122,6 +123,107 @@ def get_output_parameter(node):
                 return parm
 
     raise TypeError("Node type '%s' not supported" % node_type)
+
+
+def get_lops_rop_context_options(
+        ropnode: hou.RopNode) -> "dict[str, str | float]":
+    """Return the Context Options that a LOP ROP node uses."""
+    rop_context_options: "dict[str, str | float]" = {}
+
+    # Always set @ropname and @roppath
+    # See: https://www.sidefx.com/docs/houdini/hom/hou/isAutoContextOption.html
+    rop_context_options["ropname"] = ropnode.name()
+    rop_context_options["roppath"] = ropnode.path()
+
+    # Set @ropcook, @ropstart, @ropend and @ropinc if setropcook is enabled
+    setropcook_parm = ropnode.parm("setropcook")
+    if setropcook_parm:
+        setropcook = setropcook_parm.eval()
+        if setropcook:
+            # TODO: Support "Render Frame Range from Stage" correctly
+            # TODO: Support passing in the start, end, and increment values
+            #  for the cases where this may need to consider overridden
+            #  frame ranges for `RopNode.render()` calls.
+            trange = ropnode.evalParm("trange")
+            if trange == 0:
+                # Current frame
+                start: float = hou.frame()
+                end: float = start
+                inc: float = 1.0
+            elif trange in {1, 2}:
+                # Frame range
+                start: float = ropnode.evalParm("f1")
+                end: float = ropnode.evalParm("f2")
+                inc: float = ropnode.evalParm("f3")
+            else:
+                raise ValueError("Unsupported trange value: %s" % trange)
+            rop_context_options["ropcook"] = 1.0
+            rop_context_options["ropstart"] = start
+            rop_context_options["ropend"] = end
+            rop_context_options["ropinc"] = inc
+
+    # Get explicit context options set on the ROP node.
+    num = ropnode.evalParm("optioncount")
+    for i in range(1, num + 1):
+        # Ignore disabled options
+        if not ropnode.evalParm(f"optionenable{i}"):
+            continue
+
+        name: str = ropnode.evalParm(f"optionname{i}")
+        option_type: str = ropnode.evalParm(f"optiontype{i}")
+        if option_type == "string":
+            value: str = ropnode.evalParm(f"optionstrvalue{i}")
+        elif option_type == "float":
+            value: float = ropnode.evalParm(f"optionfloatvalue{i}")
+        else:
+            raise ValueError(f"Unsupported option type: {option_type}")
+        rop_context_options[name] = value
+
+    return rop_context_options
+
+
+@contextmanager
+def context_options(context_options: "dict[str, str | float]"):
+    """Context manager to set Solaris Context Options.
+
+    The original context options are restored after the context exits.
+
+    Arguments:
+        context_options (dict[str, str | float]):
+            The Solaris Context Options to set.
+
+    Yields:
+        dict[str, str | float]: The original context options that were changed.
+
+    """
+    # Get the original context options and their values
+    original_context_options: "dict[str, str | float]" = {}
+    for name in hou.contextOptionNames():
+        original_context_options[name] = hou.contextOption(name)
+
+    try:
+        # Override the context options
+        for name, value in context_options.items():
+            hou.setContextOption(name, value)
+        yield original_context_options
+    finally:
+        # Restore original context options that we changed
+        for name in context_options:
+            if name in original_context_options:
+                hou.setContextOption(name, original_context_options[name])
+            else:
+                # Clear context option
+                hou.setContextOption(name, None)
+
+
+@contextmanager
+def update_mode_context(mode):
+    original = hou.updateModeSetting()
+    try:
+        hou.setUpdateMode(mode)
+        yield
+    finally:
+        hou.setUpdateMode(original)
 
 
 def set_scene_fps(fps):
@@ -363,7 +465,7 @@ def read(node):
     for parameter in node.spareParms():
         value = parameter.eval()
         # test if value is json encoded dict
-        if isinstance(value, six.string_types) and \
+        if isinstance(value, str) and \
                 value.startswith(JSON_PREFIX):
             try:
                 value = json.loads(value[len(JSON_PREFIX):])
@@ -476,7 +578,7 @@ def get_template_from_value(key, value):
                                    label=key,
                                    num_components=1,
                                    default_value=(value,))
-    elif isinstance(value, six.string_types):
+    elif isinstance(value, str):
         parm = hou.StringParmTemplate(name=key,
                                       label=key,
                                       num_components=1,
@@ -813,16 +915,19 @@ def get_current_context_template_data_with_entity_attrs():
     return template_data
 
 
-def set_review_color_space(opengl_node, review_color_space="", log=None):
+def set_review_color_space(node, review_color_space="", log=None):
     """Set ociocolorspace parameter for the given OpenGL node.
 
-    Set `ociocolorspace` parameter of the given OpenGl node
+    Set `ociocolorspace` parameter of the given node
     to to the given review_color_space value.
     If review_color_space is empty, a default colorspace corresponding to
     the display & view of the current Houdini session will be used.
 
+    Note:
+        This function expects nodes of type `opengl` or `flipbook`.
+
     Args:
-        opengl_node (hou.Node): ROP node to set its ociocolorspace parm.
+        node (hou.Node): ROP node to set its ociocolorspace parm.
         review_color_space (str): Colorspace value for ociocolorspace parm.
         log (logging.Logger): Logger to log to.
     """
@@ -830,23 +935,31 @@ def set_review_color_space(opengl_node, review_color_space="", log=None):
     if log is None:
         log = self.log
 
-    # Set Color Correction parameter to OpenColorIO
-    colorcorrect_parm = opengl_node.parm("colorcorrect")
-    if colorcorrect_parm.eval() != 2:
-        colorcorrect_parm.set(2)
-        log.debug(
-            "'Color Correction' parm on '{}' has been set to"
-            " 'OpenColorIO'".format(opengl_node.path())
+    if node.type().name() not in {"opengl", "flipbook"}:
+        log.warning(
+            "Type of given node {} not allowed."
+            " only types `opengl` and `flipbook` are allowed."
+            .format(node.type().name())
         )
 
-    opengl_node.setParms(
+    # Set Color Correction parameter to OpenColorIO
+    colorcorrect_parm = node.parm("colorcorrect")
+    if colorcorrect_parm.evalAsString() != "ocio":
+        idx = colorcorrect_parm.menuItems().index("ocio")
+        colorcorrect_parm.set(idx)
+        log.debug(
+            "'Color Correction' parm on '{}' has been set to '{}'"
+            .format(node.path(), colorcorrect_parm.menuLabels()[idx])
+        )
+
+    node.setParms(
         {"ociocolorspace": review_color_space}
     )
 
     log.debug(
         "'OCIO Colorspace' parm on '{}' has been set to "
         "the view color space '{}'"
-        .format(opengl_node, review_color_space)
+        .format(node.path(), review_color_space)
     )
 
 
@@ -1326,7 +1439,7 @@ def find_active_network(category, default):
     Arguments:
         category (hou.NodeTypeCategory): The node network category type.
         default (str): The default path to fallback to if no active pane
-            is found with the given category.
+            is found with the given category, e.g. "/obj"
 
     Returns:
         hou.Node: The node network to return.
@@ -1447,6 +1560,100 @@ def start_workfile_template_builder():
         build_workfile_template(workfile_creation_enabled=True)
     except TemplateProfileNotFound:
         log.warning("Template profile not found. Skipping...")
+
+
+def show_node_parmeditor(node):
+    """Show Parameter Editor for the Node.
+
+    Args:
+        node (hou.Node): node instance
+    """
+
+    # Check if there's a floating parameter editor pane with its node
+    #   set to the specified node.
+    for tab in hou.ui.paneTabs():
+        if (
+            tab.type() == hou.paneTabType.Parm
+            and tab.isFloating()
+            and tab.currentNode() == node
+        ):
+            tab.setIsCurrentTab()
+            return
+
+    # We are using the hscript to create and set the network path of the pane
+    # because hscript can set the node path without selecting the node.
+    # Create a floating pane and set its name to the node path.
+    hou.hscript(
+        f"pane -F -m parmeditor -n {node.path()}"
+    )
+    # Hide network controls, turn linking off and set operator node path.
+    hou.hscript(
+        f"pane -a 1 -l 0 -H {node.path()} {node.path()}"
+    )
+
+
+def connect_file_parm_to_loader(file_parm: hou.Parm):
+    """Connect the given file parm to a generic loader.
+    If the parm is already connected to a generic loader node, go to that node.
+    """
+
+    from .pipeline import get_or_create_avalon_container
+
+    referenced_parm = file_parm.getReferencedParm()
+
+    # If the parm has reference
+    if file_parm != referenced_parm:
+        referenced_node = referenced_parm.getReferencedParm().node()
+        if referenced_node.type().name() == "ayon::generic_loader::1.0":
+            show_node_parmeditor(referenced_node)
+            return
+
+    # Create a generic loader node and reference its file parm
+    main_container = get_or_create_avalon_container()
+
+    node_name = f"{file_parm.node().name()}_{file_parm.name()}_loader"
+    load_node = main_container.createNode("ayon::generic_loader",
+                                          node_name=node_name)
+    load_node.moveToGoodPosition()
+
+    # Set relative reference via hscript. This avoids the issues of
+    # `setExpression` e.g. having a keyframe.
+    relative_path = file_parm.node().relativePathTo(load_node)
+    expression = rf'chs\(\"{relative_path}/file\"\)'  # noqa
+    hou.hscript(
+        'opparm -r'
+        f' {file_parm.node().path()} {file_parm.name()} \\`{expression}\\`'
+    )
+    show_node_parmeditor(load_node)
+
+
+@lru_cache(1)
+def is_version_up_workfile_menu_enabled() -> bool:
+    """Check if the 'Version Up Workfile' menu should be enabled.
+
+    It's cached because we don't care about updating the menu during the
+    current Houdini session and this allows us to avoid re-querying the
+    project settings each time.
+
+    """
+    project_settings = get_current_project_settings()
+    if project_settings["core"]["tools"]["ayon_menu"].get(
+        "version_up_current_workfile"
+    ):
+        return True
+    return False
+
+
+def format_as_collections(
+    files: list[str],
+    pattern: str = "{head}{padding}{tail} [{ranges}]"
+) -> list[str]:
+    """Return list of files as formatted sequence collections."""
+
+    collections, remainder = clique.assemble(files)
+    result = [collection.format(pattern) for collection in collections]
+    result.extend(remainder)
+    return result
 
 
 @contextmanager

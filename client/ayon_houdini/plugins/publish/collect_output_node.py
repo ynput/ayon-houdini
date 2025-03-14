@@ -6,17 +6,17 @@ from ayon_houdini.api import plugin
 class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
     """Collect the out node's SOP/COP Path value."""
 
-    order = pyblish.api.CollectorOrder
+    order = pyblish.api.CollectorOrder - 0.45
     families = [
         "pointcache",
         "camera",
         "vdbcache",
         "imagesequence",
-        "usd",
-        "usdrender",
         "redshiftproxy",
         "staticMesh",
-        "model"
+        "model",
+        "usdrender",
+        "usdrop"
     ]
 
     label = "Collect Output Node Path"
@@ -66,7 +66,8 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
 
         else:
             raise KnownPublishError(
-                "ROP node type '{}' is not supported.".format(node_type)
+                f"ROP node type '{node_type}' is not supported"
+                f" for product type '{instance.data['product_type']}'"
             )
 
         if not out_node:

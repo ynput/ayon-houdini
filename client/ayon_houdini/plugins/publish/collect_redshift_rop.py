@@ -27,13 +27,6 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
     def process(self, instance):
         rop = hou.node(instance.data.get("instance_node"))
 
-        # Collect chunkSize
-        chunk_size_parm = rop.parm("chunkSize")
-        if chunk_size_parm:
-            chunk_size = int(chunk_size_parm.eval())
-            instance.data["chunkSize"] = chunk_size
-            self.log.debug("Chunk Size: %s" % chunk_size)
-
         default_prefix = evalParmNoFrame(rop, "RS_outputFileNamePrefix")
         beauty_suffix = rop.evalParm("RS_outputBeautyAOVSuffix")
 
@@ -67,8 +60,10 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
         )
         render_products = [beauty_product]
         files_by_aov = {
-            beauty_suffix: self.generate_expected_files(instance,
-                                                        beauty_product)
+            beauty_suffix: self.generate_expected_files(
+                instance,
+                beauty_product
+            )
         }
 
         aovs_rop = rop.parm("RS_aovGetFromNode").evalAsNode()
@@ -94,11 +89,15 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
             if rop.parm(f"RS_aovID_{i}").evalAsString() == "CRYPTOMATTE" or \
                   not full_exr_mode:
 
-                aov_product = self.get_render_product_name(aov_prefix, aov_suffix)
+                aov_product = self.get_render_product_name(
+                    aov_prefix, aov_suffix
+                )
                 render_products.append(aov_product)
 
-                files_by_aov[aov_suffix] = self.generate_expected_files(instance,
-                                                                        aov_product)    # noqa
+                files_by_aov[aov_suffix] = self.generate_expected_files(
+                    instance,
+                    aov_product
+                )
 
                 # Set to False as soon as we have a separated aov.
                 multipartExr = False

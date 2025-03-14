@@ -3,7 +3,7 @@
 from ayon_houdini.api import plugin
 from ayon_core.pipeline import CreatorError
 import hou
-from ayon_core.lib import EnumDef, BoolDef
+from ayon_core.lib import EnumDef
 
 
 class CreateBGEO(plugin.HoudiniCreator):
@@ -13,12 +13,18 @@ class CreateBGEO(plugin.HoudiniCreator):
     product_type = "pointcache"
     icon = "gears"
 
+    # Default render target
+    render_target = "local"
+
+    def get_publish_families(self):
+        return ["pointcache", "bgeo"]
+
     def create(self, product_name, instance_data, pre_create_data):
 
         instance_data.update({"node_type": "geometry"})
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
-        creator_attributes["farm"] = pre_create_data["farm"]
+        creator_attributes["render_target"] = pre_create_data["render_target"]
 
         instance = super(CreateBGEO, self).create(
             product_name,
@@ -60,10 +66,17 @@ class CreateBGEO(plugin.HoudiniCreator):
         instance_node.setParms(parms)
 
     def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+        }
+
         return [
-            BoolDef("farm",
-                    label="Submitting to Farm",
-                    default=False)
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
         ]
 
     def get_pre_create_attr_defs(self):
@@ -96,7 +109,12 @@ class CreateBGEO(plugin.HoudiniCreator):
         ]
 
         return attrs + [
-            EnumDef("bgeo_type", bgeo_enum, label="BGEO Options"),
+            EnumDef(
+                "bgeo_type",
+                bgeo_enum,
+                default="bgeo.sc",
+                label="BGEO Options"
+            ),
         ] + self.get_instance_attr_defs()
 
     def get_network_categories(self):

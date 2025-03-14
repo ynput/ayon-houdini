@@ -15,6 +15,16 @@ class CreateReview(plugin.HoudiniCreator):
     product_type = "review"
     icon = "video-camera"
     review_color_space = ""
+    node_type = "opengl"
+
+    # Default render target
+    render_target = "local"
+
+    # TODO: Publish families should reflect the node type,
+    # such as `rop.flipbook` for flipbook nodes
+    # and `rop.opengl` for OpenGL nodes.
+    def get_publish_families(self):
+        return ["review", "rop.opengl"]
 
     def apply_settings(self, project_settings):
         super(CreateReview, self).apply_settings(project_settings)
@@ -26,8 +36,12 @@ class CreateReview(plugin.HoudiniCreator):
             self.review_color_space = color_settings.get("review_color_space")
 
     def create(self, product_name, instance_data, pre_create_data):
+        self.node_type = pre_create_data.get("node_type")
+        creator_attributes = instance_data.setdefault(
+            "creator_attributes", dict())
+        creator_attributes["render_target"] = pre_create_data["render_target"]
 
-        instance_data.update({"node_type": "opengl"})
+        instance_data.update({"node_type": self.node_type})
         instance_data["imageFormat"] = pre_create_data.get("imageFormat")
         instance_data["keepImages"] = pre_create_data.get("keepImages")
 
@@ -113,15 +127,36 @@ class CreateReview(plugin.HoudiniCreator):
 
         self.lock_parameters(instance_node, to_lock)
 
+    def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+        }
+
+        return [
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
+        ]
+
     def get_pre_create_attr_defs(self):
-        attrs = super(CreateReview, self).get_pre_create_attr_defs()
+        attrs = super().get_pre_create_attr_defs()
 
         image_format_enum = [
             "bmp", "cin", "exr", "jpg", "pic", "pic.gz", "png",
             "rad", "rat", "rta", "sgi", "tga", "tif",
         ]
+        node_type_enum = ["opengl"]
+        if hou.applicationVersion() >= (20, 5, 0):
+            node_type_enum.append("flipbook")
 
         return attrs + [
+            EnumDef("node_type",
+                    node_type_enum,
+                    default=self.node_type,
+                    label="Node Type"),
             BoolDef("keepImages",
                     label="Keep Image Sequences",
                     default=False),
@@ -149,4 +184,4 @@ class CreateReview(plugin.HoudiniCreator):
                       default=1.0,
                       minimum=0.0001,
                       decimals=3)
-        ]
+        ] + self.get_instance_attr_defs()

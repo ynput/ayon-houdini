@@ -54,7 +54,13 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             }
         else:
             # get aov_filter from deadline settings
-            cls.aov_filter = project_settings["deadline"]["publish"]["ProcessSubmittedJobOnFarm"]["aov_filter"]
+            cls.aov_filter = (
+                project_settings
+                ["deadline"]
+                ["publish"]
+                ["ProcessSubmittedJobOnFarm"]
+                ["aov_filter"]
+            )
             cls.aov_filter = {
                 item["name"]: item["value"]
                 for item in cls.aov_filter
@@ -93,7 +99,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             dynamic_data = {}
             if aov_name:
                 dynamic_data["aov"] = aov_name
-                
+
             if instance.data.get("renderlayer"):
                 dynamic_data["renderlayer"] = instance.data["renderlayer"]
 
@@ -112,7 +118,6 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             ext = aov_filepaths[0].split(".")[-1]
 
             # Decide if instance is reviewable
-            preview = False
             if instance.data.get("multipartExr", False):
                 # Add preview tag because its multipartExr.
                 preview = True
@@ -170,9 +175,11 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         # We are not removing it because it's used to trigger the render.
         instance.data["integrate"] = False
 
-    def _get_product_name_and_group(self, instance, product_type, dynamic_data):
+    def _get_product_name_and_group(
+        self, instance, product_type, dynamic_data
+    ):
         """Get product name and group
-        
+
         This method matches the logic in farm that gets
          `product_name` and `group_name` respecting
          `use_legacy_product_names_for_renders` logic in core settings.
@@ -186,34 +193,36 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             tuple (str, str): product name and group name
 
         """
-
         project_settings = instance.context.data.get("project_settings")
 
         use_legacy_product_name = True
         try:
-            use_legacy_product_name = project_settings["core"]["tools"]["creator"]["use_legacy_product_names_for_renders"]  # noqa: E501
+            use_legacy_product_name = (
+                project_settings
+                ["core"]
+                ["tools"]
+                ["creator"]
+                ["use_legacy_product_names_for_renders"]
+            )
         except KeyError:
             warnings.warn(
                 ("use_legacy_for_renders not found in project settings. "
                  "Using legacy product name for renders. Please update "
                  "your ayon-core version."), DeprecationWarning)
-            use_legacy_product_name = True
 
         if use_legacy_product_name:
-            product_name, group_name = _get_legacy_product_name_and_group(
+            return _get_legacy_product_name_and_group(
                 product_type=product_type,
                 source_product_name=instance.data["productName"],
                 task_name=instance.data["task"],
-                dynamic_data=dynamic_data)
-
-        else:
-            product_name, group_name = get_product_name_and_group_from_template(
-                project_name=instance.context.data["projectName"],
-                task_entity=instance.context.data["taskEntity"],
-                host_name=instance.context.data["hostName"],
-                product_type=product_type,
-                variant=instance.data["productName"],
                 dynamic_data=dynamic_data
             )
 
-        return product_name, group_name
+        return get_product_name_and_group_from_template(
+            project_name=instance.context.data["projectName"],
+            task_entity=instance.context.data["taskEntity"],
+            host_name=instance.context.data["hostName"],
+            product_type=product_type,
+            variant=instance.data["productName"],
+            dynamic_data=dynamic_data
+        )

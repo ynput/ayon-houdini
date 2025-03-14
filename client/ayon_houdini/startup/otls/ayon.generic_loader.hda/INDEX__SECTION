@@ -1,0 +1,42 @@
+Operator:     ayon::generic_loader::1.0
+Label:        AYON Generic Loader
+Path:         oplib:/ayon::Object/generic_loader::1.0?ayon::Object/generic_loader::1.0
+Icon:         opdef:/ayon::Object/generic_loader::1.0?IconImage
+Table:        Object
+License:      
+Extra:        
+User:         
+Inputs:       0 to 0
+Subnet:       true
+Python:       false
+Empty:        false
+Modified:     Mon Dec 23 21:23:36 2024
+
+Operator:     ayon::generic_loader::1.0
+Label:        AYON Generic Loader
+Path:         oplib:/ayon::Sop/generic_loader::1.0?ayon::Sop/generic_loader::1.0
+Icon:         opdef:/ayon::Sop/generic_loader::1.0?IconImage
+Table:        Sop
+License:      
+Extra:        inputcolors='0 ' outputcolors='1 "RGB 0.700195 0.700195 0.700195" ' 
+User:         
+Inputs:       0 to 0
+Subnet:       true
+Python:       false
+Empty:        false
+Modified:     Mon Dec 23 21:24:01 2024
+
+Operator:     ayon::generic_loader::1.0
+Label:        AYON Generic Loader
+Path:         oplib:/ayon::Lop/generic_loader::1.0?ayon::Lop/generic_loader::1.0
+Icon:         opdef:/ayon::Lop/generic_loader::1.0?IconImage
+Table:        Lop
+License:      
+Extra:        
+User:         
+Inputs:       0 to 0
+Subnet:       true
+Python:       false
+Empty:        false
+Modified:     Mon Dec 23 21:20:34 2024
+

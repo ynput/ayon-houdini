@@ -41,7 +41,7 @@ DEFAULT_GENERAL_SETTINGS = {
         "houdini_vars": [
             {
                 "var": "JOB",
-                "value": "{root[work]}/{project[name]}/{hierarchy}/{asset}/work/{task[name]}",  # noqa
+                "value": "{root[work]}/{project[name]}/{hierarchy}/{folder[name]}/work/{task[name]}",  # noqa
                 "is_directory": True
             }
         ]

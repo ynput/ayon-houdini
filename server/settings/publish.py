@@ -15,14 +15,6 @@ class CollectAssetHandlesModel(BaseSettingsModel):
         title="Use asset handles")
 
 
-class CollectChunkSizeModel(BaseSettingsModel):
-    """Collect Chunk Size."""
-    enabled: bool = SettingsField(title="Enabled")
-    optional: bool = SettingsField(title="Optional")
-    chunk_size: int = SettingsField(
-        title="Frames Per Task")
-
-
 class AOVFilterSubmodel(BaseSettingsModel):
     """You should use the same host name you are using for Houdini."""
     host_name: str = SettingsField("", title="Houdini Host name")
@@ -132,10 +124,6 @@ class PublishPluginsModel(BaseSettingsModel):
         title="Collect Asset Handles",
         section="Collectors"
     )
-    CollectChunkSize: CollectChunkSizeModel = SettingsField(
-        default_factory=CollectChunkSizeModel,
-        title="Collect Chunk Size"
-    )
     CollectFilesForCleaningUp: CollectFilesForCleaningUpModel = SettingsField(
         default_factory=CollectFilesForCleaningUpModel,
         title="Collect Files For Cleaning Up."
@@ -167,9 +155,19 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateWorkfilePaths: ValidateWorkfilePathsModel = SettingsField(
         default_factory=ValidateWorkfilePathsModel,
         title="Validate workfile paths settings")
+    ValidateUsdLookAssignments: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate USD Look Assignments")
     ValidateUSDRenderProductPaths: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate USD Render Product Paths")
+    ValidateRenderResolution: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate USD Render Resolution",
+        description=(
+            "Validate render resolution and pixel aspect of USD render"
+            " products match the context resolution.")
+    )
     ExtractActiveViewThumbnail: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Extract Active View Thumbnail",
@@ -184,11 +182,6 @@ class PublishPluginsModel(BaseSettingsModel):
 DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     "CollectAssetHandles": {
         "use_asset_handles": True
-    },
-    "CollectChunkSize": {
-        "enabled": True,
-        "optional": True,
-        "chunk_size": 999999
     },
     "CollectFilesForCleaningUp": {
         "enabled": False,
@@ -249,8 +242,18 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
             "$JOB"
         ]
     },
+    "ValidateUsdLookAssignments": {
+        "enabled": True,
+        "optional": True,
+        "active": True
+    },
     "ValidateUSDRenderProductPaths": {
         "enabled": False,
+        "optional": True,
+        "active": True
+    },
+    "ValidateRenderResolution": {
+        "enabled": True,
         "optional": True,
         "active": True
     },

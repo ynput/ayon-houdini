@@ -1,7 +1,8 @@
 import os
 import re
 
-from ayon_core.pipeline import get_representation_path
+import hou
+
 from ayon_houdini.api import (
     pipeline,
     plugin
@@ -19,9 +20,6 @@ class VdbLoader(plugin.HoudiniLoader):
     color = "orange"
 
     def load(self, context, name=None, namespace=None, data=None):
-
-        import hou
-
         # Get the root node
         obj = hou.node("/obj")
 
@@ -62,22 +60,16 @@ class VdbLoader(plugin.HoudiniLoader):
     @staticmethod
     def format_path(path, representation):
         """Format file path correctly for single vdb or vdb sequence."""
-        if not os.path.exists(path):
-            raise RuntimeError("Path does not exist: %s" % path)
-
-        is_sequence = bool(representation["context"].get("frame"))
         # The path is either a single file or sequence in a folder.
-        if not is_sequence:
-            filename = path
-        else:
-            filename = re.sub(r"(.*)\.(\d+)\.vdb$", "\\1.$F4.vdb", path)
+        is_sequence = bool(representation["context"].get("frame"))
+        if is_sequence:
+            folder, filename = os.path.split(path)
+            filename = re.sub(r"(.*)\.(\d+)\.vdb$", "\\1.$F4.vdb", filename)
+            path = os.path.join(folder, filename)
 
-            filename = os.path.join(path, filename)
-
-        filename = os.path.normpath(filename)
-        filename = filename.replace("\\", "/")
-
-        return filename
+        path = os.path.normpath(path)
+        path = path.replace("\\", "/")
+        return path
 
     def update(self, container, context):
         repre_entity = context["representation"]
@@ -91,7 +83,7 @@ class VdbLoader(plugin.HoudiniLoader):
             return
 
         # Update the file path
-        file_path = get_representation_path(repre_entity)
+        file_path = self.filepath_from_context(context)
         file_path = self.format_path(file_path, repre_entity)
 
         file_node.setParms({"file": file_path})
@@ -100,7 +92,6 @@ class VdbLoader(plugin.HoudiniLoader):
         node.setParms({"representation": repre_entity["id"]})
 
     def remove(self, container):
-
         node = container["node"]
         node.destroy()
 

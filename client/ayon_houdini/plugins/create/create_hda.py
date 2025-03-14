@@ -118,7 +118,7 @@ soptoolutils.genericTool(kwargs, \'$HDA_NAME\')]]></script>
 </tool>
 </shelfDocument>
         """
-        
+
         nodetype_category_name = hda_def.nodeType().category().name()
         context = context_dict[nodetype_category_name]
         util = utils_dict[nodetype_category_name]
@@ -139,6 +139,12 @@ soptoolutils.genericTool(kwargs, \'$HDA_NAME\')]]></script>
 
     hda_def.addSection('Tools.shelf', content)
 # endregion
+
+
+def promote_spare_parameters(node):
+    """Promote spare parameters to HDA node type definition"""
+    ptg = node.parmTemplateGroup()
+    node.type().definition().setParmTemplateGroup(ptg)
 
 
 class CreateHDA(plugin.HoudiniCreator):
@@ -178,12 +184,30 @@ class CreateHDA(plugin.HoudiniCreator):
         if pre_create_data is None:
             pre_create_data = {}
 
+        use_promote_spare_parameters = pre_create_data.get(
+            "use_promote_spare_parameters", True)
+
         if self.selected_nodes:
             # if we have `use selection` enabled, and we have some
             # selected nodes ...
-            if self.selected_nodes[0].type().name() == "subnet":
-                to_hda = self.selected_nodes[0]
+            one_node_selected = len(self.selected_nodes) == 1
+            first_selected_node = self.selected_nodes[0]
+
+            # If only an HDA is selected, publish just that node as HDA.
+            if one_node_selected and first_selected_node.type().definition():
+                to_hda = first_selected_node
+                use_promote_spare_parameters = False
+
+            # If only a single subnet is selected, turn that into the HDA.
+            elif (
+                one_node_selected
+                and first_selected_node.type().name() == "subnet"
+            ):
+                to_hda = first_selected_node
                 to_hda.setName("{}_subnet".format(node_name), unique_name=True)
+
+            # Collapse all selected nodes into a subnet and turn that into
+            # the HDA.
             else:
                 parent_node = self.selected_nodes[0].parent()
                 subnet = parent_node.collapseIntoSubnet(
@@ -202,6 +226,7 @@ class CreateHDA(plugin.HoudiniCreator):
 
             to_hda = parent_node.createNode(
                 "subnet", node_name="{}_subnet".format(node_name))
+
         if not to_hda.type().definition():
             # if node type has not its definition, it is not user
             # created hda. We test if hda can be created from the node.
@@ -209,7 +234,8 @@ class CreateHDA(plugin.HoudiniCreator):
                 raise CreatorError(
                     "cannot create hda from node {}".format(to_hda))
 
-            # Pick a unique type name for HDA product per folder path per project.
+            # Pick a unique type name for HDA product per folder path
+            #   per project.
             type_name = (
                 "{project_name}{folder_path}_{node_name}".format(
                     project_name=get_current_project_name(),
@@ -222,8 +248,17 @@ class CreateHDA(plugin.HoudiniCreator):
                 name=type_name,
                 description=node_name,
                 hda_file_name="$HIP/{}.hda".format(node_name),
-                ignore_external_references=True
+                ignore_external_references=True,
+                min_num_inputs=0,
+                max_num_inputs=len(to_hda.inputs()) or 1,
             )
+
+            if use_promote_spare_parameters:
+                # Similar to Houdini default behavior, when enabled this will
+                # promote spare parameters to type properties on initial
+                # creation of the HDA.
+                promote_spare_parameters(hda_node)
+
             hda_node.layoutChildren()
         elif self._check_existing(folder_path, node_name):
             raise CreatorError(
@@ -279,6 +314,12 @@ class CreateHDA(plugin.HoudiniCreator):
                             "'AYON/project_name/your_HDA_name'",
                     default=True,
                     label="Use Project as menu entry"),
+            BoolDef("use_promote_spare_parameters",
+                    tooltip="Similar to Houdini default behavior, when "
+                            "enabled this will promote spare parameters to "
+                            "type properties on initial creation of the HDA.",
+                    default=True,
+                    label="Promote Spare Parameters"),
         ]
 
     def get_dynamic_data(

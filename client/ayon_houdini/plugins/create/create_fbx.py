@@ -1,26 +1,34 @@
 # -*- coding: utf-8 -*-
-"""Creator for Unreal Static Meshes."""
+"""Creator plugins for FBX, like static mesh and model products"""
 from ayon_houdini.api import plugin
 from ayon_core.lib import BoolDef, EnumDef
 
 import hou
 
 
-class CreateStaticMesh(plugin.HoudiniCreator):
-    """Static Meshes as FBX. """
+class CreateFBX(plugin.HoudiniCreator):
+    """Model as FBX."""
 
-    identifier = "io.openpype.creators.houdini.staticmesh.fbx"
-    label = "Static Mesh (FBX)"
-    product_type = "staticMesh"
-    icon = "fa5s.cubes"
-
+    identifier = "io.ayon.creators.houdini.model.fbx"
+    label = "model (FBX)"
+    product_type = "model"
+    icon = "cube"
     default_variants = ["Main"]
+
+    # Default render target
+    render_target = "local"
+
+    def get_publish_families(self):
+        return ["fbx", "model"]
 
     def create(self, product_name, instance_data, pre_create_data):
 
         instance_data.update({"node_type": "filmboxfbx"})
+        creator_attributes = instance_data.setdefault(
+            "creator_attributes", dict())
+        creator_attributes["render_target"] = pre_create_data["render_target"]
 
-        instance = super(CreateStaticMesh, self).create(
+        instance = super().create(
             product_name,
             instance_data,
             pre_create_data)
@@ -41,7 +49,8 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             "convertunits": pre_create_data.get("convertunits"),
             # set render range to use frame range start-end frame
             "trange": 1,
-            "createsubnetroot": pre_create_data.get("createsubnetroot")
+            "createsubnetroot": pre_create_data.get("createsubnetroot"),
+            "exportkind": pre_create_data.get("exportkind")
         }
 
         # set parms
@@ -58,10 +67,24 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             hou.sopNodeTypeCategory()
         ]
 
+    def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+        }
+
+        return [
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
+        ]
+
     def get_pre_create_attr_defs(self):
         """Add settings for users. """
 
-        attrs = super(CreateStaticMesh, self).get_pre_create_attr_defs()
+        attrs = super().get_pre_create_attr_defs()
         createsubnetroot = BoolDef("createsubnetroot",
                                    tooltip="Create an extra root for the "
                                            "Export node when it's a "
@@ -84,8 +107,19 @@ class CreateStaticMesh(plugin.HoudiniCreator):
                                         "FBX unit of centimeters.",
                                 default=False,
                                 label="Convert Units")
-
-        return attrs + [createsubnetroot, vcformat, convert_units]
+        format_ascii = EnumDef("exportkind",
+                               items={
+                                   0: "Binary",
+                                   1: "ASCII"
+                               },
+                               default=0,
+                               label="Export Format")
+        return attrs + [
+            createsubnetroot,
+            vcformat,
+            convert_units,
+            format_ascii,
+        ] + self.get_instance_attr_defs()
 
     def get_dynamic_data(
         self,
@@ -100,7 +134,7 @@ class CreateStaticMesh(plugin.HoudiniCreator):
         The default prodcut name templates for Unreal include {asset} and thus
         we should pass that along as dynamic data.
         """
-        dynamic_data = super(CreateStaticMesh, self).get_dynamic_data(
+        dynamic_data = super().get_dynamic_data(
             project_name,
             folder_entity,
             task_entity,
@@ -153,3 +187,16 @@ class CreateStaticMesh(plugin.HoudiniCreator):
             )
 
         return selection
+
+
+class CreateStaticMesh(CreateFBX):
+    """Static Meshes as FBX."""
+
+    identifier = "io.openpype.creators.houdini.staticmesh.fbx"
+    label = "Static Mesh (FBX)"
+    product_type = "staticMesh"
+    icon = "cube"
+
+    def get_publish_families(self):
+        return ["fbx", "staticMesh"]
+

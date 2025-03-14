@@ -16,7 +16,7 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
     label = "Collect Frames"
     families = ["camera", "vdbcache", "imagesequence", "ass",
                 "redshiftproxy", "review", "pointcache", "fbx",
-                "model", "rop"]
+                "model", "rop", "bgeo"]
 
     def process(self, instance):
 
@@ -59,5 +59,7 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
         # It's always expected to be one collection.
         frame_collection = frame_collection[0]
         frame_collection.indexes.clear()
-        frame_collection.indexes.update(list(range(start_frame, (end_frame + 1))))
+        frame_collection.indexes.update(
+            list(range(start_frame, end_frame + 1))
+        )
         instance.data["frames"] = list(frame_collection)

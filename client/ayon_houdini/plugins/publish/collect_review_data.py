@@ -22,9 +22,6 @@ class CollectHoudiniReviewData(plugin.HoudiniInstancePlugin):
         instance.data["handleEnd"] = 0
         instance.data["fps"] = instance.context.data["fps"]
 
-        # Enable ftrack functionality
-        instance.data.setdefault("families", []).append('ftrack')
-
         # Get the camera from the rop node to collect the focal length
         ropnode_path = instance.data["instance_node"]
         ropnode = hou.node(ropnode_path)
@@ -72,7 +69,7 @@ class CollectHoudiniReviewData(plugin.HoudiniInstancePlugin):
         """
 
         if ropnode.type().name() in {
-            "opengl", "karma", "ifd", "arnold"
+            "opengl", "karma", "ifd", "arnold", "flipbook"
         }:
             return ropnode.parm("camera").eval()
 

@@ -9,6 +9,22 @@ class CreatorModel(BaseSettingsModel):
         default_factory=list,
     )
 
+def review_node_types_enum():
+    return [
+        {"label": "OpenGL", "value": "opengl"},
+        {"label": "Flipbook", "value": "flipbook"}
+    ]
+
+class CreateReviewModel(BaseSettingsModel):
+    enabled: bool = SettingsField(title="Enabled")
+    default_variants: list[str] = SettingsField(
+        title="Default Products",
+        default_factory=list,
+    )
+    node_type: str = SettingsField(
+        title="Default Node Type",
+        enum_resolver=review_node_types_enum,
+    )
 
 class CreateArnoldAssModel(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
@@ -29,6 +45,24 @@ class CreateStaticMeshModel(BaseSettingsModel):
     collision_prefixes: list[str] = SettingsField(
         default_factory=list,
         title="Collision Prefixes"
+    )
+
+
+def redshift_multi_layered_mode_enum():
+    return [
+        {"label": "No Multi-Layered EXR File", "value": "1"},
+        {"label": "Full Multi-Layered EXR File", "value": "2"}
+    ]
+
+
+class CreateRedshiftROPModel(CreatorModel):
+    multi_layered_mode: str = SettingsField(
+        "1",
+        title="Multi Layered Mode",
+        description=(
+            "Default Multi Layered Mode when creating a new Redshift ROP"
+        ),
+        enum_resolver=redshift_multi_layered_mode_enum,
     )
 
 
@@ -70,6 +104,9 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateModel: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Model")
+    CreateModelFBX: CreatorModel= SettingsField(
+        default_factory=CreatorModel,
+        title="Create Model FBX")
     CreatePointCache: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create PointCache (Abc)")
@@ -79,11 +116,11 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateRedshiftProxy: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Redshift Proxy")
-    CreateRedshiftROP: CreatorModel = SettingsField(
-        default_factory=CreatorModel,
+    CreateRedshiftROP: CreateRedshiftROPModel = SettingsField(
+        default_factory=CreateRedshiftROPModel,
         title="Create Redshift ROP")
-    CreateReview: CreatorModel = SettingsField(
-        default_factory=CreatorModel,
+    CreateReview: CreateReviewModel = SettingsField(
+        default_factory=CreateReviewModel,
         title="Create Review")
     # "-" is not compatible in the new model
     CreateStaticMesh: CreateStaticMeshModel = SettingsField(
@@ -141,6 +178,10 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
         "enabled": True,
         "default_variants": ["Main"]
     },
+    "CreateModelFBX": {
+        "enabled": True,
+        "default_variants": ["Main"]
+    },
     "CreatePointCache": {
         "enabled": True,
         "default_variants": ["Main"]
@@ -155,11 +196,13 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     },
     "CreateRedshiftROP": {
         "enabled": True,
-        "default_variants": ["Main"]
+        "default_variants": ["Main"],
+        "multi_layered_mode": "1"
     },
     "CreateReview": {
         "enabled": True,
-        "default_variants": ["Main"]
+        "default_variants": ["Main"],
+        "node_type": "opengl"
     },
     "CreateStaticMesh": {
         "enabled": True,

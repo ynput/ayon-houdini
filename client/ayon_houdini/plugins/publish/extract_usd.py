@@ -3,6 +3,7 @@ from typing import List, AnyStr
 
 import pyblish.api
 
+from ayon_core.pipeline import KnownPublishError, PublishError
 from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 from ayon_core.pipeline.publish.lib import get_instance_expected_output_path
 from ayon_houdini.api import plugin
@@ -47,7 +48,8 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
         with remap_paths(ropnode, mapping):
             render_rop(ropnode)
 
-        assert os.path.exists(output), "Output does not exist: %s" % output
+        if not os.path.exists(output):
+            PublishError(f"Output does not exist: {output}")
 
         if "representations" not in instance.data:
             instance.data["representations"] = []
@@ -120,12 +122,22 @@ def get_source_paths(
     """Return the full source filepaths for an instance's representations"""
 
     staging = repre.get("stagingDir", instance.data.get("stagingDir"))
-    files = repre.get("files", [])
+
+    # Support special `files_raw` key for representations that may originate
+    # from a path in the USD file including `:SDF_FORMAT_ARGS:` which we will
+    # also want to match against.
+    if "files_raw" in repre:
+        files = repre["files_raw"]
+    else:
+        files = repre.get("files", [])
+
     if isinstance(files, list):
         return [os.path.join(staging, fname) for fname in files]
     elif isinstance(files, str):
         # Single file
         return [os.path.join(staging, files)]
 
-    raise TypeError(f"Unsupported type for representation files: {files} "
-                    "(supports list or str)")
+    raise KnownPublishError(
+        "Unsupported type for representation files:"
+        f" {files} (supports list or str)"
+    )

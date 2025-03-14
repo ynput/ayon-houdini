@@ -4,10 +4,12 @@ import re
 
 import pyblish.api
 
+from ayon_core.pipeline import KnownPublishError
 from ayon_core.pipeline.create import get_product_name
 from ayon_houdini.api import plugin
 import ayon_houdini.api.usd as usdlib
 
+from pxr import Sdf
 import hou
 
 
@@ -26,8 +28,7 @@ def copy_instance_data(instance_src, instance_dest, attr):
             in the source instance's data.
 
     Raises:
-        KeyError: If the key does not exist on the source instance.
-        AssertionError: If a parent key already exists on the destination
+        KnownPublishError: If a parent key already exists on the destination
             instance but is not of the correct type (= is not a dict)
 
     """
@@ -42,7 +43,8 @@ def copy_instance_data(instance_src, instance_dest, attr):
         src_value = src_data[key]
         if i != len(key):
             dest_data = dest_data.setdefault(key, {})
-            assert isinstance(dest_data, dict), "Destination must be a dict"
+            if not isinstance(dest_data, dict):
+                raise KnownPublishError("Destination must be a dict.")
             src_data = src_value
         else:
             # Last iteration - assign the value
@@ -101,7 +103,13 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             # include same USD ROP
             layer_inst.append(rop_node)
 
-            staging_dir, fname = os.path.split(save_path)
+            staging_dir, fname_with_args = os.path.split(save_path)
+
+            # The save path may include :SDF_FORMAT_ARGS: which will conflict
+            # with how we end up integrating these files because those will
+            # NOT be included in the actual output filename on disk, so we
+            # remove the SDF_FORMAT_ARGS from the filename.
+            fname = Sdf.Layer.SplitIdentifier(fname_with_args)[0]
             fname_no_ext, ext = os.path.splitext(fname)
 
             variant = fname_no_ext
@@ -137,8 +145,6 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             layer_inst.data["instance_node"] = instance.data["instance_node"]
             layer_inst.data["render"] = False
             layer_inst.data["output_node"] = creator_node
-            if instance.data.get("productGroup"):
-                layer_inst.data["productGroup"] = instance.data["productGroup"]
 
             # Inherit "use handles" from the source instance
             # TODO: Do we want to maybe copy full `publish_attributes` instead?
@@ -148,14 +154,20 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             )
 
             # Allow this subset to be grouped into a USD Layer on creation
-            layer_inst.data["subsetGroup"] = "USD Layer"
-
+            layer_inst.data["productGroup"] = (
+                instance.data.get("productGroup") or "USD Layer"
+            )
             # For now just assume the representation will get published
             representation = {
                 "name": "usd",
                 "ext": ext.lstrip("."),
                 "stagingDir": staging_dir,
-                "files": fname
+                "files": fname,
+
+                # Store an additional key with filenames including the
+                # SDF_FORMAT_ARGS so we can use this to remap paths
+                # accurately later.
+                "files_raw": fname_with_args
             }
             layer_inst.data.setdefault("representations", []).append(
                 representation)

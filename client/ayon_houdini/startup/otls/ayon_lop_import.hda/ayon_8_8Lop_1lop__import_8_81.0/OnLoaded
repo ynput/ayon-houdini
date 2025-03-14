@@ -7,8 +7,10 @@ hda_module.setup_flag_changed_callback(node)
 def on_duplicate():
     """Duplicate thumbnail on node duplicate"""
     if node.evalParm("show_thumbnail") and node.evalParm("representation"):
-       hda_module.on_representation_id_changed(node)
+        hda_module.update_thumbnail(node)
 
 
 if not hou.hipFile.isLoadingHipFile():
     on_duplicate()
+else:
+    hda_module.ensure_loader_expression_parm_defaults(node)

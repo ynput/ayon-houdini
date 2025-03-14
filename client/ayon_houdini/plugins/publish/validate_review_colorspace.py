@@ -30,7 +30,7 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
     """
 
     order = pyblish.api.ValidatorOrder + 0.1
-    families = ["review"]
+    families = ["rop.opengl"]
     label = "Validate Review Colorspace"
     actions = [ResetViewSpaceAction, SelectROPAction]
 
@@ -57,18 +57,6 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
 
     def process(self, instance):
 
-        rop_node = hou.node(instance.data["instance_node"])
-
-        # This plugin is triggered when marking render as reviewable.
-        # Therefore, this plugin will run on over wrong instances.
-        # TODO: Don't run this plugin on wrong instances.
-        # This plugin should run only on review product type
-        # with instance node of opengl type.
-        if rop_node.type().name() != "opengl":
-            self.log.debug("Skipping Validation. Rop node {} "
-                           "is not an OpenGl node.".format(rop_node.path()))
-            return
-
         if not self.is_active(instance.data):
             return
 
@@ -79,35 +67,46 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
             )
             return
 
-        if rop_node.evalParm("colorcorrect") != 2:
+        rop_node = hou.node(instance.data["instance_node"])
+        colorcorrect = rop_node.parm("colorcorrect").evalAsString()
+        if not colorcorrect.startswith("ocio"):
             # any colorspace settings other than default requires
             # 'Color Correct' parm to be set to 'OpenColorIO'
             raise PublishValidationError(
                 "'Color Correction' parm on '{}' ROP must be set to"
-                " 'OpenColorIO'".format(rop_node.path())
+                " use 'OpenColorIO'".format(rop_node.path())
             )
 
-        current_color_space = rop_node.evalParm("ociocolorspace")
-        if current_color_space not in hou.Color.ocio_spaces():
-            raise PublishValidationError(
-                "Invalid value: Colorspace name doesn't exist.\n"
-                "Check 'OCIO Colorspace' parameter on '{}' ROP"
-                .format(rop_node.path())
-            )
+        if colorcorrect == "ocio":
+            # For both opengl and flipbook nodes.
 
-        # if houdini/imageio/workfile is enabled and
-        #  Review colorspace setting is empty then this check should
-        #  actually check if the current_color_space setting equals
-        #  the default colorspace value.
-        # However, it will make the black cmd screen show up more often
-        #   which is very annoying.
-        if self.review_color_space and \
-                self.review_color_space != current_color_space:
+            current_color_space = rop_node.evalParm("ociocolorspace")
+            if current_color_space not in hou.Color.ocio_spaces():
+                raise PublishValidationError(
+                    "Invalid value: Colorspace name doesn't exist.\n"
+                    "Check 'OCIO Colorspace' parameter on '{}' ROP"
+                    .format(rop_node.path())
+                )
 
-            raise PublishValidationError(
-                "Invalid value: Colorspace name doesn't match"
-                "the Colorspace specified in settings."
-            )
+            # If `ayon+settings://houdini/imageio/workfile` is enabled
+            # and the Review colorspace setting is empty, then this check
+            # should verify if the `current_color_space` setting equals
+            # the default colorspace value.
+            if self.review_color_space and \
+                    self.review_color_space != current_color_space:
+
+                raise PublishValidationError(
+                    "Invalid value: Colorspace name doesn't match"
+                    " the Colorspace specified in settings."
+                )
+
+        # TODO: Check if `ociodisplay` and `ocioview` are the same as the
+        #   default display and view.
+        # Should be the default value specified in settings?
+        # OR Should be the current/default value specified in the hip file?
+        elif colorcorrect == "ocioview":
+            # For flipbook nodes only.
+            pass
 
     @classmethod
     def repair(cls, instance):
