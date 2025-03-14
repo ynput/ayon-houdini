@@ -184,5 +184,7 @@ class ImageLoader(plugin.HoudiniLoader):
                 "ocio_space": colorspace
             }
 
+        return {}
+
     def switch(self, container, representation):
         self.update(container, representation)

@@ -48,6 +48,24 @@ class CreateStaticMeshModel(BaseSettingsModel):
     )
 
 
+def redshift_multi_layered_mode_enum():
+    return [
+        {"label": "No Multi-Layered EXR File", "value": "1"},
+        {"label": "Full Multi-Layered EXR File", "value": "2"}
+    ]
+
+
+class CreateRedshiftROPModel(CreatorModel):
+    multi_layered_mode: str = SettingsField(
+        "1",
+        title="Multi Layered Mode",
+        description=(
+            "Default Multi Layered Mode when creating a new Redshift ROP"
+        ),
+        enum_resolver=redshift_multi_layered_mode_enum,
+    )
+
+
 class CreateUSDRenderModel(CreatorModel):
     default_renderer: str = SettingsField(
         "Karma CPU",
@@ -98,8 +116,8 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateRedshiftProxy: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Redshift Proxy")
-    CreateRedshiftROP: CreatorModel = SettingsField(
-        default_factory=CreatorModel,
+    CreateRedshiftROP: CreateRedshiftROPModel = SettingsField(
+        default_factory=CreateRedshiftROPModel,
         title="Create Redshift ROP")
     CreateReview: CreateReviewModel = SettingsField(
         default_factory=CreateReviewModel,
@@ -178,7 +196,8 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     },
     "CreateRedshiftROP": {
         "enabled": True,
-        "default_variants": ["Main"]
+        "default_variants": ["Main"],
+        "multi_layered_mode": "1"
     },
     "CreateReview": {
         "enabled": True,
