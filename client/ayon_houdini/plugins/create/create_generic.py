@@ -379,7 +379,8 @@ class CreateHoudiniGeneric(plugin.HoudiniCreator):
             ayon_folder.addParmTemplate(attributes_folder)
 
         # Create Instance, Creator and Publish attributes folders
-        instance_attributes_folder = parm_group.find("AYON_instance_attributes")
+        instance_attributes_folder = parm_group.find(
+            "AYON_instance_attributes")
         if not instance_attributes_folder:
             instance_attributes_folder = hou.FolderParmTemplate(
                 "AYON_instance_attributes",
@@ -437,7 +438,7 @@ class CreateHoudiniGeneric(plugin.HoudiniCreator):
                 ])
             creator_attributes_folder.addParmTemplate(parm_template)
 
-        for plugin_name, plugin_attr_values in created_instance.publish_attributes.items():
+        for plugin_name, plugin_attr_values in created_instance.publish_attributes.items():  # noqa: E501
             prefix = f"AYON_publish_attributes_{plugin_name}_"
             for attr_def in plugin_attr_values.attr_defs:
                 parm_template = attribute_def_to_parm_template(

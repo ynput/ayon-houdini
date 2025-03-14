@@ -85,7 +85,8 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         on_new()
 
         if not IS_HEADLESS:
-            import hdefereval  # noqa, hdefereval is only available in ui mode
+            import hdefereval  # noqa: F401
+            # hdefereval is only available in ui mode
             # Defer generation of shelves due to issue on Windows where shelf
             # initialization during start up delays Houdini UI by minutes
             # making it extremely slow to launch.
