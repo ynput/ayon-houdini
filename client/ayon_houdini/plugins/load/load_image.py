@@ -2,10 +2,7 @@ import os
 import re
 import hou
 
-from ayon_core.pipeline import (
-    get_representation_path,
-    AVALON_CONTAINER_ID,
-)
+from ayon_core.pipeline import AVALON_CONTAINER_ID
 from ayon_houdini.api import (
     pipeline,
     plugin,
@@ -63,7 +60,6 @@ class ImageLoader(plugin.HoudiniLoader):
     color = "orange"
 
     def load(self, context, name=None, namespace=None, data=None):
-
         # Format file name, Houdini only wants forward slashes
         path = self.filepath_from_context(context)
         path = self.format_path(path, representation=context["representation"])
@@ -103,7 +99,7 @@ class ImageLoader(plugin.HoudiniLoader):
         node = container["node"]
 
         # Update the file path
-        file_path = get_representation_path(repre_entity)
+        file_path = self.filepath_from_context(context)
         file_path = self.format_path(file_path, repre_entity)
 
         parms = {
@@ -117,7 +113,6 @@ class ImageLoader(plugin.HoudiniLoader):
         node.setParms(parms)
 
     def remove(self, container):
-
         node = container["node"]
 
         # Let's clean up the IMAGES COP2 network
@@ -134,26 +129,20 @@ class ImageLoader(plugin.HoudiniLoader):
     @staticmethod
     def format_path(path, representation):
         """Format file path correctly for single image or sequence."""
-        if not os.path.exists(path):
-            raise RuntimeError("Path does not exist: %s" % path)
-
         ext = os.path.splitext(path)[-1]
 
-        is_sequence = bool(representation["context"].get("frame"))
         # The path is either a single file or sequence in a folder.
-        if not is_sequence:
-            filename = path
-        else:
+        is_sequence = bool(representation["context"].get("frame"))
+        if is_sequence:
+            folder, filename = os.path.split(path)
             filename = re.sub(r"(.*)\.(\d+){}$".format(re.escape(ext)),
                               "\\1.$F4{}".format(ext),
-                              path)
+                              filename)
+            path = os.path.join(folder, filename)
 
-            filename = os.path.join(path, filename)
-
-        filename = os.path.normpath(filename)
-        filename = filename.replace("\\", "/")
-
-        return filename
+        path = os.path.normpath(path)
+        path = path.replace("\\", "/")
+        return path
 
     def get_colorspace_parms(self, representation: dict) -> dict:
         """Return the color space parameters.

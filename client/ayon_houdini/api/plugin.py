@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """Houdini specific AYON/Pyblish plugin definitions."""
+import os
+from typing import Dict
+
 import hou
 
 import clique
@@ -310,13 +313,59 @@ class HoudiniLoader(load.LoaderPlugin):
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
     use_ayon_entity_uri = False
+    collapse_paths_to_root_vars = False
+
+    @classmethod
+    def apply_settings(cls, project_settings):
+        # Prepare collapsible variable mapping using entries in `os.environ`
+        # that are set to the project root paths
+        cls.collapse_paths_to_root_vars: bool = (
+            project_settings["houdini"]["load"]
+            .get("collapse_path_to_project_root_vars", False)
+        )
+
+        super().apply_settings(project_settings)
+
+    @classmethod
+    def _get_collapsible_vars(cls) -> Dict[str, str]:
+        """Return which variables keys may be collapsed to if path starts with
+        the values."""
+        collapsible_vars = {}
+        for key, value in os.environ.items():
+            if key.startswith("AYON_PROJECT_ROOT_"):
+                if not value:
+                    continue
+                collapsible_vars[key] = value.replace("\\", "/")
+
+        # Sort by length to ensure that the longest matching key is first
+        # so that the nearest matching root is used
+        return {
+            key: value
+            for key, value
+            in sorted(collapsible_vars.items(),
+                      key=lambda x: len(x[1]),
+                      reverse=True)
+        }
 
     @classmethod
     def filepath_from_context(cls, context):
         if cls.use_ayon_entity_uri:
             return get_ayon_entity_uri_from_representation_context(context)
 
-        return super(HoudiniLoader, cls).filepath_from_context(context)
+        path = super().filepath_from_context(context)
+
+        # Remap project roots to the collapsible path variables
+        if cls.collapse_paths_to_root_vars:
+            collapsible_vars = cls._get_collapsible_vars()
+            if collapsible_vars:
+                match_path = path.replace("\\", "/")
+                for key, value in collapsible_vars.items():
+                    if match_path.startswith(value):
+                        # Replace start of string with the key
+                        path = f"${key}" + path[len(value):]
+                        break
+
+        return path
 
 
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
