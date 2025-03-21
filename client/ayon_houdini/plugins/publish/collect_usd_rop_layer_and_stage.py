@@ -30,9 +30,9 @@ def is_cook_context_options_supported() -> bool:
     major, minor, patch = hou.applicationVersion()
     if (major, minor, patch) >= (20, 5, 455):
         return True
-    elif major == 20 and (minor, patch) >= (0, 918):
+    elif (major, minor) == (20, 0) and patch >= 918:
         return True
-    elif major == 19 and (minor, patch) >= (5, 1190):
+    elif (major, minor) == (19, 5) and patch >= 1190:
         return True
     return False
 
