@@ -14,6 +14,29 @@ from ayon_houdini.api.lib import (
 )
 
 
+def is_cook_context_options_supported() -> bool:
+    """Return whether current Houdini version supports cook context options.
+    With this feature e.g. `LopNode.stage()` can now take a `context_options`
+    argument to override the result, instead of having to force it with certain
+    global context options set in the scene file.
+
+    This was added on December 11th, 2024 to:
+    - Houdini 20.5.455
+
+    With backports to:
+    - Houdini 20.0.918
+    - Houdini 19.5.1190
+    """
+    major, minor, patch = hou.applicationVersion()
+    if (major, minor, patch) >= (20, 5, 455):
+        return True
+    elif (major, minor) == (20, 0) and patch >= 918:
+        return True
+    elif (major, minor) == (19, 5) and patch >= 1190:
+        return True
+    return False
+
+
 def copy_stage_layers(stage) -> Dict[Sdf.Layer, Sdf.Layer]:
     """Copy a stage's anonymous layers to new in-memory layers.
 
@@ -89,22 +112,30 @@ class CollectUsdRenderLayerAndStage(plugin.HoudiniInstancePlugin):
             "Collecting USD stage with context options:\n"
             f"{json.dumps(options, indent=4)}")
 
+        supports_cook_context_options = is_cook_context_options_supported()
         with contextlib.ExitStack() as stack:
             # Force cooking the lop node does not seem to work, so we
             # must set the cook mode to "Update" for this to work
             stack.enter_context(update_mode_context(hou.updateMode.AutoUpdate))
 
-            # Set the context options of the ROP node.
-            stack.enter_context(context_options(options))
+            context_options_kwargs = {}
+            if supports_cook_context_options:
+                # Allow `LopNode.stage()` to cook with the context options
+                context_options_kwargs["context_options"] = options
+            else:
+                # Backwards compatibility: Force cook it manually
+                # Set the context options of the ROP node.
+                stack.enter_context(context_options(options))
 
-            # Force cook. There have been some cases where the LOP node
-            # just would not return the USD stage without force cooking it.
-            lop_node.cook(force=True)
+                # Force cook. There have been some cases where the LOP node
+                # just would not return the USD stage without force cooking it.
+                lop_node.cook(force=True)
 
             # Get stage and layers from the LOP node.
             stage = lop_node.stage(use_last_cook_context_options=False,
                                    apply_viewport_overrides=False,
-                                   apply_post_layers=False)
+                                   apply_post_layers=False,
+                                   **context_options_kwargs)
             if stage is None:
                 self.log.error(
                     "Unable to get USD stage from LOP node: "
@@ -112,8 +143,12 @@ class CollectUsdRenderLayerAndStage(plugin.HoudiniInstancePlugin):
                     "errors in the node graph.")
                 return
 
-            above_break_layers = set(lop_node.layersAboveLayerBreak(
-                use_last_cook_context_options=False))
+            above_break_layers = set(
+                lop_node.layersAboveLayerBreak(
+                    use_last_cook_context_options=False,
+                    **context_options_kwargs,
+                )
+            )
             layers = [
                 layer for layer
                 in stage.GetLayerStack(includeSessionLayers=False)
