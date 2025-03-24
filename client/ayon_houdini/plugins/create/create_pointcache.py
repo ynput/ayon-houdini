@@ -9,7 +9,7 @@ import hou
 
 class CreatePointCache(plugin.HoudiniCreator):
     """Alembic ROP to pointcache"""
-    identifier = "io.openpype.creators.houdini.pointcache"
+    identifier = "io.ayon.creators.houdini.pointcache"
     label = "PointCache (Abc)"
     product_type = "pointcache"
     icon = "gears"

@@ -10,7 +10,7 @@ from ayon_core.lib import EnumDef, BoolDef
 class CreateRedshiftROP(plugin.HoudiniCreator):
     """Redshift ROP"""
 
-    identifier = "io.openpype.creators.houdini.redshift_rop"
+    identifier = "io.ayon.creators.houdini.redshift_rop"
     label = "Redshift ROP"
     product_type = "redshift_rop"
     icon = "magic"

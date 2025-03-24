@@ -10,7 +10,7 @@ import hou
 
 class CreateUSD(plugin.HoudiniCreator):
     """Universal Scene Description"""
-    identifier = "io.openpype.creators.houdini.usd"
+    identifier = "io.ayon.creators.houdini.usd"
     label = "USD"
     product_type = "usd"
     icon = "cubes"
@@ -155,7 +155,7 @@ class CreateUSDGroom(CreateUSD):
 class CreateUSDLook(CreateUSD):
     """Universal Scene Description Look"""
 
-    identifier = "io.openpype.creators.houdini.usd.look"
+    identifier = "io.ayon.creators.houdini.usd.look"
     label = "USD Look"
     product_type = "look"
     icon = "paint-brush"

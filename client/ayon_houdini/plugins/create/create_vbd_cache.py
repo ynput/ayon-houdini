@@ -8,7 +8,7 @@ import hou
 
 class CreateVDBCache(plugin.HoudiniCreator):
     """OpenVDB from Geometry ROP"""
-    identifier = "io.openpype.creators.houdini.vdbcache"
+    identifier = "io.ayon.creators.houdini.vdbcache"
     name = "vbdcache"
     label = "VDB Cache"
     product_type = "vdbcache"

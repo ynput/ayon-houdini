@@ -7,7 +7,7 @@ from ayon_core.pipeline import CreatedInstance, AutoCreator
 
 class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
     """Workfile auto-creator."""
-    identifier = "io.openpype.creators.houdini.workfile"
+    identifier = "io.ayon.creators.houdini.workfile"
     label = "Workfile"
     product_type = "workfile"
     icon = "fa5.file"
@@ -92,6 +92,15 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
         workfile = instance.get("workfile")
         if not workfile:
             return
+
+        # Convert legacy creator_identifier
+        creator_identifier = workfile.get("creator_identifier")
+        if creator_identifier:
+            workfile["creator_identifier"] = (
+                plugin.REMAP_CREATOR_IDENTIFIERS.get(creator_identifier,
+                                                     creator_identifier)
+            )
+
         created_instance = CreatedInstance.from_existing(
             workfile, self
         )

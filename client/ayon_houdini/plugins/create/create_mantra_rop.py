@@ -6,7 +6,7 @@ from ayon_core.lib import EnumDef, BoolDef
 
 class CreateMantraROP(plugin.HoudiniCreator):
     """Mantra ROP"""
-    identifier = "io.openpype.creators.houdini.mantra_rop"
+    identifier = "io.ayon.creators.houdini.mantra_rop"
     label = "Mantra ROP"
     product_type = "mantra_rop"
     icon = "magic"

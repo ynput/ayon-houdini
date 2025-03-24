@@ -150,7 +150,7 @@ def promote_spare_parameters(node):
 class CreateHDA(plugin.HoudiniCreator):
     """Publish Houdini Digital Asset file."""
 
-    identifier = "io.openpype.creators.houdini.hda"
+    identifier = "io.ayon.creators.houdini.hda"
     label = "Houdini Digital Asset (Hda)"
     product_type = "hda"
     icon = "gears"

@@ -9,7 +9,7 @@ import hou
 class CreateCompositeSequence(plugin.HoudiniCreator):
     """Composite ROP to Image Sequence"""
 
-    identifier = "io.openpype.creators.houdini.imagesequence"
+    identifier = "io.ayon.creators.houdini.imagesequence"
     label = "Composite (Image Sequence)"
     product_type = "imagesequence"
     icon = "gears"

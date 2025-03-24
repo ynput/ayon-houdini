@@ -19,7 +19,7 @@ import hou
 
 class CreateModel(plugin.HoudiniCreator):
     """Create Model"""
-    identifier = "io.openpype.creators.houdini.model"
+    identifier = "io.ayon.creators.houdini.model"
     label = "Model"
     product_type = "model"
     icon = "cube"

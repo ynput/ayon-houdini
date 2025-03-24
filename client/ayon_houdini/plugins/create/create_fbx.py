@@ -192,7 +192,7 @@ class CreateFBX(plugin.HoudiniCreator):
 class CreateStaticMesh(CreateFBX):
     """Static Meshes as FBX."""
 
-    identifier = "io.openpype.creators.houdini.staticmesh.fbx"
+    identifier = "io.ayon.creators.houdini.staticmesh.fbx"
     label = "Static Mesh (FBX)"
     product_type = "staticMesh"
     icon = "cube"
