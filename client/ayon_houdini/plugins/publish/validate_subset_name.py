@@ -21,9 +21,7 @@ class FixProductNameAction(RepairAction):
 
 class ValidateSubsetName(plugin.HoudiniInstancePlugin,
                          OptionalPyblishPluginMixin):
-    """Validate Product name.
-
-    """
+    """Validate Product name."""
 
     families = ["staticMesh", "hda"]
     label = "Validate Product Name"
@@ -64,12 +62,13 @@ class ValidateSubsetName(plugin.HoudiniInstancePlugin,
             instance.data["productType"],
             variant=instance.data["variant"],
             dynamic_data={
-                "asset": folder_entity["name"],
                 "folder": {
-                            "label": folder_entity["label"],
-                            "name": folder_entity["name"]
-                            }
-                }
+                    "label": folder_entity["label"],
+                    "name": folder_entity["name"],
+                },
+                # Backwards compatibility
+                "asset": folder_entity["name"],
+            },
         )
 
         if instance.data.get("productName") != product_name:

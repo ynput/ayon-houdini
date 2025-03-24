@@ -35,7 +35,7 @@ class HoudiniCreatorBase(object):
         respective creator identifiers.
 
         Create `houdini_cached_legacy_instance` key for any legacy instances
-        detected in the scene as instances per family.
+        detected in the scene as instances per product type (legacy: family).
 
         Args:
             Dict[str, Any]: Shared data.

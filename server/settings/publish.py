@@ -7,9 +7,8 @@ from ayon_server.settings import (
 # Publish Plugins
 class CollectAssetHandlesModel(BaseSettingsModel):
     """Collect Frame Range
-    Disable this if you want the publisher to
-    ignore start and end handles specified in the
-    asset data for publish instances
+    Disable this if you want the publisher to ignore start and end handles
+    specified in the task or folder data for publish instances.
     """
     use_asset_handles: bool = SettingsField(
         title="Use asset handles")

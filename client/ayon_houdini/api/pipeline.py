@@ -228,13 +228,13 @@ def containerise(name,
     """Bundle `nodes` into a subnet and imprint it with metadata
 
     Containerisation enables a tracking of version, author and origin
-    for loaded assets.
+    for loaded products.
 
     Arguments:
         name (str): Name of resulting assembly
         namespace (str): Namespace under which to host container
         nodes (list): Long names of nodes to containerise
-        context (dict): Asset information
+        context (dict): Loaded product context information
         loader (str, optional): Name of loader used to produce this container.
         suffix (str, optional): Suffix of container, defaults to `_CON`.
 
