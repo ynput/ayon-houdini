@@ -3,6 +3,7 @@
 import os
 import json
 import logging
+import warnings
 from typing import Optional
 
 import hou  # noqa
@@ -467,6 +468,11 @@ def get_or_create_ayon_container() -> "hou.OpNode":
 
 def get_or_create_avalon_container():
     """Deprecated, please use `get_or_create_ayon_container` instead."""
+    warnings.warn(
+        "get_or_create_avalon_container is deprecated, "
+        "please use get_or_create_ayon_container instead.",
+        DeprecationWarning
+    )
     return get_or_create_ayon_container()
 
 
