@@ -19,8 +19,8 @@ class FixProductNameAction(RepairAction):
     label = "Fix Product Name"
 
 
-class ValidateSubsetName(plugin.HoudiniInstancePlugin,
-                         OptionalPyblishPluginMixin):
+class ValidateProductName(plugin.HoudiniInstancePlugin,
+                          OptionalPyblishPluginMixin):
     """Validate Product name."""
 
     families = ["staticMesh", "hda"]
@@ -112,3 +112,28 @@ class ValidateSubsetName(plugin.HoudiniInstancePlugin,
             "Product name on rop node '%s' has been set to '%s'.",
             rop_node.path(), product_name
         )
+
+    @classmethod
+    def convert_attribute_values(
+        cls, create_context, instance
+    ):
+        # Convert old class name `ValidateSubsetName` to new class name
+        # `ValidateProductName` in the instance data.
+        if not instance:
+            return
+
+        publish_attributes = instance.data.get("publish_attributes", {})
+        if not publish_attributes:
+            return
+
+        if (
+                "ValidateSubsetName" in publish_attributes
+                and "ValidateProductName" not in publish_attributes
+        ):
+            cls.log.debug(
+                "Converted `ValidateSubsetName` -> `ValidateProductName` "
+                f"in publish attributes for {instance.name}"
+            )
+            publish_attributes["ValidateProductName"] = publish_attributes.pop(
+                "ValidateSubsetName"
+            )
