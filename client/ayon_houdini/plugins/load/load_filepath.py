@@ -2,7 +2,7 @@ from ayon_houdini.api import (
     hda_utils,
     plugin
 )
-from ayon_houdini.api.pipeline import get_or_create_avalon_container
+from ayon_houdini.api.pipeline import get_or_create_ayon_container
 
 
 class FilePathLoader(plugin.HoudiniLoader):
@@ -29,7 +29,7 @@ class FilePathLoader(plugin.HoudiniLoader):
         node_name = "{}_{}".format(namespace, name) if namespace else name
 
         # Create node
-        parent_node = get_or_create_avalon_container()
+        parent_node = get_or_create_ayon_container()
         node = parent_node.createNode("ayon::generic_loader",
                                       node_name=node_name)
         node.moveToGoodPosition()

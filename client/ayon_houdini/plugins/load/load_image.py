@@ -2,7 +2,7 @@ import os
 import re
 import hou
 
-from ayon_core.pipeline import AVALON_CONTAINER_ID
+from ayon_core.pipeline import AYON_CONTAINER_ID
 from ayon_houdini.api import (
     pipeline,
     plugin,
@@ -10,30 +10,17 @@ from ayon_houdini.api import (
 )
 
 
-def get_image_avalon_container():
+def get_image_ayon_container():
     """The COP2 files must be in a COP2 network.
 
-    So we maintain a single entry point within AVALON_CONTAINERS,
+    So we maintain a single entry point within AYON_CONTAINERS,
     just for ease of use.
 
     """
-
-    path = pipeline.AVALON_CONTAINERS
-    avalon_container = hou.node(path)
-    if not avalon_container:
-        # Let's create avalon container secretly
-        # but make sure the pipeline still is built the
-        # way we anticipate it was built, asserting it.
-        assert path == "/obj/AVALON_CONTAINERS"
-
-        parent = hou.node("/obj")
-        avalon_container = parent.createNode(
-            "subnet", node_name="AVALON_CONTAINERS"
-        )
-
-    image_container = hou.node(path + "/IMAGES")
+    root_container = pipeline.get_or_create_ayon_container()
+    image_container = root_container.node("IMAGES")
     if not image_container:
-        image_container = avalon_container.createNode(
+        image_container = root_container.createNode(
             "cop2net", node_name="IMAGES"
         )
         image_container.moveToGoodPosition()
@@ -65,7 +52,7 @@ class ImageLoader(plugin.HoudiniLoader):
         path = self.format_path(path, representation=context["representation"])
 
         # Get the root node
-        parent = get_image_avalon_container()
+        parent = get_image_ayon_container()
 
         # Define node name
         namespace = namespace if namespace else context["folder"]["name"]
@@ -81,15 +68,15 @@ class ImageLoader(plugin.HoudiniLoader):
 
         # Imprint it manually
         data = {
-            "schema": "openpype:container-2.0",
-            "id": AVALON_CONTAINER_ID,
+            "schema": "ayon:container-3.0",
+            "id": AYON_CONTAINER_ID,
             "name": node_name,
             "namespace": namespace,
             "loader": str(self.__class__.__name__),
             "representation": context["representation"]["id"],
         }
 
-        # todo: add folder="Avalon"
+        # todo: add folder="AYON"
         lib.imprint(node, data)
 
         return node

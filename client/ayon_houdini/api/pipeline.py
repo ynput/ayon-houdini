@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Pipeline tools for OpenPype Houdini integration."""
+"""Pipeline tools for AYON Houdini integration."""
 import os
 import json
 import logging
+from typing import Optional
 
 import hou  # noqa
 
@@ -33,8 +34,13 @@ from .lib import JSON_PREFIX
 
 log = logging.getLogger("ayon_houdini")
 
-AVALON_CONTAINERS = "/obj/AVALON_CONTAINERS"
-CONTEXT_CONTAINER = "/obj/OpenPypeContext"
+AYON_CONTAINERS = "/obj/AYON_CONTAINERS"
+CONTEXT_CONTAINER = "/obj/AYONContext"
+
+# legacy backwards compatibility
+LEGACY_AVALON_CONTAINERS = "/obj/AVALON_CONTAINERS"
+LEGACY_CONTEXT_CONTAINER = "/obj/OpenPypeContext"
+
 IS_HEADLESS = not hasattr(hou, "ui")
 
 PLUGINS_DIR = os.path.join(HOUDINI_HOST_DIR, "plugins")
@@ -161,33 +167,38 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             hou.Node: context node
 
         """
-        obj_network = hou.node("/obj")
+        parent_name, name  = CONTEXT_CONTAINER.rsplit("/", 1)
+        obj_network = hou.node(parent_name)
         op_ctx = obj_network.createNode("subnet",
-                                        node_name="OpenPypeContext",
+                                        node_name=name,
                                         run_init_scripts=False,
                                         load_contents=False)
 
         op_ctx.moveToGoodPosition()
         op_ctx.setBuiltExplicitly(False)
-        op_ctx.setCreatorState("OpenPype")
-        op_ctx.setComment("OpenPype node to hold context metadata")
+        op_ctx.setCreatorState("AYON")
+        op_ctx.setComment("AYON node to hold context metadata")
         op_ctx.setColor(hou.Color((0.081, 0.798, 0.810)))
         op_ctx.setDisplayFlag(False)
         op_ctx.hide(True)
         return op_ctx
 
+    @staticmethod
+    def get_context_node() -> "Optional[hou.OpNode]":
+        return (
+            hou.node(CONTEXT_CONTAINER)
+            or hou.node(LEGACY_CONTEXT_CONTAINER)
+        )
+
     def update_context_data(self, data, changes):
-        op_ctx = hou.node(CONTEXT_CONTAINER)
-        if not op_ctx:
-            op_ctx = self.create_context_node()
+        context_node = self.get_context_node() or self.create_context_node()
+        lib.imprint(context_node, data, update=True)
 
-        lib.imprint(op_ctx, data, update=True)
-
-    def get_context_data(self):
-        op_ctx = hou.node(CONTEXT_CONTAINER)
-        if not op_ctx:
-            op_ctx = self.create_context_node()
-        return lib.read(op_ctx)
+    def get_context_data(self) -> dict:
+        context_node = self.get_context_node()
+        if not context_node:
+            return {}
+        return lib.read(context_node)
 
     def save_file(self, dst_path=None):
         # Force forwards slashes to avoid segfault
@@ -232,8 +243,8 @@ def containerise(name,
 
     """
 
-    # Get AVALON_CONTAINERS subnet
-    subnet = get_or_create_avalon_container()
+    # Get AYON Containers subnet
+    subnet = get_or_create_ayon_container()
 
     # Create proper container name
     container_name = "{}_{}".format(name, suffix or "CON")
@@ -241,8 +252,8 @@ def containerise(name,
     container.setName(container_name, unique_name=True)
 
     data = {
-        "schema": "openpype:container-2.0",
-        "id": AVALON_CONTAINER_ID,
+        "schema": "ayon:container-3.0",
+        "id": AYON_CONTAINER_ID,
         "name": name,
         "namespace": namespace,
         "loader": str(loader),
@@ -298,7 +309,7 @@ def parse_container(container):
         data[name] = parm.eval()
 
     # Backwards compatibility pre-schemas for containers
-    data["schema"] = data.get("schema", "openpype:container-1.0")
+    data["schema"] = data.get("schema", "ayon:container-3.0")
 
     # Append transient data
     data["objectName"] = container.path()
@@ -311,8 +322,7 @@ def ls():
     containers = []
     for identifier in (
         AYON_CONTAINER_ID,
-        AVALON_CONTAINER_ID,
-        "pyblish.mindbender.container"
+        AVALON_CONTAINER_ID
     ):
         containers += lib.lsattr("id", identifier)
 
@@ -438,16 +448,26 @@ def on_new():
         _enforce_start_frame()
 
 
-def get_or_create_avalon_container() -> "hou.OpNode":
-    avalon_container = hou.node(AVALON_CONTAINERS)
-    if avalon_container:
-        return avalon_container
+def get_or_create_ayon_container() -> "hou.OpNode":
+    ayon_container = hou.node(AYON_CONTAINERS)
+    if ayon_container:
+        return ayon_container
 
-    parent_path, name = AVALON_CONTAINERS.rsplit("/", 1)
+    # Allow legacy name for the containers
+    legacy_ayon_container = hou.node(LEGACY_AVALON_CONTAINERS)
+    if legacy_ayon_container:
+        return legacy_ayon_container
+
+    parent_path, name = AYON_CONTAINERS.rsplit("/", 1)
     parent = hou.node(parent_path)
     return parent.createNode(
         "subnet", node_name=name
     )
+
+
+def get_or_create_avalon_container():
+    """Deprecated, please use `get_or_create_ayon_container` instead."""
+    return get_or_create_ayon_container()
 
 
 def _set_context_settings():
