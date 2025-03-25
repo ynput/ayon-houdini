@@ -145,7 +145,7 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateReviewColorspace: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Review Colorspace")
-    ValidateSubsetName: BasicEnabledStatesModel = SettingsField(
+    ValidateProductName: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Subset Name")
     ValidateUnrealStaticMeshName: BasicEnabledStatesModel = SettingsField(
@@ -219,7 +219,7 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "optional": True,
         "active": True
     },
-    "ValidateSubsetName": {
+    "ValidateProductName": {
         "enabled": True,
         "optional": True,
         "active": True
