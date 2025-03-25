@@ -17,7 +17,7 @@ def get_applied_items(list_proxy) -> List[Union[Sdf.Reference, Sdf.Payload]]:
     return list_proxy.ApplyEditsToList([])
 
 
-class ValidateUsdLookContents(plugin.HoudiniInstancePlugin):
+class ValidateUsdLookDisallowedTypes(plugin.HoudiniInstancePlugin):
     """Validate no meshes are defined in the look.
 
     Usually, a published look should not contain generated meshes in the output
@@ -31,7 +31,7 @@ class ValidateUsdLookContents(plugin.HoudiniInstancePlugin):
     order = pyblish.api.ValidatorOrder
     families = ["look"]
     hosts = ["houdini"]
-    label = "Validate Look No Meshes/Lights"
+    label = "Validate Look No Disallowed Types"
     actions = [SelectROPAction]
 
     disallowed_types = [
