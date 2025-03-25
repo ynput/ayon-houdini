@@ -7,7 +7,7 @@ from ayon_core.lib import EnumDef
 class CreateArnoldAss(plugin.HoudiniCreator):
     """Arnold .ass Archive"""
 
-    identifier = "io.ayon.creators.houdini.ass"
+    identifier = "io.openpype.creators.houdini.ass"
     label = "Arnold ASS"
     product_type = "ass"
     icon = "magic"

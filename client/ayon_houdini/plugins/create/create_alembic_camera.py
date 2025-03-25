@@ -10,7 +10,7 @@ import hou
 class CreateAlembicCamera(plugin.HoudiniCreator):
     """Single baked camera from Alembic ROP."""
 
-    identifier = "io.ayon.creators.houdini.camera"
+    identifier = "io.openpype.creators.houdini.camera"
     label = "Camera (Abc)"
     product_type = "camera"
     icon = "camera"

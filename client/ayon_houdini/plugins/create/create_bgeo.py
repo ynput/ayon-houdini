@@ -8,7 +8,7 @@ from ayon_core.lib import EnumDef
 
 class CreateBGEO(plugin.HoudiniCreator):
     """BGEO pointcache creator."""
-    identifier = "io.ayon.creators.houdini.bgeo"
+    identifier = "io.openpype.creators.houdini.bgeo"
     label = "PointCache (Bgeo)"
     product_type = "pointcache"
     icon = "gears"

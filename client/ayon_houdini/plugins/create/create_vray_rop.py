@@ -10,7 +10,7 @@ from ayon_core.lib import EnumDef, BoolDef
 class CreateVrayROP(plugin.HoudiniCreator):
     """VRay ROP"""
 
-    identifier = "io.ayon.creators.houdini.vray_rop"
+    identifier = "io.openpype.creators.houdini.vray_rop"
     label = "VRay ROP"
     product_type = "vray_rop"
     icon = "magic"

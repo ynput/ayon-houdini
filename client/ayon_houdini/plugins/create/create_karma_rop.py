@@ -6,7 +6,7 @@ from ayon_core.lib import BoolDef, EnumDef, NumberDef
 
 class CreateKarmaROP(plugin.HoudiniCreator):
     """Karma ROP"""
-    identifier = "io.ayon.creators.houdini.karma_rop"
+    identifier = "io.openpype.creators.houdini.karma_rop"
     label = "Karma ROP"
     product_type = "karma_rop"
     icon = "magic"

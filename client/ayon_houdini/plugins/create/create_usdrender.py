@@ -23,7 +23,7 @@ def get_usd_rop_renderers():
 
 class CreateUSDRender(plugin.HoudiniCreator):
     """USD Render ROP in /stage"""
-    identifier = "io.ayon.creators.houdini.usdrender"
+    identifier = "io.openpype.creators.houdini.usdrender"
     label = "USD Render"
     product_type = "usdrender"
     icon = "magic"

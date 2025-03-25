@@ -7,7 +7,7 @@ from ayon_core.lib import EnumDef
 
 class CreateRedshiftProxy(plugin.HoudiniCreator):
     """Redshift Proxy"""
-    identifier = "io.ayon.creators.houdini.redshiftproxy"
+    identifier = "io.openpype.creators.houdini.redshiftproxy"
     label = "Redshift Proxy"
     product_type = "redshiftproxy"
     icon = "magic"

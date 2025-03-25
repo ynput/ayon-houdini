@@ -5,7 +5,7 @@ from ayon_core.lib import EnumDef, BoolDef
 class CreateArnoldRop(plugin.HoudiniCreator):
     """Arnold ROP"""
 
-    identifier = "io.ayon.creators.houdini.arnold_rop"
+    identifier = "io.openpype.creators.houdini.arnold_rop"
     label = "Arnold ROP"
     product_type = "arnold_rop"
     icon = "magic"

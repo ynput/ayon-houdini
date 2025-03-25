@@ -7,7 +7,7 @@ from ayon_core.pipeline import CreatedInstance, AutoCreator
 
 class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
     """Workfile auto-creator."""
-    identifier = "io.ayon.creators.houdini.workfile"
+    identifier = "io.openpype.creators.houdini.workfile"
     label = "Workfile"
     product_type = "workfile"
     icon = "fa5.file"

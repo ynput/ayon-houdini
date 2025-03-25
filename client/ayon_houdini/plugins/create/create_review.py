@@ -10,7 +10,7 @@ import hou
 class CreateReview(plugin.HoudiniCreator):
     """Review with OpenGL ROP"""
 
-    identifier = "io.ayon.creators.houdini.review"
+    identifier = "io.openpype.creators.houdini.review"
     label = "Review"
     product_type = "review"
     icon = "video-camera"
