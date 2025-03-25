@@ -5,7 +5,7 @@ import hou
 
 
 class ShowParametersAction(InventoryAction):
-
+    """Show node parameters in a pop-up parameter window."""
     label = "Show parameters"
     icon = "pencil-square-o"
     color = "#888888"
