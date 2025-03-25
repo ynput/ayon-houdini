@@ -270,7 +270,7 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     },
     "ValidateUsdLookDisallowedTypes": {
         "enabled": True,
-        "optional": True,
+        "optional": False,
         "active": True,
         "disallowed_types": [
             "UsdGeomBoundable",
