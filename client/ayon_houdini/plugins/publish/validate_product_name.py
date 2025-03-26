@@ -132,7 +132,7 @@ class ValidateProductName(plugin.HoudiniInstancePlugin,
         ):
             cls.log.debug(
                 "Converted `ValidateSubsetName` -> `ValidateProductName` "
-                f"in publish attributes for {instance.data["name"]}"
+                f"in publish attributes for {instance['productName']}"
             )
             publish_attributes["ValidateProductName"] = publish_attributes.pop(
                 "ValidateSubsetName"
