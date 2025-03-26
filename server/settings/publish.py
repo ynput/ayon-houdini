@@ -162,7 +162,7 @@ class PublishPluginsModel(BaseSettingsModel):
         title="Validate Review Colorspace")
     ValidateProductName: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
-        title="Validate Subset Name")
+        title="Validate Product Name")
     ValidateUnrealStaticMeshName: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Unreal Static Mesh Name")
