@@ -106,6 +106,21 @@ class BasicEnabledStatesModel(BaseSettingsModel):
     active: bool = SettingsField(title="Active")
 
 
+class ValidateUsdLookDisallowedTypesModel(BasicEnabledStatesModel):
+    disallowed_types: list[str] = SettingsField(
+        default_factory=list,
+        title="Disallowed Types",
+        description=(
+            "Disallowed types for look product. "
+            "This should be USD schema types like:\n"
+            "- `UsdGeomBoundable` for Meshes/Lights/Procedurals\n"
+            "- `UsdRenderSettingsBase` for Render Settings\n"
+            "- `UsdRenderVar` for Render Var\n"
+            "- `UsdGeomCamera` for Cameras"
+        )
+    )
+
+
 class ExtractUsdModel(BaseSettingsModel):
     use_ayon_entity_uri: bool = SettingsField(
         False,
@@ -157,6 +172,12 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateUsdLookAssignments: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate USD Look Assignments")
+    ValidateUsdLookDisallowedTypes: ValidateUsdLookDisallowedTypesModel = (
+        SettingsField(
+            default_factory=ValidateUsdLookDisallowedTypesModel,
+            title="Validate USD Look Disallowed Types"
+        )
+    )
     ValidateUSDRenderProductPaths: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate USD Render Product Paths")
@@ -245,6 +266,17 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "enabled": True,
         "optional": True,
         "active": True
+    },
+    "ValidateUsdLookDisallowedTypes": {
+        "enabled": True,
+        "optional": False,
+        "active": True,
+        "disallowed_types": [
+            "UsdGeomBoundable",
+            "UsdRenderSettingsBase",
+            "UsdRenderVar",
+            "UsdGeomCamera"
+        ]
     },
     "ValidateUSDRenderProductPaths": {
         "enabled": False,
