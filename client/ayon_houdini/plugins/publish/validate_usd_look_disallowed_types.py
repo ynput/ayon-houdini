@@ -6,6 +6,7 @@ from functools import partial
 from pxr import Sdf
 import pyblish.api
 
+from ayon_core.pipeline import OptionalPyblishPluginMixin
 from ayon_core.pipeline.publish import PublishValidationError
 from ayon_houdini.api.action import SelectROPAction
 from ayon_houdini.api.usd import get_schema_type_names
@@ -17,7 +18,8 @@ def get_applied_items(list_proxy) -> List[Union[Sdf.Reference, Sdf.Payload]]:
     return list_proxy.ApplyEditsToList([])
 
 
-class ValidateUsdLookDisallowedTypes(plugin.HoudiniInstancePlugin):
+class ValidateUsdLookDisallowedTypes(plugin.HoudiniInstancePlugin,
+                                     OptionalPyblishPluginMixin):
     """Validate no meshes are defined in the look.
 
     Usually, a published look should not contain generated meshes in the output
@@ -42,6 +44,8 @@ class ValidateUsdLookDisallowedTypes(plugin.HoudiniInstancePlugin):
     ]
 
     def process(self, instance):
+        if not self.is_active(instance.data):
+            return
 
         # Get Sdf.Layers from "Collect ROP Sdf Layers and USD Stage" plug-in
         layers = instance.data.get("layers")
