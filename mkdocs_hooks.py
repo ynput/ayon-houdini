@@ -9,7 +9,7 @@ import logging
 TMP_FILE = "./missing_init_files.json"
 NFILES = []
 
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class ColorFormatter(logging.Formatter):
@@ -47,7 +47,7 @@ logging.basicConfig(
 )
 
 
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def create_init_file(dirpath, msg):
@@ -133,8 +133,8 @@ def remove_missing_init_files(msg=""):
 
 def remove_pychache_dirs(msg=""):
     """
-    This function walks the current directory and removes all existing '__pycache__'
-    directories.
+    This function walks the current directory and removes all existing
+    '__pycache__' directories.
 
     Args:
         msg: An optional message to display during the removal process.
@@ -155,7 +155,7 @@ def remove_pychache_dirs(msg=""):
         logging.info(f"{msg}: no __pycache__ dirs found")
 
 
-# mkdocs hooks -----------------------------------------------------------------
+# mkdocs hooks ----------------------------------------------------------------
 
 
 def on_startup(command, dirty):
