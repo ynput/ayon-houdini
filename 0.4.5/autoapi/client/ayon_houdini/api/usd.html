@@ -1,0 +1,719 @@
+<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=prev href=shelves.html><link rel=next href=workfile_template_builder.html><link rel=icon href=../../../../img/favicon.ico><meta name=generator content="mkdocs-1.6.1, mkdocs-material-9.6.9"><title>usd - ayon-houdini</title><link rel=stylesheet href=../../../../assets/stylesheets/main.4af4bdda.min.css><link rel=stylesheet href=../../../../assets/stylesheets/palette.06af60db.min.css><script src=https://unpkg.com/iframe-worker/shim></script><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback"><style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style><link rel=stylesheet href=../../../../assets/_mkdocstrings.css><link rel=stylesheet href=../../../../css/custom.css><script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script></head> <body dir=ltr data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#client.ayon_houdini.api.usd class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <div data-md-color-scheme=default data-md-component=outdated hidden> </div> <header class="md-header md-header--shadow" data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=../../../../index.html title=ayon-houdini class="md-header__button md-logo" aria-label=ayon-houdini data-md-component=logo> <img src=../../../../img/ay-symbol-blackw-full.png alt=logo> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg> </label> <div class=md-header__title data-md-component=header-title> <div class=md-header__ellipsis> <div class=md-header__topic> <span class=md-ellipsis> ayon-houdini </span> </div> <div class=md-header__topic data-md-component=header-topic> <span class=md-ellipsis> usd </span> </div> </div> </div> <form class=md-header__option data-md-component=palette> <input class=md-option data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to light mode" type=radio name=__palette id=__palette_0> <label class="md-header__button md-icon" title="Switch to light mode" for=__palette_1 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg> </label> <input class=md-option data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme=default data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to dark mode" type=radio name=__palette id=__palette_1> <label class="md-header__button md-icon" title="Switch to dark mode" for=__palette_0 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg> </label> </form> <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg> </label> <nav class=md-search__options aria-label=Search> <button type=reset class="md-search__icon md-icon" title=Clear aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg> </button> </nav> </form> <div class=md-search__output> <div class=md-search__scrollwrap tabindex=0 data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list role=presentation></ol> </div> </div> </div> </div> </div> <div class=md-header__source> <a href=https://github.com/ynput/ayon-houdini title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg> </div> <div class=md-source__repository> GitHub </div> </a> </div> </nav> </header> <div class=md-container data-md-component=container> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=../../../../index.html title=ayon-houdini class="md-nav__button md-logo" aria-label=ayon-houdini data-md-component=logo> <img src=../../../../img/ay-symbol-blackw-full.png alt=logo> </a> ayon-houdini </label> <div class=md-nav__source> <a href=https://github.com/ynput/ayon-houdini title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg> </div> <div class=md-source__repository> GitHub </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../../../index.html class=md-nav__link> <span class=md-ellipsis> Home </span> </a> </li> <li class=md-nav__item> <a href=../../../../license.html class=md-nav__link> <span class=md-ellipsis> License </span> </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3 checked> <label class=md-nav__link for=__nav_3 id=__nav_3_label tabindex> <span class=md-ellipsis> Reference </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_3_label aria-expanded=true> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> Reference </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1 checked> <label class=md-nav__link for=__nav_3_1 id=__nav_3_1_label tabindex=0> <span class=md-ellipsis> client </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_3_1_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1> <span class="md-nav__icon md-icon"></span> client </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1_1 checked> <div class="md-nav__link md-nav__container"> <a href=../index.html class="md-nav__link "> <span class=md-ellipsis> ayon_houdini </span> </a> <label class="md-nav__link " for=__nav_3_1_1 id=__nav_3_1_1_label tabindex=0> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=3 aria-labelledby=__nav_3_1_1_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1_1> <span class="md-nav__icon md-icon"></span> ayon_houdini </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../addon.html class=md-nav__link> <span class=md-ellipsis> addon </span> </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1_1_2 checked> <div class="md-nav__link md-nav__container"> <a href=index.html class="md-nav__link "> <span class=md-ellipsis> api </span> </a> <label class="md-nav__link " for=__nav_3_1_1_2 id=__nav_3_1_1_2_label tabindex=0> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=4 aria-labelledby=__nav_3_1_1_2_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1_1_2> <span class="md-nav__icon md-icon"></span> api </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=action.html class=md-nav__link> <span class=md-ellipsis> action </span> </a> </li> <li class=md-nav__item> <a href=colorspace.html class=md-nav__link> <span class=md-ellipsis> colorspace </span> </a> </li> <li class=md-nav__item> <a href=creator_node_shelves.html class=md-nav__link> <span class=md-ellipsis> creator_node_shelves </span> </a> </li> <li class=md-nav__item> <a href=hda_utils.html class=md-nav__link> <span class=md-ellipsis> hda_utils </span> </a> </li> <li class=md-nav__item> <a href=lib.html class=md-nav__link> <span class=md-ellipsis> lib </span> </a> </li> <li class=md-nav__item> <a href=pipeline.html class=md-nav__link> <span class=md-ellipsis> pipeline </span> </a> </li> <li class=md-nav__item> <a href=plugin.html class=md-nav__link> <span class=md-ellipsis> plugin </span> </a> </li> <li class=md-nav__item> <a href=shelves.html class=md-nav__link> <span class=md-ellipsis> shelves </span> </a> </li> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> <span class=md-ellipsis> usd </span> <span class="md-nav__icon md-icon"></span> </label> <a href=usd.html class="md-nav__link md-nav__link--active"> <span class=md-ellipsis> usd </span> </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd class=md-nav__link> <span class=md-ellipsis> usd </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.add_usd_output_processor class=md-nav__link> <span class=md-ellipsis> add_usd_output_processor </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_ayon_entity_uri_from_representation_context class=md-nav__link> <span class=md-ellipsis> get_ayon_entity_uri_from_representation_context </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_configured_save_layers class=md-nav__link> <span class=md-ellipsis> get_configured_save_layers </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_layer_save_path class=md-nav__link> <span class=md-ellipsis> get_layer_save_path </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_referenced_layers class=md-nav__link> <span class=md-ellipsis> get_referenced_layers </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_schema_type_names class=md-nav__link> <span class=md-ellipsis> get_schema_type_names </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_usd_render_rop_rendersettings class=md-nav__link> <span class=md-ellipsis> get_usd_render_rop_rendersettings </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.iter_layer_recursive class=md-nav__link> <span class=md-ellipsis> iter_layer_recursive </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.outputprocessors class=md-nav__link> <span class=md-ellipsis> outputprocessors </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.remap_paths class=md-nav__link> <span class=md-ellipsis> remap_paths </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.remove_usd_output_processor class=md-nav__link> <span class=md-ellipsis> remove_usd_output_processor </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.setup_lop_python_layer class=md-nav__link> <span class=md-ellipsis> setup_lop_python_layer </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=workfile_template_builder.html class=md-nav__link> <span class=md-ellipsis> workfile_template_builder </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../hooks/set_default_display_and_view.html class=md-nav__link> <span class=md-ellipsis> hooks </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../plugins/create/convert_legacy.html class=md-nav__link> <span class=md-ellipsis> plugins </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../startup/husdplugins/outputprocessors/ayon_uri_processor.html class=md-nav__link> <span class=md-ellipsis> startup </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class=md-nav__item> <a href=../version.html class=md-nav__link> <span class=md-ellipsis> version </span> </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../../../server/settings/create.html class=md-nav__link> <span class=md-ellipsis> server </span> <span class="md-nav__icon md-icon"></span> </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd class=md-nav__link> <span class=md-ellipsis> usd </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.add_usd_output_processor class=md-nav__link> <span class=md-ellipsis> add_usd_output_processor </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_ayon_entity_uri_from_representation_context class=md-nav__link> <span class=md-ellipsis> get_ayon_entity_uri_from_representation_context </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_configured_save_layers class=md-nav__link> <span class=md-ellipsis> get_configured_save_layers </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_layer_save_path class=md-nav__link> <span class=md-ellipsis> get_layer_save_path </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_referenced_layers class=md-nav__link> <span class=md-ellipsis> get_referenced_layers </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_schema_type_names class=md-nav__link> <span class=md-ellipsis> get_schema_type_names </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.get_usd_render_rop_rendersettings class=md-nav__link> <span class=md-ellipsis> get_usd_render_rop_rendersettings </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.iter_layer_recursive class=md-nav__link> <span class=md-ellipsis> iter_layer_recursive </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.outputprocessors class=md-nav__link> <span class=md-ellipsis> outputprocessors </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.remap_paths class=md-nav__link> <span class=md-ellipsis> remap_paths </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.remove_usd_output_processor class=md-nav__link> <span class=md-ellipsis> remove_usd_output_processor </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.usd.setup_lop_python_layer class=md-nav__link> <span class=md-ellipsis> setup_lop_python_layer </span> </a> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <article class="md-content__inner md-typeset"> <h1>usd</h1> <div class="doc doc-object doc-module"> <a id=client.ayon_houdini.api.usd></a> <div class="doc doc-contents first"> <p>Houdini-specific USD Library functions.</p> <div class="doc doc-children"> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.add_usd_output_processor class="doc doc-heading"> <code class="highlight language-python"><span class=n>add_usd_output_processor</span><span class=p>(</span><span class=n>ropnode</span><span class=p>,</span> <span class=n>processor</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Add USD Output Processor to USD Rop node.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>ropnode</code> </td> <td> <code><span title=hou.RopNode>RopNode</span></code> </td> <td> <div class=doc-md-description> <p>The USD Rop node.</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>processor</code> </td> <td> <code><span title=str>str</span></code> </td> <td> <div class=doc-md-description> <p>The output processor name. This is the basename of the python file that contains the Houdini USD Output Processor.</p> </div> </td> <td> <em>required</em> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>add_usd_output_processor</span><span class=p>(</span><span class=n>ropnode</span><span class=p>,</span> <span class=n>processor</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Add USD Output Processor to USD Rop node.</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        ropnode (hou.RopNode): The USD Rop node.</span>
+<span class=sd>        processor (str): The output processor name. This is the basename of</span>
+<span class=sd>            the python file that contains the Houdini USD Output Processor.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+
+    <span class=kn>import</span><span class=w> </span><span class=nn>loputils</span>
+
+    <span class=n>loputils</span><span class=o>.</span><span class=n>handleOutputProcessorAdd</span><span class=p>(</span>
+        <span class=p>{</span>
+            <span class=s2>&quot;node&quot;</span><span class=p>:</span> <span class=n>ropnode</span><span class=p>,</span>
+            <span class=s2>&quot;parm&quot;</span><span class=p>:</span> <span class=n>ropnode</span><span class=o>.</span><span class=n>parm</span><span class=p>(</span><span class=s2>&quot;outputprocessors&quot;</span><span class=p>),</span>
+            <span class=s2>&quot;script_value&quot;</span><span class=p>:</span> <span class=n>processor</span><span class=p>,</span>
+        <span class=p>}</span>
+    <span class=p>)</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.get_ayon_entity_uri_from_representation_context class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_ayon_entity_uri_from_representation_context</span><span class=p>(</span><span class=n>context</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Resolve AYON Entity URI from representation context.</p> <details class=note open> <summary>Note</summary> <p>The representation context is the <code>get_representation_context</code> dict containing the <code>project</code>, <code>folder,</code>representation<code>and so forth. It is not the representation entity</code>context` key.</p> </details> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>context</code> </td> <td> <code><span title=dict>dict</span></code> </td> <td> <div class=doc-md-description> <p>The representation context.</p> </div> </td> <td> <em>required</em> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Raises:</span></p> <table> <thead> <tr> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code><span title=RuntimeError>RuntimeError</span></code> </td> <td> <div class=doc-md-description> <p>Unable to resolve to a single valid URI.</p> </div> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td><code>str</code></td> <td> <code><span title=str>str</span></code> </td> <td> <div class=doc-md-description> <p>The AYON entity URI.</p> </div> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>383</span>
+<span class=normal>384</span>
+<span class=normal>385</span>
+<span class=normal>386</span>
+<span class=normal>387</span>
+<span class=normal>388</span>
+<span class=normal>389</span>
+<span class=normal>390</span>
+<span class=normal>391</span>
+<span class=normal>392</span>
+<span class=normal>393</span>
+<span class=normal>394</span>
+<span class=normal>395</span>
+<span class=normal>396</span>
+<span class=normal>397</span>
+<span class=normal>398</span>
+<span class=normal>399</span>
+<span class=normal>400</span>
+<span class=normal>401</span>
+<span class=normal>402</span>
+<span class=normal>403</span>
+<span class=normal>404</span>
+<span class=normal>405</span>
+<span class=normal>406</span>
+<span class=normal>407</span>
+<span class=normal>408</span>
+<span class=normal>409</span>
+<span class=normal>410</span>
+<span class=normal>411</span>
+<span class=normal>412</span>
+<span class=normal>413</span>
+<span class=normal>414</span>
+<span class=normal>415</span>
+<span class=normal>416</span>
+<span class=normal>417</span>
+<span class=normal>418</span>
+<span class=normal>419</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>get_ayon_entity_uri_from_representation_context</span><span class=p>(</span><span class=n>context</span><span class=p>:</span> <span class=nb>dict</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Resolve AYON Entity URI from representation context.</span>
+
+<span class=sd>    Note:</span>
+<span class=sd>        The representation context is the `get_representation_context` dict</span>
+<span class=sd>        containing the `project`, `folder, `representation` and so forth.</span>
+<span class=sd>        It is not the representation entity `context` key.</span>
+
+<span class=sd>    Arguments:</span>
+<span class=sd>        context (dict): The representation context.</span>
+
+<span class=sd>    Raises:</span>
+<span class=sd>        RuntimeError: Unable to resolve to a single valid URI.</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        str: The AYON entity URI.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=n>project_name</span> <span class=o>=</span> <span class=n>context</span><span class=p>[</span><span class=s2>&quot;project&quot;</span><span class=p>][</span><span class=s2>&quot;name&quot;</span><span class=p>]</span>
+    <span class=n>representation_id</span> <span class=o>=</span> <span class=n>context</span><span class=p>[</span><span class=s2>&quot;representation&quot;</span><span class=p>][</span><span class=s2>&quot;id&quot;</span><span class=p>]</span>
+    <span class=n>response</span> <span class=o>=</span> <span class=n>ayon_api</span><span class=o>.</span><span class=n>post</span><span class=p>(</span>
+        <span class=sa>f</span><span class=s2>&quot;projects/</span><span class=si>{</span><span class=n>project_name</span><span class=si>}</span><span class=s2>/uris&quot;</span><span class=p>,</span>
+        <span class=n>entityType</span><span class=o>=</span><span class=s2>&quot;representation&quot;</span><span class=p>,</span>
+        <span class=n>ids</span><span class=o>=</span><span class=p>[</span><span class=n>representation_id</span><span class=p>])</span>
+    <span class=k>if</span> <span class=n>response</span><span class=o>.</span><span class=n>status_code</span> <span class=o>!=</span> <span class=mi>200</span><span class=p>:</span>
+        <span class=k>raise</span> <span class=ne>RuntimeError</span><span class=p>(</span>
+            <span class=sa>f</span><span class=s2>&quot;Unable to resolve AYON entity URI for &#39;</span><span class=si>{</span><span class=n>project_name</span><span class=si>}</span><span class=s2>&#39; &quot;</span>
+            <span class=sa>f</span><span class=s2>&quot;representation id &#39;</span><span class=si>{</span><span class=n>representation_id</span><span class=si>}</span><span class=s2>&#39;: </span><span class=si>{</span><span class=n>response</span><span class=o>.</span><span class=n>text</span><span class=si>}</span><span class=s2>&quot;</span>
+        <span class=p>)</span>
+    <span class=n>uris</span> <span class=o>=</span> <span class=n>response</span><span class=o>.</span><span class=n>data</span><span class=p>[</span><span class=s2>&quot;uris&quot;</span><span class=p>]</span>
+    <span class=k>if</span> <span class=nb>len</span><span class=p>(</span><span class=n>uris</span><span class=p>)</span> <span class=o>!=</span> <span class=mi>1</span><span class=p>:</span>
+        <span class=k>raise</span> <span class=ne>RuntimeError</span><span class=p>(</span>
+            <span class=sa>f</span><span class=s2>&quot;Unable to resolve AYON entity URI for &#39;</span><span class=si>{</span><span class=n>project_name</span><span class=si>}</span><span class=s2>&#39; &quot;</span>
+            <span class=sa>f</span><span class=s2>&quot;representation id &#39;</span><span class=si>{</span><span class=n>representation_id</span><span class=si>}</span><span class=s2>&#39; to single URI. &quot;</span>
+            <span class=sa>f</span><span class=s2>&quot;Received data: </span><span class=si>{</span><span class=n>response</span><span class=o>.</span><span class=n>data</span><span class=si>}</span><span class=s2>&quot;</span>
+        <span class=p>)</span>
+    <span class=k>return</span> <span class=n>uris</span><span class=p>[</span><span class=mi>0</span><span class=p>][</span><span class=s2>&quot;uri&quot;</span><span class=p>]</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.get_configured_save_layers class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_configured_save_layers</span><span class=p>(</span><span class=n>usd_rop</span><span class=p>,</span> <span class=n>strip_above_layer_break</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Retrieve the layer save paths from a USD ROP.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>usdrop</code> </td> <td> <code><span title=hou.RopNode>RopNode</span></code> </td> <td> <div class=doc-md-description> <p>USD Rop Node</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>strip_above_layer_break</code> </td> <td> <code><span title=Optional>Optional</span>[<span title=bool>bool</span>]</code> </td> <td> <div class=doc-md-description> <p>Whether to exclude any layers that are above layer breaks. This defaults to True.</p> </div> </td> <td> <code>True</code> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> </td> <td> <div class=doc-md-description> <p>List[Sdf.Layer]: The layers with configured save paths.</p> </div> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>192</span>
+<span class=normal>193</span>
+<span class=normal>194</span>
+<span class=normal>195</span>
+<span class=normal>196</span>
+<span class=normal>197</span>
+<span class=normal>198</span>
+<span class=normal>199</span>
+<span class=normal>200</span>
+<span class=normal>201</span>
+<span class=normal>202</span>
+<span class=normal>203</span>
+<span class=normal>204</span>
+<span class=normal>205</span>
+<span class=normal>206</span>
+<span class=normal>207</span>
+<span class=normal>208</span>
+<span class=normal>209</span>
+<span class=normal>210</span>
+<span class=normal>211</span>
+<span class=normal>212</span>
+<span class=normal>213</span>
+<span class=normal>214</span>
+<span class=normal>215</span>
+<span class=normal>216</span>
+<span class=normal>217</span>
+<span class=normal>218</span>
+<span class=normal>219</span>
+<span class=normal>220</span>
+<span class=normal>221</span>
+<span class=normal>222</span>
+<span class=normal>223</span>
+<span class=normal>224</span>
+<span class=normal>225</span>
+<span class=normal>226</span>
+<span class=normal>227</span>
+<span class=normal>228</span>
+<span class=normal>229</span>
+<span class=normal>230</span>
+<span class=normal>231</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>get_configured_save_layers</span><span class=p>(</span><span class=n>usd_rop</span><span class=p>,</span> <span class=n>strip_above_layer_break</span><span class=o>=</span><span class=kc>True</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Retrieve the layer save paths from a USD ROP.</span>
+
+<span class=sd>    Arguments:</span>
+<span class=sd>        usdrop (hou.RopNode): USD Rop Node</span>
+<span class=sd>        strip_above_layer_break (Optional[bool]): Whether to exclude any</span>
+<span class=sd>            layers that are above layer breaks. This defaults to True.</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        List[Sdf.Layer]: The layers with configured save paths.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+
+    <span class=n>lop_node</span> <span class=o>=</span> <span class=n>get_usd_rop_loppath</span><span class=p>(</span><span class=n>usd_rop</span><span class=p>)</span>
+    <span class=n>stage</span> <span class=o>=</span> <span class=n>lop_node</span><span class=o>.</span><span class=n>stage</span><span class=p>(</span><span class=n>apply_viewport_overrides</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>stage</span><span class=p>:</span>
+        <span class=k>raise</span> <span class=ne>RuntimeError</span><span class=p>(</span>
+            <span class=s2>&quot;No valid USD stage for ROP node: &quot;</span> <span class=s2>&quot;</span><span class=si>%s</span><span class=s2>&quot;</span> <span class=o>%</span> <span class=n>usd_rop</span><span class=o>.</span><span class=n>path</span><span class=p>()</span>
+        <span class=p>)</span>
+
+    <span class=n>root_layer</span> <span class=o>=</span> <span class=n>stage</span><span class=o>.</span><span class=n>GetRootLayer</span><span class=p>()</span>
+
+    <span class=k>if</span> <span class=n>strip_above_layer_break</span><span class=p>:</span>
+        <span class=n>layers_above_layer_break</span> <span class=o>=</span> <span class=nb>set</span><span class=p>(</span><span class=n>lop_node</span><span class=o>.</span><span class=n>layersAboveLayerBreak</span><span class=p>())</span>
+    <span class=k>else</span><span class=p>:</span>
+        <span class=n>layers_above_layer_break</span> <span class=o>=</span> <span class=nb>set</span><span class=p>()</span>
+
+    <span class=n>save_layers</span> <span class=o>=</span> <span class=p>[]</span>
+    <span class=k>for</span> <span class=n>layer</span> <span class=ow>in</span> <span class=n>iter_layer_recursive</span><span class=p>(</span><span class=n>root_layer</span><span class=p>):</span>
+        <span class=k>if</span> <span class=p>(</span>
+            <span class=n>strip_above_layer_break</span> <span class=ow>and</span>
+            <span class=n>layer</span><span class=o>.</span><span class=n>identifier</span> <span class=ow>in</span> <span class=n>layers_above_layer_break</span>
+        <span class=p>):</span>
+            <span class=k>continue</span>
+
+        <span class=n>save_path</span> <span class=o>=</span> <span class=n>get_layer_save_path</span><span class=p>(</span><span class=n>layer</span><span class=p>)</span>
+        <span class=k>if</span> <span class=n>save_path</span> <span class=ow>is</span> <span class=ow>not</span> <span class=kc>None</span><span class=p>:</span>
+            <span class=n>save_layers</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>layer</span><span class=p>)</span>
+
+    <span class=k>return</span> <span class=n>save_layers</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.get_layer_save_path class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_layer_save_path</span><span class=p>(</span><span class=n>layer</span><span class=p>,</span> <span class=n>expand_string</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Get custom HoudiniLayerInfo-&gt;HoudiniSavePath from SdfLayer.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>layer</code> </td> <td> <code><span title=pxr.Sdf.Layer>Layer</span></code> </td> <td> <div class=doc-md-description> <p>The Layer to retrieve the save pah data from.</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>expand_string</code> </td> <td> <code><span title=bool>bool</span></code> </td> <td> <div class=doc-md-description> <p>Whether to expand any houdini vars in the save path before computing the absolute path.</p> </div> </td> <td> <code>True</code> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> </td> <td> <div class=doc-md-description> <p>str or None: Path to save to when data exists.</p> </div> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>126</span>
+<span class=normal>127</span>
+<span class=normal>128</span>
+<span class=normal>129</span>
+<span class=normal>130</span>
+<span class=normal>131</span>
+<span class=normal>132</span>
+<span class=normal>133</span>
+<span class=normal>134</span>
+<span class=normal>135</span>
+<span class=normal>136</span>
+<span class=normal>137</span>
+<span class=normal>138</span>
+<span class=normal>139</span>
+<span class=normal>140</span>
+<span class=normal>141</span>
+<span class=normal>142</span>
+<span class=normal>143</span>
+<span class=normal>144</span>
+<span class=normal>145</span>
+<span class=normal>146</span>
+<span class=normal>147</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>get_layer_save_path</span><span class=p>(</span><span class=n>layer</span><span class=p>,</span> <span class=n>expand_string</span><span class=o>=</span><span class=kc>True</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Get custom HoudiniLayerInfo-&gt;HoudiniSavePath from SdfLayer.</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        layer (pxr.Sdf.Layer): The Layer to retrieve the save pah data from.</span>
+<span class=sd>        expand_string (bool): Whether to expand any houdini vars in the save</span>
+<span class=sd>            path before computing the absolute path.</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        str or None: Path to save to when data exists.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=n>hou_layer_info</span> <span class=o>=</span> <span class=n>layer</span><span class=o>.</span><span class=n>rootPrims</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&quot;HoudiniLayerInfo&quot;</span><span class=p>)</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>hou_layer_info</span><span class=p>:</span>
+        <span class=k>return</span>
+
+    <span class=n>save_path</span> <span class=o>=</span> <span class=n>hou_layer_info</span><span class=o>.</span><span class=n>customData</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&quot;HoudiniSavePath&quot;</span><span class=p>,</span> <span class=kc>None</span><span class=p>)</span>
+    <span class=k>if</span> <span class=n>save_path</span><span class=p>:</span>
+        <span class=c1># Unfortunately this doesn&#39;t actually resolve the full absolute path</span>
+        <span class=k>if</span> <span class=n>expand_string</span><span class=p>:</span>
+            <span class=n>save_path</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>text</span><span class=o>.</span><span class=n>expandString</span><span class=p>(</span><span class=n>save_path</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>layer</span><span class=o>.</span><span class=n>ComputeAbsolutePath</span><span class=p>(</span><span class=n>save_path</span><span class=p>)</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.get_referenced_layers class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_referenced_layers</span><span class=p>(</span><span class=n>layer</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Return SdfLayers for all external references of the current layer</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>layer</code> </td> <td> <code><span title=pxr.Sdf.Layer>Layer</span></code> </td> <td> <div class=doc-md-description> <p>The Layer to retrieve the save pah data from.</p> </div> </td> <td> <em>required</em> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td><code>list</code></td> <td> </td> <td> <div class=doc-md-description> <p>List of pxr.Sdf.Layer that are external references to this layer</p> </div> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>150</span>
+<span class=normal>151</span>
+<span class=normal>152</span>
+<span class=normal>153</span>
+<span class=normal>154</span>
+<span class=normal>155</span>
+<span class=normal>156</span>
+<span class=normal>157</span>
+<span class=normal>158</span>
+<span class=normal>159</span>
+<span class=normal>160</span>
+<span class=normal>161</span>
+<span class=normal>162</span>
+<span class=normal>163</span>
+<span class=normal>164</span>
+<span class=normal>165</span>
+<span class=normal>166</span>
+<span class=normal>167</span>
+<span class=normal>168</span>
+<span class=normal>169</span>
+<span class=normal>170</span>
+<span class=normal>171</span>
+<span class=normal>172</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>get_referenced_layers</span><span class=p>(</span><span class=n>layer</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Return SdfLayers for all external references of the current layer</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        layer (pxr.Sdf.Layer): The Layer to retrieve the save pah data from.</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        list: List of pxr.Sdf.Layer that are external references to this layer</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+
+    <span class=n>layers</span> <span class=o>=</span> <span class=p>[]</span>
+    <span class=k>for</span> <span class=n>layer_id</span> <span class=ow>in</span> <span class=n>layer</span><span class=o>.</span><span class=n>GetExternalReferences</span><span class=p>():</span>
+        <span class=n>layer</span> <span class=o>=</span> <span class=n>Sdf</span><span class=o>.</span><span class=n>Layer</span><span class=o>.</span><span class=n>Find</span><span class=p>(</span><span class=n>layer_id</span><span class=p>)</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=n>layer</span><span class=p>:</span>
+            <span class=c1># A file may not be in memory and is</span>
+            <span class=c1># referenced from disk. As such it cannot</span>
+            <span class=c1># be found. We will ignore those layers.</span>
+            <span class=k>continue</span>
+
+        <span class=n>layers</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>layer</span><span class=p>)</span>
+
+    <span class=k>return</span> <span class=n>layers</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.get_schema_type_names class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_schema_type_names</span><span class=p>(</span><span class=n>type_name</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Return schema type name for type name and its derived types</p> <p>This can be useful for checking whether a <code>Sdf.PrimSpec</code>'s type name is of a given type or any of its derived types.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>type_name</code> </td> <td> <code><span title=str>str</span></code> </td> <td> <div class=doc-md-description> <p>The type name, like e.g. 'UsdGeomMesh'</p> </div> </td> <td> <em>required</em> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code><span title=typing.List>List</span>[<span title=str>str</span>]</code> </td> <td> <div class=doc-md-description> <p>List[str]: List of schema type names and their derived types.</p> </div> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>351</span>
+<span class=normal>352</span>
+<span class=normal>353</span>
+<span class=normal>354</span>
+<span class=normal>355</span>
+<span class=normal>356</span>
+<span class=normal>357</span>
+<span class=normal>358</span>
+<span class=normal>359</span>
+<span class=normal>360</span>
+<span class=normal>361</span>
+<span class=normal>362</span>
+<span class=normal>363</span>
+<span class=normal>364</span>
+<span class=normal>365</span>
+<span class=normal>366</span>
+<span class=normal>367</span>
+<span class=normal>368</span>
+<span class=normal>369</span>
+<span class=normal>370</span>
+<span class=normal>371</span>
+<span class=normal>372</span>
+<span class=normal>373</span>
+<span class=normal>374</span>
+<span class=normal>375</span>
+<span class=normal>376</span>
+<span class=normal>377</span>
+<span class=normal>378</span>
+<span class=normal>379</span>
+<span class=normal>380</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>get_schema_type_names</span><span class=p>(</span><span class=n>type_name</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=n>List</span><span class=p>[</span><span class=nb>str</span><span class=p>]:</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Return schema type name for type name and its derived types</span>
+
+<span class=sd>    This can be useful for checking whether a `Sdf.PrimSpec`&#39;s type name is of</span>
+<span class=sd>    a given type or any of its derived types.</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        type_name (str): The type name, like e.g. &#39;UsdGeomMesh&#39;</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        List[str]: List of schema type names and their derived types.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=n>schema_registry</span> <span class=o>=</span> <span class=n>Usd</span><span class=o>.</span><span class=n>SchemaRegistry</span>
+    <span class=n>type_</span> <span class=o>=</span> <span class=n>Tf</span><span class=o>.</span><span class=n>Type</span><span class=o>.</span><span class=n>FindByName</span><span class=p>(</span><span class=n>type_name</span><span class=p>)</span>
+
+    <span class=k>if</span> <span class=n>type_</span> <span class=o>==</span> <span class=n>Tf</span><span class=o>.</span><span class=n>Type</span><span class=o>.</span><span class=n>Unknown</span><span class=p>:</span>
+        <span class=n>type_</span> <span class=o>=</span> <span class=n>schema_registry</span><span class=o>.</span><span class=n>GetTypeFromSchemaTypeName</span><span class=p>(</span><span class=n>type_name</span><span class=p>)</span>
+        <span class=k>if</span> <span class=n>type_</span> <span class=o>==</span> <span class=n>Tf</span><span class=o>.</span><span class=n>Type</span><span class=o>.</span><span class=n>Unknown</span><span class=p>:</span>
+            <span class=c1># Type not found</span>
+            <span class=k>return</span> <span class=p>[]</span>
+
+    <span class=n>results</span> <span class=o>=</span> <span class=p>[]</span>
+    <span class=n>derived</span> <span class=o>=</span> <span class=n>type_</span><span class=o>.</span><span class=n>GetAllDerivedTypes</span><span class=p>()</span>
+    <span class=k>for</span> <span class=n>derived_type</span> <span class=ow>in</span> <span class=n>itertools</span><span class=o>.</span><span class=n>chain</span><span class=p>([</span><span class=n>type_</span><span class=p>],</span> <span class=n>derived</span><span class=p>):</span>
+        <span class=n>schema_type_name</span> <span class=o>=</span> <span class=n>schema_registry</span><span class=o>.</span><span class=n>GetSchemaTypeName</span><span class=p>(</span><span class=n>derived_type</span><span class=p>)</span>
+        <span class=k>if</span> <span class=n>schema_type_name</span><span class=p>:</span>
+            <span class=n>results</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>schema_type_name</span><span class=p>)</span>
+
+    <span class=k>return</span> <span class=n>results</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.get_usd_render_rop_rendersettings class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_usd_render_rop_rendersettings</span><span class=p>(</span><span class=n>rop_node</span><span class=p>,</span> <span class=n>stage</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span> <span class=n>logger</span><span class=o>=</span><span class=kc>None</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Return the chosen UsdRender.Settings from the stage (if any).</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>rop_node</code> </td> <td> <code><span title=hou.Node>Node</span></code> </td> <td> <div class=doc-md-description> <p>The Houdini USD Render ROP node.</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>stage</code> </td> <td> <code><span title=pxr.Usd.Stage>Stage</span></code> </td> <td> <div class=doc-md-description> <p>The USD stage to find the render settings in. This is usually the stage from the LOP path the USD Render ROP node refers to.</p> </div> </td> <td> <code>None</code> </td> </tr> <tr class=doc-section-item> <td> <code>logger</code> </td> <td> <code><span title=logging.Logger>Logger</span></code> </td> <td> <div class=doc-md-description> <p>Logger to log warnings to if no render settings were find in stage.</p> </div> </td> <td> <code>None</code> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> </td> <td> <div class=doc-md-description> <p>Optional[UsdRender.Settings]: Render Settings.</p> </div> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>311</span>
+<span class=normal>312</span>
+<span class=normal>313</span>
+<span class=normal>314</span>
+<span class=normal>315</span>
+<span class=normal>316</span>
+<span class=normal>317</span>
+<span class=normal>318</span>
+<span class=normal>319</span>
+<span class=normal>320</span>
+<span class=normal>321</span>
+<span class=normal>322</span>
+<span class=normal>323</span>
+<span class=normal>324</span>
+<span class=normal>325</span>
+<span class=normal>326</span>
+<span class=normal>327</span>
+<span class=normal>328</span>
+<span class=normal>329</span>
+<span class=normal>330</span>
+<span class=normal>331</span>
+<span class=normal>332</span>
+<span class=normal>333</span>
+<span class=normal>334</span>
+<span class=normal>335</span>
+<span class=normal>336</span>
+<span class=normal>337</span>
+<span class=normal>338</span>
+<span class=normal>339</span>
+<span class=normal>340</span>
+<span class=normal>341</span>
+<span class=normal>342</span>
+<span class=normal>343</span>
+<span class=normal>344</span>
+<span class=normal>345</span>
+<span class=normal>346</span>
+<span class=normal>347</span>
+<span class=normal>348</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>get_usd_render_rop_rendersettings</span><span class=p>(</span><span class=n>rop_node</span><span class=p>,</span> <span class=n>stage</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span> <span class=n>logger</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Return the chosen UsdRender.Settings from the stage (if any).</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        rop_node (hou.Node): The Houdini USD Render ROP node.</span>
+<span class=sd>        stage (pxr.Usd.Stage): The USD stage to find the render settings</span>
+<span class=sd>             in. This is usually the stage from the LOP path the USD Render</span>
+<span class=sd>             ROP node refers to.</span>
+<span class=sd>        logger (logging.Logger): Logger to log warnings to if no render</span>
+<span class=sd>            settings were find in stage.</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        Optional[UsdRender.Settings]: Render Settings.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=k>if</span> <span class=n>logger</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span>
+        <span class=n>logger</span> <span class=o>=</span> <span class=n>log</span>
+
+    <span class=k>if</span> <span class=n>stage</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span>
+        <span class=n>lop_node</span> <span class=o>=</span> <span class=n>get_usd_rop_loppath</span><span class=p>(</span><span class=n>rop_node</span><span class=p>)</span>
+        <span class=n>stage</span> <span class=o>=</span> <span class=n>lop_node</span><span class=o>.</span><span class=n>stage</span><span class=p>()</span>
+
+    <span class=n>path</span> <span class=o>=</span> <span class=n>rop_node</span><span class=o>.</span><span class=n>evalParm</span><span class=p>(</span><span class=s2>&quot;rendersettings&quot;</span><span class=p>)</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>path</span><span class=p>:</span>
+        <span class=c1># Default behavior</span>
+        <span class=n>path</span> <span class=o>=</span> <span class=s2>&quot;/Render/rendersettings&quot;</span>
+
+    <span class=n>prim</span> <span class=o>=</span> <span class=n>stage</span><span class=o>.</span><span class=n>GetPrimAtPath</span><span class=p>(</span><span class=n>path</span><span class=p>)</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>prim</span><span class=p>:</span>
+        <span class=n>logger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=s2>&quot;No render settings primitive found at: </span><span class=si>%s</span><span class=s2>&quot;</span><span class=p>,</span> <span class=n>path</span><span class=p>)</span>
+        <span class=k>return</span>
+
+    <span class=n>render_settings</span> <span class=o>=</span> <span class=n>UsdRender</span><span class=o>.</span><span class=n>Settings</span><span class=p>(</span><span class=n>prim</span><span class=p>)</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>render_settings</span><span class=p>:</span>
+        <span class=n>logger</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=s2>&quot;Prim at </span><span class=si>%s</span><span class=s2> is not a valid RenderSettings prim.&quot;</span><span class=p>,</span> <span class=n>path</span><span class=p>)</span>
+        <span class=k>return</span>
+
+    <span class=k>return</span> <span class=n>render_settings</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.iter_layer_recursive class="doc doc-heading"> <code class="highlight language-python"><span class=n>iter_layer_recursive</span><span class=p>(</span><span class=n>layer</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Recursively iterate all 'external' referenced layers</p> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>175</span>
+<span class=normal>176</span>
+<span class=normal>177</span>
+<span class=normal>178</span>
+<span class=normal>179</span>
+<span class=normal>180</span>
+<span class=normal>181</span>
+<span class=normal>182</span>
+<span class=normal>183</span>
+<span class=normal>184</span>
+<span class=normal>185</span>
+<span class=normal>186</span>
+<span class=normal>187</span>
+<span class=normal>188</span>
+<span class=normal>189</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>iter_layer_recursive</span><span class=p>(</span><span class=n>layer</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Recursively iterate all &#39;external&#39; referenced layers&quot;&quot;&quot;</span>
+
+    <span class=n>layers</span> <span class=o>=</span> <span class=n>get_referenced_layers</span><span class=p>(</span><span class=n>layer</span><span class=p>)</span>
+    <span class=n>traversed</span> <span class=o>=</span> <span class=nb>set</span><span class=p>(</span><span class=n>layers</span><span class=p>)</span>  <span class=c1># Avoid recursion to itself (if even possible)</span>
+    <span class=n>traverse</span> <span class=o>=</span> <span class=nb>list</span><span class=p>(</span><span class=n>layers</span><span class=p>)</span>
+    <span class=k>for</span> <span class=n>layer</span> <span class=ow>in</span> <span class=n>traverse</span><span class=p>:</span>
+
+        <span class=c1># Include children layers (recursion)</span>
+        <span class=n>children_layers</span> <span class=o>=</span> <span class=n>get_referenced_layers</span><span class=p>(</span><span class=n>layer</span><span class=p>)</span>
+        <span class=n>children_layers</span> <span class=o>=</span> <span class=p>[</span><span class=n>x</span> <span class=k>for</span> <span class=n>x</span> <span class=ow>in</span> <span class=n>children_layers</span> <span class=k>if</span> <span class=n>x</span> <span class=ow>not</span> <span class=ow>in</span> <span class=n>traversed</span><span class=p>]</span>
+        <span class=n>traverse</span><span class=o>.</span><span class=n>extend</span><span class=p>(</span><span class=n>children_layers</span><span class=p>)</span>
+        <span class=n>traversed</span><span class=o>.</span><span class=n>update</span><span class=p>(</span><span class=n>children_layers</span><span class=p>)</span>
+
+        <span class=k>yield</span> <span class=n>layer</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.outputprocessors class="doc doc-heading"> <code class="highlight language-python"><span class=n>outputprocessors</span><span class=p>(</span><span class=n>ropnode</span><span class=p>,</span> <span class=n>processors</span><span class=o>=</span><span class=nb>tuple</span><span class=p>(),</span> <span class=n>disable_all_others</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Context manager to temporarily add Output Processors to USD ROP node.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>ropnode</code> </td> <td> <code><span title=hou.RopNode>RopNode</span></code> </td> <td> <div class=doc-md-description> <p>The USD Rop node.</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>processors</code> </td> <td> <code><span title=tuple>tuple</span> or <span title=list>list</span></code> </td> <td> <div class=doc-md-description> <p>The processors to add.</p> </div> </td> <td> <code><span title=tuple>tuple</span>()</code> </td> </tr> <tr class=doc-section-item> <td> <code>disable_all_others</code> </td> <td> <code>(<span title=bool>bool</span>, <span title=Optional>Optional</span>)</code> </td> <td> <div class=doc-md-description> <p>Whether to disable all output processors currently on the ROP node that are not in the <code>processors</code> list passed to this function.</p> </div> </td> <td> <code>True</code> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 58</span>
+<span class=normal> 59</span>
+<span class=normal> 60</span>
+<span class=normal> 61</span>
+<span class=normal> 62</span>
+<span class=normal> 63</span>
+<span class=normal> 64</span>
+<span class=normal> 65</span>
+<span class=normal> 66</span>
+<span class=normal> 67</span>
+<span class=normal> 68</span>
+<span class=normal> 69</span>
+<span class=normal> 70</span>
+<span class=normal> 71</span>
+<span class=normal> 72</span>
+<span class=normal> 73</span>
+<span class=normal> 74</span>
+<span class=normal> 75</span>
+<span class=normal> 76</span>
+<span class=normal> 77</span>
+<span class=normal> 78</span>
+<span class=normal> 79</span>
+<span class=normal> 80</span>
+<span class=normal> 81</span>
+<span class=normal> 82</span>
+<span class=normal> 83</span>
+<span class=normal> 84</span>
+<span class=normal> 85</span>
+<span class=normal> 86</span>
+<span class=normal> 87</span>
+<span class=normal> 88</span>
+<span class=normal> 89</span>
+<span class=normal> 90</span>
+<span class=normal> 91</span>
+<span class=normal> 92</span>
+<span class=normal> 93</span>
+<span class=normal> 94</span>
+<span class=normal> 95</span>
+<span class=normal> 96</span>
+<span class=normal> 97</span>
+<span class=normal> 98</span>
+<span class=normal> 99</span>
+<span class=normal>100</span>
+<span class=normal>101</span>
+<span class=normal>102</span>
+<span class=normal>103</span>
+<span class=normal>104</span>
+<span class=normal>105</span>
+<span class=normal>106</span></pre></div></td><td class=code><div><pre><span></span><code><span class=nd>@contextlib</span><span class=o>.</span><span class=n>contextmanager</span>
+<span class=k>def</span><span class=w> </span><span class=nf>outputprocessors</span><span class=p>(</span><span class=n>ropnode</span><span class=p>,</span> <span class=n>processors</span><span class=o>=</span><span class=nb>tuple</span><span class=p>(),</span> <span class=n>disable_all_others</span><span class=o>=</span><span class=kc>True</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Context manager to temporarily add Output Processors to USD ROP node.</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        ropnode (hou.RopNode): The USD Rop node.</span>
+<span class=sd>        processors (tuple or list): The processors to add.</span>
+<span class=sd>        disable_all_others (bool, Optional): Whether to disable all</span>
+<span class=sd>            output processors currently on the ROP node that are not in the</span>
+<span class=sd>            `processors` list passed to this function.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=c1># TODO: Add support for forcing the correct Order of the processors</span>
+
+    <span class=n>original</span> <span class=o>=</span> <span class=p>[]</span>
+    <span class=n>prefix</span> <span class=o>=</span> <span class=s2>&quot;enableoutputprocessor_&quot;</span>
+    <span class=n>processor_parms</span> <span class=o>=</span> <span class=n>ropnode</span><span class=o>.</span><span class=n>globParms</span><span class=p>(</span><span class=n>prefix</span> <span class=o>+</span> <span class=s2>&quot;*&quot;</span><span class=p>)</span>
+    <span class=k>for</span> <span class=n>parm</span> <span class=ow>in</span> <span class=n>processor_parms</span><span class=p>:</span>
+        <span class=n>original</span><span class=o>.</span><span class=n>append</span><span class=p>((</span><span class=n>parm</span><span class=p>,</span> <span class=n>parm</span><span class=o>.</span><span class=n>eval</span><span class=p>()))</span>
+
+    <span class=k>if</span> <span class=n>disable_all_others</span><span class=p>:</span>
+        <span class=k>for</span> <span class=n>parm</span> <span class=ow>in</span> <span class=n>processor_parms</span><span class=p>:</span>
+            <span class=n>parm</span><span class=o>.</span><span class=n>set</span><span class=p>(</span><span class=kc>False</span><span class=p>)</span>
+
+    <span class=n>added</span> <span class=o>=</span> <span class=p>[]</span>
+    <span class=k>for</span> <span class=n>processor</span> <span class=ow>in</span> <span class=n>processors</span><span class=p>:</span>
+
+        <span class=n>parm</span> <span class=o>=</span> <span class=n>ropnode</span><span class=o>.</span><span class=n>parm</span><span class=p>(</span><span class=n>prefix</span> <span class=o>+</span> <span class=n>processor</span><span class=p>)</span>
+        <span class=k>if</span> <span class=n>parm</span><span class=p>:</span>
+            <span class=c1># If processor already exists, just enable it</span>
+            <span class=n>parm</span><span class=o>.</span><span class=n>set</span><span class=p>(</span><span class=kc>True</span><span class=p>)</span>
+
+        <span class=k>else</span><span class=p>:</span>
+            <span class=c1># Else add the new processor</span>
+            <span class=n>add_usd_output_processor</span><span class=p>(</span><span class=n>ropnode</span><span class=p>,</span> <span class=n>processor</span><span class=p>)</span>
+            <span class=n>added</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>processor</span><span class=p>)</span>
+
+    <span class=k>try</span><span class=p>:</span>
+        <span class=k>yield</span>
+    <span class=k>finally</span><span class=p>:</span>
+
+        <span class=c1># Remove newly added processors</span>
+        <span class=k>for</span> <span class=n>processor</span> <span class=ow>in</span> <span class=n>added</span><span class=p>:</span>
+            <span class=n>remove_usd_output_processor</span><span class=p>(</span><span class=n>ropnode</span><span class=p>,</span> <span class=n>processor</span><span class=p>)</span>
+
+        <span class=c1># Revert to original values</span>
+        <span class=k>for</span> <span class=n>parm</span><span class=p>,</span> <span class=n>value</span> <span class=ow>in</span> <span class=n>original</span><span class=p>:</span>
+            <span class=k>if</span> <span class=n>parm</span><span class=p>:</span>
+                <span class=n>parm</span><span class=o>.</span><span class=n>set</span><span class=p>(</span><span class=n>value</span><span class=p>)</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.remap_paths class="doc doc-heading"> <code class="highlight language-python"><span class=n>remap_paths</span><span class=p>(</span><span class=n>rop_node</span><span class=p>,</span> <span class=n>mapping</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Enable the AyonRemapPaths output processor with provided <code>mapping</code></p> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>287</span>
+<span class=normal>288</span>
+<span class=normal>289</span>
+<span class=normal>290</span>
+<span class=normal>291</span>
+<span class=normal>292</span>
+<span class=normal>293</span>
+<span class=normal>294</span>
+<span class=normal>295</span>
+<span class=normal>296</span>
+<span class=normal>297</span>
+<span class=normal>298</span>
+<span class=normal>299</span>
+<span class=normal>300</span>
+<span class=normal>301</span>
+<span class=normal>302</span>
+<span class=normal>303</span>
+<span class=normal>304</span>
+<span class=normal>305</span>
+<span class=normal>306</span>
+<span class=normal>307</span>
+<span class=normal>308</span></pre></div></td><td class=code><div><pre><span></span><code><span class=nd>@contextlib</span><span class=o>.</span><span class=n>contextmanager</span>
+<span class=k>def</span><span class=w> </span><span class=nf>remap_paths</span><span class=p>(</span><span class=n>rop_node</span><span class=p>,</span> <span class=n>mapping</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Enable the AyonRemapPaths output processor with provided `mapping`&quot;&quot;&quot;</span>
+    <span class=kn>from</span><span class=w> </span><span class=nn>ayon_houdini.api.lib</span><span class=w> </span><span class=kn>import</span> <span class=n>parm_values</span>
+
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>mapping</span><span class=p>:</span>
+        <span class=c1># Do nothing</span>
+        <span class=k>yield</span>
+        <span class=k>return</span>
+
+    <span class=c1># Houdini string parms need to escape backslashes due to the support</span>
+    <span class=c1># of expressions - as such we do so on the json data</span>
+    <span class=n>value</span> <span class=o>=</span> <span class=n>json</span><span class=o>.</span><span class=n>dumps</span><span class=p>(</span><span class=n>mapping</span><span class=p>)</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>&quot;</span><span class=se>\\</span><span class=s2>&quot;</span><span class=p>,</span> <span class=s2>&quot;</span><span class=se>\\\\</span><span class=s2>&quot;</span><span class=p>)</span>
+    <span class=k>with</span> <span class=n>outputprocessors</span><span class=p>(</span>
+        <span class=n>rop_node</span><span class=p>,</span>
+        <span class=n>processors</span><span class=o>=</span><span class=p>[</span><span class=s2>&quot;ayon_remap_paths&quot;</span><span class=p>],</span>
+        <span class=n>disable_all_others</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span>
+    <span class=p>):</span>
+        <span class=k>with</span> <span class=n>parm_values</span><span class=p>([</span>
+            <span class=p>(</span><span class=n>rop_node</span><span class=o>.</span><span class=n>parm</span><span class=p>(</span><span class=s2>&quot;ayon_remap_paths_remap_json&quot;</span><span class=p>),</span> <span class=n>value</span><span class=p>)</span>
+        <span class=p>]):</span>
+            <span class=k>yield</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.remove_usd_output_processor class="doc doc-heading"> <code class="highlight language-python"><span class=n>remove_usd_output_processor</span><span class=p>(</span><span class=n>ropnode</span><span class=p>,</span> <span class=n>processor</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Removes USD Output Processor from USD Rop node.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>ropnode</code> </td> <td> <code><span title=hou.RopNode>RopNode</span></code> </td> <td> <div class=doc-md-description> <p>The USD Rop node.</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>processor</code> </td> <td> <code><span title=str>str</span></code> </td> <td> <div class=doc-md-description> <p>The output processor name. This is the basename of the python file that contains the Houdini USD Output Processor.</p> </div> </td> <td> <em>required</em> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span>
+<span class=normal>52</span>
+<span class=normal>53</span>
+<span class=normal>54</span>
+<span class=normal>55</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>remove_usd_output_processor</span><span class=p>(</span><span class=n>ropnode</span><span class=p>,</span> <span class=n>processor</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Removes USD Output Processor from USD Rop node.</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        ropnode (hou.RopNode): The USD Rop node.</span>
+<span class=sd>        processor (str): The output processor name. This is the basename of</span>
+<span class=sd>            the python file that contains the Houdini USD Output Processor.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=kn>import</span><span class=w> </span><span class=nn>loputils</span>
+
+    <span class=n>parm</span> <span class=o>=</span> <span class=n>ropnode</span><span class=o>.</span><span class=n>parm</span><span class=p>(</span><span class=n>processor</span> <span class=o>+</span> <span class=s2>&quot;_remove&quot;</span><span class=p>)</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>parm</span><span class=p>:</span>
+        <span class=k>raise</span> <span class=ne>RuntimeError</span><span class=p>(</span>
+            <span class=s2>&quot;Output Processor </span><span class=si>%s</span><span class=s2> does not &quot;</span>
+            <span class=s2>&quot;exist on </span><span class=si>%s</span><span class=s2>&quot;</span> <span class=o>%</span> <span class=p>(</span><span class=n>processor</span><span class=p>,</span> <span class=n>ropnode</span><span class=o>.</span><span class=n>name</span><span class=p>())</span>
+        <span class=p>)</span>
+
+    <span class=n>loputils</span><span class=o>.</span><span class=n>handleOutputProcessorRemove</span><span class=p>({</span><span class=s2>&quot;node&quot;</span><span class=p>:</span> <span class=n>ropnode</span><span class=p>,</span> <span class=s2>&quot;parm&quot;</span><span class=p>:</span> <span class=n>parm</span><span class=p>})</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.usd.setup_lop_python_layer class="doc doc-heading"> <code class="highlight language-python"><span class=n>setup_lop_python_layer</span><span class=p>(</span><span class=n>layer</span><span class=p>,</span> <span class=n>node</span><span class=p>,</span> <span class=n>savepath</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span> <span class=n>apply_file_format_args</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Set up Sdf.Layer with HoudiniLayerInfo prim for metadata.</p> <p>This is the same as <code>loputils.createPythonLayer</code> but can be run on top of <code>pxr.Sdf.Layer</code> instances that are already created in a Python LOP node. That's useful if your layer creation itself is built to be DCC agnostic, then we just need to run this after per layer to make it explicitly stored for houdini.</p> <p>By default, Houdini doesn't apply the FileFormatArguments supplied to the created layer; however it does support USD's file save suffix of <code>:SDF_FORMAT_ARGS:</code> to supply them. With <code>apply_file_format_args</code> any file format args set on the layer's creation will be added to the save path through that.</p> <details class=note open> <summary>The <code>node.addHeldLayer</code> call will only work from a LOP python node</summary> <p>whenever <code>node.editableStage()</code> or <code>node.editableLayer()</code> was called.</p> </details> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>layer</code> </td> <td> <code><span title=pxr.Sdf.Layer>Layer</span></code> </td> <td> <div class=doc-md-description> <p>An existing layer (most likely just created in the current runtime)</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>node</code> </td> <td> <code><span title=hou.LopNode>LopNode</span></code> </td> <td> <div class=doc-md-description> <p>The Python LOP node to attach the layer to so it does not get garbage collected/mangled after the downstream.</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>savepath</code> </td> <td> <code><span title=Optional>Optional</span>[<span title=str>str</span>]</code> </td> <td> <div class=doc-md-description> <p>When provided the HoudiniSaveControl will be set to Explicit with HoudiniSavePath to this path.</p> </div> </td> <td> <code>None</code> </td> </tr> <tr class=doc-section-item> <td> <code>apply_file_format_args</code> </td> <td> <code><span title=Optional>Optional</span>[<span title=bool>bool</span>]</code> </td> <td> <div class=doc-md-description> <p>When enabled any FileFormatArgs defined for the layer on creation will be set in the HoudiniSavePath so Houdini USD ROP will use them top.</p> </div> </td> <td> <code>True</code> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> </td> <td> <div class=doc-md-description> <p>Sdf.PrimSpec: The Created HoudiniLayerInfo prim spec.</p> </div> </td> </tr> </tbody> </table> <details class=quote> <summary>Source code in <code>client/ayon_houdini/api/usd.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>234</span>
+<span class=normal>235</span>
+<span class=normal>236</span>
+<span class=normal>237</span>
+<span class=normal>238</span>
+<span class=normal>239</span>
+<span class=normal>240</span>
+<span class=normal>241</span>
+<span class=normal>242</span>
+<span class=normal>243</span>
+<span class=normal>244</span>
+<span class=normal>245</span>
+<span class=normal>246</span>
+<span class=normal>247</span>
+<span class=normal>248</span>
+<span class=normal>249</span>
+<span class=normal>250</span>
+<span class=normal>251</span>
+<span class=normal>252</span>
+<span class=normal>253</span>
+<span class=normal>254</span>
+<span class=normal>255</span>
+<span class=normal>256</span>
+<span class=normal>257</span>
+<span class=normal>258</span>
+<span class=normal>259</span>
+<span class=normal>260</span>
+<span class=normal>261</span>
+<span class=normal>262</span>
+<span class=normal>263</span>
+<span class=normal>264</span>
+<span class=normal>265</span>
+<span class=normal>266</span>
+<span class=normal>267</span>
+<span class=normal>268</span>
+<span class=normal>269</span>
+<span class=normal>270</span>
+<span class=normal>271</span>
+<span class=normal>272</span>
+<span class=normal>273</span>
+<span class=normal>274</span>
+<span class=normal>275</span>
+<span class=normal>276</span>
+<span class=normal>277</span>
+<span class=normal>278</span>
+<span class=normal>279</span>
+<span class=normal>280</span>
+<span class=normal>281</span>
+<span class=normal>282</span>
+<span class=normal>283</span>
+<span class=normal>284</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>setup_lop_python_layer</span><span class=p>(</span><span class=n>layer</span><span class=p>,</span> <span class=n>node</span><span class=p>,</span> <span class=n>savepath</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span>
+                           <span class=n>apply_file_format_args</span><span class=o>=</span><span class=kc>True</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Set up Sdf.Layer with HoudiniLayerInfo prim for metadata.</span>
+
+<span class=sd>    This is the same as `loputils.createPythonLayer` but can be run on top</span>
+<span class=sd>    of `pxr.Sdf.Layer` instances that are already created in a Python LOP node.</span>
+<span class=sd>    That&#39;s useful if your layer creation itself is built to be DCC agnostic,</span>
+<span class=sd>    then we just need to run this after per layer to make it explicitly</span>
+<span class=sd>    stored for houdini.</span>
+
+<span class=sd>    By default, Houdini doesn&#39;t apply the FileFormatArguments supplied to</span>
+<span class=sd>    the created layer; however it does support USD&#39;s file save suffix</span>
+<span class=sd>    of `:SDF_FORMAT_ARGS:` to supply them. With `apply_file_format_args` any</span>
+<span class=sd>    file format args set on the layer&#39;s creation will be added to the</span>
+<span class=sd>    save path through that.</span>
+
+<span class=sd>    Note: The `node.addHeldLayer` call will only work from a LOP python node</span>
+<span class=sd>        whenever `node.editableStage()` or `node.editableLayer()` was called.</span>
+
+<span class=sd>    Arguments:</span>
+<span class=sd>        layer (Sdf.Layer): An existing layer (most likely just created</span>
+<span class=sd>            in the current runtime)</span>
+<span class=sd>        node (hou.LopNode): The Python LOP node to attach the layer to so</span>
+<span class=sd>            it does not get garbage collected/mangled after the downstream.</span>
+<span class=sd>        savepath (Optional[str]): When provided the HoudiniSaveControl</span>
+<span class=sd>            will be set to Explicit with HoudiniSavePath to this path.</span>
+<span class=sd>        apply_file_format_args (Optional[bool]): When enabled any</span>
+<span class=sd>            FileFormatArgs defined for the layer on creation will be set</span>
+<span class=sd>            in the HoudiniSavePath so Houdini USD ROP will use them top.</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        Sdf.PrimSpec: The Created HoudiniLayerInfo prim spec.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=c1># Add a Houdini Layer Info prim where we can put the save path.</span>
+    <span class=n>p</span> <span class=o>=</span> <span class=n>Sdf</span><span class=o>.</span><span class=n>CreatePrimInLayer</span><span class=p>(</span><span class=n>layer</span><span class=p>,</span> <span class=s1>&#39;/HoudiniLayerInfo&#39;</span><span class=p>)</span>
+    <span class=n>p</span><span class=o>.</span><span class=n>specifier</span> <span class=o>=</span> <span class=n>Sdf</span><span class=o>.</span><span class=n>SpecifierDef</span>
+    <span class=n>p</span><span class=o>.</span><span class=n>typeName</span> <span class=o>=</span> <span class=s1>&#39;HoudiniLayerInfo&#39;</span>
+    <span class=k>if</span> <span class=n>savepath</span><span class=p>:</span>
+        <span class=k>if</span> <span class=n>apply_file_format_args</span><span class=p>:</span>
+            <span class=n>args</span> <span class=o>=</span> <span class=n>layer</span><span class=o>.</span><span class=n>GetFileFormatArguments</span><span class=p>()</span>
+            <span class=n>savepath</span> <span class=o>=</span> <span class=n>Sdf</span><span class=o>.</span><span class=n>Layer</span><span class=o>.</span><span class=n>CreateIdentifier</span><span class=p>(</span><span class=n>savepath</span><span class=p>,</span> <span class=n>args</span><span class=p>)</span>
+
+        <span class=n>p</span><span class=o>.</span><span class=n>customData</span><span class=p>[</span><span class=s1>&#39;HoudiniSavePath&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>savepath</span>
+        <span class=n>p</span><span class=o>.</span><span class=n>customData</span><span class=p>[</span><span class=s1>&#39;HoudiniSaveControl&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=s1>&#39;Explicit&#39;</span>
+    <span class=c1># Let everyone know what node created this layer.</span>
+    <span class=n>p</span><span class=o>.</span><span class=n>customData</span><span class=p>[</span><span class=s1>&#39;HoudiniCreatorNode&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>node</span><span class=o>.</span><span class=n>sessionId</span><span class=p>()</span>
+    <span class=n>p</span><span class=o>.</span><span class=n>customData</span><span class=p>[</span><span class=s1>&#39;HoudiniEditorNodes&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>Vt</span><span class=o>.</span><span class=n>IntArray</span><span class=p>([</span><span class=n>node</span><span class=o>.</span><span class=n>sessionId</span><span class=p>()])</span>
+    <span class=n>node</span><span class=o>.</span><span class=n>addHeldLayer</span><span class=p>(</span><span class=n>layer</span><span class=o>.</span><span class=n>identifier</span><span class=p>)</span>
+
+    <span class=k>return</span> <span class=n>p</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> </div> </div> </div> </article> </div> <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script> </div> </main> <footer class=md-footer> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-copyright> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"base": "../../../..", "features": ["navigation.sections", "navigation.path", "navigation.prune"], "search": "../../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script> <script src=../../../../assets/javascripts/bundle.c8b220af.min.js></script> </body> </html>
