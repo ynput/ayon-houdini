@@ -99,6 +99,7 @@ class CreateKarmaROP(plugin.HoudiniCreator):
             "local": "Local machine rendering",
             "local_no_render": "Use existing frames (local)",
             "farm": "Farm Rendering",
+            "farm_no_render": "Use existing frames (farm)"
         }
 
         return [

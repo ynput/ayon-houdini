@@ -25,7 +25,7 @@ class CollectFarmInstances(plugin.HoudiniInstancePlugin):
 
         # Collect Render Target
         if creator_attribute.get("render_target") not in {
-            "farm_split", "farm"
+            "farm_split", "farm","farm_no_render"
         }:
             instance.data["farm"] = False
             instance.data["splitRender"] = False
@@ -34,6 +34,13 @@ class CollectFarmInstances(plugin.HoudiniInstancePlugin):
             return
 
         instance.data["farm"] = True
+
+        if creator_attribute.get("render_target") == "farm_no_render":
+            instance.data["farm_no_render"] = True
+            self.log.debug("Skipping farm render job, using existing frames.")            
+        else:
+            instance.data["farm_no_render"] = False
+            
         instance.data["splitRender"] = (
             creator_attribute.get("render_target") == "farm_split"
         )
