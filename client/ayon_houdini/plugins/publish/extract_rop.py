@@ -16,7 +16,7 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
     targets = ["local", "remote"]
 
     def process(self, instance: pyblish.api.Instance):
-        if instance.data.get("farm"):
+        if instance.data.get("farm") and not instance.data.get("farm_no_render"):
             self.log.debug("Should be processed on farm, skipping.")
             return
         creator_attribute = instance.data["creator_attributes"]

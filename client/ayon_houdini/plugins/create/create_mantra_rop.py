@@ -86,6 +86,7 @@ class CreateMantraROP(plugin.HoudiniCreator):
             "local_no_render": "Use existing frames (local)",
             "farm": "Farm Rendering",
             "farm_split": "Farm Rendering - Split export & render jobs",
+            "farm_no_render": "Use existing frames (farm)"
         }
 
         return [
