@@ -134,6 +134,14 @@ class ValidateProductName(plugin.HoudiniInstancePlugin,
                 "Converted `ValidateSubsetName` -> `ValidateProductName` "
                 f"in publish attributes for {instance['productName']}"
             )
-            publish_attributes["ValidateProductName"] = publish_attributes.pop(
-                "ValidateSubsetName"
+
+            # Until PR https://github.com/ynput/ayon-core/pull/1219 we can't
+            # use `publish_attributes` directly. We can't `pop()` the key
+            # either. Use this logic as soon as `ayon-houdini` requires an
+            # `ayon-core` version with the fix included.
+            # publish_attributes["ValidateProductName"] = (
+            #     publish_attributes.pop("ValidateSubsetName")
+            # )
+            publish_attributes._data["ValidateProductName"] =(
+                publish_attributes["ValidateSubsetName"]
             )
