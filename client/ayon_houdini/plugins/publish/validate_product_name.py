@@ -142,6 +142,6 @@ class ValidateProductName(plugin.HoudiniInstancePlugin,
             # publish_attributes["ValidateProductName"] = (
             #     publish_attributes.pop("ValidateSubsetName")
             # )
-            publish_attributes._data["ValidateProductName"] =(
+            publish_attributes._data["ValidateProductName"] = (
                 publish_attributes["ValidateSubsetName"]
             )
