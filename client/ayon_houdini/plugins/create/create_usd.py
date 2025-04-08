@@ -49,7 +49,6 @@ class CreateUSD(plugin.HoudiniCreator):
 
         # Lock any parameters in this list
         to_lock = [
-            "fileperframe",
             # Lock some AYON attributes
             "productType",
             "id",
