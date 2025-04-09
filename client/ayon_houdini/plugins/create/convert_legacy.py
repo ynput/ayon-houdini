@@ -17,18 +17,18 @@ class HoudiniLegacyConvertor(ProductConvertorPlugin):
     should nevertheless cover all creators that came with AYON.
 
     """
-    identifier = "io.openpype.creators.houdini.legacy"
+    identifier = "io.ayon.creators.houdini.legacy"
     product_type_to_id = {
-        "camera": "io.openpype.creators.houdini.camera",
-        "ass": "io.openpype.creators.houdini.ass",
-        "imagesequence": "io.openpype.creators.houdini.imagesequence",
-        "hda": "io.openpype.creators.houdini.hda",
-        "pointcache": "io.openpype.creators.houdini.pointcache",
-        "redshiftproxy": "io.openpype.creators.houdini.redshiftproxy",
-        "redshift_rop": "io.openpype.creators.houdini.redshift_rop",
-        "usd": "io.openpype.creators.houdini.usd",
-        "usdrender": "io.openpype.creators.houdini.usdrender",
-        "vdbcache": "io.openpype.creators.houdini.vdbcache"
+        "camera": "io.ayon.creators.houdini.camera",
+        "ass": "io.ayon.creators.houdini.ass",
+        "imagesequence": "io.ayon.creators.houdini.imagesequence",
+        "hda": "io.ayon.creators.houdini.hda",
+        "pointcache": "io.ayon.creators.houdini.pointcache",
+        "redshiftproxy": "io.ayon.creators.houdini.redshiftproxy",
+        "redshift_rop": "io.ayon.creators.houdini.redshift_rop",
+        "usd": "io.ayon.creators.houdini.usd",
+        "usdrender": "io.ayon.creators.houdini.usdrender",
+        "vdbcache": "io.ayon.creators.houdini.vdbcache"
     }
 
     def __init__(self, *args, **kwargs):

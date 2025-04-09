@@ -2,9 +2,7 @@
 """Creator plugin for creating workfiles."""
 from ayon_houdini.api import plugin
 from ayon_houdini.api.lib import read, imprint
-from ayon_houdini.api.pipeline import CONTEXT_CONTAINER
 from ayon_core.pipeline import CreatedInstance, AutoCreator
-import hou
 
 
 class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
@@ -77,29 +75,40 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
             current_instance["productName"] = product_name
 
         # write workfile information to context container.
-        op_ctx = hou.node(CONTEXT_CONTAINER)
-        if not op_ctx:
-            op_ctx = self.host.create_context_node()
+        context_node = self.host.get_context_node()
+        if not context_node:
+            context_node = self.host.create_context_node()
 
         workfile_data = {"workfile": current_instance.data_to_store()}
-        imprint(op_ctx, workfile_data)
+        imprint(context_node, workfile_data)
 
     def collect_instances(self):
-        op_ctx = hou.node(CONTEXT_CONTAINER)
-        instance = read(op_ctx)
+        context_node = self.host.get_context_node()
+        if not context_node:
+            return
+        instance = read(context_node)
         if not instance:
             return
         workfile = instance.get("workfile")
         if not workfile:
             return
+
+        # Convert legacy creator_identifier
+        creator_identifier = workfile.get("creator_identifier")
+        if creator_identifier:
+            workfile["creator_identifier"] = (
+                plugin.REMAP_CREATOR_IDENTIFIERS.get(creator_identifier,
+                                                     creator_identifier)
+            )
+
         created_instance = CreatedInstance.from_existing(
             workfile, self
         )
         self._add_instance_to_context(created_instance)
 
     def update_instances(self, update_list):
-        op_ctx = hou.node(CONTEXT_CONTAINER)
+        context_node = self.host.get_context_node()
         for created_inst, _changes in update_list:
             if created_inst["creator_identifier"] == self.identifier:
                 workfile_data = {"workfile": created_inst.data_to_store()}
-                imprint(op_ctx, workfile_data, update=True)
+                imprint(context_node, workfile_data, update=True)

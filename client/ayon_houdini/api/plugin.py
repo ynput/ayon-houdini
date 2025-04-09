@@ -24,6 +24,56 @@ from .usd import get_ayon_entity_uri_from_representation_context
 
 SETTINGS_CATEGORY = "houdini"
 
+REMAP_CREATOR_IDENTIFIERS: Dict[str, str] = {
+    "io.openpype.creators.houdini.ass":
+        "io.ayon.creators.houdini.ass",
+    "io.openpype.creators.houdini.arnold_rop":
+        "io.ayon.creators.houdini.arnold_rop",
+    "io.openpype.creators.houdini.bgeo":
+        "io.ayon.creators.houdini.bgeo",
+    "io.openpype.creators.houdini.camera":
+        "io.ayon.creators.houdini.camera",
+    "io.openpype.creators.houdini.hda": "io.ayon.creators.houdini.hda",
+    "io.openpype.creators.houdini.imagesequence":
+        "io.ayon.creators.houdini.imagesequence",
+    "io.openpype.creators.houdini.karma_rop":
+        "io.ayon.creators.houdini.karma_rop",
+    "io.openpype.creators.houdini.mantra_rop":
+        "io.ayon.creators.houdini.mantra_rop",
+    "io.openpype.creators.houdini.model": "io.ayon.creators.houdini.model",
+    "io.openpype.creators.houdini.pointcache":
+        "io.ayon.creators.houdini.pointcache",
+    "io.openpype.creators.houdini.redshiftproxy":
+        "io.ayon.creators.houdini.redshiftproxy",
+    "io.openpype.creators.houdini.redshift_rop":
+        "io.ayon.creators.houdini.redshift_rop",
+    "io.openpype.creators.houdini.review": "io.ayon.creators.houdini.review",
+    "io.openpype.creators.houdini.staticmesh.fbx":
+        "io.ayon.creators.houdini.staticmesh.fbx",
+    "io.openpype.creators.houdini.usd": "io.ayon.creators.houdini.usd",
+    "io.openpype.creators.houdini.usd.look":
+        "io.ayon.creators.houdini.usd.look",
+    "io.openpype.creators.houdini.usdrender":
+        "io.ayon.creators.houdini.usdrender",
+    "io.openpype.creators.houdini.vray_rop":
+        "io.ayon.creators.houdini.vray_rop",
+    "io.openpype.creators.houdini.vdbcache":
+        "io.ayon.creators.houdini.vdbcache",
+    "io.openpype.creators.houdini.workfile":
+        "io.ayon.creators.houdini.workfile",
+}
+
+# For backwards compatibility starting from ayon-houdini 0.4.6 we will
+# remap the AYON creator identifiers to their legacy ones. This way, for the
+# time being no remapping occurs yet. But it will allow for a few releases to
+# occur that could still open scenes with the newer identifiers if a user needs
+# to downgrade versions.
+# When removing this all the Creators should update their `identifier` to the
+# new identifier too.
+REMAP_CREATOR_IDENTIFIERS = {
+    new: old for old, new in REMAP_CREATOR_IDENTIFIERS.items()
+}
+
 
 class HoudiniCreatorBase(object):
     @staticmethod
@@ -35,7 +85,7 @@ class HoudiniCreatorBase(object):
         respective creator identifiers.
 
         Create `houdini_cached_legacy_instance` key for any legacy instances
-        detected in the scene as instances per family.
+        detected in the scene as instances per product type (legacy: family).
 
         Args:
             Dict[str, Any]: Shared data.
@@ -54,6 +104,11 @@ class HoudiniCreatorBase(object):
                 if creator_identifier_parm:
                     # creator instance
                     creator_id = creator_identifier_parm.eval()
+
+                    # Allow legacy creator identifiers to be remapped
+                    creator_id = REMAP_CREATOR_IDENTIFIERS.get(
+                        creator_id, creator_id)
+
                     cache.setdefault(creator_id, []).append(node)
 
                 else:
