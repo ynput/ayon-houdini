@@ -70,7 +70,7 @@ class CreateMantraROP(plugin.HoudiniCreator):
             parms.update({"override_camerares": 1})
         instance_node.setParms(parms)
 
-        # Lock some Avalon attributes
+        # Lock some AYON attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
 

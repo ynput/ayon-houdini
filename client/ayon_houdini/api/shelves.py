@@ -17,7 +17,7 @@ log = logging.getLogger("ayon_houdini.shelves")
 
 def generate_shelves():
     """This function generates complete shelves from shelf set to tools
-    in Houdini from openpype project settings houdini shelf definition.
+    in Houdini from AYON project settings houdini shelf definition.
     """
     current_os = platform.system().lower()
 

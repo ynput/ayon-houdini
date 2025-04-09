@@ -7,9 +7,8 @@ from ayon_server.settings import (
 # Publish Plugins
 class CollectAssetHandlesModel(BaseSettingsModel):
     """Collect Frame Range
-    Disable this if you want the publisher to
-    ignore start and end handles specified in the
-    asset data for publish instances
+    Disable this if you want the publisher to ignore start and end handles
+    specified in the task or folder data for publish instances.
     """
     use_asset_handles: bool = SettingsField(
         title="Use asset handles")
@@ -161,9 +160,9 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateReviewColorspace: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Review Colorspace")
-    ValidateSubsetName: BasicEnabledStatesModel = SettingsField(
+    ValidateProductName: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
-        title="Validate Subset Name")
+        title="Validate Product Name")
     ValidateUnrealStaticMeshName: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Unreal Static Mesh Name")
@@ -241,7 +240,7 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "optional": True,
         "active": True
     },
-    "ValidateSubsetName": {
+    "ValidateProductName": {
         "enabled": True,
         "optional": True,
         "active": True

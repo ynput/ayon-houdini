@@ -538,7 +538,7 @@ ayon_folder0	[ 0	locks=0 ]	(	0	)
 name	[ 0	locks=0 ]	(	$OS	)
 namespace	[ 0	locks=0 ]	(	`opfullpath(\".\")`	)
 loader	[ 0	locks=0 ]	(	FilePathLoader	)
-id	[ 0	locks=0 ]	(	pyblish.avalon.container	)
+id	[ 0	locks=0 ]	(	ayon.load.container	)
 representation	[ 0	locks=0 ]	(	[ representation	"from ayon_houdini.api import hda_utils
 return hda_utils.expression_get_representation_id()" ] 	)
 version_name	[ 0	locks=0 ]	(	""	)

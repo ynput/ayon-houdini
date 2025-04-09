@@ -131,7 +131,7 @@ class CreateFBX(plugin.HoudiniCreator):
         instance
     ):
         """
-        The default prodcut name templates for Unreal include {asset} and thus
+        The default product name templates for Unreal include {asset} and thus
         we should pass that along as dynamic data.
         """
         dynamic_data = super().get_dynamic_data(
