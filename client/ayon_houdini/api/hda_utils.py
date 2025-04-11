@@ -504,7 +504,7 @@ def keep_background_images_linked(node, old_name):
 
 
 class SelectFolderPathDialog(QtWidgets.QDialog):
-    """Simple dialog to allow a user to select project and asset."""
+    """Simple dialog to allow a user to select project and folder."""
 
     def __init__(self, parent=None):
         super(SelectFolderPathDialog, self).__init__(parent)

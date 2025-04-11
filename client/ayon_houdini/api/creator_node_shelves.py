@@ -1,4 +1,4 @@
-"""Library to register OpenPype Creators for Houdini TAB node search menu.
+"""Library to register AYON Creators for Houdini TAB node search menu.
 
 This can be used to install custom houdini tools for the TAB search
 menu which will trigger a publish instance to be created interactively.
@@ -200,7 +200,7 @@ def install():
     create_context.reset_current_context()
     create_context._reset_creator_plugins()
 
-    log.debug("Writing OpenPype Creator nodes to shelf: {}".format(filepath))
+    log.debug("Writing AYON Creator nodes to shelf: {}".format(filepath))
     tools = []
 
     with shelves_change_block():

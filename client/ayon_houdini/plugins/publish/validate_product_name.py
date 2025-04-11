@@ -19,11 +19,9 @@ class FixProductNameAction(RepairAction):
     label = "Fix Product Name"
 
 
-class ValidateSubsetName(plugin.HoudiniInstancePlugin,
-                         OptionalPyblishPluginMixin):
-    """Validate Product name.
-
-    """
+class ValidateProductName(plugin.HoudiniInstancePlugin,
+                          OptionalPyblishPluginMixin):
+    """Validate Product name."""
 
     families = ["staticMesh", "hda"]
     label = "Validate Product Name"
@@ -64,12 +62,13 @@ class ValidateSubsetName(plugin.HoudiniInstancePlugin,
             instance.data["productType"],
             variant=instance.data["variant"],
             dynamic_data={
-                "asset": folder_entity["name"],
                 "folder": {
-                            "label": folder_entity["label"],
-                            "name": folder_entity["name"]
-                            }
-                }
+                    "label": folder_entity["label"],
+                    "name": folder_entity["name"],
+                },
+                # Backwards compatibility
+                "asset": folder_entity["name"],
+            },
         )
 
         if instance.data.get("productName") != product_name:
@@ -113,3 +112,36 @@ class ValidateSubsetName(plugin.HoudiniInstancePlugin,
             "Product name on rop node '%s' has been set to '%s'.",
             rop_node.path(), product_name
         )
+
+    @classmethod
+    def convert_attribute_values(
+        cls, create_context, instance
+    ):
+        # Convert old class name `ValidateSubsetName` to new class name
+        # `ValidateProductName` in the instance data.
+        if not instance:
+            return
+
+        publish_attributes = instance.data.get("publish_attributes", {})
+        if not publish_attributes:
+            return
+
+        if (
+                "ValidateSubsetName" in publish_attributes
+                and "ValidateProductName" not in publish_attributes
+        ):
+            cls.log.debug(
+                "Converted `ValidateSubsetName` -> `ValidateProductName` "
+                f"in publish attributes for {instance['productName']}"
+            )
+
+            # Until PR https://github.com/ynput/ayon-core/pull/1219 we can't
+            # use `publish_attributes` directly. We can't `pop()` the key
+            # either. Use this logic as soon as `ayon-houdini` requires an
+            # `ayon-core` version 1.1.7 or higher.
+            # publish_attributes["ValidateProductName"] = (
+            #     publish_attributes.pop("ValidateSubsetName")
+            # )
+            publish_attributes._data["ValidateProductName"] = (
+                publish_attributes["ValidateSubsetName"]
+            )

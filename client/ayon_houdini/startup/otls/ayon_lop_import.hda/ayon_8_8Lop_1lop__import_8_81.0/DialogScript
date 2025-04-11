@@ -321,7 +321,7 @@
             name    "id"
             label   "ID"
             type    label
-            default { "pyblish.avalon.container" }
+            default { "ayon.load.container" }
         }
         parm {
             name    "representation"

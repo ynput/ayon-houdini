@@ -58,7 +58,7 @@ class CreateReview(plugin.HoudiniCreator):
             root=hou.text.expandString("$HIP/pyblish"),
             # keep dynamic link to product name
             product_name="`chs(\"AYON_productName\")`",
-            ext=pre_create_data.get("image_format") or "png"
+            ext=pre_create_data.get("imageFormat") or "png"
         )
 
         parms = {

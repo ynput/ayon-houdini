@@ -113,7 +113,7 @@ class CreateVrayROP(plugin.HoudiniCreator):
 
         instance_node.setParms(parms)
 
-        # lock parameters from AVALON
+        # lock parameters from AYON
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
