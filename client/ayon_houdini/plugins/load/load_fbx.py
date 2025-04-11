@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Fbx Loader for houdini. """
-from ayon_core.pipeline import get_representation_path
+import hou
+
 from ayon_houdini.api import (
     pipeline,
     plugin
@@ -21,7 +22,6 @@ class FbxLoader(plugin.HoudiniLoader):
     extensions = {"fbx"}
 
     def load(self, context, name=None, namespace=None, data=None):
-
         # get file path from context
         file_path = self.filepath_from_context(context)
         file_path = file_path.replace("\\", "/")
@@ -35,7 +35,7 @@ class FbxLoader(plugin.HoudiniLoader):
         self[:] = nodes
 
         # Call containerise function which does some automations for you
-        #  like moving created nodes to the AVALON_CONTAINERS subnetwork
+        #  like moving created nodes to the AYON_CONTAINERS subnetwork
         containerised_nodes = pipeline.containerise(
             node_name,
             namespace,
@@ -48,7 +48,6 @@ class FbxLoader(plugin.HoudiniLoader):
         return containerised_nodes
 
     def update(self, container, context):
-        repre_entity = context["representation"]
         node = container["node"]
         try:
             file_node = next(
@@ -59,16 +58,15 @@ class FbxLoader(plugin.HoudiniLoader):
             return
 
         # Update the file path from representation
-        file_path = get_representation_path(repre_entity)
+        file_path = self.filepath_from_context(context)
         file_path = file_path.replace("\\", "/")
 
         file_node.setParms({"file": file_path})
 
         # Update attribute
-        node.setParms({"representation": repre_entity["id"]})
+        node.setParms({"representation": context["representation"]["id"]})
 
     def remove(self, container):
-
         node = container["node"]
         node.destroy()
 
@@ -95,10 +93,8 @@ class FbxLoader(plugin.HoudiniLoader):
         it'll be much easier to build it in the root obj level.
 
         Afterwards, your tree will be automatically moved to
-        '/obj/AVALON_CONTAINERS' subnetwork.
+        '/obj/AYON_CONTAINERS' subnetwork.
         """
-        import hou
-
         # Get the root obj level
         obj = hou.node("/obj")
 

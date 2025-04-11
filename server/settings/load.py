@@ -37,6 +37,16 @@ class LoadUseAYONEntityURIModel(BaseSettingsModel):
 
 
 class LoadPluginsModel(BaseSettingsModel):
+    collapse_path_to_project_root_vars: bool = SettingsField(
+        False,
+        title="Collapse loaded paths to project root variables",
+        description=(
+            "Collapse loaded filepaths to project root environment variables"
+            " if there's a matching path start. So that e.g."
+            " `C:/root/project/path/to/file` may turn to"
+            " `$AYON_PROJECT_ROOT_WORK/project/path/to/file`."
+        )
+    )
     CameraLoader: CameraLoaderModel = SettingsField(
         default_factory=CameraLoaderModel,
         title="Load Camera (abc)")
