@@ -363,22 +363,24 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
 
 class RenderLegacyProductTypeCreator(HoudiniCreator):
+    """Creator for Render ROPs to allow toggling between legacy product types
+    and the 'render' product type. This is mostly for backwards
+    compatibility. See #214."""
+
+    # Overriding `product_type` avoids linters complaining that the attribute
+    # is actually a property that can't be assigned to in `apply_settings`
+    # because it inherits as property from `Creator`.
+    product_type = "render"
     legacy_product_type = "render"
     use_legacy_product_type = False
 
     def apply_settings(self, project_settings):
         super().apply_settings(project_settings)
-        self.use_legacy_product_type = (
-            project_settings["houdini"]["create"].get(
-                "render_rops_use_legacy_product_type", False
-            )
+        use_legacy_product_type = project_settings["houdini"]["create"].get(
+            "render_rops_use_legacy_product_type", False
         )
-
-    @property
-    def product_type(self):
-        if self.use_legacy_product_type:
-            return self.legacy_product_type
-        return "render"
+        if use_legacy_product_type:
+            self.product_type = self.legacy_product_type
 
 
 class HoudiniLoader(load.LoaderPlugin):
