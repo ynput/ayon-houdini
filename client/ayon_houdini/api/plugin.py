@@ -14,7 +14,7 @@ from ayon_core.pipeline import (
     AYON_INSTANCE_ID,
     AVALON_INSTANCE_ID,
     load,
-    publish, legacy_create
+    publish
 )
 from ayon_core.lib import BoolDef
 
