@@ -7,12 +7,12 @@ from ayon_core.pipeline import CreatorError
 from ayon_core.lib import EnumDef, BoolDef
 
 
-class CreateVrayROP(plugin.HoudiniCreator):
+class CreateVrayROP(plugin.RenderLegacyProductTypeCreator):
     """VRay ROP"""
 
     identifier = "io.openpype.creators.houdini.vray_rop"
     label = "VRay ROP"
-    product_type = "render"
+    legacy_product_type = "vray_rop"
     icon = "magic"
     ext = "exr"
 

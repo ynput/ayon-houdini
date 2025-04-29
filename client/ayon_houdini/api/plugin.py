@@ -14,7 +14,7 @@ from ayon_core.pipeline import (
     AYON_INSTANCE_ID,
     AVALON_INSTANCE_ID,
     load,
-    publish
+    publish, legacy_create
 )
 from ayon_core.lib import BoolDef
 
@@ -360,6 +360,25 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
         for key, value in settings.items():
             setattr(self, key, value)
+
+
+class RenderLegacyProductTypeCreator(HoudiniCreator):
+    legacy_product_type = "render"
+    use_legacy_product_type = False
+
+    def apply_settings(self, project_settings):
+        super().apply_settings(project_settings)
+        self.use_legacy_product_type = (
+            project_settings["houdini"]["create"].get(
+                "render_rops_use_legacy_product_type", False
+            )
+        )
+
+    @property
+    def product_type(self):
+        if self.use_legacy_product_type:
+            return self.legacy_product_type
+        return "render"
 
 
 class HoudiniLoader(load.LoaderPlugin):

@@ -4,11 +4,11 @@ from ayon_houdini.api import plugin
 from ayon_core.lib import EnumDef, BoolDef
 
 
-class CreateMantraROP(plugin.HoudiniCreator):
+class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
     """Mantra ROP"""
     identifier = "io.openpype.creators.houdini.mantra_rop"
     label = "Mantra ROP"
-    product_type = "render"
+    legacy_product_type = "mantra_rop"
     icon = "magic"
 
     # Default render target

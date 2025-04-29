@@ -2,12 +2,12 @@ from ayon_houdini.api import plugin
 from ayon_core.lib import EnumDef, BoolDef
 
 
-class CreateArnoldRop(plugin.HoudiniCreator):
+class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
     """Arnold ROP"""
 
     identifier = "io.openpype.creators.houdini.arnold_rop"
     label = "Arnold ROP"
-    product_type = "render"
+    legacy_product_type = "arnold_rop"
     icon = "magic"
 
     # Default extension

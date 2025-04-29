@@ -77,6 +77,18 @@ class CreateUSDRenderModel(CreatorModel):
 
 
 class CreatePluginsModel(BaseSettingsModel):
+    render_rops_use_legacy_product_type: bool = SettingsField(
+        False,
+        label="Render ROPs use legacy product types",
+        description=(
+            "When enabled, it will use legacy product types like "
+            "`arnold_rop`, `mantra_rop`, `usdrender` and so forth. "
+            "When disabled, render ROPs will render to `render` product type. "
+            "This setting is mostly for backward compatibility for existing "
+            "projects and affects the Arnold, Karma, Mantra, Redshift, V-Ray "
+            "and USD Render ROPs."
+        ),
+    )
     CreateAlembicCamera: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Alembic Camera")
@@ -141,6 +153,7 @@ class CreatePluginsModel(BaseSettingsModel):
 
 
 DEFAULT_HOUDINI_CREATE_SETTINGS = {
+    "render_rops_use_legacy_product_type": False,
     "CreateAlembicCamera": {
         "enabled": True,
         "default_variants": ["Main"]

@@ -4,11 +4,11 @@ from ayon_houdini.api import plugin
 from ayon_core.lib import BoolDef, EnumDef, NumberDef
 
 
-class CreateKarmaROP(plugin.HoudiniCreator):
+class CreateKarmaROP(plugin.RenderLegacyProductTypeCreator):
     """Karma ROP"""
     identifier = "io.openpype.creators.houdini.karma_rop"
     label = "Karma ROP"
-    product_type = "render"
+    legacy_product_type = "karma_rop"
     icon = "magic"
 
     # Default render target
