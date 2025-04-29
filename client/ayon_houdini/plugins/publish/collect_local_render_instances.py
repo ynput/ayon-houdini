@@ -223,6 +223,6 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             task_entity=instance.context.data["taskEntity"],
             host_name=instance.context.data["hostName"],
             product_type=product_type,
-            variant=instance.data["productName"],
+            variant=instance.data["variant"],
             dynamic_data=dynamic_data
         )
