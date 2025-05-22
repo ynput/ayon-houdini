@@ -40,7 +40,7 @@ def load_adapted_stylesheet() -> str:
         return load_adapted_stylesheet.cache
     except AttributeError:
         css = load_stylesheet()
-        css = re.sub("(font-size:\s+\d+)pt;", "\\1px;", css)
+        css = re.sub(r"(font-size:\s+\d+)pt;", "\\1px;", css)
         setattr(load_adapted_stylesheet, "cache", css)
     return load_adapted_stylesheet.cache
 
