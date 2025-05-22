@@ -35,6 +35,15 @@ from ayon_houdini.api import lib
 from .usd import get_ayon_entity_uri_from_representation_context
 
 
+def load_adapted_stylesheet() -> str:
+    try:
+        return load_adapted_stylesheet.cache
+    except AttributeError:
+        css = load_stylesheet()
+        css = re.sub("(font-size:\s+\d+)pt;", "\\1px;", css)
+        setattr(load_adapted_stylesheet, "cache", css)
+    return load_adapted_stylesheet.cache
+
 def get_session_cache() -> dict:
     """Get a persistent `hou.session.ayon_cache` dict"""
     cache = getattr(hou.session, "ayon_cache", None)
@@ -509,7 +518,7 @@ class SelectFolderPathDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(SelectFolderPathDialog, self).__init__(parent)
         self.setWindowTitle("Set project and folder path")
-        self.setStyleSheet(load_stylesheet())
+        self.setStyleSheet(load_adapted_stylesheet())
 
         project_widget = QtWidgets.QComboBox()
         project_widget.addItems(self.get_projects())
@@ -593,7 +602,7 @@ def select_folder_path(node):
             dialog.folder_widget.set_selected_folder_path(folder_path)
         QtCore.QTimer.singleShot(100, _select_folder_path)
 
-    dialog.setStyleSheet(load_stylesheet())
+    dialog.setStyleSheet(load_adapted_stylesheet())
 
     # Make it appear like a pop-up near cursor
     dialog.resize(300, 600)
@@ -634,7 +643,7 @@ class SelectProductDialog(QtWidgets.QDialog):
     def __init__(self, project_name, folder_id, parent=None):
         super(SelectProductDialog, self).__init__(parent)
         self.setWindowTitle("Select a Product")
-        self.setStyleSheet(load_stylesheet())
+        self.setStyleSheet(load_adapted_stylesheet())
 
         self.project_name = project_name
         self.folder_id = folder_id

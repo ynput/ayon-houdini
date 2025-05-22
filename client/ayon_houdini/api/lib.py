@@ -1473,6 +1473,7 @@ def prompt_reset_context():
         AttributeDefinitionsDialog
     )
     from ayon_core.style import load_stylesheet
+    from . hda_utils import load_adapted_stylesheet
     from ayon_core.lib import BoolDef, UILabelDef
 
     definitions = [
@@ -1506,7 +1507,7 @@ def prompt_reset_context():
 
     dialog = AttributeDefinitionsDialog(definitions)
     dialog.setWindowTitle("Saving to different context.")
-    dialog.setStyleSheet(load_stylesheet())
+    dialog.setStyleSheet(load_adapted_stylesheet())
     if not dialog.exec_():
         return None
 
