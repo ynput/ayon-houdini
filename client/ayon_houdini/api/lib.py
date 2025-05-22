@@ -1472,7 +1472,7 @@ def prompt_reset_context():
     from ayon_core.tools.attribute_defs.dialog import (
         AttributeDefinitionsDialog
     )
-    from . hda_utils import load_adapted_stylesheet
+    from .hda_utils import load_adapted_stylesheet
     from ayon_core.lib import BoolDef, UILabelDef
 
     definitions = [
