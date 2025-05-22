@@ -1506,7 +1506,7 @@ def prompt_reset_context():
 
     dialog = AttributeDefinitionsDialog(definitions)
     dialog.setWindowTitle("Saving to different context.")
-    dialog.setStyleSheet(load_adapted_stylesheet())
+    dialog.setStyleSheet(load_adapted_stylesheet(dialog))
     if not dialog.exec_():
         return None
 
