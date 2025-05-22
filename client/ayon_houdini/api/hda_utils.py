@@ -43,6 +43,10 @@ def load_adapted_stylesheet() -> str:
     sizes from points (pt) to pixels (px), and caches the result for future
     use.
 
+    Houdini seems to handle pixels more gracefully than points on Windows, but
+    using pixels across the board creates more problems, so we keep this fix
+    local until a better solution emerges.
+
     Returns:
         str: The adapted stylesheet as a string.
     """
