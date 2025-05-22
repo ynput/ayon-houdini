@@ -54,23 +54,20 @@ def load_adapted_stylesheet(widget: QtWidgets.QWidget) -> str:
     try:
         return load_adapted_stylesheet.cache[dpr]
     except AttributeError:
-        hou.logging.log(
-            hou.logging.LogEntry(
-                message=f"load_adapted_stylesheet: AttributeError: {dpr}",
-                source="AYON",
-            )
-        )
         setattr(load_adapted_stylesheet, "cache", {})
     except KeyError:
-        hou.logging.log(
-            hou.logging.LogEntry(
-                message=f"load_adapted_stylesheet: KeyError: {dpr}",
-                source="AYON",
-            )
+        pass
+
+    # if we arrive here, a new cache entry must be created.
+    hou.logging.log(
+        hou.logging.LogEntry(
+            message=f"load_adapted_stylesheet: new cache entry: {dpr}",
+            source="AYON",
         )
+    )
 
     def _convert(match):
-        size = int((int(match.group(2)) + 1) * hou.ui.globalScaleFactor())
+        size = int((int(match.group(2)) * 1.1) * hou.ui.globalScaleFactor())
         size = int(size / dpr)
         return f"{match.group(1)}{size}px;"
 
