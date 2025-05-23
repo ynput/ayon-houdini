@@ -17,22 +17,65 @@ from ayon_api import (
     get_product_by_name,
     get_version_by_name,
     get_representation_by_name,
-    get_representations
+    get_representations,
 )
 from ayon_core.pipeline import Anatomy
 from ayon_core.lib import StringTemplate
 from ayon_core.pipeline.context_tools import (
     get_current_project_name,
-    get_current_folder_path
+    get_current_folder_path,
 )
 from ayon_core.pipeline.load import (
     get_representation_context,
-    get_representation_path_from_context
+    get_representation_path_from_context,
 )
 from ayon_core.style import load_stylesheet
 from ayon_core.tools.utils import SimpleFoldersWidget
 from ayon_houdini.api import lib
 from .usd import get_ayon_entity_uri_from_representation_context
+
+
+def load_adapted_stylesheet(widget: QtWidgets.QWidget) -> str:
+    """
+    Loads and adapts AYON's stylesheet for Houdini.
+
+    This function retrieves AYON's Qt stylesheet, modifies it to convert font
+    sizes from points (pt) to pixels (px), and caches the result for future
+    use.
+
+    Houdini seems to handle pixels more gracefully than points on Windows, but
+    using pixels across the board creates more problems, so we keep this fix
+    local until a better solution emerges.
+
+    Returns:
+        str: The adapted stylesheet as a string.
+    """
+    dpr = widget.screen().devicePixelRatio()
+    try:
+        return load_adapted_stylesheet.cache[dpr]
+    except AttributeError:
+        setattr(load_adapted_stylesheet, "cache", {})
+    except KeyError:
+        pass
+
+    # if we arrive here, a new cache entry must be created.
+    hou.logging.log(
+        hou.logging.LogEntry(
+            message=f"load_adapted_stylesheet: new cache entry: {dpr}",
+            source="AYON",
+        )
+    )
+
+    def _convert(match):
+        size = int((int(match.group(2)) * 1.1) * hou.ui.globalScaleFactor())
+        size = int(size / dpr)
+        return f"{match.group(1)}{size}px;"
+
+    css = load_stylesheet()
+    css = re.sub(r"(font-size:\s+)(\d+)pt;", _convert, css)  # type: ignore
+    load_adapted_stylesheet.cache[dpr] = css
+
+    return load_adapted_stylesheet.cache[dpr]
 
 
 def get_session_cache() -> dict:
@@ -69,22 +112,20 @@ def get_available_versions(node):
     folder_path = node.evalParm("folder_path")
     product_name = node.evalParm("product_name")
 
-    if not all([
-        project_name, folder_path, product_name
-    ]):
+    if not all([project_name, folder_path, product_name]):
         return []
 
     folder_entity = get_folder_by_path(
-        project_name,
-        folder_path,
-        fields={"id"})
+        project_name, folder_path, fields={"id"}
+    )
     if not folder_entity:
         return []
     product_entity = get_product_by_name(
         project_name,
         product_name=product_name,
         folder_id=folder_entity["id"],
-        fields={"id"})
+        fields={"id"},
+    )
     if not product_entity:
         return []
 
@@ -93,25 +134,24 @@ def get_available_versions(node):
         project_name,
         product_ids={product_entity["id"]},
         fields={"version"},
-        hero=False)
+        hero=False,
+    )
     version_names = [version["version"] for version in versions]
     version_names.reverse()
     return version_names
 
 
 def set_node_representation_from_context(
-        node,
-        context,
-        ensure_expression_defaults=True
+    node, context, ensure_expression_defaults=True
 ):
     """Update project, folder, product, version, representation name parms.
 
-     Arguments:
-         node (hou.Node): Node to update
-         context (dict): Context of representation
-         ensure_expression_defaults (bool): Ensure expression defaults.
+    Arguments:
+        node (hou.Node): Node to update
+        context (dict): Context of representation
+        ensure_expression_defaults (bool): Ensure expression defaults.
 
-     """
+    """
     # TODO: Avoid 'duplicate' taking over the expression if originally
     #       it was $OS and by duplicating, e.g. the `folder` does not exist
     #       anymore since it is now `hero1` instead of `hero`
@@ -131,8 +171,11 @@ def set_node_representation_from_context(
         "version": version,
         "representation_name": context["representation"]["name"],
     }
-    parms = {key: value for key, value in parms.items()
-             if node.evalParm(key) != value}
+    parms = {
+        key: value
+        for key, value in parms.items()
+        if node.evalParm(key) != value
+    }
     node.setParms(parms)
 
     if ensure_expression_defaults:
@@ -185,9 +228,7 @@ def ensure_loader_expression_parm_defaults(node):
 
 
 def get_representation_path(
-    project_name: str,
-    representation_id: str,
-    use_ayon_entity_uri: bool
+    project_name: str, representation_id: str, use_ayon_entity_uri: bool
 ) -> str:
     # Ignore invalid representation ids silently
     # TODO remove - added for backwards compatibility with OpenPype scenes
@@ -267,9 +308,9 @@ def _get_thumbnail(project_name: str, version_id: str, thumbnail_dir: str):
         return path
 
     # Try and create a thumbnail cache file
-    data = ayon_api.get_thumbnail(project_name,
-                                  entity_type="version",
-                                  entity_id=version_id)
+    data = ayon_api.get_thumbnail(
+        project_name, entity_type="version", entity_id=version_id
+    )
     if data:
         thumbnail_dir_expanded = hou.text.expandString(thumbnail_dir)
         os.makedirs(thumbnail_dir_expanded, exist_ok=True)
@@ -288,10 +329,7 @@ def update_thumbnail(node):
         set_node_thumbnail(node, None)
         return
 
-    project_name = (
-        node.evalParm("project_name")
-        or get_current_project_name()
-    )
+    project_name = node.evalParm("project_name") or get_current_project_name()
     repre_entity = get_representation_by_id(project_name, representation_id)
     if node.evalParm("show_thumbnail"):
         # Update thumbnail
@@ -323,13 +361,13 @@ def compute_thumbnail_rect(node):
     height = width * aspect
 
     center = 0.5
-    half_width = (width * .5)
+    half_width = width * 0.5
 
     return hou.BoundingRect(
         offset_x + center - half_width,
         offset_y,
         offset_x + center + half_width,
-        offset_y + height
+        offset_y + height,
     )
 
 
@@ -348,23 +386,22 @@ def on_thumbnail_size_changed(node):
 
 
 def get_node_expected_representation_id(node) -> str:
-    project_name = node.evalParm(
-        "project_name") or get_current_project_name()
+    project_name = node.evalParm("project_name") or get_current_project_name()
     return get_representation_id(
-            project_name=project_name,
-            folder_path=node.evalParm("folder_path"),
-            product_name=node.evalParm("product_name"),
-            version=node.evalParm("version"),
-            representation_name=node.evalParm("representation_name"),
+        project_name=project_name,
+        folder_path=node.evalParm("folder_path"),
+        product_name=node.evalParm("product_name"),
+        version=node.evalParm("version"),
+        representation_name=node.evalParm("representation_name"),
     )
 
 
 def get_representation_id(
-        project_name,
-        folder_path,
-        product_name,
-        version,
-        representation_name,
+    project_name,
+    folder_path,
+    product_name,
+    version,
+    representation_name,
 ):
     """Get representation id.
 
@@ -382,15 +419,15 @@ def get_representation_id(
         ValueError: If the entity could not be resolved with input values.
 
     """
-    if not all([
-        project_name, folder_path, product_name, version, representation_name
-    ]):
+    if not all(
+        [project_name, folder_path, product_name, version, representation_name]
+    ):
         labels = {
             "project": project_name,
             "folder": folder_path,
             "product": product_name,
             "version": version,
-            "representation": representation_name
+            "representation": representation_name,
         }
         missing = ", ".join(key for key, value in labels.items() if not value)
         raise ValueError(f"Load info incomplete. Found empty: {missing}")
@@ -400,11 +437,12 @@ def get_representation_id(
     except ValueError:
         raise ValueError(
             f"Invalid version format: '{version}'\n"
-            "Make sure to set a valid version number.")
+            "Make sure to set a valid version number."
+        )
 
-    folder_entity = get_folder_by_path(project_name,
-                                       folder_path=folder_path,
-                                       fields={"id"})
+    folder_entity = get_folder_by_path(
+        project_name, folder_path=folder_path, fields={"id"}
+    )
     if not folder_entity:
         # This may be due to the project not existing - so let's validate
         # that first
@@ -416,15 +454,14 @@ def get_representation_id(
         project_name,
         product_name=product_name,
         folder_id=folder_entity["id"],
-        fields={"id"})
+        fields={"id"},
+    )
     if not product_entity:
         raise ValueError(f"Product not found: '{product_name}'")
 
     version_entity = get_version_by_name(
-        project_name,
-        version,
-        product_id=product_entity["id"],
-        fields={"id"})
+        project_name, version, product_id=product_entity["id"], fields={"id"}
+    )
     if not version_entity:
         raise ValueError(f"Version not found: '{version}'")
 
@@ -432,7 +469,8 @@ def get_representation_id(
         project_name,
         representation_name,
         version_id=version_entity["id"],
-        fields={"id"})
+        fields={"id"},
+    )
     if not representation_entity:
         raise ValueError(f"Representation not found: '{representation_name}'.")
     return representation_entity["id"]
@@ -440,10 +478,7 @@ def get_representation_id(
 
 def setup_flag_changed_callback(node):
     """Register flag changed callback (for thumbnail brightness)"""
-    node.addEventCallback(
-        (hou.nodeEventType.FlagChanged,),
-        on_flag_changed
-    )
+    node.addEventCallback((hou.nodeEventType.FlagChanged,), on_flag_changed)
 
 
 def on_flag_changed(node, **kwargs):
@@ -453,7 +488,7 @@ def on_flag_changed(node, **kwargs):
     """
     # Showing thumbnail is disabled so can return early since
     # there should be no thumbnail to update.
-    if not node.evalParm('show_thumbnail'):
+    if not node.evalParm("show_thumbnail"):
         return
 
     # Update node thumbnails brightness with the
@@ -481,10 +516,10 @@ def on_flag_changed(node, **kwargs):
 def keep_background_images_linked(node, old_name):
     """Reconnect background images to node from old name.
 
-     Used as callback on node name changes to keep thumbnails linked."""
+    Used as callback on node name changes to keep thumbnails linked."""
     from ayon_houdini.api.lib import (
         get_background_images,
-        set_background_images
+        set_background_images,
     )
 
     parent = node.parent()
@@ -509,7 +544,7 @@ class SelectFolderPathDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(SelectFolderPathDialog, self).__init__(parent)
         self.setWindowTitle("Set project and folder path")
-        self.setStyleSheet(load_stylesheet())
+        self.setStyleSheet(load_adapted_stylesheet(self))
 
         project_widget = QtWidgets.QComboBox()
         project_widget.addItems(self.get_projects())
@@ -591,9 +626,10 @@ def select_folder_path(node):
         # has not been selected yet and thus selection does not work.
         def _select_folder_path():
             dialog.folder_widget.set_selected_folder_path(folder_path)
+
         QtCore.QTimer.singleShot(100, _select_folder_path)
 
-    dialog.setStyleSheet(load_stylesheet())
+    dialog.setStyleSheet(load_adapted_stylesheet(dialog))
 
     # Make it appear like a pop-up near cursor
     dialog.resize(300, 600)
@@ -608,7 +644,7 @@ def select_folder_path(node):
     # Set project
     selected_project_name = dialog.get_selected_project_name()
     if selected_project_name == get_current_project_name():
-        selected_project_name = '$AYON_PROJECT_NAME'
+        selected_project_name = "$AYON_PROJECT_NAME"
 
     project_parm = node.parm("project_name")
     project_parm.set(selected_project_name)
@@ -621,7 +657,7 @@ def select_folder_path(node):
         return
 
     if selected_folder_path == get_current_folder_path():
-        selected_folder_path = '$AYON_FOLDER_PATH'
+        selected_folder_path = "$AYON_FOLDER_PATH"
 
     folder_parm = node.parm("folder_path")
     folder_parm.set(selected_folder_path)
@@ -634,7 +670,7 @@ class SelectProductDialog(QtWidgets.QDialog):
     def __init__(self, project_name, folder_id, parent=None):
         super(SelectProductDialog, self).__init__(parent)
         self.setWindowTitle("Select a Product")
-        self.setStyleSheet(load_stylesheet())
+        self.setStyleSheet(load_adapted_stylesheet(self))
 
         self.project_name = project_name
         self.folder_id = folder_id
@@ -654,7 +690,9 @@ class SelectProductDialog(QtWidgets.QDialog):
         self.products_widget = products_widget
 
         # Connect Signals
-        product_types_widget.currentTextChanged.connect(self.on_product_type_changed)
+        product_types_widget.currentTextChanged.connect(
+            self.on_product_type_changed
+        )
         products_widget.itemDoubleClicked.connect(self.accept)
         accept_button.clicked.connect(self.accept)
 
@@ -672,8 +710,7 @@ class SelectProductDialog(QtWidgets.QDialog):
         return self.product_types_widget.currentText()
 
     def get_product_types(self) -> List[str]:
-        """return default product types.
-        """
+        """return default product types."""
 
         return [
             "*",
@@ -702,7 +739,8 @@ class SelectProductDialog(QtWidgets.QDialog):
 
     def set_selected_product_name(self, product_name: str):
         matching_items = self.products_widget.findItems(
-            product_name, QtCore.Qt.MatchFixedString)
+            product_name, QtCore.Qt.MatchFixedString
+        )
         if matching_items:
             self.products_widget.setCurrentItem(matching_items[0])
 
@@ -715,7 +753,7 @@ class SelectProductDialog(QtWidgets.QDialog):
         products = ayon_api.get_products(
             self.project_name,
             folder_ids=[self.folder_id],
-            product_types=product_types
+            product_types=product_types,
         )
 
         return list(sorted(product["name"] for product in products))
@@ -733,16 +771,14 @@ def select_product_name(node):
     folder_path = node.evalParm("folder_path")
     product_parm = node.parm("product_name")
 
-    folder_entity = ayon_api.get_folder_by_path(project_name,
-                                                folder_path,
-                                                fields={"id"})
+    folder_entity = ayon_api.get_folder_by_path(
+        project_name, folder_path, fields={"id"}
+    )
     if not folder_entity:
         return
 
     dialog = SelectProductDialog(
-        project_name,
-        folder_entity["id"],
-        parent=lib.get_main_window()
+        project_name, folder_entity["id"], parent=lib.get_main_window()
     )
     dialog.set_selected_product_name(product_parm.eval())
 
@@ -776,17 +812,17 @@ def get_available_representations(node):
     product_name = node.evalParm("product_name")
     version = node.evalParm("version")
 
-    if not all([
-        project_name, folder_path, product_name, version
-    ]):
+    if not all([project_name, folder_path, product_name, version]):
         return []
 
     try:
         version = int(version.strip())
     except ValueError:
         load_message_parm = node.parm("load_message")
-        load_message_parm.set(f"Invalid version format: '{version}'\n"
-                              "Make sure to set a valid version number.")
+        load_message_parm.set(
+            f"Invalid version format: '{version}'\n"
+            "Make sure to set a valid version number."
+        )
         return
 
     representation_filter = None
@@ -795,25 +831,22 @@ def get_available_representations(node):
         representation_filter = filter_parm.eval().split(" ")
 
     folder_entity = get_folder_by_path(
-        project_name,
-        folder_path=folder_path,
-        fields={"id"}
+        project_name, folder_path=folder_path, fields={"id"}
     )
     product_entity = get_product_by_name(
-            project_name,
-            product_name=product_name,
-            folder_id=folder_entity["id"],
-            fields={"id"})
+        project_name,
+        product_name=product_name,
+        folder_id=folder_entity["id"],
+        fields={"id"},
+    )
     version_entity = get_version_by_name(
-            project_name,
-            version,
-            product_id=product_entity["id"],
-            fields={"id"})
+        project_name, version, product_id=product_entity["id"], fields={"id"}
+    )
     representations = get_representations(
-            project_name,
-            version_ids={version_entity["id"]},
-            fields={"name"},
-            representation_names=representation_filter
+        project_name,
+        version_ids={version_entity["id"]},
+        fields={"name"},
+        representation_names=representation_filter,
     )
     representations_names = [n["name"] for n in representations]
     return representations_names
@@ -870,8 +903,13 @@ def expression_get_representation_id() -> str:
     representation_name = hou.evalParm("representation_name")
 
     node = hou.pwd()
-    hash_value = (project_name, folder_path, product_name, version,
-                  representation_name)
+    hash_value = (
+        project_name,
+        folder_path,
+        product_name,
+        version,
+        representation_name,
+    )
     cache = get_session_cache().setdefault("representation_ids", {})
     if hash_value in cache:
         return cache[hash_value]
@@ -899,5 +937,5 @@ def expression_get_representation_path() -> str:
     cache[hash_value] = path
     return hou.text.expandString(path)
 
-# endregion
 
+# endregion
