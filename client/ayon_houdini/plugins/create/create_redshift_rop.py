@@ -7,12 +7,12 @@ from ayon_houdini.api import plugin
 from ayon_core.lib import EnumDef, BoolDef
 
 
-class CreateRedshiftROP(plugin.HoudiniCreator):
+class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
     """Redshift ROP"""
 
     identifier = "io.openpype.creators.houdini.redshift_rop"
     label = "Redshift ROP"
-    product_type = "redshift_rop"
+    legacy_product_type = "redshift_rop"
     icon = "magic"
     ext = "exr"
     multi_layered_mode = "1"  # No Multi-Layered EXR File
@@ -169,3 +169,6 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
                     label="Multi-Layered EXR"),
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "redshift_rop"]
