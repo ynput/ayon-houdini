@@ -20,10 +20,7 @@ class AbcLoader(plugin.HoudiniLoader):
     color = "orange"
 
     def load(self, context, name=None, namespace=None, data=None):
-        # Format file name, Houdini only wants forward slashes
         file_path = self.filepath_from_context(context)
-        file_path = os.path.normpath(file_path)
-        file_path = file_path.replace("\\", "/")
 
         # Get the root node
         obj = hou.node("/obj")
@@ -84,3 +81,9 @@ class AbcLoader(plugin.HoudiniLoader):
 
     def switch(self, container, context):
         self.update(container, context)
+
+    @classmethod
+    def filepath_from_context(cls, context):
+        file_path = super().filepath_from_context(context)
+        # Format file name, Houdini only wants forward slashes
+        return os.path.normpath(file_path).replace("\\", "/")
