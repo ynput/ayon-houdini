@@ -541,6 +541,8 @@ def keep_background_images_linked(node, old_name):
 class SelectFolderPathDialog(QtWidgets.QDialog):
     """Simple dialog to allow a user to select project and folder."""
 
+    last_width = 300
+
     def __init__(self, parent=None):
         super(SelectFolderPathDialog, self).__init__(parent)
         self.setWindowTitle("Set project and folder path")
@@ -556,11 +558,24 @@ class SelectFolderPathDialog(QtWidgets.QDialog):
 
         accept_button = QtWidgets.QPushButton("Set folder path")
 
-        main_layout = QtWidgets.QVBoxLayout(self)
+        top_layout = QtWidgets.QHBoxLayout(self)
+        top_layout.setContentsMargins(5, 10, 10, 10)
+        self._grip = QtWidgets.QSizeGrip(self)
+        self._grip.setStyleSheet(
+            "QSizeGrip {width: 4px;height: 64px;background-color: #454555;"
+            "padding: 2, 0, 2, 0;}\n"
+            "QSizeGrip::hover {background-color: #707080}"
+        )
+        self._grip.setVisible(True)
+        top_layout.addWidget(self._grip, 0)
+
+        main_layout = QtWidgets.QVBoxLayout()
         main_layout.addWidget(project_widget, 0)
         main_layout.addWidget(filter_widget, 0)
         main_layout.addWidget(folder_widget, 1)
         main_layout.addWidget(accept_button, 0)
+
+        top_layout.addLayout(main_layout)
 
         self.project_widget = project_widget
         self.folder_widget = folder_widget
@@ -569,6 +584,10 @@ class SelectFolderPathDialog(QtWidgets.QDialog):
         filter_widget.textChanged.connect(folder_widget.set_name_filter)
         folder_widget.double_clicked.connect(self.accept)
         accept_button.clicked.connect(self.accept)
+
+    def resizeEvent(self, event):
+        SelectFolderPathDialog.last_width = event.size().width()
+        super().resizeEvent(event)
 
     def get_selected_folder_path(self) -> str:
         return self.folder_widget.get_selected_folder_path()
@@ -631,10 +650,14 @@ def select_folder_path(node):
 
     dialog.setStyleSheet(load_adapted_stylesheet(dialog))
 
-    # Make it appear like a pop-up near cursor
-    dialog.resize(300, 600)
+    # Make it appear like a pop-up near cursor - use session's last width
+    dialog.setMinimumWidth(300)
+    dialog.setFixedHeight(600)
+    dialog.resize(SelectFolderPathDialog.last_width, 600)
     dialog.setWindowFlags(QtCore.Qt.Popup)
-    pos = dialog.mapToGlobal(cursor_pos - QtCore.QPoint(300, 0))
+    pos = dialog.mapToGlobal(
+        cursor_pos - QtCore.QPoint(SelectFolderPathDialog.last_width, 0)
+    )
     dialog.move(pos)
 
     result = dialog.exec_()
