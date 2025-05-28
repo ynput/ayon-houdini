@@ -48,6 +48,24 @@ class CreateStaticMeshModel(BaseSettingsModel):
     )
 
 
+def redshift_multi_layered_mode_enum():
+    return [
+        {"label": "No Multi-Layered EXR File", "value": "1"},
+        {"label": "Full Multi-Layered EXR File", "value": "2"}
+    ]
+
+
+class CreateRedshiftROPModel(CreatorModel):
+    multi_layered_mode: str = SettingsField(
+        "1",
+        title="Multi Layered Mode",
+        description=(
+            "Default Multi Layered Mode when creating a new Redshift ROP"
+        ),
+        enum_resolver=redshift_multi_layered_mode_enum,
+    )
+
+
 class CreateUSDRenderModel(CreatorModel):
     default_renderer: str = SettingsField(
         "Karma CPU",
@@ -59,6 +77,18 @@ class CreateUSDRenderModel(CreatorModel):
 
 
 class CreatePluginsModel(BaseSettingsModel):
+    render_rops_use_legacy_product_type: bool = SettingsField(
+        False,
+        label="Render ROPs use legacy product types",
+        description=(
+            "When enabled, it will use legacy product types like "
+            "`arnold_rop`, `mantra_rop`, `usdrender` and so forth. "
+            "When disabled, render ROPs will render to `render` product type. "
+            "This setting is mostly for backward compatibility for existing "
+            "projects and affects the Arnold, Karma, Mantra, Redshift, V-Ray "
+            "and USD Render ROPs."
+        ),
+    )
     CreateAlembicCamera: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Alembic Camera")
@@ -86,6 +116,9 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateModel: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Model")
+    CreateModelFBX: CreatorModel= SettingsField(
+        default_factory=CreatorModel,
+        title="Create Model FBX")
     CreatePointCache: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create PointCache (Abc)")
@@ -95,8 +128,8 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateRedshiftProxy: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Redshift Proxy")
-    CreateRedshiftROP: CreatorModel = SettingsField(
-        default_factory=CreatorModel,
+    CreateRedshiftROP: CreateRedshiftROPModel = SettingsField(
+        default_factory=CreateRedshiftROPModel,
         title="Create Redshift ROP")
     CreateReview: CreateReviewModel = SettingsField(
         default_factory=CreateReviewModel,
@@ -120,6 +153,7 @@ class CreatePluginsModel(BaseSettingsModel):
 
 
 DEFAULT_HOUDINI_CREATE_SETTINGS = {
+    "render_rops_use_legacy_product_type": False,
     "CreateAlembicCamera": {
         "enabled": True,
         "default_variants": ["Main"]
@@ -157,6 +191,10 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
         "enabled": True,
         "default_variants": ["Main"]
     },
+    "CreateModelFBX": {
+        "enabled": True,
+        "default_variants": ["Main"]
+    },
     "CreatePointCache": {
         "enabled": True,
         "default_variants": ["Main"]
@@ -171,7 +209,8 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     },
     "CreateRedshiftROP": {
         "enabled": True,
-        "default_variants": ["Main"]
+        "default_variants": ["Main"],
+        "multi_layered_mode": "1"
     },
     "CreateReview": {
         "enabled": True,

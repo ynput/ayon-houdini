@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """Houdini specific AYON/Pyblish plugin definitions."""
+import os
+from typing import Dict
+
 import hou
 
 import clique
@@ -21,6 +24,56 @@ from .usd import get_ayon_entity_uri_from_representation_context
 
 SETTINGS_CATEGORY = "houdini"
 
+REMAP_CREATOR_IDENTIFIERS: Dict[str, str] = {
+    "io.openpype.creators.houdini.ass":
+        "io.ayon.creators.houdini.ass",
+    "io.openpype.creators.houdini.arnold_rop":
+        "io.ayon.creators.houdini.arnold_rop",
+    "io.openpype.creators.houdini.bgeo":
+        "io.ayon.creators.houdini.bgeo",
+    "io.openpype.creators.houdini.camera":
+        "io.ayon.creators.houdini.camera",
+    "io.openpype.creators.houdini.hda": "io.ayon.creators.houdini.hda",
+    "io.openpype.creators.houdini.imagesequence":
+        "io.ayon.creators.houdini.imagesequence",
+    "io.openpype.creators.houdini.karma_rop":
+        "io.ayon.creators.houdini.karma_rop",
+    "io.openpype.creators.houdini.mantra_rop":
+        "io.ayon.creators.houdini.mantra_rop",
+    "io.openpype.creators.houdini.model": "io.ayon.creators.houdini.model",
+    "io.openpype.creators.houdini.pointcache":
+        "io.ayon.creators.houdini.pointcache",
+    "io.openpype.creators.houdini.redshiftproxy":
+        "io.ayon.creators.houdini.redshiftproxy",
+    "io.openpype.creators.houdini.redshift_rop":
+        "io.ayon.creators.houdini.redshift_rop",
+    "io.openpype.creators.houdini.review": "io.ayon.creators.houdini.review",
+    "io.openpype.creators.houdini.staticmesh.fbx":
+        "io.ayon.creators.houdini.staticmesh.fbx",
+    "io.openpype.creators.houdini.usd": "io.ayon.creators.houdini.usd",
+    "io.openpype.creators.houdini.usd.look":
+        "io.ayon.creators.houdini.usd.look",
+    "io.openpype.creators.houdini.usdrender":
+        "io.ayon.creators.houdini.usdrender",
+    "io.openpype.creators.houdini.vray_rop":
+        "io.ayon.creators.houdini.vray_rop",
+    "io.openpype.creators.houdini.vdbcache":
+        "io.ayon.creators.houdini.vdbcache",
+    "io.openpype.creators.houdini.workfile":
+        "io.ayon.creators.houdini.workfile",
+}
+
+# For backwards compatibility starting from ayon-houdini 0.4.6 we will
+# remap the AYON creator identifiers to their legacy ones. This way, for the
+# time being no remapping occurs yet. But it will allow for a few releases to
+# occur that could still open scenes with the newer identifiers if a user needs
+# to downgrade versions.
+# When removing this all the Creators should update their `identifier` to the
+# new identifier too.
+REMAP_CREATOR_IDENTIFIERS = {
+    new: old for old, new in REMAP_CREATOR_IDENTIFIERS.items()
+}
+
 
 class HoudiniCreatorBase(object):
     @staticmethod
@@ -32,7 +85,7 @@ class HoudiniCreatorBase(object):
         respective creator identifiers.
 
         Create `houdini_cached_legacy_instance` key for any legacy instances
-        detected in the scene as instances per family.
+        detected in the scene as instances per product type (legacy: family).
 
         Args:
             Dict[str, Any]: Shared data.
@@ -51,6 +104,11 @@ class HoudiniCreatorBase(object):
                 if creator_identifier_parm:
                     # creator instance
                     creator_id = creator_identifier_parm.eval()
+
+                    # Allow legacy creator identifiers to be remapped
+                    creator_id = REMAP_CREATOR_IDENTIFIERS.get(
+                        creator_id, creator_id)
+
                     cache.setdefault(creator_id, []).append(node)
 
                 else:
@@ -308,19 +366,86 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             setattr(self, key, value)
 
 
+class RenderLegacyProductTypeCreator(HoudiniCreator):
+    """Creator for Render ROPs to allow toggling between legacy product types
+    and the 'render' product type. This is mostly for backwards
+    compatibility. See #214."""
+
+    # Overriding `product_type` avoids linters complaining that the attribute
+    # is actually a property that can't be assigned to in `apply_settings`
+    # because it inherits as property from `Creator`.
+    product_type = "render"
+    legacy_product_type = "render"
+    use_legacy_product_type = False
+
+    def apply_settings(self, project_settings):
+        super().apply_settings(project_settings)
+        use_legacy_product_type = project_settings["houdini"]["create"].get(
+            "render_rops_use_legacy_product_type", False
+        )
+        if use_legacy_product_type:
+            self.product_type = self.legacy_product_type
+
+
 class HoudiniLoader(load.LoaderPlugin):
     """Base class for Houdini load plugins."""
 
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
     use_ayon_entity_uri = False
+    collapse_paths_to_root_vars = False
+
+    @classmethod
+    def apply_settings(cls, project_settings):
+        # Prepare collapsible variable mapping using entries in `os.environ`
+        # that are set to the project root paths
+        cls.collapse_paths_to_root_vars: bool = (
+            project_settings["houdini"]["load"]
+            .get("collapse_path_to_project_root_vars", False)
+        )
+
+        super().apply_settings(project_settings)
+
+    @classmethod
+    def _get_collapsible_vars(cls) -> Dict[str, str]:
+        """Return which variables keys may be collapsed to if path starts with
+        the values."""
+        collapsible_vars = {}
+        for key, value in os.environ.items():
+            if key.startswith("AYON_PROJECT_ROOT_"):
+                if not value:
+                    continue
+                collapsible_vars[key] = value.replace("\\", "/")
+
+        # Sort by length to ensure that the longest matching key is first
+        # so that the nearest matching root is used
+        return {
+            key: value
+            for key, value
+            in sorted(collapsible_vars.items(),
+                      key=lambda x: len(x[1]),
+                      reverse=True)
+        }
 
     @classmethod
     def filepath_from_context(cls, context):
         if cls.use_ayon_entity_uri:
             return get_ayon_entity_uri_from_representation_context(context)
 
-        return super(HoudiniLoader, cls).filepath_from_context(context)
+        path = super().filepath_from_context(context)
+
+        # Remap project roots to the collapsible path variables
+        if cls.collapse_paths_to_root_vars:
+            collapsible_vars = cls._get_collapsible_vars()
+            if collapsible_vars:
+                match_path = path.replace("\\", "/")
+                for key, value in collapsible_vars.items():
+                    if match_path.startswith(value):
+                        # Replace start of string with the key
+                        path = f"${key}" + path[len(value):]
+                        break
+
+        return path
 
 
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):

@@ -21,8 +21,8 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
 
     def process(self, instance):
         creator_attribute = instance.data["creator_attributes"]
-        product_type = instance.data["productType"]
         rop_node = hou.node(instance.data.get("instance_node"))
+        node_type = rop_node.type().name()
 
         # TODO: This section goes against pyblish concepts where
         # pyblish plugins should change the state of the scene.
@@ -32,26 +32,26 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
 
         # Align split parameter value on rop node to the render target.
         if instance.data["splitRender"]:
-            if product_type == "arnold_rop":
+            if node_type == "arnold":
                 rop_node.setParms({"ar_ass_export_enable": 1})
-            elif product_type == "mantra_rop":
+            elif node_type == "ifd":
                 rop_node.setParms({"soho_outputmode": 1})
-            elif product_type == "redshift_rop":
+            elif node_type == "Redshift_ROP":
                 rop_node.setParms({"RS_archive_enable": 1})
-            elif product_type == "vray_rop":
+            elif node_type == "vray_renderer":
                 rop_node.setParms({"render_export_mode": "2"})
-            elif product_type == "usdrender":
+            elif node_type == "usdrender":
                 rop_node.setParms({"runcommand": 0})
         else:
-            if product_type == "arnold_rop":
+            if node_type == "arnold":
                 rop_node.setParms({"ar_ass_export_enable": 0})
-            elif product_type == "mantra_rop":
+            elif node_type == "ifd":
                 rop_node.setParms({"soho_outputmode": 0})
-            elif product_type == "redshift_rop":
+            elif node_type == "Redshift_ROP":
                 rop_node.setParms({"RS_archive_enable": 0})
-            elif product_type == "vray_rop":
+            elif node_type == "vray_renderer":
                 rop_node.setParms({"render_export_mode": "1"})
-            elif product_type == "usdrender":
+            elif node_type == "usdrender":
                 rop_node.setParms({"runcommand": 1})
 
         if instance.data.get("farm"):

@@ -3,7 +3,7 @@ import os
 import hou
 from ayon_core.pipeline import (
     get_representation_path,
-    AVALON_CONTAINER_ID
+    AYON_CONTAINER_ID
 )
 from ayon_core.pipeline.load import LoadError
 from ayon_houdini.api import (
@@ -48,8 +48,8 @@ class HdaLoader(plugin.HoudiniLoader):
 
         # Imprint it manually
         data = {
-            "schema": "openpype:container-2.0",
-            "id": AVALON_CONTAINER_ID,
+            "schema": "ayon:container-3.0",
+            "id": AYON_CONTAINER_ID,
             "name": node_name,
             "namespace": namespace,
             "loader": self.__class__.__name__,
@@ -90,7 +90,7 @@ class HdaLoader(plugin.HoudiniLoader):
         parent = node.parent()
         node.destroy()
 
-        if parent.path() == pipeline.AVALON_CONTAINERS:
+        if parent.path() == pipeline.AYON_CONTAINERS:
             return
 
         # Remove parent if empty.
@@ -100,7 +100,7 @@ class HdaLoader(plugin.HoudiniLoader):
     def _create_dedicated_parent_node(self, hda_def):
 
         # Get the root node
-        parent_node = pipeline.get_or_create_avalon_container()
+        parent_node = pipeline.get_or_create_ayon_container()
         node = None
         node_type = None
         if hda_def.nodeTypeCategory() == hou.objNodeTypeCategory():

@@ -12,6 +12,8 @@ from .lib import (
     maintained_selection
 )
 
+import hou
+hou.logging.createSource("AYON")
 
 __all__ = [
     "HoudiniHost",

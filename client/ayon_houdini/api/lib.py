@@ -1447,7 +1447,7 @@ def find_active_network(category, default):
 
 
 def update_content_on_context_change():
-    """Update all Creator instances to current asset"""
+    """Update all Creator instances to current folder and task"""
     host = registered_host()
     context = host.get_current_context()
 
@@ -1476,7 +1476,7 @@ def prompt_reset_context():
     from ayon_core.tools.attribute_defs.dialog import (
         AttributeDefinitionsDialog
     )
-    from ayon_core.style import load_stylesheet
+    from .hda_utils import load_adapted_stylesheet
     from ayon_core.lib import BoolDef, UILabelDef
 
     definitions = [
@@ -1510,7 +1510,7 @@ def prompt_reset_context():
 
     dialog = AttributeDefinitionsDialog(definitions)
     dialog.setWindowTitle("Saving to different context.")
-    dialog.setStyleSheet(load_stylesheet())
+    dialog.setStyleSheet(load_adapted_stylesheet(dialog))
     if not dialog.exec_():
         return None
 
@@ -1574,7 +1574,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
     If the parm is already connected to a generic loader node, go to that node.
     """
 
-    from .pipeline import get_or_create_avalon_container
+    from .pipeline import get_or_create_ayon_container
 
     referenced_parm = file_parm.getReferencedParm()
 
@@ -1586,7 +1586,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
             return
 
     # Create a generic loader node and reference its file parm
-    main_container = get_or_create_avalon_container()
+    main_container = get_or_create_ayon_container()
 
     node_name = f"{file_parm.node().name()}_{file_parm.name()}_loader"
     load_node = main_container.createNode("ayon::generic_loader",

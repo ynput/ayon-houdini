@@ -7,15 +7,15 @@ from ayon_houdini.api import plugin
 from ayon_core.lib import EnumDef, BoolDef
 
 
-class CreateRedshiftROP(plugin.HoudiniCreator):
+class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
     """Redshift ROP"""
 
     identifier = "io.openpype.creators.houdini.redshift_rop"
     label = "Redshift ROP"
-    product_type = "redshift_rop"
+    legacy_product_type = "redshift_rop"
     icon = "magic"
     ext = "exr"
-    multi_layered_mode = "No Multi-Layered EXR File"
+    multi_layered_mode = "1"  # No Multi-Layered EXR File
 
     # Default render target
     render_target = "farm_split"
@@ -57,12 +57,11 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
 
         # Set the linked rop to the Redshift ROP
         ipr_rop.parm("linked_rop").set(instance_node.path())
-        ext = pre_create_data.get("image_format")
-        multi_layered_mode = pre_create_data.get("multi_layered_mode")
+        ext: int = pre_create_data.get("image_format", 0)
+        multi_layered_mode: str = pre_create_data.get(
+            "multi_layered_mode", "1")
 
         ext_format_index = {"exr": 0, "tif": 1, "jpg": 2, "png": 3}
-        multilayer_mode_index = {"No Multi-Layered EXR File": "1",
-                                 "Full Multi-Layered EXR File": "2" }
 
         filepath = "{renders_dir}{product_name}/{product_name}.{fmt}".format(
                 renders_dir=hou.text.expandString("$HIP/pyblish/renders/"),
@@ -70,11 +69,14 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
                 fmt="$AOV.$F4.{ext}".format(ext=ext)
             )
 
-        if multilayer_mode_index[multi_layered_mode] == "1":
+        if multi_layered_mode == "1":
             multipart = False
-
-        elif multilayer_mode_index[multi_layered_mode] == "2":
+        elif multi_layered_mode == "2":
             multipart = True
+        else:
+            raise ValueError(
+                f"Unknown value for 'multi_layered_mode': {multi_layered_mode}"
+            )
 
         parms = {
             # Render frame range
@@ -85,9 +87,7 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
             "RS_outputFileFormat": ext_format_index[ext],
         }
         if ext == "exr":
-            parms["RS_outputMultilayerMode"] = (
-                multilayer_mode_index[multi_layered_mode]
-            )
+            parms["RS_outputMultilayerMode"] = multi_layered_mode
             parms["RS_aovMultipart"] = multipart
 
         if self.selected_nodes:
@@ -107,7 +107,7 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
 
         instance_node.setParms(parms)
 
-        # Lock some Avalon attributes
+        # Lock some AYON attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
@@ -153,8 +153,8 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
         ]
 
         multi_layered_mode = [
-            "No Multi-Layered EXR File",
-            "Full Multi-Layered EXR File"
+            {"value": "1", "label": "No Multi-Layered EXR File"},
+            {"value": "2", "label": "Full Multi-Layered EXR File"},
         ]
 
         attrs = super(CreateRedshiftROP, self).get_pre_create_attr_defs()
@@ -169,3 +169,6 @@ class CreateRedshiftROP(plugin.HoudiniCreator):
                     label="Multi-Layered EXR"),
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "redshift_rop"]

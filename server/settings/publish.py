@@ -7,9 +7,8 @@ from ayon_server.settings import (
 # Publish Plugins
 class CollectAssetHandlesModel(BaseSettingsModel):
     """Collect Frame Range
-    Disable this if you want the publisher to
-    ignore start and end handles specified in the
-    asset data for publish instances
+    Disable this if you want the publisher to ignore start and end handles
+    specified in the task or folder data for publish instances.
     """
     use_asset_handles: bool = SettingsField(
         title="Use asset handles")
@@ -107,6 +106,21 @@ class BasicEnabledStatesModel(BaseSettingsModel):
     active: bool = SettingsField(title="Active")
 
 
+class ValidateUsdLookDisallowedTypesModel(BasicEnabledStatesModel):
+    disallowed_types: list[str] = SettingsField(
+        default_factory=list,
+        title="Disallowed Types",
+        description=(
+            "Disallowed types for look product. "
+            "This should be USD schema types like:\n"
+            "- `UsdGeomBoundable` for Meshes/Lights/Procedurals\n"
+            "- `UsdRenderSettingsBase` for Render Settings\n"
+            "- `UsdRenderVar` for Render Var\n"
+            "- `UsdGeomCamera` for Cameras"
+        )
+    )
+
+
 class ExtractUsdModel(BaseSettingsModel):
     use_ayon_entity_uri: bool = SettingsField(
         False,
@@ -146,9 +160,9 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateReviewColorspace: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Review Colorspace")
-    ValidateSubsetName: BasicEnabledStatesModel = SettingsField(
+    ValidateProductName: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
-        title="Validate Subset Name")
+        title="Validate Product Name")
     ValidateUnrealStaticMeshName: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Unreal Static Mesh Name")
@@ -158,6 +172,12 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateUsdLookAssignments: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate USD Look Assignments")
+    ValidateUsdLookDisallowedTypes: ValidateUsdLookDisallowedTypesModel = (
+        SettingsField(
+            default_factory=ValidateUsdLookDisallowedTypesModel,
+            title="Validate USD Look Disallowed Types"
+        )
+    )
     ValidateUSDRenderProductPaths: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate USD Render Product Paths")
@@ -220,7 +240,7 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "optional": True,
         "active": True
     },
-    "ValidateSubsetName": {
+    "ValidateProductName": {
         "enabled": True,
         "optional": True,
         "active": True
@@ -246,6 +266,17 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "enabled": True,
         "optional": True,
         "active": True
+    },
+    "ValidateUsdLookDisallowedTypes": {
+        "enabled": True,
+        "optional": False,
+        "active": True,
+        "disallowed_types": [
+            "UsdGeomBoundable",
+            "UsdRenderSettingsBase",
+            "UsdRenderVar",
+            "UsdGeomCamera"
+        ]
     },
     "ValidateUSDRenderProductPaths": {
         "enabled": False,
