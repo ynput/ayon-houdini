@@ -161,6 +161,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
     add_publish_button = False
 
     settings_category = SETTINGS_CATEGORY
+    node_type = "geometry"
 
     def create(self, product_name, instance_data, pre_create_data):
         try:
@@ -172,7 +173,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             # Get the node type and remove it from the data, not needed
             node_type = instance_data.pop("node_type", None)
             if node_type is None:
-                node_type = "geometry"
+                node_type = self.node_type
 
             folder_path = instance_data["folderPath"]
 
@@ -226,7 +227,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for instance in self.collection_shared_data[
                 "houdini_cached_instances"].get(self.identifier, []):
 
-            node_data = read(instance)
+            node_data = self.read(instance)
 
             # Node paths are always the full node path since that is unique
             # Because it's the node's path it's not written into attributes
@@ -266,6 +267,9 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         values.pop("instance_id", None)
         values.pop("families", None)
         imprint(node, values, update=update)
+
+    def read(self, node: hou.Node):
+        return read(node)
 
     def remove_instances(self, instances):
         """Remove specified instance from the scene.
