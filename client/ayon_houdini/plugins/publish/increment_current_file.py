@@ -44,7 +44,7 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
 
         # Filename must not have changed since collecting.
         host = registered_host()
-        current_file = host.current_file()
+        current_file = host.get_current_workfile()
         if context.data["currentFile"] != current_file:
             raise KnownPublishError(
                 f"Collected filename '{context.data['currentFile']}' differs"
