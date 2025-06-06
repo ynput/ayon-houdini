@@ -201,13 +201,6 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             return {}
         return lib.read(context_node)
 
-    def save_file(self, dst_path=None):
-        # Force forwards slashes to avoid segfault
-        dst_path = dst_path.replace("\\", "/")
-
-        hou.hipFile.save(file_name=dst_path,
-                         save_to_recent_files=True)
-
 
 def on_file_event_callback(event):
     if event == hou.hipFileEventType.AfterLoad:
