@@ -13,7 +13,7 @@ import ayon_api
 
 import hou
 
-from ayon_core.lib import StringTemplate
+from ayon_core.lib import StringTemplate, get_version_from_path
 from ayon_core.settings import get_current_project_settings
 from ayon_core.pipeline import (
     Anatomy,
@@ -893,6 +893,16 @@ def get_current_context_template_data_with_entity_attrs():
     template_data["root"] = anatomy.roots
     template_data["folderAttributes"] = folder_attributes
     template_data["taskAttributes"] = task_attributes
+
+    # Add 'version' key with the current workfile version.
+    host = registered_host()
+    version: int = 0
+    filepath = host.get_current_workfile()
+    if filepath:
+        version_str = get_version_from_path(filepath)
+        if version_str:
+            version = int(version_str)
+    template_data["version"] = version
 
     return template_data
 
