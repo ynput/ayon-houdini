@@ -895,9 +895,16 @@ def get_current_context_template_data_with_entity_attrs():
     template_data["taskAttributes"] = task_attributes
 
     # Add 'version' key with the current workfile version.
-    host = registered_host()
+    # We do not use `registered_host().get_current_workfile()` here because
+    # this method may be called `on_new()` during integration installation
+    # where the host itself is not yet registered.
+    filepath = hou.hipFile.path()
+    if (
+            os.path.basename(filepath) == "untitled.hip"
+            and not os.path.exists(filepath)
+    ):
+        filepath = None
     version: int = 0
-    filepath = host.get_current_workfile()
     if filepath:
         version_str = get_version_from_path(filepath)
         if version_str:
