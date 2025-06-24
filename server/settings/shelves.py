@@ -55,7 +55,7 @@ class ShelvesModel(BaseSettingsModel):
         title="Options",
         description="Switch between shelves manager options",
         enum_resolver=shelves_enum_options,
-        conditionalEnum=True
+        conditional_enum=True
     )
     add_shelf_file: AddShelfFileModel = SettingsField(
         title="Add a .shelf file",
