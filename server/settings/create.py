@@ -32,7 +32,7 @@ class CreateArnoldAssModel(BaseSettingsModel):
         title="Default Products",
         default_factory=list,
     )
-    ext: str = SettingsField(Title="Extension")
+    ext: str = SettingsField(title="Extension")
 
 
 class CreateStaticMeshModel(BaseSettingsModel):
@@ -79,7 +79,7 @@ class CreateUSDRenderModel(CreatorModel):
 class CreatePluginsModel(BaseSettingsModel):
     render_rops_use_legacy_product_type: bool = SettingsField(
         False,
-        label="Render ROPs use legacy product types",
+        title="Render ROPs use legacy product types",
         description=(
             "When enabled, it will use legacy product types like "
             "`arnold_rop`, `mantra_rop`, `usdrender` and so forth. "
