@@ -70,6 +70,39 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             return
 
         rop_node = hou.node(instance.data["instance_node"])
+        lop_path = rop_node.evalParm("loppath")
+        lop_node = hou.node(lop_path)
+
+        self.log.debug(f"ROP Node: {rop_node.path()} references LOP Node: {lop_node.path()}")
+
+        def find_geoclipsequence(node):
+            if node.type().name() == "geoclipsequence":
+                return node
+            for input_node in node.inputs():
+                if input_node:
+                    result = find_geoclipsequence(input_node)
+                    if result:
+                        return result
+            return None
+
+        geoclip_node = find_geoclipsequence(lop_node)
+        self.log.debug(f" geoclip node {geoclip_node}")
+
+        if geoclip_node:
+            self.log.debug("True geoclip node")
+            if geoclip_node.parm("saveclipfilepath"):
+                clip_path = geoclip_node.evalParm("saveclipfilepath")
+            else:
+                clip_path = None
+            manifest_path = geoclip_node.evalParm("manifestfile")
+            topology_path = geoclip_node.evalParm("topologyfile")
+
+            self.log.debug(f"Found GeoClipSequence Node: {geoclip_node.path()}")
+            self.log.debug(f"Clip Path: {clip_path}")
+            self.log.debug(f"Manifest Path: {manifest_path}")
+            self.log.debug(f"Topology Path: {topology_path}")
+        else: 
+            self.log.debug("False not a geoclipsequence node")
 
         save_layers = []
         for layer in usdlib.get_configured_save_layers(rop_node):
@@ -88,15 +121,15 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                     "Created by: %s", creator_node.path()
                 )
 
-            save_layers.append((layer, save_path, creator_node))
-
+            save_layers.append((layer,clip_path, manifest_path, save_path, creator_node))
+        self.log.debug(f"save layers {save_layers}")
         # Store on the instance
         instance.data["usdConfiguredSavePaths"] = save_layers
 
         # Create configured layer instances so User can disable updating
         # specific configured layers for publishing.
         context = instance.context
-        for layer, save_path, creator_node in save_layers:
+        for layer, clip_path, manifest_path, save_path, creator_node in save_layers:
             name = os.path.basename(save_path)
             layer_inst = context.create_instance(name)
 
