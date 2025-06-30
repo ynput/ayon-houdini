@@ -34,7 +34,8 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
                 "",
             )
             try:
-                rop_node.render()
+                self._rop_render(rop_node)
+
             finally:
                 ayon_publish.set_ayon_publish_nodes_pre_render_script(
                     rop_node,
@@ -94,3 +95,29 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
             }
             self.log.debug(f"Collected representation: {representation}")
             representations.append(representation)
+
+    def _rop_render(self, node:hou.RopNode):
+        """Perform the render by node, it would raise Exception
+        once there is error found.
+
+        Args:
+            node (hou.RopNode): rop node
+        """
+        try:
+            node.render()
+        except hou.OperationFailed as e:
+            node.addError(f"Operation failed: {str(e)}")
+            self.log.error(f"Operation error on{node.path(): {e}}")
+            raise
+        except hou.PermissionError as e:
+            node.addError(f"Permission error: {str(e)}")
+            self.log.error(f"Permission error on{node.path(): {e}}")
+            raise
+        except hou.Error as e:
+            node.addError(f"Houdini error: {str(e)}")
+            self.log.error(f"Houdini error on{node.path(): {e}}")
+            raise
+        except Exception as e:
+            node.addError(f"Unexpected error: {str(e)}")
+            self.log.error(f"Unexpected error on {node.path()}: {e}")
+            raise
