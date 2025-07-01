@@ -105,19 +105,20 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
         """
         try:
             node.render()
+
         except hou.OperationFailed as e:
-            node.addError(f"Operation failed: {str(e)}")
-            self.log.error(f"Operation error on{node.path(): {e}}")
+            node.addError(f"Operation failed: {e}")
+            self.log.error(f"Operation error on {node.path(): {e}}")
             raise
         except hou.PermissionError as e:
-            node.addError(f"Permission error: {str(e)}")
-            self.log.error(f"Permission error on{node.path(): {e}}")
+            node.addError(f"Permission error: {e}")
+            self.log.error(f"Permission error on {node.path(): {e}}")
             raise
         except hou.Error as e:
-            node.addError(f"Houdini error: {str(e)}")
-            self.log.error(f"Houdini error on{node.path(): {e}}")
+            node.addError(f"Houdini error: {e}")
+            self.log.error(f"Houdini error on {node.path(): {e}}")
             raise
         except Exception as e:
-            node.addError(f"Unexpected error: {str(e)}")
+            node.addError(f"Unexpected error: {e}")
             self.log.error(f"Unexpected error on {node.path()}: {e}")
             raise
