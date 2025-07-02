@@ -52,4 +52,21 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
             )
 
         new_filepath = version_up(current_file)
-        host.save_workfile(new_filepath)
+
+        if hasattr(host, "save_workfile_with_context"):
+            from ayon_core.host.interfaces import SaveWorkfileOptionalData
+            host.save_workfile_with_context(
+                filepath=new_filepath,
+                folder_entity=context.data["folderEntity"],
+                task_entity=context.data["taskEntity"],
+                description=f"Incremented by publishing.",
+                # Optimize the save by reducing needed queries for context
+                prepared_data=SaveWorkfileOptionalData(
+                    project_entity=context.data["projectEntity"],
+                    project_settings=context.data["project_settings"],
+                    anatomy=context.data["anatomy"],
+                )
+            )
+        else:
+            # Backwards compatibility
+            host.save_workfile(new_filepath)
