@@ -59,7 +59,7 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
                 filepath=new_filepath,
                 folder_entity=context.data["folderEntity"],
                 task_entity=context.data["taskEntity"],
-                description=f"Incremented by publishing.",
+                description="Incremented by publishing.",
                 # Optimize the save by reducing needed queries for context
                 prepared_data=SaveWorkfileOptionalData(
                     project_entity=context.data["projectEntity"],
