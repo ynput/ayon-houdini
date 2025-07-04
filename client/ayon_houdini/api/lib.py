@@ -909,7 +909,7 @@ def get_current_context_template_data_with_entity_attrs():
         version_str = get_version_from_path(filepath)
         if version_str:
             version = int(version_str)
-    template_data["version"] = version
+    template_data["workfile_version"] = version
 
     return template_data
 
