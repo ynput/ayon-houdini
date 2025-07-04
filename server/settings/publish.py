@@ -64,7 +64,7 @@ class CollectFilesForCleaningUpModel(BaseSettingsModel):
     families: list[str] = SettingsField(
         default_factory=list,
         enum_resolver=product_types_enum,
-        conditionalEnum=True,
+        conditional_enum=True,
         title="Product Types"
     )
 
