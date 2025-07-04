@@ -21,7 +21,7 @@ from .plugin import HoudiniCreator
 class HoudiniTemplateBuilder(AbstractTemplateBuilder):
     """Concrete implementation of AbstractTemplateBuilder for Houdini"""
 
-    def resolve_template_path(self, path, fill_data):
+    def resolve_template_path(self, path, fill_data=None):
         """Allows additional resolving over the template path using custom
         integration methods, like Houdini's expand string functionality.
 
