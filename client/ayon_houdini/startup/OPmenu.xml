@@ -6,14 +6,14 @@
 <menuDocument>
     <menu>
         <!-- Operator type and asset options. -->
-        <subMenu id="opmenu.vhda_options_create">
-            <insertBefore>opmenu.unsynchronize</insertBefore>
-                <scriptItem id="opmenu.vhda_create_ayon">
-                    <insertAfter>opmenu.vhda_create</insertAfter>
-                    <label>Create New (AYON)...</label>
-                    <context>
-                    </context>
-                    <scriptCode>
+
+        <insertBefore>opmenu.unsynchronize</insertBefore>
+            <scriptItem id="opmenu.vhda_create_ayon">
+                <insertAfter>opmenu.vhda_create</insertAfter>
+                <label>Create Digital Asset (AYON)...</label>
+                <context>
+                </context>
+                <scriptCode>
 <![CDATA[
 from ayon_houdini.api.creator_node_shelves import create_interactive
 
@@ -22,8 +22,7 @@ if node not in hou.selectedNodes():
     node.setSelected(True)
 create_interactive("io.openpype.creators.houdini.hda", **kwargs)
 ]]>
-                     </scriptCode>
-                </scriptItem>
-        </subMenu>
+                </scriptCode>
+            </scriptItem>
     </menu>
 </menuDocument>
