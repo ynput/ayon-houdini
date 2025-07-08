@@ -154,7 +154,6 @@ class CreateHDA(plugin.HoudiniCreator):
     label = "Houdini Digital Asset (Hda)"
     product_type = "hda"
     icon = "gears"
-    maintain_selection = False
 
     def _check_existing(self, folder_path, product_name):
         # type: (str, str) -> bool
