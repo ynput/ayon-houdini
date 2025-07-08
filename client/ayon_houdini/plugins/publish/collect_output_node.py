@@ -67,7 +67,7 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
         else:
             raise KnownPublishError(
                 f"ROP node type '{node_type}' is not supported"
-                f" for product type '{instance.data['product_type']}'"
+                f" for product type '{instance.data['productType']}'"
             )
 
         if not out_node:
