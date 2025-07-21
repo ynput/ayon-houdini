@@ -292,7 +292,7 @@ def render_rop(ropnode, frame_range=None):
         raise RuntimeError("Render failed: {0}".format(exc))
 
 
-def imprint(node, data, update=False):
+def imprint(node, data, update=False, folder="Extra"):
     """Store attributes with value on a node
 
     Depending on the type of attribute it creates the correct parameter
@@ -312,6 +312,8 @@ def imprint(node, data, update=False):
         update (bool, optional): flag if imprint should update
             already existing data or leave them untouched and only
             add new.
+        folder (str, optional): The folder name to add new parms into.
+            Defaults to "Extra" due to legacy reasons.
 
     Returns:
         None
@@ -352,12 +354,12 @@ def imprint(node, data, update=False):
 
     # Add new parm templates
     if new_parm_templates:
-        parm_folder = parm_group.findFolder("Extra")
+        parm_folder = parm_group.findFolder(folder)
 
         # if folder doesn't exist yet, create one and append to it,
         # else append to existing one
         if not parm_folder:
-            parm_folder = hou.FolderParmTemplate("folder", "Extra")
+            parm_folder = hou.FolderParmTemplate("folder", folder)
             parm_folder.setParmTemplates(new_parm_templates)
             parm_group.append(parm_folder)
         else:
@@ -1428,11 +1430,11 @@ def find_active_network(category, default):
 
     Arguments:
         category (hou.NodeTypeCategory): The node network category type.
-        default (str): The default path to fallback to if no active pane
-            is found with the given category, e.g. "/obj"
+        default (Optional[str]): The default path to fallback to if no active
+            pane is found with the given category, e.g. "/obj"
 
     Returns:
-        hou.Node: The node network to return.
+        Optional[hou.Node]: The node network to return.
 
     """
     # Find network editors that are current tab of given category
@@ -1447,7 +1449,7 @@ def find_active_network(category, default):
             continue
 
         pwd = pane.pwd()
-        if pwd.type().category() != category:
+        if pwd.childTypeCategory() != category:
             continue
 
         if not pwd.isEditable():
@@ -1456,7 +1458,9 @@ def find_active_network(category, default):
         return pwd
 
     # Default to the fallback if no valid candidate was found
-    return hou.node(default)
+    if default is not None:
+        return hou.node(default)
+    return None
 
 
 def update_content_on_context_change():
