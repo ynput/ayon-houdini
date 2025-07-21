@@ -48,7 +48,7 @@ class ValidateCopOutputNode(plugin.HoudiniInstancePlugin):
 
             return [node]
 
-        # Output node must be a Cop node.
+        # Output node must be a COP2 node.
         version = hou.applicationVersion()
         if version >= (20, 5, 0):
             # In Houdini 20.5 and later, COP2 nodes are used and `hou.CopNode`
