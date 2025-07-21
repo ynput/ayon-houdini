@@ -14,7 +14,6 @@ class ValidateCopOutputNode(plugin.HoudiniInstancePlugin):
         - The COP Path is set.
         - The COP Path refers to an existing object.
         - The COP Path node is a COP node.
-
     """
 
     order = pyblish.api.ValidatorOrder
@@ -49,20 +48,29 @@ class ValidateCopOutputNode(plugin.HoudiniInstancePlugin):
 
             return [node]
 
-        # Output node must be a Sop node.
-        if not isinstance(output_node, hou.CopNode):
+        # Output node must be a Cop node.
+        version = hou.applicationVersion()
+        if version >= (20, 5, 0):
+            # In Houdini 20.5 and later, COP2 nodes are used and `hou.CopNode`
+            # started referring to Copernicus nodes instead.
+            class_type = hou.Cop2Node
+        else:
+            class_type = hou.CopNode
+
+        node_category_name = output_node.type().category().name()
+        if not isinstance(output_node, class_type):
             cls.log.error(
                 "Output node %s is not a COP node. "
                 "COP Path must point to a COP node, "
                 "instead found category type: %s",
-                output_node.path(), output_node.type().category().name()
+                output_node.path(), node_category_name
             )
             return [output_node]
 
         # For the sake of completeness also assert the category type
         # is Cop2 to avoid potential edge case scenarios even though
         # the isinstance check above should be stricter than this category
-        if output_node.type().category().name() != "Cop2":
+        if node_category_name != "Cop2":
             cls.log.error(
                 "Output node %s is not of category Cop2.", output_node.path()
             )
