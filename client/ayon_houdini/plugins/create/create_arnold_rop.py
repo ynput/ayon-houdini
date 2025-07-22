@@ -9,6 +9,7 @@ class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
     label = "Arnold ROP"
     legacy_product_type = "arnold_rop"
     icon = "magic"
+    description = __doc__
 
     # Default extension
     ext = "exr"

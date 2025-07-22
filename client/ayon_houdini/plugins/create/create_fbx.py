@@ -14,6 +14,7 @@ class CreateFBX(plugin.HoudiniCreator):
     product_type = "model"
     icon = "cube"
     default_variants = ["Main"]
+    description = "Create a static model as FBX file."
 
     # Default render target
     render_target = "local"

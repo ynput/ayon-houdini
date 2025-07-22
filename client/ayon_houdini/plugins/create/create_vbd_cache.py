@@ -11,6 +11,7 @@ class CreateVDBCache(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.vdbcache"
     name = "vbdcache"
     label = "VDB Cache"
+    description = __doc__
     product_type = "vdbcache"
     icon = "cloud"
 

@@ -12,6 +12,7 @@ class CreateBGEO(plugin.HoudiniCreator):
     label = "PointCache (Bgeo)"
     product_type = "pointcache"
     icon = "gears"
+    description = "Create Geometry ROP to export BGEO pointcache data"
 
     # Default render target
     render_target = "local"

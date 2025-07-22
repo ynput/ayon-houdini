@@ -13,6 +13,7 @@ class CreatePointCache(plugin.HoudiniCreator):
     label = "PointCache (Abc)"
     product_type = "pointcache"
     icon = "gears"
+    description = "Create Alembic ROP to export pointcache data"
 
     # Default render target
     render_target = "local"

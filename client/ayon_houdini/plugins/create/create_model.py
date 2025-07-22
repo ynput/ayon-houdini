@@ -23,6 +23,7 @@ class CreateModel(plugin.HoudiniCreator):
     label = "Model"
     product_type = "model"
     icon = "cube"
+    description = "Create a static model as Alembic file"
 
     # Default render target
     render_target = "local"
