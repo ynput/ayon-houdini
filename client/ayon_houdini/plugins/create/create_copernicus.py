@@ -28,7 +28,7 @@ class CreateCopernicusROP(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
         filepath = "{}{}".format(
             hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4{}".format(product_name, self.ext)
+            f"{product_name}.$F4{self.ext}"
         )
         parms = {
             "trange": 1,
