@@ -17,6 +17,10 @@ class CreateCopernicusROP(plugin.HoudiniCreator):
 
     ext = ".exr"
 
+    # Copernicus was introduced in Houdini 20.5 so we only enable this
+    # creator if the Houdini version is 20.5 or higher.
+    enabled = hou.applicationVersion() >= (20, 5, 0)
+
     def create(self, product_name, instance_data, pre_create_data):
         instance_data["node_type"] = "image"
 
