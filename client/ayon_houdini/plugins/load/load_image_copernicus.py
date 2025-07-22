@@ -53,6 +53,14 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
     icon = "code-fork"
     color = "orange"
 
+    @classmethod
+    def apply_settings(cls, project_settings):
+        # Copernicus was introduced in Houdini 20.5.
+        if hou.applicationVersion() < (20, 5, 0):
+            cls.enabled = False
+            return None
+        return super().apply_settings(project_settings)
+
     def load(self, context, name=None, namespace=None, data=None):
         # Format file name, Houdini only wants forward slashes
         path = self.filepath_from_context(context)
