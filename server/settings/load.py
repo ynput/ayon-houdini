@@ -1,6 +1,14 @@
 from ayon_server.settings import BaseSettingsModel, SettingsField
 
 
+class EnabledLoadPluginsModel(BaseSettingsModel):
+    enabled: bool = SettingsField(
+        default=True,
+        title="Enabled",
+        description="Whether the plug-in is enabled"
+    )
+
+
 
 def camera_aperture_expression_enum_options():
     return [
@@ -50,6 +58,14 @@ class LoadPluginsModel(BaseSettingsModel):
     CameraLoader: CameraLoaderModel = SettingsField(
         default_factory=CameraLoaderModel,
         title="Load Camera (abc)")
+    ImageLoader: EnabledLoadPluginsModel = SettingsField(
+        default_factory=EnabledLoadPluginsModel,
+        title="Load Image (COP2)"
+    )
+    ImageCopernicusLoader: EnabledLoadPluginsModel = SettingsField(
+        default_factory=EnabledLoadPluginsModel,
+        title="Load Image (Copernicus)"
+    )
     LOPLoadAssetLoader: LoadUseAYONEntityURIModel = SettingsField(
         default_factory=LoadUseAYONEntityURIModel,
         title="LOP Load Asset")
