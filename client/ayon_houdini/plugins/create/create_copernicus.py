@@ -6,23 +6,25 @@ from ayon_core.pipeline import CreatorError
 import hou
 
 
-class CreateCompositeSequence(plugin.HoudiniCreator):
-    """Composite ROP to Image Sequence"""
+class CreateCopernicusROP(plugin.HoudiniCreator):
+    """Copernicus ROP to Image Sequence"""
 
-    identifier = "io.openpype.creators.houdini.imagesequence"
-    label = "Composite (COP2)"
-    description = "Render legacy COP2 ROP to image sequence"
-    product_type = "imagesequence"
+    identifier = "io.ayon.creators.houdini.copernicus"
+    label = "Composite (Copernicus)"
+    description = "Render using the Copernicus Image ROP."
+    product_type = "render"
     icon = "fa5.eye"
 
     ext = ".exr"
 
+    # Copernicus was introduced in Houdini 20.5 so we only enable this
+    # creator if the Houdini version is 20.5 or higher.
+    enabled = hou.applicationVersion() >= (20, 5, 0)
+
     def create(self, product_name, instance_data, pre_create_data):
-        import hou  # noqa
+        instance_data["node_type"] = "image"
 
-        instance_data.update({"node_type": "comp"})
-
-        instance = super(CreateCompositeSequence, self).create(
+        instance = super().create(
             product_name,
             instance_data,
             pre_create_data)
@@ -30,13 +32,12 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
         filepath = "{}{}".format(
             hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4{}".format(product_name, self.ext)
+            f"{product_name}.$F4{self.ext}"
         )
         parms = {
             "trange": 1,
             "copoutput": filepath
         }
-
         if self.selected_nodes:
             if len(self.selected_nodes) > 1:
                 raise CreatorError("More than one item selected.")
@@ -50,12 +51,14 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
         instance_node.parm("f1").setExpression("$FSTART")
         instance_node.parm("f2").setExpression("$FEND")
 
-        # Lock any parameters in this list
-        to_lock = ["prim_to_detail_pattern"]
-        self.lock_parameters(instance_node, to_lock)
-
     def get_network_categories(self):
         return [
             hou.ropNodeTypeCategory(),
             hou.cop2NodeTypeCategory()
+        ]
+
+    def get_publish_families(self):
+        return [
+            "render",
+            "image_rop",
         ]

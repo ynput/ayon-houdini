@@ -90,6 +90,9 @@ def get_output_parameter(node):
         return node.parm("sopoutput")
     elif node_type == "comp":
         return node.parm("copoutput")
+    elif node_type in {"image", "image_rop"}:
+        # Copernicus
+        return node.parm("copoutput")
     elif node_type in {"karma", "opengl", "flipbook"}:
         return node.parm("picture")
     elif node_type == "ifd":  # Mantra

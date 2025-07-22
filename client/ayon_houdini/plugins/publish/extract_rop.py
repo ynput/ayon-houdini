@@ -12,7 +12,8 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
     order = pyblish.api.ExtractorOrder
 
     families = ["abc", "camera", "bgeo", "pointcache", "fbx",
-                "vdbcache", "ass", "redshiftproxy", "mantraifd"]
+                "vdbcache", "ass", "redshiftproxy", "mantraifd",
+                "image_rop"]
     targets = ["local", "remote"]
 
     def process(self, instance: pyblish.api.Instance):
