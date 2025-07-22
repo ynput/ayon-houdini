@@ -20,7 +20,7 @@ import hou
 class CreateModel(plugin.HoudiniCreator):
     """Create Model"""
     identifier = "io.openpype.creators.houdini.model"
-    label = "Model"
+    label = "Model (Abc)"
     product_type = "model"
     icon = "cube"
     description = "Create a static model as Alembic file"
