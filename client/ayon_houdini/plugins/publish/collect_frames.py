@@ -16,7 +16,7 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
     label = "Collect Frames"
     families = ["camera", "vdbcache", "imagesequence", "ass",
                 "redshiftproxy", "review", "pointcache", "fbx",
-                "model", "bgeo"]
+                "model", "bgeo", "image_rop"]
 
     def process(self, instance):
 
