@@ -12,6 +12,7 @@ class CreateVrayROP(plugin.RenderLegacyProductTypeCreator):
 
     identifier = "io.openpype.creators.houdini.vray_rop"
     label = "VRay ROP"
+    description = "Create V-Ray ROP for rendering with V-Ray"
     legacy_product_type = "vray_rop"
     icon = "magic"
     ext = "exr"

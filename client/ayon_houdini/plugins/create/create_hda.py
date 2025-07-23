@@ -152,6 +152,7 @@ class CreateHDA(plugin.HoudiniCreator):
 
     identifier = "io.openpype.creators.houdini.hda"
     label = "Houdini Digital Asset (Hda)"
+    description = "Create a Houdini Digital Asset (HDA) product"
     product_type = "hda"
     icon = "gears"
 

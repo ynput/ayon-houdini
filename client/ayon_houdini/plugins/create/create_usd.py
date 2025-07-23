@@ -15,7 +15,7 @@ class CreateUSD(plugin.HoudiniCreator):
     product_type = "usd"
     icon = "cubes"
     enabled = False
-    description = "Create USD"
+    description = "Create USD for generic use"
 
     # Default render target
     render_target = "local"

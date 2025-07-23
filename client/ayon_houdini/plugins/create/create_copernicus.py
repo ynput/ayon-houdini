@@ -11,7 +11,7 @@ class CreateCopernicusROP(plugin.HoudiniCreator):
 
     identifier = "io.ayon.creators.houdini.copernicus"
     label = "Composite (Copernicus)"
-    description = "Render using the Copernicus Image ROP."
+    description = "Render using the Copernicus Image ROP"
     product_type = "render"
     icon = "fa5.eye"
 

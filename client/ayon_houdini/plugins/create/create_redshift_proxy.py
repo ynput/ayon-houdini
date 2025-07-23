@@ -11,6 +11,7 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
     label = "Redshift Proxy"
     product_type = "redshiftproxy"
     icon = "magic"
+    description = "Export Redshift Proxy (.rs)"
 
     # Default render target
     render_target = "local"

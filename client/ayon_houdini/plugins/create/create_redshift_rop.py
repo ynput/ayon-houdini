@@ -12,6 +12,7 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
 
     identifier = "io.openpype.creators.houdini.redshift_rop"
     label = "Redshift ROP"
+    description = "Create Redshift ROP for rendering with Redshift"
     legacy_product_type = "redshift_rop"
     icon = "magic"
     ext = "exr"

@@ -8,11 +8,12 @@ import hou
 
 
 class CreateReview(plugin.HoudiniCreator):
-    """Review with OpenGL ROP"""
+    """Review with OpenGL or Flipbook ROP"""
 
     identifier = "io.openpype.creators.houdini.review"
     label = "Review"
     product_type = "review"
+    description = __doc__
     icon = "video-camera"
     review_color_space = ""
     node_type = "opengl"

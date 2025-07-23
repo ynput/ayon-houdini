@@ -5,12 +5,13 @@ from ayon_core.lib import EnumDef
 
 
 class CreateArnoldAss(plugin.HoudiniCreator):
-    """Arnold .ass Archive"""
+    """Export Arnold .ass archive"""
 
     identifier = "io.openpype.creators.houdini.ass"
     label = "Arnold ASS"
     product_type = "ass"
     icon = "magic"
+    description = __doc__
 
     # Default extension: `.ass` or `.ass.gz`
     # however calling HoudiniCreator.create()
