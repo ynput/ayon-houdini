@@ -8,12 +8,13 @@ import hou
 
 
 class CreateAlembicCamera(plugin.HoudiniCreator):
-    """Single baked camera from Alembic ROP."""
+    """Single baked camera from Alembic ROP"""
 
     identifier = "io.openpype.creators.houdini.camera"
     label = "Camera (Abc)"
     product_type = "camera"
     icon = "camera"
+    description = __doc__
 
     # Default render target
     render_target = "local"

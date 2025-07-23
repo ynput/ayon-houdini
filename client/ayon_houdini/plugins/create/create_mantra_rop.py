@@ -10,6 +10,7 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
     label = "Mantra ROP"
     legacy_product_type = "mantra_rop"
     icon = "magic"
+    description = "Create Mantra ROP for rendering with Mantra"
 
     # Default render target
     render_target = "farm_split"

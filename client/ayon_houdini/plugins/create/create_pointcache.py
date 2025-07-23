@@ -12,7 +12,8 @@ class CreatePointCache(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.pointcache"
     label = "PointCache (Abc)"
     product_type = "pointcache"
-    icon = "gears"
+    icon = "cubes"
+    description = "Create Alembic ROP to export pointcache data"
 
     # Default render target
     render_target = "local"

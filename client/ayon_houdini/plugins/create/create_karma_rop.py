@@ -10,6 +10,7 @@ class CreateKarmaROP(plugin.RenderLegacyProductTypeCreator):
     label = "Karma ROP"
     legacy_product_type = "karma_rop"
     icon = "magic"
+    description = "Create Karma ROP for rendering with Karma"
 
     # Default render target
     render_target = "farm"
