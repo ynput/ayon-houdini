@@ -3,6 +3,7 @@ title = "Houdini"
 version = "0.6.2+dev"
 app_host_name = "houdini"
 client_dir = "ayon_houdini"
+project_can_override_addon_version = True
 
 ayon_server_version = ">=1.1.2"
 ayon_required_addons = {
