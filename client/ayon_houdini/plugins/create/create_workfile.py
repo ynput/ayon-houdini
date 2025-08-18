@@ -7,12 +7,14 @@ from ayon_core.pipeline import CreatedInstance, AutoCreator
 
 class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
     """Workfile auto-creator."""
+    settings_category = "houdini"
     identifier = "io.openpype.creators.houdini.workfile"
     label = "Workfile"
     product_type = "workfile"
     icon = "fa5.file"
 
     default_variant = "Main"
+    is_mandatory = False
 
     def create(self):
         variant = self.default_variant
@@ -78,6 +80,9 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
         context_node = self.host.get_context_node()
         if not context_node:
             context_node = self.host.create_context_node()
+
+        if hasattr(current_instance, "set_mandatory"):
+            current_instance.set_mandatory(self.is_mandatory)
 
         workfile_data = {"workfile": current_instance.data_to_store()}
         imprint(context_node, workfile_data)

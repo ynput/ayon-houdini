@@ -76,6 +76,17 @@ class CreateUSDRenderModel(CreatorModel):
         ))
 
 
+class WorkfileModel(BaseSettingsModel):
+    is_mandatory: bool = SettingsField(
+        default=False,
+        title="Mandatory workfile",
+        description=(
+            "Workfile cannot be disabled by user in UI."
+            " Requires core addon 1.4.1 or newer."
+        )
+    )
+
+
 class CreatePluginsModel(BaseSettingsModel):
     render_rops_use_legacy_product_type: bool = SettingsField(
         False,
@@ -150,6 +161,9 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateVrayROP: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create VRay ROP")
+    CreateWorkfile: WorkfileModel = SettingsField(
+        default_factory=WorkfileModel,
+        title="Create Workfile")
 
 
 DEFAULT_HOUDINI_CREATE_SETTINGS = {
