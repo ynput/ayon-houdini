@@ -19,6 +19,10 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
     label = "Collect Slap Comps"
     families = ["usdrender"]
 
+    # Copernicus was introduced in Houdini 20.5 so we only enable this
+    # creator if the Houdini version is 20.5 or higher.
+    enabled = hou.applicationVersion() >= (20, 5, 0)
+    
     def process(self, instance):
         if not instance.data["farm"]:
             return
