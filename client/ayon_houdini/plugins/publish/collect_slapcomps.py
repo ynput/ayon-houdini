@@ -37,7 +37,7 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
 
         comp_numbers = ropnode.evalParm("husk_slapcomp")
         for i in range(1, comp_numbers+1):
-        
+
             if not ropnode.evalParm(f'husk_sc_enable{i}'):
                 continue
 
@@ -47,11 +47,10 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
                     "Slap Comp on farm only works with slap files!"
                 )
                 continue
-            
+
             slapcomp_src = ropnode.evalParm(f'husk_sc_file{i}')
-            
             name = ropnode.evalParm(f'husk_sc_label{i}')
-            
+
             mapinput = []
 
             for j in range(1, ropnode.evalParm(f'husk_sc_mapinput{i}')+1):
@@ -70,7 +69,7 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
                     mapoutput.append(f"{src_cop}:{dst_aov}")
 
             mapoutput = ",".join(mapoutput)
-            
+
             options = {
                 "name": name,
                 "mapinput": mapinput,
@@ -78,16 +77,17 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
             }
 
             options = "&".join(
-                f"{option}={value}" for option, value in options.items() if value
+                f"{option}={value}"
+                for option, value in options.items() if value
             )
 
-            if options: 
+            if options:
                 slapcomp_src += f"?{options}"
 
             self.log.debug(
                 f"Found Slap Comp: {slapcomp_src}"
             )
-            
+
             slapcomp_sources.append(slapcomp_src)
 
         instance.data["slapComp"] = slapcomp_sources
