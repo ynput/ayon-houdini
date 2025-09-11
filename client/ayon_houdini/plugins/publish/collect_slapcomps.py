@@ -51,29 +51,24 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
             slapcomp_src = ropnode.evalParm(f'husk_sc_file{i}')
             name = ropnode.evalParm(f'husk_sc_label{i}')
 
-            mapinput = []
-
+            map_inputs: list[str] = []
             for j in range(1, ropnode.evalParm(f'husk_sc_mapinput{i}')+1):
                 src_aov = ropnode.evalParm(f'husk_sc_in{i}_aov{j}')
                 dst_cop = ropnode.evalParm(f'husk_sc_in{i}_cop{j}')
                 if src_aov or dst_cop:
-                    mapinput.append(f"{src_aov}:{dst_cop}")
+                    map_inputs.append(f"{src_aov}:{dst_cop}")
 
-            mapinput = ",".join(mapinput)
-
-            mapoutput = []
+            map_outputs: list[str] = []
             for j in range(1, ropnode.evalParm(f'husk_sc_mapoutput{i}')+1):
                 src_cop = ropnode.evalParm(f'husk_sc_out{i}_cop{j}')
                 dst_aov = ropnode.evalParm(f'husk_sc_out{i}_aov{j}')
                 if src_cop or dst_aov:
-                    mapoutput.append(f"{src_cop}:{dst_aov}")
-
-            mapoutput = ",".join(mapoutput)
+                    map_outputs.append(f"{src_cop}:{dst_aov}")
 
             options = {
                 "name": name,
-                "mapinput": mapinput,
-                "mapoutput": mapoutput,
+                "mapinput": ",".join(map_inputs),
+                "mapoutput": ",".join(map_outputs),
             }
 
             options = "&".join(
