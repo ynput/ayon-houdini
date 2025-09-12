@@ -48,7 +48,10 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
             # slap comp cli expects a path to apex node.
             if ropnode.evalParm(f'husk_sc_source{i}') != "file":
                 self.log.warning(
-                    "Slap Comp on farm only works with slap files!"
+                    f"USD Render ROP '{node_path}' has Slap Comp {i}"
+                    " enabled using a COP node. This is currently not"
+                    " supported for farm rendering and will be skipped,"
+                    " please use a file-based slap comp instead."
                 )
                 continue
 
