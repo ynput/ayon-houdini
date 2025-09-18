@@ -63,6 +63,14 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         self._op_events = {}
         self._has_been_setup = False
 
+    def get_app_information(self):
+        from ayon_core.host import ApplicationInformation
+
+        return ApplicationInformation(
+            app_name="Houdini",
+            app_version=hou.applicationVersionString(),
+        )
+
     def install(self):
         pyblish.api.register_host("houdini")
         pyblish.api.register_host("hython")
