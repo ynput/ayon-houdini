@@ -1658,14 +1658,14 @@ def save_slapcomp_to_file(
         filepath: str
 ):
     """Save slapcomp to file
-    
-    Args: 
+
+    Args:
     slapcomp_out (hou.CopNode): A Block to Geometry Copernicus node
         to export as geometry.
-    filepath (str): where to save the slapcomp. It can be 
+    filepath (str): where to save the slapcomp. It can be
         a relative or absolute path.
     """
-    
+
     sopenet = slapcomp_out.parent().createNode("sopnet")
     copnet = sopenet.createNode("copnet")
     blocktogeo = copnet.createNode("blocktogeo")
@@ -1683,6 +1683,6 @@ def save_slapcomp_to_file(
             )
 
     copnet.geometry().saveToFile(filepath)
-    
+
     # Clean up.
     sopenet.destroy()

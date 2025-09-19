@@ -54,7 +54,7 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
 
             if ropnode.evalParm(f'husk_sc_source{i}') != "file":
                 slapcomp_out = ropnode.parm(f'husk_sc_cop{i}').evalAsNode()
-                
+
                 slapcomp_dir = os.path.dirname(instance.data["files"][0])
                 slapcomp_src = f"{slapcomp_dir}/{slapcomp_out.name()}.bgeo"
 
