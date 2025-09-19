@@ -12,6 +12,11 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
     It collects Slap Comps from the USD render rop node and
     save them as a list in `slapComp` key in `instance.data`.
 
+    It also generates a `.bgeo` file if the slap comp is using
+    a COP Node. This is a workaround as it's not possible to
+    predict the generated filename from the USD ROP,
+    as discussed in https://www.sidefx.com/forum/topic/101973/
+
     Each item in the list follows:
         slap_comp_path?option=value&option2=value2
 
@@ -28,7 +33,13 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
     enabled = hou.applicationVersion() >= (20, 5, 0)
 
     def process(self, instance):
-        if not instance.data["farm"]:
+        if not instance.data["splitRender"]:
+            # This collector plugin is only needed when using the
+            # `Farm Rendering - Split export & render jobs` render target,
+            # as it uses a separate DL plugin from the default Houdini DL plugin.
+            # For other render targets, such as **farm rendering** and
+            # **local machine rendering**, this plugin is not necessary
+            # because Houdini handles the slap comp process by default.
             return
 
         node_path = instance.data.get("instance_node")
