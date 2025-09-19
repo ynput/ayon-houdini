@@ -35,8 +35,9 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
     def process(self, instance):
         if not instance.data["splitRender"]:
             # This collector plugin is only needed when using the
-            # `Farm Rendering - Split export & render jobs` render target,
-            # as it uses a separate DL plugin from the default Houdini DL plugin.
+            # `Farm Rendering - Split export & render jobs` render
+            # target, as it uses a separate DL plugin from the
+            # default Houdini DL plugin.
             # For other render targets, such as **farm rendering** and
             # **local machine rendering**, this plugin is not necessary
             # because Houdini handles the slap comp process by default.
