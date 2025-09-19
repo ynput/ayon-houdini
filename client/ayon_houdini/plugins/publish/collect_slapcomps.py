@@ -1,8 +1,9 @@
 from __future__ import annotations
+import os
 import hou
 import pyblish.api
 
-from ayon_houdini.api import plugin
+from ayon_houdini.api import lib, plugin
 
 
 class CollectSlapComps(plugin.HoudiniInstancePlugin):
@@ -16,7 +17,9 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
 
     """
 
-    order = pyblish.api.CollectorOrder
+    # This specific order value is used so that
+    # this plugin runs after CollectRenderProducts
+    order = pyblish.api.CollectorOrder + 0.1
     label = "Collect Slap Comps"
     families = ["usdrender"]
 
@@ -47,16 +50,26 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
                 continue
 
             # slap comp cli expects a path to apex node.
-            if ropnode.evalParm(f'husk_sc_source{i}') != "file":
-                self.log.warning(
-                    f"USD Render ROP '{node_path}' has Slap Comp {i}"
-                    " enabled using a COP node. This is currently not"
-                    " supported for farm rendering and will be skipped,"
-                    " please use a file-based slap comp instead."
-                )
-                continue
+            slapcomp_src = ""
 
-            slapcomp_src = ropnode.evalParm(f'husk_sc_file{i}')
+            if ropnode.evalParm(f'husk_sc_source{i}') != "file":
+                slapcomp_out = ropnode.parm(f'husk_sc_cop{i}').evalAsNode()
+                
+                slapcomp_dir = os.path.dirname(instance.data["files"][0])
+                slapcomp_src = f"{slapcomp_dir}/{slapcomp_out.name()}.bgeo"
+
+                lib.save_slapcomp_to_file(
+                    slapcomp_out,
+                    slapcomp_src
+                )
+                self.log.debug(
+                    f"USD Render ROP '{node_path}' has Slap Comp {i}"
+                    " enabled using a COP node. A Slap Comp file"
+                    " been exported for farm rendering."
+                )
+            else:
+                slapcomp_src = ropnode.evalParm(f'husk_sc_file{i}')
+
             name = ropnode.evalParm(f'husk_sc_label{i}')
 
             map_inputs: list[str] = []
