@@ -55,11 +55,11 @@ class ValidateProductName(plugin.HoudiniInstancePlugin,
             task_name = task_entity["name"]
             task_type = task_entity["taskType"]
         product_name = get_product_name(
-            instance.context.data["projectName"],
-            task_name,
-            task_type,
-            instance.context.data["hostName"],
-            instance.data["productType"],
+            project_name=instance.context.data["projectName"],
+            task_name=task_name,
+            task_type=task_type,
+            host_name=instance.context.data["hostName"],
+            product_type=instance.data["productType"],
             variant=instance.data["variant"],
             dynamic_data={
                 "folder": {
@@ -90,11 +90,11 @@ class ValidateProductName(plugin.HoudiniInstancePlugin,
             task_name = task_entity["name"]
             task_type = task_entity["taskType"]
         product_name = get_product_name(
-            instance.context.data["projectName"],
-            task_name,
-            task_type,
-            instance.context.data["hostName"],
-            instance.data["productType"],
+            project_name=instance.context.data["projectName"],
+            task_name=task_name,
+            task_type=task_type,
+            host_name=instance.context.data["hostName"],
+            product_type=instance.data["productType"],
             variant=instance.data["variant"],
             dynamic_data={
                 "asset": folder_entity["name"],
