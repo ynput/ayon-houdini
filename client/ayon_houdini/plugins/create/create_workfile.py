@@ -25,20 +25,22 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
             ), None)
 
         project_entity = self.create_context.get_current_project_entity()
-        project_name = project_entity["name"]
         folder_entity = self.create_context.get_current_folder_entity()
-        folder_path = folder_entity["path"]
         task_entity = self.create_context.get_current_task_entity()
+
+        project_name = project_entity["name"]
+        folder_path = folder_entity["path"]
         task_name = task_entity["name"]
         host_name = self.create_context.host_name
 
         if current_instance is None:
             product_name = self.get_product_name(
-                project_name,
-                folder_entity,
-                task_entity,
-                variant,
-                host_name,
+                project_name=project_name,
+                project_entity=project_entity,
+                folder_entity=folder_entity,
+                task_entity=task_entity,
+                variant=variant,
+                host_name=host_name,
             )
             data = {
                 "folderPath": folder_path,
@@ -66,11 +68,12 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
         ):
             # Update instance context if is not the same
             product_name = self.get_product_name(
-                project_name,
-                folder_entity,
-                task_entity,
-                variant,
-                host_name,
+                project_name=project_name,
+                project_entity=project_entity,
+                folder_entity=folder_entity,
+                task_entity=task_entity,
+                variant=variant,
+                host_name=host_name,
             )
             current_instance["folderPath"] = folder_path
             current_instance["task"] = task_name
