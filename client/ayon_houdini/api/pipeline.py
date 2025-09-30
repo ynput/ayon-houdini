@@ -66,7 +66,6 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
     def get_app_information(self):
         from ayon_core.host import ApplicationInformation
 
-        app_name = "Houdini"
         hou_name = hou.applicationName()
         license_name = hou.licenseCategory().name()
         if hou_name == "houdinicore":
@@ -76,6 +75,9 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             app_name = "Houdini FX"
 
         elif hou_name == "happrentice":
+            app_name = "Houdini"
+        else:
+            print(f"Unknown houdini app name: {hou_name}")
             app_name = "Houdini"
 
         full_app_name = f"{app_name} {license_name}"
