@@ -68,6 +68,7 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
 
         app_name = "Houdini"
         hou_name = hou.applicationName()
+        license_name = hou.licenseCategory().name()
         if hou_name == "houdinicore":
             app_name = "Houdini Core"
 
@@ -75,10 +76,12 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             app_name = "Houdini FX"
 
         elif hou_name == "happrentice":
-            app_name = "Houdini Apprentice"
+            app_name = "Houdini"
+
+        full_app_name = f"{app_name} {license_name}"
 
         return ApplicationInformation(
-            app_name=app_name,
+            app_name=full_app_name,
             app_version=hou.applicationVersionString(),
         )
 
