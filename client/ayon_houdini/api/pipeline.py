@@ -66,8 +66,19 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
     def get_app_information(self):
         from ayon_core.host import ApplicationInformation
 
+        app_name = "Houdini"
+        hou_name = hou.applicationName()
+        if hou_name == "houdinicore":
+            app_name = "Houdini Core"
+
+        elif hou_name == "houdinifx":
+            app_name = "Houdini FX"
+
+        elif hou_name == "happrentice":
+            app_name = "Houdini Apprentice"
+
         return ApplicationInformation(
-            app_name="Houdini",
+            app_name=app_name,
             app_version=hou.applicationVersionString(),
         )
 
