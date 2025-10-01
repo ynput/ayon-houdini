@@ -1666,8 +1666,8 @@ def save_slapcomp_to_file(
         a relative or absolute path.
     """
 
-    sopenet = slapcomp_out.parent().createNode("sopnet")
-    copnet = sopenet.createNode("copnet")
+    sopnet = slapcomp_out.parent().createNode("sopnet")
+    copnet = sopnet.createNode("copnet")
     blocktogeo = copnet.createNode("blocktogeo")
     blocktogeo.parm("blockpath").set(slapcomp_out.path())
 
@@ -1685,4 +1685,4 @@ def save_slapcomp_to_file(
     copnet.geometry().saveToFile(filepath)
 
     # Clean up.
-    sopenet.destroy()
+    sopnet.destroy()
