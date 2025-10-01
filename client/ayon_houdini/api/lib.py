@@ -1677,10 +1677,11 @@ def save_slapcomp_to_file(
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
     except OSError as e:
         if e.errno != errno.EEXIST:
-            print(
+            raise RuntimeError(
                 f"Failed to create {os.path.dirname(filepath)}"
                 " dir. Maybe due to insufficient permissions."
             )
+        
 
     copnet.geometry().saveToFile(filepath)
 
