@@ -63,6 +63,30 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         self._op_events = {}
         self._has_been_setup = False
 
+    def get_app_information(self):
+        from ayon_core.host import ApplicationInformation
+
+        hou_name = hou.applicationName()
+        license_name = hou.licenseCategory().name()
+        if hou_name == "houdinicore":
+            app_name = "Houdini Core"
+
+        elif hou_name == "houdinifx":
+            app_name = "Houdini FX"
+
+        elif hou_name == "happrentice":
+            app_name = "Houdini"
+        else:
+            print(f"Unknown houdini app name: {hou_name}")
+            app_name = "Houdini"
+
+        full_app_name = f"{app_name} {license_name}"
+
+        return ApplicationInformation(
+            app_name=full_app_name,
+            app_version=hou.applicationVersionString(),
+        )
+
     def install(self):
         pyblish.api.register_host("houdini")
         pyblish.api.register_host("hython")
