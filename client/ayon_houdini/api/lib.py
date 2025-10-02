@@ -1681,7 +1681,7 @@ def save_slapcomp_to_file(
                 f"Failed to create {os.path.dirname(filepath)}"
                 " dir. Maybe due to insufficient permissions."
             )
-        raise RuntimeError(e)
+        raise
 
     copnet.geometry().saveToFile(filepath)
 
