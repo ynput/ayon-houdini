@@ -1651,3 +1651,39 @@ def format_as_collections(
     result = [collection.format(pattern) for collection in collections]
     result.extend(remainder)
     return result
+
+
+def save_slapcomp_to_file(
+        slapcomp_out: hou.CopNode,
+        filepath: str
+):
+    """Save slapcomp to file
+
+    Args:
+    slapcomp_out (hou.CopNode): A Block to Geometry Copernicus node
+        to export as geometry.
+    filepath (str): where to save the slapcomp. It can be
+        a relative or absolute path.
+    """
+
+    sopnet = slapcomp_out.parent().createNode("sopnet")
+    copnet = sopnet.createNode("copnet")
+    blocktogeo = copnet.createNode("blocktogeo")
+    blocktogeo.parm("blockpath").set(slapcomp_out.path())
+
+    # Create the destination folder as `saveToFile`
+    # doesn't create missing intermediate directories.
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            print(
+                f"Failed to create {os.path.dirname(filepath)}"
+                " dir. Maybe due to insufficient permissions."
+            )
+        raise
+
+    copnet.geometry().saveToFile(filepath)
+
+    # Clean up.
+    sopnet.destroy()
