@@ -15,8 +15,8 @@ class ValidateHoudiniNotApprenticeLicense(plugin.HoudiniInstancePlugin):
         the resulting files will get "scrambled" with a license protection
         and get a special .usdnc suffix.
 
-        This currently breaks the Subset/representation pipeline so we disallow
-        any publish with apprentice license.
+        This currently breaks the product/representation pipeline so we
+        disallow any publish with apprentice license.
 
     Alembic ROPs:
         Houdini Apprentice does not export Alembic.
@@ -29,7 +29,7 @@ class ValidateHoudiniNotApprenticeLicense(plugin.HoudiniInstancePlugin):
     def process(self, instance):
 
         if hou.isApprentice():
-            # Find which family was matched with the plug-in
+            # Find which family or product type was matched with the plug-in
             families = {instance.data["productType"]}
             families.update(instance.data.get("families", []))
             disallowed_families = families.intersection(self.families)

@@ -7,12 +7,13 @@ from ayon_core.pipeline import CreatorError
 from ayon_core.lib import EnumDef, BoolDef
 
 
-class CreateVrayROP(plugin.HoudiniCreator):
+class CreateVrayROP(plugin.RenderLegacyProductTypeCreator):
     """VRay ROP"""
 
     identifier = "io.openpype.creators.houdini.vray_rop"
     label = "VRay ROP"
-    product_type = "vray_rop"
+    description = "Create V-Ray ROP for rendering with V-Ray"
+    legacy_product_type = "vray_rop"
     icon = "magic"
     ext = "exr"
 
@@ -93,12 +94,14 @@ class CreateVrayROP(plugin.HoudiniCreator):
 
         instance_node.setParms(parms)
 
-        # lock parameters from AVALON
+        # lock parameters from AYON
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
-        node.parm("render_export_filepath").set(f"{staging_dir}/vrscene/$OS.$F4.vrscene")
+        node.parm("render_export_filepath").set(
+            f"{staging_dir}/vrscene/$OS.$F4.vrscene"
+        )
 
         image_format = pre_create_data["image_format"]
         aov_value = ""
@@ -174,3 +177,6 @@ class CreateVrayROP(plugin.HoudiniCreator):
                     default=False)
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "vray_rop"]

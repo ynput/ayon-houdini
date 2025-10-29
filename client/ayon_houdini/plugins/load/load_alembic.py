@@ -1,5 +1,7 @@
 import os
-from ayon_core.pipeline import get_representation_path
+
+import hou
+
 from ayon_houdini.api import (
     pipeline,
     plugin
@@ -18,12 +20,7 @@ class AbcLoader(plugin.HoudiniLoader):
     color = "orange"
 
     def load(self, context, name=None, namespace=None, data=None):
-        import hou
-
-        # Format file name, Houdini only wants forward slashes
         file_path = self.filepath_from_context(context)
-        file_path = os.path.normpath(file_path)
-        file_path = file_path.replace("\\", "/")
 
         # Get the root node
         obj = hou.node("/obj")
@@ -61,7 +58,6 @@ class AbcLoader(plugin.HoudiniLoader):
         )
 
     def update(self, container, context):
-        repre_entity = context["representation"]
         node = container["node"]
         try:
             alembic_node = next(
@@ -72,18 +68,22 @@ class AbcLoader(plugin.HoudiniLoader):
             return
 
         # Update the file path
-        file_path = get_representation_path(repre_entity)
-        file_path = file_path.replace("\\", "/")
+        file_path = self.filepath_from_context(context)
 
         alembic_node.setParms({"fileName": file_path})
 
         # Update attribute
-        node.setParms({"representation": repre_entity["id"]})
+        node.setParms({"representation": context["representation"]["id"]})
 
     def remove(self, container):
-
         node = container["node"]
         node.destroy()
 
     def switch(self, container, context):
         self.update(container, context)
+
+    @classmethod
+    def filepath_from_context(cls, context):
+        file_path = super().filepath_from_context(context)
+        # Format file name, Houdini only wants forward slashes
+        return os.path.normpath(file_path).replace("\\", "/")

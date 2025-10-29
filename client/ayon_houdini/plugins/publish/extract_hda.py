@@ -48,8 +48,10 @@ class ExtractHDA(plugin.HoudiniExtractorPlugin):
             parm_folder = parm_group.findFolder("Extra")
             if not parm_folder:
                 raise PublishError(
-                    f"Extra AYON parm folder does not exist on {hda_node.path()}\n\n"
-                    "Please select the node and create an HDA product from the publisher UI."
+                    "Extra AYON parm folder does not exist"
+                    f" on {hda_node.path()}"
+                    "\n\nPlease select the node and create an"
+                    " HDA product from the publisher UI."
                 )
 
             # Remove `Extra` AYON parameters

@@ -60,8 +60,10 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
         )
         render_products = [beauty_product]
         files_by_aov = {
-            beauty_suffix: self.generate_expected_files(instance,
-                                                        beauty_product)
+            beauty_suffix: self.generate_expected_files(
+                instance,
+                beauty_product
+            )
         }
 
         aovs_rop = rop.parm("RS_aovGetFromNode").evalAsNode()
@@ -87,11 +89,15 @@ class CollectRedshiftROPRenderProducts(plugin.HoudiniInstancePlugin):
             if rop.parm(f"RS_aovID_{i}").evalAsString() == "CRYPTOMATTE" or \
                   not full_exr_mode:
 
-                aov_product = self.get_render_product_name(aov_prefix, aov_suffix)
+                aov_product = self.get_render_product_name(
+                    aov_prefix, aov_suffix
+                )
                 render_products.append(aov_product)
 
-                files_by_aov[aov_suffix] = self.generate_expected_files(instance,
-                                                                        aov_product)    # noqa
+                files_by_aov[aov_suffix] = self.generate_expected_files(
+                    instance,
+                    aov_product
+                )
 
                 # Set to False as soon as we have a separated aov.
                 multipartExr = False

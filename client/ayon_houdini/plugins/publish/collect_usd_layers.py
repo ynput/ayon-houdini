@@ -153,7 +153,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                 attr="publish_attributes.CollectRopFrameRange.use_handles"
             )
 
-            # Allow this subset to be grouped into a USD Layer on creation
+            # Allow this product to be grouped into a USD Layer on creation
             layer_inst.data["productGroup"] = (
                 instance.data.get("productGroup") or "USD Layer"
             )

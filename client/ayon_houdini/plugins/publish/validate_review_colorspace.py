@@ -82,27 +82,39 @@ class ValidateReviewColorspace(plugin.HoudiniInstancePlugin,
 
             current_color_space = rop_node.evalParm("ociocolorspace")
             if current_color_space not in hou.Color.ocio_spaces():
-                raise PublishValidationError(
-                    "Invalid value: Colorspace name doesn't exist.\n"
-                    "Check 'OCIO Colorspace' parameter on '{}' ROP"
-                    .format(rop_node.path())
-                )
+                if current_color_space in hou.Color.ocio_activeDisplays():
+                    # Even though a display is not a colorspace, it still seems
+                    # valid for conversion in OCIO, even if no colorspace with
+                    # that name is in the config.
+                    self.log.debug(
+                        f"Allowing OCIO display '{current_color_space}' as "
+                        "color conversion."
+                    )
+                else:
+                    raise PublishValidationError(
+                        f"Invalid colorspace conversion name. The colorspace "
+                        f"name '{current_color_space}' does not exist.\n"
+                        "Check 'OCIO Colorspace' parameter on "
+                        f"'{rop_node.path()}' ROP."
+                    )
 
-            # If `ayon+settings://houdini/imageio/workfile` is enabled 
+            # If `ayon+settings://houdini/imageio/workfile` is enabled
             # and the Review colorspace setting is empty, then this check
-            # should verify if the `current_color_space` setting equals 
+            # should verify if the `current_color_space` setting equals
             # the default colorspace value.
             if self.review_color_space and \
                     self.review_color_space != current_color_space:
 
                 raise PublishValidationError(
-                    "Invalid value: Colorspace name doesn't match"
-                    "the Colorspace specified in settings."
+                    f"Invalid value: Colorspace name '{current_color_space}' "
+                    "doesn't match the Colorspace specified in settings: "
+                    f"'{self.review_color_space}'."
                 )
-            
-        # TODO: Check if `ociodisplay` and `ocioview` are the same as the default display and view.
+
+        # TODO: Check if `ociodisplay` and `ocioview` are the same as the
+        #   default display and view.
         # Should be the default value specified in settings?
-        # OR Should be the current/default value specified in the hip file? 
+        # OR Should be the current/default value specified in the hip file?
         elif colorcorrect == "ocioview":
             # For flipbook nodes only.
             pass

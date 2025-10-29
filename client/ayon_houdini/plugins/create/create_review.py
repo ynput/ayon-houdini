@@ -8,24 +8,25 @@ import hou
 
 
 class CreateReview(plugin.HoudiniCreator):
-    """Review with OpenGL ROP"""
+    """Review with OpenGL or Flipbook ROP"""
 
     identifier = "io.openpype.creators.houdini.review"
     label = "Review"
     product_type = "review"
+    description = __doc__
     icon = "video-camera"
     review_color_space = ""
     node_type = "opengl"
 
     # Default render target
     render_target = "local"
-    
-    # TODO: Publish families should reflect the node type, 
-    # such as `rop.flipbook` for flipbook nodes 
+
+    # TODO: Publish families should reflect the node type,
+    # such as `rop.flipbook` for flipbook nodes
     # and `rop.opengl` for OpenGL nodes.
     def get_publish_families(self):
         return ["review", "rop.opengl"]
-    
+
     def apply_settings(self, project_settings):
         super(CreateReview, self).apply_settings(project_settings)
         # workfile settings added in '0.2.13'
@@ -36,7 +37,6 @@ class CreateReview(plugin.HoudiniCreator):
             self.review_color_space = color_settings.get("review_color_space")
 
     def create(self, product_name, instance_data, pre_create_data):
-        
         self.node_type = pre_create_data.get("node_type")
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
@@ -120,7 +120,9 @@ class CreateReview(plugin.HoudiniCreator):
         self.lock_parameters(instance_node, to_lock)
     
     def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
-        node.parm("picture").set(f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}")
+        node.parm("picture").set(
+            f"{staging_dir}/$OS.$F4.{pre_create_data['imageFormat']}"
+        )
 
     def get_instance_attr_defs(self):
         render_target_items = {
@@ -135,7 +137,7 @@ class CreateReview(plugin.HoudiniCreator):
                     label="Render target",
                     default=self.render_target)
         ]
-    
+
     def get_pre_create_attr_defs(self):
         attrs = super().get_pre_create_attr_defs()
 

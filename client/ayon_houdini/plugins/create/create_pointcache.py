@@ -12,14 +12,15 @@ class CreatePointCache(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.pointcache"
     label = "PointCache (Abc)"
     product_type = "pointcache"
-    icon = "gears"
+    icon = "cubes"
+    description = "Create Alembic ROP to export pointcache data"
 
     # Default render target
     render_target = "local"
 
     def get_publish_families(self):
         return ["pointcache", "abc"]
-    
+
     def create(self, product_name, instance_data, pre_create_data):
         instance_data.update({"node_type": "alembic"})
         creator_attributes = instance_data.setdefault(
@@ -51,12 +52,14 @@ class CreatePointCache(plugin.HoudiniCreator):
             if isinstance(selected_node, hou.SopNode):
                 parms["sop_path"] = selected_node.path()
                 self.log.debug(
-                   "Valid SopNode selection, 'SOP Path' in ROP will be set to '%s'."
+                   "Valid SopNode selection, 'SOP Path' in ROP"
+                   " will be set to '%s'."
                    % selected_node.path()
                 )
 
             # Allow object level paths to Geometry nodes (e.g. /obj/geo1)
-            # but do not allow other object level nodes types like cameras, etc.
+            #   but do not allow other object level nodes types
+            #   like cameras, etc.
             elif isinstance(selected_node, hou.ObjNode) and \
                     selected_node.type().name() in ["geo"]:
 
@@ -67,8 +70,8 @@ class CreatePointCache(plugin.HoudiniCreator):
                 if sop_path:
                     parms["sop_path"] = sop_path.path()
                     self.log.debug(
-                        "Valid ObjNode selection, 'SOP Path' in ROP will be set to "
-                        "the child path '%s'."
+                        "Valid ObjNode selection, 'SOP Path' in ROP"
+                        " will be set to the child path '%s'."
                         % sop_path.path()
                     )
 

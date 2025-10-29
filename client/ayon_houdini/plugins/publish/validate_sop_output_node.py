@@ -24,7 +24,7 @@ class ValidateSopOutputNode(plugin.HoudiniInstancePlugin):
     """
 
     order = pyblish.api.ValidatorOrder
-    families = ["pointcache", "vdbcache", "model"]
+    families = ["pointcache", "vdbcache", "abc"]
     label = "Validate Output Node (SOP)"
     actions = [SelectROPAction, SelectInvalidAction]
 
@@ -35,7 +35,8 @@ class ValidateSopOutputNode(plugin.HoudiniInstancePlugin):
             raise PublishValidationError(
                 "Output node(s) are incorrect.",
                 detail=(
-                    f"Incorrect output SOP path on Rop(s)\n\n - {invalid[0].path()}"
+                    "Incorrect output SOP path on Rop(s)"
+                    f"\n\n - {invalid[0].path()}"
                 )
             )
 

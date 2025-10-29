@@ -21,7 +21,7 @@ from .plugin import HoudiniCreator
 class HoudiniTemplateBuilder(AbstractTemplateBuilder):
     """Concrete implementation of AbstractTemplateBuilder for Houdini"""
 
-    def resolve_template_path(self, path, fill_data):
+    def resolve_template_path(self, path, fill_data=None):
         """Allows additional resolving over the template path using custom
         integration methods, like Houdini's expand string functionality.
 
@@ -50,7 +50,7 @@ class HoudiniTemplateBuilder(AbstractTemplateBuilder):
         # TODO Check if template is already imported
 
         # Merge (Load) template workfile in the current scene.
-        try: 
+        try:
             hou.hipFile.merge(path, ignore_load_warnings=True)
             return True
         except hou.OperationFailed:
@@ -65,14 +65,14 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
 
     def get_placeholder_node_name(self, placeholder_data):
         return self.identifier.replace(".", "_")
-    
+
     def create_placeholder_node(self, node_name=None):
         """Create node to be used as placeholder.
 
         By default, it creates a null node in '/out'.
         Feel free to override it in different workfile build plugins.
         """
- 
+
         node = hou.node("/out").createNode(
             "null", node_name, force_valid_node_name=True)
         node.moveToGoodPosition()
@@ -81,20 +81,19 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
             p = parms.find(parm)
             p.hide(True)
             parms.replace(parm, p)
-        node.setParmTemplateGroup(parms) 
+        node.setParmTemplateGroup(parms)
         return node
-    
+
     def create_placeholder(self, placeholder_data):
-        
         node_name = self.get_placeholder_node_name(placeholder_data)
 
-        placeholder_node = self.create_placeholder_node(node_name) 
+        placeholder_node = self.create_placeholder_node(node_name)
         HoudiniCreator.customize_node_look(placeholder_node)
 
         placeholder_data["plugin_identifier"] = self.identifier
-        
+
         imprint(placeholder_node, placeholder_data)
-    
+
     def collect_scene_placeholders(self):
         # Read the cache by identifier
         placeholder_nodes = self.builder.get_shared_populate_data(
@@ -112,13 +111,13 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
             self.builder.set_shared_populate_data(
                     self.identifier, placeholder_nodes
                 )
-            
+
         return placeholder_nodes
-    
+
     def update_placeholder(self, placeholder_item, placeholder_data):
         placeholder_node = hou.node(placeholder_item.scene_identifier)
         imprint(placeholder_node, placeholder_data, update=True)
-        
+
         # Update node name
         node_name = self.get_placeholder_node_name(placeholder_data)
         node_name = hou.text.variableName(node_name)
@@ -162,19 +161,19 @@ def update_placeholder(*args):
 
     if len(placeholder_items) == 0:
         show_message_dialog(
-            "Workfile Placeholder Manager", 
-            "Please select a placeholder node.", 
-            "warning", 
+            "Workfile Placeholder Manager",
+            "Please select a placeholder node.",
+            "warning",
             get_main_window()
         )
         return
 
     if len(placeholder_items) > 1:
         show_message_dialog(
-            "Workfile Placeholder Manager", 
-            "Too many selected placeholder nodes.\n"
-            "Please, Select one placeholder node.", 
-            "warning", 
+            "Workfile Placeholder Manager",
+            "Too many selected placeholder nodes."
+            "\nPlease, Select one placeholder node.",
+            "warning",
             get_main_window()
         )
         return

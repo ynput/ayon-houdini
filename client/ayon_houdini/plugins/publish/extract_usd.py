@@ -138,5 +138,6 @@ def get_source_paths(
         return [os.path.join(staging, files)]
 
     raise KnownPublishError(
-        f"Unsupported type for representation files: {files} (supports list or str)"
+        "Unsupported type for representation files:"
+        f" {files} (supports list or str)"
     )

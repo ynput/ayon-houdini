@@ -11,7 +11,8 @@ class CreateBGEO(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.bgeo"
     label = "PointCache (Bgeo)"
     product_type = "pointcache"
-    icon = "gears"
+    icon = "cubes"
+    description = "Create Geometry ROP to export BGEO pointcache data"
 
     # Default render target
     render_target = "local"

@@ -11,6 +11,7 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
     label = "Redshift Proxy"
     product_type = "redshiftproxy"
     icon = "magic"
+    description = "Export Redshift Proxy (.rs)"
 
     # Default render target
     render_target = "local"
@@ -20,7 +21,7 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
         # Redshift provides a `Redshift_Proxy_Output` node type which shows
         # a limited set of parameters by default and is set to extract a
         # Redshift Proxy. However when "imprinting" extra parameters needed
-        # for OpenPype it starts showing all its parameters again. It's unclear
+        # for AYON it starts showing all its parameters again. It's unclear
         # why this happens.
         # TODO: Somehow enforce so that it only shows the original limited
         #       attributes of the Redshift_Proxy_Output node type
@@ -43,7 +44,7 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
 
         instance_node.setParms(parms)
 
-        # Lock some Avalon attributes
+        # Lock some AYON attributes
         to_lock = ["productType", "id", "prim_to_detail_pattern"]
         self.lock_parameters(instance_node, to_lock)
 

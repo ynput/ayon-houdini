@@ -2,13 +2,14 @@ from ayon_houdini.api import plugin
 from ayon_core.lib import EnumDef, BoolDef
 
 
-class CreateArnoldRop(plugin.HoudiniCreator):
+class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
     """Arnold ROP"""
 
     identifier = "io.openpype.creators.houdini.arnold_rop"
     label = "Arnold ROP"
-    product_type = "arnold_rop"
+    legacy_product_type = "arnold_rop"
     icon = "magic"
+    description =  "Create Arnold ROP for rendering with Arnold"
 
     # Default extension
     ext = "exr"
@@ -95,3 +96,6 @@ class CreateArnoldRop(plugin.HoudiniCreator):
                     label="Image Format Options"),
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "arnold_rop"]

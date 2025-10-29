@@ -2,7 +2,6 @@ from typing import Optional
 import hou
 
 from ayon_core.lib import EnumDef
-from ayon_core.pipeline import get_representation_path
 
 from ayon_houdini.api import (
     pipeline,
@@ -133,7 +132,6 @@ return aperture
         ]
 
     def load(self, context, name=None, namespace=None, options=None):
-
         # Format file name, Houdini only wants forward slashes
         file_path = self.filepath_from_context(context).replace("\\", "/")
 
@@ -174,16 +172,15 @@ return aperture
                                      suffix="")
 
     def update(self, container, context):
-        repre_entity = context["representation"]
         node = container["node"]
 
         # Update the file path
-        file_path = get_representation_path(repre_entity)
+        file_path = self.filepath_from_context(context)
         file_path = file_path.replace("\\", "/")
 
         # Update attributes
         node.setParms({"fileName": file_path,
-                       "representation": repre_entity["id"]})
+                       "representation": context["representation"]["id"]})
 
         # Store the cam temporarily next to the Alembic Archive
         # so that we can preserve parm values the user set on it
@@ -219,7 +216,6 @@ return aperture
         self.update(container, context)
 
     def remove(self, container):
-
         node = container["node"]
         node.destroy()
 

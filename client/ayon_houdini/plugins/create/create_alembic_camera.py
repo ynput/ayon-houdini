@@ -8,12 +8,13 @@ import hou
 
 
 class CreateAlembicCamera(plugin.HoudiniCreator):
-    """Single baked camera from Alembic ROP."""
+    """Single baked camera from Alembic ROP"""
 
     identifier = "io.openpype.creators.houdini.camera"
     label = "Camera (Abc)"
     product_type = "camera"
     icon = "camera"
+    description = __doc__
 
     # Default render target
     render_target = "local"
@@ -62,7 +63,7 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
             hou.ropNodeTypeCategory(),
             hou.objNodeTypeCategory()
         ]
-    
+
     def get_instance_attr_defs(self):
         render_target_items = {
             "local": "Local machine rendering",
@@ -76,7 +77,7 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
                     label="Render target",
                     default=self.render_target)
         ]
-    
+
     def get_pre_create_attr_defs(self):
         attrs = super().get_pre_create_attr_defs()
         return attrs + self.get_instance_attr_defs()

@@ -97,6 +97,23 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
+            name    "enable_repre_filter"
+            label   "Enable Representation Filter"
+            type    toggle
+            default { "0" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "representation_filter"
+            label   "Representation Filter"
+            type    string
+            default { "" }
+            help    "space separated list of representation names to filter to"
+            disablewhen "{ enable_repre_filter == 0 }"
+            hidewhen "{ enable_repre_filter == 0 }"
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
             name    "clear_cache"
             label   "Clear Cache"
             type    button
@@ -223,7 +240,7 @@
             name    "id"
             label   "ID"
             type    label
-            default { "pyblish.avalon.container" }
+            default { "ayon.load.container" }
         }
         parm {
             name    "representation"
@@ -497,10 +514,11 @@
     }
 
     parm {
-        name    "newparameter"
-        label   "Nodes referencing file"
+        name    "nodes_referencing_file"
+        label   "Nodes Referencing File"
         type    oplist
         default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
+        parmtag { "oprelative" "/" }
         parmtag { "script_callback_language" "python" }
     }
 }

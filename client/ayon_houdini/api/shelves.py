@@ -17,7 +17,7 @@ log = logging.getLogger("ayon_houdini.shelves")
 
 def generate_shelves():
     """This function generates complete shelves from shelf set to tools
-    in Houdini from openpype project settings houdini shelf definition.
+    in Houdini from AYON project settings houdini shelf definition.
     """
     current_os = platform.system().lower()
 
@@ -161,8 +161,8 @@ def get_or_create_shelf(shelf_label):
 
 
 def get_or_create_tool(tool_definition, shelf, template_data):
-    """This function verifies if the tool exists and updates it. If not, creates
-    a new one.
+    """This function verifies if the tool exists and updates it. If not,
+    creates a new one.
 
     Arguments:
         tool_definition (dict): Dict with label, script, icon and help

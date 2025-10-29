@@ -4,12 +4,13 @@ from ayon_houdini.api import plugin
 from ayon_core.lib import BoolDef, EnumDef, NumberDef
 
 
-class CreateKarmaROP(plugin.HoudiniCreator):
+class CreateKarmaROP(plugin.RenderLegacyProductTypeCreator):
     """Karma ROP"""
     identifier = "io.openpype.creators.houdini.karma_rop"
     label = "Karma ROP"
-    product_type = "karma_rop"
+    legacy_product_type = "karma_rop"
     icon = "magic"
+    description = "Create Karma ROP for rendering with Karma"
 
     # Default render target
     render_target = "farm"
@@ -32,7 +33,7 @@ class CreateKarmaROP(plugin.HoudiniCreator):
             pre_create_data)
 
         instance_node = hou.node(instance.get("instance_node"))
-        
+
         parms = {
             # Render Frame Range
             "trange": 1,
@@ -64,7 +65,7 @@ class CreateKarmaROP(plugin.HoudiniCreator):
 
         instance_node.setParms(parms)
 
-        # Lock some Avalon attributes
+        # Lock some AYON attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
@@ -130,3 +131,6 @@ class CreateKarmaROP(plugin.HoudiniCreator):
                     default=False),
         ]
         return attrs + self.get_instance_attr_defs()
+
+    def get_publish_families(self):
+        return ["render", "karma_rop"]

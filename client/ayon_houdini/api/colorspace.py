@@ -52,14 +52,17 @@ def get_scene_linear_colorspace():
     return colorspaces["roles"].get("scene_linear", {}).get("colorspace")
 
 
-def get_default_display_view_colorspace():
+def get_default_display_view_colorspace() -> str:
     """Returns the colorspace attribute of the default (display, view) pair.
 
     It's used for 'ociocolorspace' parm in OpenGL Node."""
 
     prefs = get_color_management_preferences()
-    return get_display_view_colorspace_name(
+    colorspace = get_display_view_colorspace_name(
         config_path=prefs["config"],
         display=prefs["display"],
         view=prefs["view"]
     )
+    if colorspace == "<USE_DISPLAY_NAME>":
+        colorspace = prefs["display"]
+    return colorspace

@@ -9,12 +9,11 @@ import clique
 from functools import lru_cache
 from contextlib import contextmanager
 
-import six
 import ayon_api
 
 import hou
 
-from ayon_core.lib import StringTemplate
+from ayon_core.lib import StringTemplate, get_version_from_path
 from ayon_core.settings import get_current_project_settings
 from ayon_core.pipeline import (
     Anatomy,
@@ -90,6 +89,9 @@ def get_output_parameter(node):
     }:
         return node.parm("sopoutput")
     elif node_type == "comp":
+        return node.parm("copoutput")
+    elif node_type in {"image", "image_rop"}:
+        # Copernicus
         return node.parm("copoutput")
     elif node_type in {"karma", "opengl", "flipbook"}:
         return node.parm("picture")
@@ -293,7 +295,7 @@ def render_rop(ropnode, frame_range=None):
         raise RuntimeError("Render failed: {0}".format(exc))
 
 
-def imprint(node, data, update=False):
+def imprint(node, data, update=False, folder="Extra"):
     """Store attributes with value on a node
 
     Depending on the type of attribute it creates the correct parameter
@@ -313,6 +315,8 @@ def imprint(node, data, update=False):
         update (bool, optional): flag if imprint should update
             already existing data or leave them untouched and only
             add new.
+        folder (str, optional): The folder name to add new parms into.
+            Defaults to "Extra" due to legacy reasons.
 
     Returns:
         None
@@ -353,12 +357,12 @@ def imprint(node, data, update=False):
 
     # Add new parm templates
     if new_parm_templates:
-        parm_folder = parm_group.findFolder("Extra")
+        parm_folder = parm_group.findFolder(folder)
 
         # if folder doesn't exist yet, create one and append to it,
         # else append to existing one
         if not parm_folder:
-            parm_folder = hou.FolderParmTemplate("folder", "Extra")
+            parm_folder = hou.FolderParmTemplate("folder", folder)
             parm_folder.setParmTemplates(new_parm_templates)
             parm_group.append(parm_folder)
         else:
@@ -451,7 +455,7 @@ def read(node):
     for parameter in node.spareParms():
         value = parameter.eval()
         # test if value is json encoded dict
-        if isinstance(value, six.string_types) and \
+        if isinstance(value, str) and \
                 value.startswith(JSON_PREFIX):
             try:
                 value = json.loads(value[len(JSON_PREFIX):])
@@ -561,7 +565,7 @@ def get_template_from_value(key, value):
                                    label=key,
                                    num_components=1,
                                    default_value=(value,))
-    elif isinstance(value, six.string_types):
+    elif isinstance(value, str):
         parm = hou.StringParmTemplate(name=key,
                                       label=key,
                                       num_components=1,
@@ -895,6 +899,23 @@ def get_current_context_template_data_with_entity_attrs():
     template_data["folderAttributes"] = folder_attributes
     template_data["taskAttributes"] = task_attributes
 
+    # Add 'version' key with the current workfile version.
+    # We do not use `registered_host().get_current_workfile()` here because
+    # this method may be called `on_new()` during integration installation
+    # where the host itself is not yet registered.
+    filepath = hou.hipFile.path()
+    if (
+            os.path.basename(filepath) == "untitled.hip"
+            and not os.path.exists(filepath)
+    ):
+        filepath = None
+    version: int = 0
+    if filepath:
+        version_str = get_version_from_path(filepath)
+        if version_str:
+            version = int(version_str)
+    template_data["workfile_version"] = version
+
     return template_data
 
 
@@ -906,7 +927,7 @@ def set_review_color_space(node, review_color_space="", log=None):
     If review_color_space is empty, a default colorspace corresponding to
     the display & view of the current Houdini session will be used.
 
-    Note: 
+    Note:
         This function expects nodes of type `opengl` or `flipbook`.
 
     Args:
@@ -1412,11 +1433,11 @@ def find_active_network(category, default):
 
     Arguments:
         category (hou.NodeTypeCategory): The node network category type.
-        default (str): The default path to fallback to if no active pane
-            is found with the given category, e.g. "/obj"
+        default (Optional[str]): The default path to fallback to if no active
+            pane is found with the given category, e.g. "/obj"
 
     Returns:
-        hou.Node: The node network to return.
+        Optional[hou.Node]: The node network to return.
 
     """
     # Find network editors that are current tab of given category
@@ -1431,7 +1452,7 @@ def find_active_network(category, default):
             continue
 
         pwd = pane.pwd()
-        if pwd.type().category() != category:
+        if pwd.childTypeCategory() != category:
             continue
 
         if not pwd.isEditable():
@@ -1440,11 +1461,13 @@ def find_active_network(category, default):
         return pwd
 
     # Default to the fallback if no valid candidate was found
-    return hou.node(default)
+    if default is not None:
+        return hou.node(default)
+    return None
 
 
 def update_content_on_context_change():
-    """Update all Creator instances to current asset"""
+    """Update all Creator instances to current folder and task"""
     host = registered_host()
     context = host.get_current_context()
 
@@ -1473,7 +1496,7 @@ def prompt_reset_context():
     from ayon_core.tools.attribute_defs.dialog import (
         AttributeDefinitionsDialog
     )
-    from ayon_core.style import load_stylesheet
+    from .hda_utils import load_adapted_stylesheet
     from ayon_core.lib import BoolDef, UILabelDef
 
     definitions = [
@@ -1507,7 +1530,7 @@ def prompt_reset_context():
 
     dialog = AttributeDefinitionsDialog(definitions)
     dialog.setWindowTitle("Saving to different context.")
-    dialog.setStyleSheet(load_stylesheet())
+    dialog.setStyleSheet(load_adapted_stylesheet(dialog))
     if not dialog.exec_():
         return None
 
@@ -1543,7 +1566,8 @@ def show_node_parmeditor(node):
         node (hou.Node): node instance
     """
 
-    # Check if there's a floating parameter editor pane with its node set to the specified node.
+    # Check if there's a floating parameter editor pane with its node
+    #   set to the specified node.
     for tab in hou.ui.paneTabs():
         if (
             tab.type() == hou.paneTabType.Parm
@@ -1569,8 +1593,8 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
     """Connect the given file parm to a generic loader.
     If the parm is already connected to a generic loader node, go to that node.
     """
-    
-    from .pipeline import get_or_create_avalon_container
+
+    from .pipeline import get_or_create_ayon_container
 
     referenced_parm = file_parm.getReferencedParm()
 
@@ -1582,8 +1606,8 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
             return
 
     # Create a generic loader node and reference its file parm
-    main_container = get_or_create_avalon_container()
-    
+    main_container = get_or_create_ayon_container()
+
     node_name = f"{file_parm.node().name()}_{file_parm.name()}_loader"
     load_node = main_container.createNode("ayon::generic_loader",
                                           node_name=node_name)
@@ -1595,7 +1619,7 @@ def connect_file_parm_to_loader(file_parm: hou.Parm):
     expression = rf'chs\(\"{relative_path}/file\"\)'  # noqa
     hou.hscript(
         'opparm -r'
-        f' {file_parm.node().path()} {file_parm.name()} \`{expression}\`'
+        f' {file_parm.node().path()} {file_parm.name()} \\`{expression}\\`'
     )
     show_node_parmeditor(load_node)
 
@@ -1617,13 +1641,52 @@ def is_version_up_workfile_menu_enabled() -> bool:
     return False
 
 
-def format_as_collections(files: list[str], pattern: str = "{head}{padding}{tail} [{ranges}]") -> list[str]:
+def format_as_collections(
+    files: list[str],
+    pattern: str = "{head}{padding}{tail} [{ranges}]"
+) -> list[str]:
     """Return list of files as formatted sequence collections."""
-    
+
     collections, remainder = clique.assemble(files)
     result = [collection.format(pattern) for collection in collections]
     result.extend(remainder)
     return result
+
+
+def save_slapcomp_to_file(
+        slapcomp_out: hou.CopNode,
+        filepath: str
+):
+    """Save slapcomp to file
+
+    Args:
+    slapcomp_out (hou.CopNode): A Block to Geometry Copernicus node
+        to export as geometry.
+    filepath (str): where to save the slapcomp. It can be
+        a relative or absolute path.
+    """
+
+    sopnet = slapcomp_out.parent().createNode("sopnet")
+    copnet = sopnet.createNode("copnet")
+    blocktogeo = copnet.createNode("blocktogeo")
+    blocktogeo.parm("blockpath").set(slapcomp_out.path())
+
+    # Create the destination folder as `saveToFile`
+    # doesn't create missing intermediate directories.
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            print(
+                f"Failed to create {os.path.dirname(filepath)}"
+                " dir. Maybe due to insufficient permissions."
+            )
+        raise
+
+    copnet.geometry().saveToFile(filepath)
+
+    # Clean up.
+    sopnet.destroy()
 
 
 def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
