@@ -35,7 +35,7 @@ class CreateBGEO(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
 
         parms = {}
-        
+
         instance_node.parm("trange").set(1)
         if self.selected_nodes:
             # if selection is on SOP level, use it
@@ -58,7 +58,8 @@ class CreateBGEO(plugin.HoudiniCreator):
 
         instance_node.setParms(parms)
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
         node.parm("sopoutput").set(f"{staging_dir}/$OS.$F4.{pre_create_data['bgeo_type']}")
 
     def get_instance_attr_defs(self):

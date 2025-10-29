@@ -107,9 +107,10 @@ class CreateModel(plugin.HoudiniCreator):
         to_lock = ["prim_to_detail_pattern"]
         self.lock_parameters(instance_node, to_lock)
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
         node.parm("filename").set(f"{staging_dir}/$OS.abc")
-    
+
     def get_network_categories(self):
         return [
             hou.ropNodeTypeCategory(),

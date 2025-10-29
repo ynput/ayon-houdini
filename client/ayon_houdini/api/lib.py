@@ -1690,15 +1690,17 @@ def save_slapcomp_to_file(
 
 
 def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
-    """Expand Houdini String with More Control
+    r"""Expand Houdini String with More Control
 
     This feature applies the `hou.text.expandString` function selectively.
     Sometimes, we need to expand only Houdini variables like `$HIP`.
-    Other times, we want to expand only Houdini expressions, such as `chs('AYON_productName')`.
+    Other times, we want to expand only Houdini expressions,
+        such as `chs('AYON_productName')`.
 
     Example Patterns:
-        r"\$[a-zA-Z0-9_]+"  ➜ Any sub string that starts by a `$` sign followed by letters, numbders and underscores.
-        r"`[^`]+`"  ➜ Any substring enclosed backticks.
+        \$[a-zA-Z0-9_]+  ➜ Any sub string that starts by a $ sign
+            followed by letters, numbders and underscores.
+        `[^`]+`  ➜ Any substring enclosed backticks.
     """
 
     def expand_match(match):

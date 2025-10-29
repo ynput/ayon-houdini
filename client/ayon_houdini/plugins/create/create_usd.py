@@ -54,7 +54,8 @@ class CreateUSD(plugin.HoudiniCreator):
         ]
         self.lock_parameters(instance_node, to_lock)
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
         node.parm("lopoutput").set(f"{staging_dir}/$OS.usd")
 
     def get_network_categories(self):

@@ -203,16 +203,22 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
                 product_name,
                 instance_data,
                 self)
-            
+
             if self.enable_staging_path_management:
                 staging_dir = self.get_staging_dir(instance)
 
                 if self.expand_staging_dir:
                     with hou.ScriptEvalContext(instance_node):
-                        # Expand vars only without expanding expressions to keep dynamic link to ROP parameters.
+                        # Expand vars only without expanding expressions
+                        #   to keep dynamic link to ROP parameters.
                         staging_dir = expand_houdini_string(staging_dir)
 
-                self.set_node_staging_dir(instance_node, staging_dir, instance, pre_create_data)
+                self.set_node_staging_dir(
+                    instance_node,
+                    staging_dir,
+                    instance,
+                    pre_create_data
+                )
 
             self._add_instance_to_context(instance)
             self.imprint(instance_node, instance.data_to_store())
@@ -364,10 +370,12 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         houdini_general_settings = project_settings["houdini"]["general"]
         self.add_publish_button = houdini_general_settings.get(
             "add_self_publish_button", False)
-        
-        self.enable_staging_path_management = houdini_general_settings["set_rop_output"]["enabled"]
-        self.expand_staging_dir = houdini_general_settings["set_rop_output"]["expand_vars"]
-        self.default_staging_dir = houdini_general_settings["set_rop_output"]["default_output_dir"] or self.default_staging_dir
+
+        set_rop_output = houdini_general_settings["set_rop_output"]
+        self.enable_staging_path_management = set_rop_output["enabled"]
+        self.expand_staging_dir = set_rop_output["expand_vars"]
+        self.default_staging_dir = \
+            set_rop_output["default_output_dir"] or self.default_staging_dir
 
         # Apply Creator Settings
         settings_name = self.settings_name
@@ -401,12 +409,12 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             str: Staging dir path
         """
 
-        staging_dir_info = super(HoudiniCreator, self).get_staging_dir(instance)
+        staging_dir_info = super().get_staging_dir(instance)
 
-        staging_dir_path = self.default_staging_dir        
+        staging_dir_path = self.default_staging_dir
         if staging_dir_info is not None:
             staging_dir_path = staging_dir_info.directory
-    
+
         return staging_dir_path.replace("\\", "/").rstrip("/")
 
     def set_node_staging_dir(
@@ -420,7 +428,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         Args:
             node (hou.Node): Houdini node to set its output directory.
             staging_dir (str): Staging output directory.
-            instance (CreatedInstance): Instance object associated with the given node.
+            instance (CreatedInstance): Instance object associated
+                with the given node.
             pre_create_data(dict): Data based on pre creation attributes.
 
         """

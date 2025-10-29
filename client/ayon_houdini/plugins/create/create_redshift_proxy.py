@@ -48,7 +48,8 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
         to_lock = ["productType", "id", "prim_to_detail_pattern"]
         self.lock_parameters(instance_node, to_lock)
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
         node.parm("RS_archive_file").set(f"{staging_dir}/$OS.$F4.rs")
 
     def get_network_categories(self):

@@ -287,8 +287,9 @@ class CreateHDA(plugin.HoudiniCreator):
 
         return hda_node
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
-        
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+
         with hou.ScriptEvalContext(node):
             staging_dir = expand_houdini_string(staging_dir, r"`[^`]+`")
 

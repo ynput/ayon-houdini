@@ -36,7 +36,7 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
         parms = {
             # Render Frame Range
             "trange": 1,
-        }          
+        }
 
         if pre_create_data.get("render_target") == "farm_split":
             parms["soho_outputmode"] = 1
@@ -63,9 +63,11 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
         node.setParms({
-            "vm_picture": f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}",
+            "vm_picture": f"{staging_dir}"
+                          f"/$OS.$F4.{pre_create_data['image_format']}",
             "soho_diskfile": f"{staging_dir}/ifd/$OS.$F4.ifd"
         })
 

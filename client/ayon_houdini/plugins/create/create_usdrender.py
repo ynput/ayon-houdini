@@ -83,7 +83,7 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
             # folder to our choice. The
             # `__render__.usd` (default name, defined by `lopoutput` parm)
             # in that folder will then be the file to render.
-                
+
             parms["lopoutput"] = "__render__.usd"
             parms["allframesatonce"] = True
 
@@ -109,7 +109,8 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
         node.parm("savetodirectory_directory").set(f"{staging_dir}/usd/$HIPNAME/$OS")
 
     def get_instance_attr_defs(self):

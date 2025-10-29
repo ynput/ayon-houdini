@@ -55,7 +55,8 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
 
         instance_node.parm("trange").set(1)
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
         node.parm("filename").set(f"{staging_dir}/$OS.abc")
 
     def get_network_categories(self):

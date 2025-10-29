@@ -28,8 +28,9 @@ class ROPOutputDirModel(BaseSettingsModel):
 
     When enabled, this setting defines output paths for ROP nodes,
     which can be overridden by custom staging directories.
-    Disable it to completely turn off setting default values and 
-    custom staging directories defined in **ayon+settings://core/tools/publish/custom_staging_dir_profiles**.
+    Disable it to completely turn off setting default values and
+    custom staging directories defined in
+    **ayon+settings://core/tools/publish/custom_staging_dir_profiles**.
     """
 
     enabled: bool = SettingsField(title="Enabled")
@@ -38,7 +39,7 @@ class ROPOutputDirModel(BaseSettingsModel):
         title="Expand Houdini Variables",
         description="When enabled, Houdini variables (e.g., `$HIP`) "
                     "will be expanded, but Houdini expressions "
-                    "(e.g., \`chs('AYON_productName')\`) will remain "
+                    r"(e.g., \`chs('AYON_productName')\`) will remain "
                     "unexpanded in the `Default Output Directory`."
     )
 
@@ -47,9 +48,10 @@ class ROPOutputDirModel(BaseSettingsModel):
         description="This is the initial output directory for newly created "
                     "AYON ROPs. It serves as a starting point when a new ROP "
                     "is generated using the AYON creator. Artists can modify "
-                    "this directory after the ROP is created. It Supports Houdini "
-                    "vars (e.g., `$HIP`) and expressions (e.g., \`chs('AYON_productName')\`)"
-                    " Note: Houdini Expressions will be expanded for HDA products."
+                    "this directory after the ROP is created. "
+                    "It Supports Houdini vars (e.g., `$HIP`) and expressions "
+                    "(e.g., `chs('AYON_productName')`)"
+                    " Note: Houdini Expressions are expanded for HDA products."
     )
 
 

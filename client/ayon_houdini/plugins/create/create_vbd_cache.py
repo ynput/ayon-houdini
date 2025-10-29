@@ -42,7 +42,8 @@ class CreateVDBCache(plugin.HoudiniCreator):
 
         instance_node.setParms(parms)
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
         node.parm("sopoutput").set(f"{staging_dir}/$OS.$F4.vdb")
 
     def get_network_categories(self):

@@ -39,23 +39,25 @@ class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
         parms = {
             # Render frame range
             "trange": 1,
-            # Arnold ROP settings            
+            # Arnold ROP settings
             "ar_exr_half_precision": 1           # half precision
         }
 
         if pre_create_data.get("render_target") == "farm_split":
             parms["ar_ass_export_enable"] = 1
-                
+
         instance_node.setParms(parms)
 
         # Lock any parameters in this list
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
-    def set_node_staging_dir(self, node, staging_dir, instance, pre_create_data):
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
         node.setParms({
-            "ar_picture": f"{staging_dir}/$OS.$F4.{pre_create_data['image_format']}",
-            "ar_ass_file": f"{staging_dir}/ass/$OS.$F4.ass" 
+            "ar_picture": f"{staging_dir}"
+                          f"/$OS.$F4.{pre_create_data['image_format']}",
+            "ar_ass_file": f"{staging_dir}/ass/$OS.$F4.ass"
         })
 
     def get_instance_attr_defs(self):
