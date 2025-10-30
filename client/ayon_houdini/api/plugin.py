@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Houdini specific AYON/Pyblish plugin definitions."""
 import os
-from typing import Dict
+from typing import Dict, Optional
 
 import hou
 
@@ -17,6 +17,7 @@ from ayon_core.pipeline import (
     publish,
 )
 from ayon_core.lib import BoolDef
+from ayon_core.pipeline.staging_dir import StagingDir
 
 from .lib import (
     imprint, read, lsattr, render_rop,
@@ -393,7 +394,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for key, value in settings.items():
             setattr(self, key, value)
 
-    def get_staging_dir(self, instance):
+    def get_staging_dir(self, instance) -> Optional[StagingDir]:
         """Get Staging Dir
 
         Return the staging dir and persistence from instance.
@@ -418,13 +419,13 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
                 is_custom=True,
             )
 
-       staging_dir_info.directory = (
-           staging_dir_info.directory
-           .replace("\\", "/")
-           .rstrip("/")
-       )
+        staging_dir_info.directory = (
+            staging_dir_info.directory
+            .replace("\\", "/")
+            .rstrip("/")
+        )
 
-       return staging_dir_info
+        return staging_dir_info
 
     def set_node_staging_dir(
             self, node: hou.Node,
