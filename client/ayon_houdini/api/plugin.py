@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Houdini specific AYON/Pyblish plugin definitions."""
-from abc import abstractmethod
 import os
 from typing import Dict, Optional
 
@@ -429,7 +428,6 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
         return staging_dir_info
 
-    @abstractmethod
     def set_node_staging_dir(
             self, node: hou.Node,
             staging_dir: str,
@@ -447,7 +445,10 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
         """
 
-        pass
+        raise NotImplementedError(
+            f"{self.__class__.__name__} "
+            "doesn't implement `set_node_staging_dir`"
+        )
 
 
 class RenderLegacyProductTypeCreator(HoudiniCreator):
