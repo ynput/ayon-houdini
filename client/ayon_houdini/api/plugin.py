@@ -384,7 +384,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         settings_name = self.settings_name
         if settings_name is None:
             settings_name = self.__class__.__name__
-            
+
 
         settings = create_settings.get(settings_name)
         if settings is None:
