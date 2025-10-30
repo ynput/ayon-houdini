@@ -373,19 +373,20 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         self.add_publish_button = houdini_general_settings.get(
             "add_self_publish_button", False)
 
-        set_rop_output = houdini_general_settings["set_rop_output"]
+        # Apply Creator Settings
+        create_settings = project_settings["houdini"]["create"]
+        set_rop_output = create_settings["set_rop_output"]
         self.enable_staging_path_management = set_rop_output["enabled"]
         self.expand_staging_dir = set_rop_output["expand_vars"]
         self.default_staging_dir = \
             set_rop_output["default_output_dir"] or self.default_staging_dir
 
-        # Apply Creator Settings
         settings_name = self.settings_name
         if settings_name is None:
             settings_name = self.__class__.__name__
+            
 
-        settings = project_settings["houdini"]["create"]
-        settings = settings.get(settings_name)
+        settings = create_settings.get(settings_name)
         if settings is None:
             self.log.debug(
                 "No settings found for {}".format(self.__class__.__name__)
