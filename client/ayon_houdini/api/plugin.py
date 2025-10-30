@@ -207,7 +207,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
                 self)
 
             if self.enable_staging_path_management:
-                staging_dir = self.get_staging_dir(instance)
+                staging_dir_info = self.get_staging_dir(instance)
+                staging_dir = staging_dir_info.directory
 
                 if self.expand_staging_dir:
                     with hou.ScriptEvalContext(instance_node):
