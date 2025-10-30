@@ -48,10 +48,10 @@ class ROPOutputDirModel(BaseSettingsModel):
         description="This is the initial output directory for newly created "
                     "AYON ROPs. It serves as a starting point when a new ROP "
                     "is generated using the AYON creator. Artists can modify "
-                    "this directory after the ROP is created. "
-                    "It Supports Houdini vars (e.g., `$HIP`) and expressions "
-                    "(e.g., `chs('AYON_productName')`)"
-                    " Note: Houdini Expressions are expanded for HDA products."
+                    "this directory after the ROP is created.\n\n"
+                    "It supports Houdini vars (e.g., `$HIP`) and expressions "
+                    "(e.g., `chs('AYON_productName')`)\n"
+                    "Note: Houdini Expressions are expanded for HDA products."
     )
 
 
