@@ -411,11 +411,20 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
         staging_dir_info = super().get_staging_dir(instance)
 
-        staging_dir_path = self.default_staging_dir
-        if staging_dir_info is not None:
-            staging_dir_path = staging_dir_info.directory
+        if staging_dir_info is None:
+            staging_dir_info = StagingDir(
+                self.default_staging_dir,
+                is_persistent=False,
+                is_custom=True,
+            )
 
-        return staging_dir_path.replace("\\", "/").rstrip("/")
+       staging_dir_info.directory = (
+           staging_dir_info.directory
+           .replace("\\", "/")
+           .rstrip("/")
+       )
+
+       return staging_dir_info
 
     def set_node_staging_dir(
             self, node: hou.Node,
