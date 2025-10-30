@@ -408,7 +408,7 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
                 dir gathered.
 
         Returns:
-            str: Staging dir path
+            Optional[StagingDir]: Staging dir path
         """
 
         staging_dir_info = super().get_staging_dir(instance)
