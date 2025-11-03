@@ -64,12 +64,6 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
 
         ext_format_index = {"exr": 0, "tif": 1, "jpg": 2, "png": 3}
 
-        filepath = "{renders_dir}{product_name}/{product_name}.{fmt}".format(
-                renders_dir=hou.text.expandString("$HIP/pyblish/renders/"),
-                product_name=product_name,
-                fmt="$AOV.$F4.{ext}".format(ext=ext)
-            )
-
         if multi_layered_mode == "1":
             multipart = False
         elif multi_layered_mode == "2":
@@ -83,10 +77,10 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
             # Render frame range
             "trange": 1,
             # Redshift ROP settings
-            "RS_outputFileNamePrefix": filepath,
             "RS_outputBeautyAOVSuffix": "beauty",
             "RS_outputFileFormat": ext_format_index[ext],
         }
+
         if ext == "exr":
             parms["RS_outputMultilayerMode"] = multi_layered_mode
             parms["RS_aovMultipart"] = multipart
@@ -99,10 +93,6 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
                     camera = node.path()
             parms["RS_renderCamera"] = camera or ""
 
-        export_dir = hou.text.expandString("$HIP/pyblish/rs/")
-        rs_filepath = f"{export_dir}{product_name}/{product_name}.$F4.rs"
-        parms["RS_archive_file"] = rs_filepath
-
         if pre_create_data.get("render_target") == "farm_split":
             parms["RS_archive_enable"] = 1
 
@@ -111,6 +101,15 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
         # Lock some AYON attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            "RS_outputFileNamePrefix":
+                f"{staging_dir}"
+                f"/$OS.$AOV.$F4.{pre_create_data['image_format']}",
+            "RS_archive_file": f"{staging_dir}/rs/$OS.$F4.rs"
+        })
 
     def remove_instances(self, instances):
         for instance in instances:

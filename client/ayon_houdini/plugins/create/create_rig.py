@@ -31,15 +31,7 @@ class CreateRig(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        file_path = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4.{}".format(
-                product_name,
-                pre_create_data.get("bgeo_type") or "bgeo.sc")
-        )
-        parms = {
-            "sopoutput": file_path
-        }
+        parms = {}
 
         if self.selected_nodes:
             # if selection is on SOP level, use it
@@ -61,6 +53,10 @@ class CreateRig(plugin.HoudiniCreator):
                 parms["soppath"] = outputs[0].path()
 
         instance_node.setParms(parms)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("sopoutput").set(f"{staging_dir}/$OS.$F4.{pre_create_data['bgeo_type']}")
 
     def get_pre_create_attr_defs(self):
         attrs = super().get_pre_create_attr_defs()

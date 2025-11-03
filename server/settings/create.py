@@ -87,6 +87,38 @@ class WorkfileModel(BaseSettingsModel):
     )
 
 
+class ROPOutputDirModel(BaseSettingsModel):
+    """Set ROP Output Directory on Create
+
+    When enabled, this setting defines output paths for ROP nodes,
+    which can be overridden by custom staging directories.
+    Disable it to completely turn off setting default values and
+    custom staging directories defined in
+    **ayon+settings://core/tools/publish/custom_staging_dir_profiles**.
+    """
+
+    enabled: bool = SettingsField(title="Enabled")
+
+    expand_vars: bool = SettingsField(
+        title="Expand Houdini Variables",
+        description="When enabled, Houdini variables (e.g., `$HIP`) "
+                    "will be expanded, but Houdini expressions "
+                    r"(e.g., \`chs('AYON_productName')\`) will remain "
+                    "unexpanded in the `Default Output Directory`."
+    )
+
+    default_output_dir: str = SettingsField(
+        title="Default Output Directory",
+        description="This is the initial output directory for newly created "
+                    "AYON ROPs. It serves as a starting point when a new ROP "
+                    "is generated using the AYON creator. Artists can modify "
+                    "this directory after the ROP is created.\n\n"
+                    "It supports Houdini vars (e.g., `$HIP`) and expressions "
+                    "(e.g., `chs('AYON_productName')`)\n"
+                    "Note: Houdini Expressions are expanded for HDA products."
+    )
+
+
 class CreatePluginsModel(BaseSettingsModel):
     render_rops_use_legacy_product_type: bool = SettingsField(
         False,
@@ -100,9 +132,15 @@ class CreatePluginsModel(BaseSettingsModel):
             "and USD Render ROPs."
         ),
     )
+    set_rop_output: ROPOutputDirModel = SettingsField(
+        default_factory=ROPOutputDirModel,
+        title="Set ROP Output Directory on Create"
+    )
+
     CreateAlembicCamera: CreatorModel = SettingsField(
         default_factory=CreatorModel,
-        title="Create Alembic Camera")
+        title="Create Alembic Camera",
+        section="Creators")
     CreateArnoldAss: CreateArnoldAssModel = SettingsField(
         default_factory=CreateArnoldAssModel,
         title="Create Arnold Ass")
@@ -168,6 +206,11 @@ class CreatePluginsModel(BaseSettingsModel):
 
 DEFAULT_HOUDINI_CREATE_SETTINGS = {
     "render_rops_use_legacy_product_type": False,
+    "set_rop_output": {
+        "enabled": True,
+        "expand_vars": False,
+        "default_output_dir": "$HIP/ayon/`chs(\"AYON_productName\")`"
+    },
     "CreateAlembicCamera": {
         "enabled": True,
         "default_variants": ["Main"]

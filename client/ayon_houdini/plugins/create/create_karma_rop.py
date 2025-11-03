@@ -34,29 +34,9 @@ class CreateKarmaROP(plugin.RenderLegacyProductTypeCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        ext = pre_create_data.get("image_format")
-
-        renders_dir = hou.text.expandString("$HIP/pyblish/renders/")
-        filepath = f"{renders_dir}{product_name}/{product_name}.$F4.{ext}"
-        checkpoint = "{cp_dir}{product_name}.$F4.checkpoint".format(
-            cp_dir=hou.text.expandString("$HIP/pyblish/"),
-            product_name=product_name
-        )
-
-        usd_directory = "{usd_dir}{product_name}_$RENDERID".format(
-            usd_dir=hou.text.expandString("$HIP/pyblish/renders/usd_renders/"),     # noqa
-            product_name=product_name
-        )
-
         parms = {
             # Render Frame Range
             "trange": 1,
-            # Karma ROP Setting
-            "picture": filepath,
-            # Karma Checkpoint Setting
-            "productName": checkpoint,
-            # USD Output Directory
-            "savetodirectory": usd_directory,
         }
 
         res_x = pre_create_data.get("res_x")
@@ -88,6 +68,19 @@ class CreateKarmaROP(plugin.RenderLegacyProductTypeCreator):
         # Lock some AYON attributes
         to_lock = ["productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            # Karma ROP Setting
+            # keep dynamic link to product name in file paths.
+            "picture": f"{staging_dir}"
+                       f"/$OS.$F4.{pre_create_data['image_format']}",
+            # Karma Checkpoint Setting
+            "productName": f"{staging_dir}/checkpoint/$OS.$F4.checkpoint",
+            # USD Output Directory
+            "savetodirectory": f"{staging_dir}/usd/$OS_$RENDERID"
+        })
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.
