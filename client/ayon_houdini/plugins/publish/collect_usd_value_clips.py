@@ -24,12 +24,13 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         stage = instance.data.get("stage", None)
         if stage is None:
             return
-        
+
         prim = stage.GetPrimAtPath("/HoudiniLayerInfo")
 
         editor_nodes = prim.GetCustomDataByKey("HoudiniEditorNodes")
 
-        # Houdini LOPs only allows one geoclip. anynewer geoclip overrides the previous one.
+        # Houdini LOPs only allows one geoclip.
+        # any newer geoclip overrides the previous one.
         clip_node = None
         for node_id in editor_nodes:
             node = hou.nodeBySessionId(node_id)
@@ -44,15 +45,15 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         files.append(clip_node.evalParm('manifestfile'))
         files.append(clip_node.evalParm('topologyfile'))
 
-        # Number of frames: 
-
+        # Compute number of frames
         start_frame = int(clip_node.evalParm('startframe'))
 
         loop_frames = 1 - clip_node.evalParm('loopframes')
         end_frame = int(clip_node.evalParm('endframe') + loop_frames)
 
 
-        saveclipfilepath = clip_node.parm('saveclipfilepath').evalAtFrame(start_frame)
+        saveclipfilepath = \
+            clip_node.parm('saveclipfilepath').evalAtFrame(start_frame)
 
         frame_collection, _ = clique.assemble(
             [saveclipfilepath],
@@ -63,7 +64,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         # Return as no frame pattern detected.
         if not frame_collection:
             return
-            
+
         # It's always expected to be one collection.
         frame_collection = frame_collection[0]
         frame_collection.indexes.clear()
@@ -88,4 +89,6 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
 
             asset_remap[src] = f"./{resources_dir_name}/{src_name}"
 
-            self.log.debug(f"Registering transfer & remap: {src} -> {asset_remap[src]}")
+            self.log.debug(
+                f"Registering transfer & remap: {src} -> {asset_remap[src]}"
+            )
