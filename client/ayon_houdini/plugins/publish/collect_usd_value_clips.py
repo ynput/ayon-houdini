@@ -26,69 +26,61 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             return
 
         prim = stage.GetPrimAtPath("/HoudiniLayerInfo")
-
         editor_nodes = prim.GetCustomDataByKey("HoudiniEditorNodes")
 
-        # Houdini LOPs only allows one geoclip.
-        # any newer geoclip overrides the previous one.
-        clip_node = None
-        for node_id in editor_nodes:
-            node = hou.nodeBySessionId(node_id)
-            if node.type().name() == "geoclipsequence":
-                clip_node = node
-                break
-
-        if clip_node is None:
-            return
-
-        files = []
-        files.append(clip_node.evalParm('manifestfile'))
-        files.append(clip_node.evalParm('topologyfile'))
-
-        # Compute number of frames
-        start_frame = int(clip_node.evalParm('startframe'))
-
-        loop_frames = 1 - clip_node.evalParm('loopframes')
-        end_frame = int(clip_node.evalParm('endframe') + loop_frames)
-
-
-        saveclipfilepath = \
-            clip_node.parm('saveclipfilepath').evalAtFrame(start_frame)
-
-        frame_collection, _ = clique.assemble(
-            [saveclipfilepath],
-            patterns=[clique.PATTERNS["frames"]],
-            minimum_items=1
-        )
-
-        # Return as no frame pattern detected.
-        if not frame_collection:
-            return
-
-        # It's always expected to be one collection.
-        frame_collection = frame_collection[0]
-        frame_collection.indexes.clear()
-        frame_collection.indexes.update(
-            list(range(start_frame, end_frame + 1))
-        )
-        files.extend(list(frame_collection))
-
-        # Register Files for transfer and remap them.
         transfers = instance.data.setdefault("transfers", [])
         asset_remap = instance.data.setdefault("assetRemap", {})
-
         resources_dir = instance.data["resourcesDir"]
         resources_dir_name = os.path.basename(resources_dir)
 
-        for src in files:
-            src_name = os.path.basename(src)
+        clip_node = None
+        for node_id in editor_nodes:
+            node = hou.nodeBySessionId(node_id)
+            if node.type().name() != "geoclipsequence":
+                continue
+            clip_node = node
 
-            transfers.append(
-                (src, os.path.join(resources_dir, src_name))
+            files = []
+            files.append(clip_node.evalParm('manifestfile'))
+            files.append(clip_node.evalParm('topologyfile'))
+
+            # Compute number of frames
+            start_frame = int(clip_node.evalParm('startframe'))
+
+            loop_frames = 1 - clip_node.evalParm('loopframes')
+            end_frame = int(clip_node.evalParm('endframe') + loop_frames)
+
+            saveclipfilepath = \
+                clip_node.parm('saveclipfilepath').evalAtFrame(start_frame)
+
+            frame_collection, _ = clique.assemble(
+                [saveclipfilepath],
+                patterns=[clique.PATTERNS["frames"]],
+                minimum_items=1
             )
 
-            asset_remap[src] = f"./{resources_dir_name}/{src_name}"
+            # Skip if no frame pattern detected.
+            if not frame_collection:
+                continue
 
-            self.log.debug(
-                f"Registering transfer & remap: {src} -> {asset_remap[src]}"
+            # It's always expected to be one collection.
+            frame_collection = frame_collection[0]
+            frame_collection.indexes.clear()
+            frame_collection.indexes.update(
+                list(range(start_frame, end_frame + 1))
             )
+            files.extend(list(frame_collection))
+
+            for src in files:
+                src_name = os.path.basename(src)
+
+                transfers.append(
+                    (src, os.path.join(resources_dir, src_name))
+                )
+
+                asset_remap[src] = f"./{resources_dir_name}/{src_name}"
+
+                self.log.debug(
+                    "Registering transfer & remap: "
+                    f"{src} -> {asset_remap[src]}"
+                )
