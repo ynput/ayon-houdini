@@ -66,13 +66,13 @@ def get_output_parameter(node):
             future development.
 
     Args:
-        node(hou.Node): node instance
+        node (hou.Node): node instance
 
     Returns:
         hou.Parm
     """
 
-    node_type = node.type().name()
+    node_type: str = node.type().name()
 
     # Figure out which type of node is being rendered
     if node_type in {"alembic", "rop_alembic"}:
