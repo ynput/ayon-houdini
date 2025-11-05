@@ -1687,3 +1687,53 @@ def save_slapcomp_to_file(
 
     # Clean up.
     sopnet.destroy()
+
+
+def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
+    r"""Expand Houdini String with More Control
+
+    It applies the `hou.text.expandString` function selectively.
+    Sometimes, we need to expand only Houdini variables like `$HIP`.
+    Other times, we want to expand only Houdini expressions,
+        such as `chs('AYON_productName')`.
+
+    Example Patterns:
+        \$[a-zA-Z0-9_]+  ➜ Any sub string that starts by a $ sign
+            followed by letters, numbders and underscores.
+        `[^`]+`  ➜ Any substring enclosed backticks.
+
+    Example:
+        >>> expand_houdini_string(
+                "~/documents/ayon/`chs('AYON_productName')`",
+                pattern=r"\$[a-zA-Z0-9_]+"
+            )
+        "~/documents/ayon/`chs('AYON_productName')`"
+        >>> expand_houdini_string(
+                "./ayon/`chs('AYON_productName')`",
+                pattern=r"\$[a-zA-Z0-9_]+"
+            )
+        "./ayon/`chs('AYON_productName')`"
+        >>> expand_houdini_string(
+                "$HIP/ayon/`chs('AYON_productName')`",
+                pattern=r"\$[a-zA-Z0-9_]+"
+            )
+        "H:/AYON/projects/AY_CG_demo/assets/characters/sloth/work/FX/ayon/`chs('AYON_productName')`"
+        >>> expand_houdini_string(
+                "$HIP/ayon/`chs('AYON_productName')`",
+                pattern= r"`[^`]+`"
+            )  # Used for HDA product.
+        "$HIP/ayon/"
+
+    Args:
+        text(str): text to expand.
+        pattern(str): regex pattern to apply.
+
+    Returns:
+        str: expanded text.
+    """
+
+    def expand_match(match):
+        matched_string  = match.group(0)
+        return hou.text.expandString(matched_string)
+
+    return re.sub(pattern, expand_match, text)

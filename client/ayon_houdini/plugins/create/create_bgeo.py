@@ -34,15 +34,7 @@ class CreateBGEO(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        file_path = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4.{}".format(
-                product_name,
-                pre_create_data.get("bgeo_type") or "bgeo.sc")
-        )
-        parms = {
-            "sopoutput": file_path
-        }
+        parms = {}
 
         instance_node.parm("trange").set(1)
         if self.selected_nodes:
@@ -65,6 +57,10 @@ class CreateBGEO(plugin.HoudiniCreator):
                 parms["soppath"] = outputs[0].path()
 
         instance_node.setParms(parms)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("sopoutput").set(f"{staging_dir}/$OS.$F4.{pre_create_data['bgeo_type']}")
 
     def get_instance_attr_defs(self):
         render_target_items = {

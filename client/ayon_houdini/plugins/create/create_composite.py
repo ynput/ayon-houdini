@@ -28,13 +28,8 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
             pre_create_data)
 
         instance_node = hou.node(instance.get("instance_node"))
-        filepath = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4{}".format(product_name, self.ext)
-        )
         parms = {
             "trange": 1,
-            "copoutput": filepath
         }
 
         if self.selected_nodes:
@@ -53,6 +48,10 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
         # Lock any parameters in this list
         to_lock = ["prim_to_detail_pattern"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("copoutput").set(f"{staging_dir}/$OS.$F4{self.ext}")
 
     def get_network_categories(self):
         return [

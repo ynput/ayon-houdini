@@ -42,15 +42,10 @@ class CreateArnoldAss(plugin.HoudiniCreator):
         parm_template_group.hideFolder("Properties", True)
         instance_node.setParmTemplateGroup(parm_template_group)
 
-        filepath = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4{}".format(product_name, self.ext)
-        )
         parms = {
             # Render frame range
             "trange": 1,
             # Arnold ROP settings
-            "ar_ass_file": filepath,
             "ar_ass_export_enable": 1
         }
 
@@ -59,6 +54,10 @@ class CreateArnoldAss(plugin.HoudiniCreator):
         # Lock any parameters in this list
         to_lock = ["ar_ass_export_enable", "productType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("ar_ass_file").set(f"{staging_dir}/$OS.$F4{self.ext}")
 
     def get_instance_attr_defs(self):
         render_target_items = {

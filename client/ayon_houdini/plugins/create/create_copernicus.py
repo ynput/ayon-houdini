@@ -30,13 +30,8 @@ class CreateCopernicusROP(plugin.HoudiniCreator):
             pre_create_data)
 
         instance_node = hou.node(instance.get("instance_node"))
-        filepath = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            f"{product_name}.$F4{self.ext}"
-        )
         parms = {
             "trange": 1,
-            "copoutput": filepath
         }
         if self.selected_nodes:
             if len(self.selected_nodes) > 1:
@@ -50,6 +45,10 @@ class CreateCopernicusROP(plugin.HoudiniCreator):
         # to match other Houdini nodes default.
         instance_node.parm("f1").setExpression("$FSTART")
         instance_node.parm("f2").setExpression("$FEND")
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("copoutput").set(f"{staging_dir}/$OS.$F4{self.ext}")
 
     def get_network_categories(self):
         return [

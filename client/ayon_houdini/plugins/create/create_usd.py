@@ -37,7 +37,6 @@ class CreateUSD(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
 
         parms = {
-            "lopoutput": "$HIP/pyblish/{}.usd".format(product_name),
             "enableoutputprocessor_simplerelativepaths": False,
         }
         parms.update(self.additional_parameters)
@@ -54,6 +53,10 @@ class CreateUSD(plugin.HoudiniCreator):
             "id",
         ]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("lopoutput").set(f"{staging_dir}/$OS.usd")
 
     def get_network_categories(self):
         return [
