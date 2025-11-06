@@ -88,6 +88,13 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                     "Created by: %s", creator_node.path()
                 )
 
+            # Skip any explicit save layer that is created by a geoclipsequence
+            # node, because this will be the topology layer - which will be
+            # included with a USD instance relatively by the
+            # CollectUSDValueClips plug-in
+            if creator_node.type().name() == "geoclipsequence":
+                continue
+
             save_layers.append((layer, save_path, creator_node))
 
         # Store on the instance
