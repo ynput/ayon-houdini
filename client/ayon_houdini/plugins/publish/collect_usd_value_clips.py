@@ -93,7 +93,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         # Skip if no frame pattern detected.
         if not frame_collection:
             self.log.warning(
-                "Unable detect frame sequence in filepath '{saveclipfilepath}'"
+                f"Unable detect frame sequence in filepath: {saveclipfilepath}"
             )
             # Assume it's some form of static clip file in this scenario
             files.append(saveclipfilepath)
