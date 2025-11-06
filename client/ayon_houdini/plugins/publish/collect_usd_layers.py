@@ -98,7 +98,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             # created by another node.
             if (
                 creator_node.type().name() == "geoclipsequence"
-                and 
+                and
                 save_control != "Explicit"
             ):
                 continue
@@ -111,9 +111,17 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         # Create configured layer instances so User can disable updating
         # specific configured layers for publishing.
         context = instance.context
+        instance.data["runTimeInstances"] = {}
         for layer, save_path, creator_node in save_layers:
+            self.log.debug(f">>> Creating instance for '{layer.identifier}'")
+
             name = os.path.basename(save_path)
             layer_inst = context.create_instance(name)
+
+            # Add to runTimeInstances to allow accessing from main instance.
+            instance.data["runTimeInstances"].update({
+                layer: layer_inst
+            })
 
             # include same USD ROP
             layer_inst.append(rop_node)
