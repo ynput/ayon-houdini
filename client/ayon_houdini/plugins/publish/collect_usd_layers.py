@@ -77,6 +77,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             info = layer.rootPrims.get("HoudiniLayerInfo")
             save_path = info.customData.get("HoudiniSavePath")
             creator = info.customData.get("HoudiniCreatorNode")
+            save_control = info.customData.get("HoudiniSaveControl")
 
             self.log.debug("Found configured save path: "
                            "%s -> %s", layer, save_path)
@@ -92,7 +93,14 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             # node, because this will be the topology layer - which will be
             # included with a USD instance relatively by the
             # CollectUSDValueClips plug-in
-            if creator_node.type().name() == "geoclipsequence":
+            # Note: `geoclipsequence` nodes do not have explicit save control.
+            # If explicit save controls are present, they are most likely
+            # created by another node.
+            if (
+                creator_node.type().name() == "geoclipsequence"
+                and 
+                save_control != "Explicit"
+            ):
                 continue
 
             save_layers.append((layer, save_path, creator_node))
