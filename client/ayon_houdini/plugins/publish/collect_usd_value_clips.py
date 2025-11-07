@@ -1,6 +1,7 @@
 import os
 import hou
 import clique
+from typing import Optional
 
 import pyblish.api
 
@@ -26,19 +27,15 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             self._get_layer_value_clips(layer, instance)
 
     def _get_layer_value_clips(self, layer, instance):
-        prim_spec = layer.GetPrimAtPath("/HoudiniLayerInfo")
-        if not prim_spec:
+        info_prim = layer.GetPrimAtPath("/HoudiniLayerInfo")
+        if not info_prim:
             return
 
-        editor_nodes = prim_spec.customData.get("HoudiniEditorNodes")
+        editor_nodes = info_prim.customData.get("HoudiniEditorNodes")
         if not editor_nodes:
             return
 
-        transfers = instance.data.setdefault("transfers", [])
         asset_remap = instance.data.setdefault("assetRemap", {})
-        resources_dir = instance.data["resourcesDir"]
-        resources_dir_name = os.path.basename(resources_dir)
-
         for node_id in editor_nodes:
             # Consider only geoclipsequence nodes
             node = hou.nodeBySessionId(node_id)
@@ -51,6 +48,24 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
 
             # Collect all their output files
             files = self._get_geoclipsequence_output_files(node)
+
+            # Check if the layer is an explicit save layer, because if it is
+            # then likely it is collected as its own instance by the
+            # CollectUsdLayers plug-in and we want to attach the files to that
+            # layer instance instead.
+            target_instance = instance
+            if info_prim.customData.get("HoudiniSaveControl") == "Explicit":
+                override_instance = self._find_instance_by_explict_save_layer(
+                    instance.context,
+                    layer
+                )
+                if override_instance:
+                    target_instance = override_instance
+
+            # Set up transfers
+            transfers = target_instance.data.setdefault("transfers", [])
+            resources_dir = target_instance.data["resourcesDir"]
+            resources_dir_name = os.path.basename(resources_dir)
             for src in files:
                 # Make relative transfers of these files and remap
                 # them to relative paths from the published USD layer
@@ -107,3 +122,28 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         )
         files.extend(list(frame_collection))
         return files
+
+    def _find_instance_by_explict_save_layer(
+        self,
+        instance: pyblish.api.Instance,
+        layer
+    ) -> Optional[pyblish.api.Instance]:
+        """Find the target instance (in context) for the given layer if it's
+        an explicit save layer.
+
+        If the layer is an explicit save layer, then try to find if there's a
+        publish instance for it and return it instead. Otherwise, return the
+        input instance.
+        """
+        for other_instance in instance.context:
+            # Skip self
+            if instance is other_instance:
+                continue
+
+            if other_instance.data.get("usd_layer") is layer:
+                self.log.debug(
+                    "Setting explicit save layer target instance: "
+                    f"{other_instance}"
+                )
+                return other_instance
+        return None
