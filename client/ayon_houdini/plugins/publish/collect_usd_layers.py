@@ -7,7 +7,6 @@ import pyblish.api
 from ayon_core.pipeline import KnownPublishError
 from ayon_core.pipeline.create import get_product_name
 from ayon_houdini.api import plugin
-import ayon_houdini.api.usd as usdlib
 
 from pxr import Sdf
 import hou
