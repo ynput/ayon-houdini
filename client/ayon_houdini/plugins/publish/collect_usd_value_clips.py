@@ -56,7 +56,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             target_instance = instance
             if info_prim.customData.get("HoudiniSaveControl") == "Explicit":
                 override_instance = self._find_instance_by_explict_save_layer(
-                    instance.context,
+                    instance,
                     layer
                 )
                 if override_instance:
