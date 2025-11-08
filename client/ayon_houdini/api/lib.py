@@ -66,19 +66,19 @@ def get_output_parameter(node):
             future development.
 
     Args:
-        node(hou.Node): node instance
+        node (hou.Node): node instance
 
     Returns:
         hou.Parm
     """
 
-    node_type = node.type().name()
+    node_type: str = node.type().name()
 
     # Figure out which type of node is being rendered
     if node_type in {"alembic", "rop_alembic"}:
         return node.parm("filename")
     elif node_type == "arnold":
-        if node_type.evalParm("ar_ass_export_enable"):
+        if node.evalParm("ar_ass_export_enable"):
             return node.parm("ar_ass_file")
         return node.parm("ar_picture")
     elif node_type in {
