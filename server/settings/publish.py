@@ -240,7 +240,7 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     },
     "ValidateSingleFrame": {
         "enabled": True,
-        "optional": True,
+        "optional": False,
         "active": True
     },
     "ValidateReviewColorspace": {
