@@ -76,7 +76,8 @@ class ValidateUSDAssetContributionDefaultPrim(plugin.HoudiniInstancePlugin,
     def repair(cls, instance):
         rop_node = hou.node(instance.data["instance_node"])
         rop_node.parm("defaultprim").set(
-            "/`strsplit(chs(\"folderPath\"), \"/\", -1)`"
+            '/`ifs(strmatch("[0-9]", strsplit(chs("folderPath"), "/", -1)[0])'
+            ', "_", "")``strsplit(chs("folderPath"), "/", -1)`'
         )
 
     @staticmethod

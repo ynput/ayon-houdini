@@ -96,7 +96,10 @@ class CreateUSDModel(CreateUSD):
     additional_parameters = {
         # Set the 'default prim' by default to the folder name being
         # published to
-        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+        "defaultprim": (
+            '/`ifs(strmatch("[0-9]", strsplit(chs("folderPath"), "/", -1)[0])'
+            ', "_", "")``strsplit(chs("folderPath"), "/", -1)`'
+        ),
     }
 
     def get_detail_description(self):
@@ -118,7 +121,11 @@ class CreateUSDAssembly(CreateUSD):
     additional_parameters = {
         # Set the 'default prim' by default to the folder name being
         # published to
-        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+        "defaultprim": (
+            '/`ifs(strmatch("[0-9]", strsplit(chs("folderPath"), "/", -1)[0])'
+            ', "_", "")``strsplit(chs("folderPath"), "/", -1)`'
+        ),
+
     }
 
     def get_detail_description(self):
@@ -141,7 +148,10 @@ class CreateUSDGroom(CreateUSD):
     additional_parameters = {
         # Set the 'default prim' by default to the folder name being
         # published to
-        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+        "defaultprim": (
+            '/`ifs(strmatch("[0-9]", strsplit(chs("folderPath"), "/", -1)[0])'
+            ', "_", "")``strsplit(chs("folderPath"), "/", -1)`'
+        ),
     }
 
     def get_detail_description(self):
@@ -167,7 +177,10 @@ class CreateUSDLook(CreateUSD):
     additional_parameters = {
         # Set the 'default prim' by default to the folder name being
         # published to
-        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+        "defaultprim": (
+            '/`ifs(strmatch("[0-9]", strsplit(chs("folderPath"), "/", -1)[0])'
+            ', "_", "")``strsplit(chs("folderPath"), "/", -1)`'
+        ),
     }
 
     def get_detail_description(self):
