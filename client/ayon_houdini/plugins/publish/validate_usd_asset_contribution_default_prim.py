@@ -5,6 +5,7 @@ import pyblish.api
 
 from ayon_core.pipeline import PublishValidationError
 from ayon_core.pipeline.publish import RepairAction, OptionalPyblishPluginMixin
+from ayon_core.pipeline.usdlib import get_standard_default_prim_name
 
 from ayon_houdini.api.action import SelectROPAction
 from ayon_houdini.api import plugin
@@ -59,7 +60,9 @@ class ValidateUSDAssetContributionDefaultPrim(plugin.HoudiniInstancePlugin,
                 description=self.get_description()
             )
 
-        folder_name = instance.data["folderPath"].rsplit("/", 1)[-1]
+        folder_name = get_standard_default_prim_name(
+            instance.data["folderPath"]
+        )
         if not default_prim.lstrip("/") == folder_name:
             raise PublishValidationError(
                 f"Default prim specified on ROP node does not match the"
