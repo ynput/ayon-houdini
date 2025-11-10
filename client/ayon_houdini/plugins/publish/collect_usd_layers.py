@@ -7,7 +7,6 @@ import pyblish.api
 from ayon_core.pipeline import KnownPublishError
 from ayon_core.pipeline.create import get_product_name
 from ayon_houdini.api import plugin
-import ayon_houdini.api.usd as usdlib
 
 from pxr import Sdf
 import hou
@@ -72,11 +71,16 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         rop_node = hou.node(instance.data["instance_node"])
 
         save_layers = []
-        for layer in usdlib.get_configured_save_layers(rop_node):
+        for layer in instance.data.get("layers", []):
 
-            info = layer.rootPrims.get("HoudiniLayerInfo")
+            info = layer.GetPrimAtPath("/HoudiniLayerInfo")
+            if not info:
+                continue
             save_path = info.customData.get("HoudiniSavePath")
             creator = info.customData.get("HoudiniCreatorNode")
+            save_control = info.customData.get("HoudiniSaveControl")
+            if save_control != "Explicit":
+                continue
 
             self.log.debug("Found configured save path: "
                            "%s -> %s", layer, save_path)
@@ -87,6 +91,20 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                 self.log.debug(
                     "Created by: %s", creator_node.path()
                 )
+
+            # Skip any explicit save layer that is created by a geoclipsequence
+            # node, because this will be the topology layer - which will be
+            # included with a USD instance relatively by the
+            # CollectUSDValueClips plug-in
+            # Note: `geoclipsequence` nodes do not have explicit save control.
+            # If explicit save controls are present, they are most likely
+            # created by another node.
+            if (
+                creator_node
+                and creator_node.type().name() == "geoclipsequence"
+                and save_control != "Explicit"
+            ):
+                continue
 
             save_layers.append((layer, save_path, creator_node))
 
