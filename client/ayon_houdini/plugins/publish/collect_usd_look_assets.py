@@ -135,6 +135,19 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                 if spec.typeName != "asset":
                     continue
 
+                if spec.default is None:
+                    # This may happen if no default value is authored. Likely
+                    # the property is animated or only custom metadata is set
+                    # for the property's opinion.
+                    # TODO: Support detecting animated asset path values
+                    #  Houdini makes it non-trivial
+                    #  to key material parameters so for now we'll assume the
+                    #  user did not animate asset paths making this low prio.
+                    self.log.debug(
+                        f"Skipping spec {path} due to no default value."
+                    )
+                    continue
+
                 asset: Sdf.AssetPath = spec.default
                 base, ext = os.path.splitext(asset.path)
                 if ext in self.exclude_suffixes:
