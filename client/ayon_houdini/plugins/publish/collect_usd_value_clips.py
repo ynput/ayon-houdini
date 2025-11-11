@@ -41,8 +41,10 @@ def get_clip_frames_in_frame_range(
 
     # Case 2: Has end frame, no loop - clip plays once
     if not loop:
-        actual_clip_end = clip_end + 1  # Houdini exports an additional frame when not looping
-        # Intersection of [clip_start, actual_clip_end] and [range_start, range_end]
+        # Houdini exports an additional frame when not looping
+        actual_clip_end = clip_end + 1
+        # Intersection of [clip_start, actual_clip_end]
+        # and [range_start, range_end]
         intersection_start = max(clip_start, range_start)
         intersection_end = min(actual_clip_end, range_end)
         if intersection_start <= intersection_end:
