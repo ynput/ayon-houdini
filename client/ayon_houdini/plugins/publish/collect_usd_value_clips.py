@@ -18,19 +18,19 @@ def get_clip_frames_in_frame_range(
     """Calculate which clip frames are visible in the given frame range.
 
     Args:
-        clip_start: Start frame of sequence (X)
-        clip_end: End frame of sequence (Y)
+        clip_start: Start frame of clip (X)
+        clip_end: End frame of clip (Y)
         has_end_set: Whether clip end applies or it's infinite.
-        loop: Whether sequence loops after end
+        loop: Whether clip loops after end
         range_start: Start of query range (e.g., 1001)
         range_end: End of query range (e.g., 1100)
 
     Returns:
-        set[int]: Set of sequence frames visible in the range
+        set[int]: Set of clip frames visible in the range
     """
     visible_frames = set()
 
-    # Case 1: No end frame - sequence runs infinitely from start
+    # Case 1: No end frame - clip runs infinitely from start
     if not has_end_set:
         if clip_start <= range_end:
             # All frames from max(seq_start, range_start) to range_end are
@@ -39,7 +39,7 @@ def get_clip_frames_in_frame_range(
             visible_frames = set(range(start, range_end + 1))
         return visible_frames
 
-    # Case 2: Has end frame, no loop - sequence plays once
+    # Case 2: Has end frame, no loop - clip plays once
     if not loop:
         clip_end += 1  # Houdini exports an additional frame when not looping
         # Intersection of [clip_start, clip_end] and [range_start, range_end]
@@ -55,13 +55,13 @@ def get_clip_frames_in_frame_range(
 
     for frame in range(range_start, range_end + 1):
         if frame < clip_start:
-            # Before sequence starts - not visible
+            # Before clip starts: not visible
             continue
         elif frame <= clip_end:
-            # Within first play of sequence
+            # Within first play of clip
             visible_frames.add(frame)
         else:
-            # After first play - map to looped frame
+            # After first play: map to looped frame
             offset = (frame - clip_start) % loop_duration
             looped_frame = clip_start + offset
             visible_frames.add(looped_frame)
