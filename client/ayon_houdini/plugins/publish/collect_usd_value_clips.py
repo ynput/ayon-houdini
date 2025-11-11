@@ -33,7 +33,7 @@ def get_clip_frames_in_frame_range(
     # Case 1: No end frame - clip runs infinitely from start
     if not has_end_set:
         if clip_start <= range_end:
-            # All frames from max(seq_start, range_start) to range_end are
+            # All frames from max(clip_start, range_start) to range_end are
             # included
             start = max(clip_start, range_start)
             visible_frames = set(range(start, range_end + 1))
@@ -41,10 +41,10 @@ def get_clip_frames_in_frame_range(
 
     # Case 2: Has end frame, no loop - clip plays once
     if not loop:
-        clip_end += 1  # Houdini exports an additional frame when not looping
-        # Intersection of [clip_start, clip_end] and [range_start, range_end]
+        actual_clip_end = clip_end + 1  # Houdini exports an additional frame when not looping
+        # Intersection of [clip_start, actual_clip_end] and [range_start, range_end]
         intersection_start = max(clip_start, range_start)
-        intersection_end = min(clip_end, range_end)
+        intersection_end = min(actual_clip_end, range_end)
         if intersection_start <= intersection_end:
             visible_frames = set(
                 range(intersection_start, intersection_end + 1))
@@ -156,7 +156,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         A Geometry Clip Sequence only writes out files for the frames that
         appear in the ROP render range. If it has a start and end frame, then
         it won't write out frames beyond those frame ranges. If it loops, then
-        it loops soley beyond the end frame, not before the start frame.
+        it loops solely beyond the end frame, not before the start frame.
 
         As such, we find the intersection of the frame ranges to determine the
         files to be written out.
