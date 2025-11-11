@@ -8,6 +8,69 @@ import pyblish.api
 from ayon_houdini.api import plugin
 
 
+def get_clip_frames_in_frame_range(
+        clip_start: int,
+        clip_end: int,
+        has_end_set: bool,
+        loop: bool,
+        range_start: int,
+        range_end: int):
+    """Calculate which clip frames are visible in the given frame range.
+
+    Args:
+        clip_start: Start frame of clip (X)
+        clip_end: End frame of clip (Y)
+        has_end_set: Whether clip end applies or it's infinite.
+        loop: Whether clip loops after end
+        range_start: Start of query range (e.g., 1001)
+        range_end: End of query range (e.g., 1100)
+
+    Returns:
+        set[int]: Set of clip frames visible in the range
+    """
+    visible_frames = set()
+
+    # Case 1: No end frame - clip runs infinitely from start
+    if not has_end_set:
+        if clip_start <= range_end:
+            # All frames from max(clip_start, range_start) to range_end are
+            # included
+            start = max(clip_start, range_start)
+            visible_frames = set(range(start, range_end + 1))
+        return visible_frames
+
+    # Case 2: Has end frame, no loop - clip plays once
+    if not loop:
+        # Houdini exports an additional frame when not looping
+        actual_clip_end = clip_end + 1
+        # Intersection of [clip_start, actual_clip_end]
+        # and [range_start, range_end]
+        intersection_start = max(clip_start, range_start)
+        intersection_end = min(actual_clip_end, range_end)
+        if intersection_start <= intersection_end:
+            visible_frames = set(
+                range(intersection_start, intersection_end + 1))
+        return visible_frames
+
+    # Case 3: Has end frame and loops
+    loop_duration = clip_end - clip_start + 1
+
+    for frame in range(range_start, range_end + 1):
+        if frame < clip_start:
+            # Before clip starts: not visible
+            continue
+        elif frame <= clip_end:
+            # Within first play of clip
+            visible_frames.add(frame)
+        else:
+            # After first play: map to looped frame
+            offset = (frame - clip_start) % loop_duration
+            looped_frame = clip_start + offset
+            visible_frames.add(looped_frame)
+
+    return visible_frames
+
+
 class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
     """Collect USD value clips that are to be written out for a USD publish.
 
@@ -35,6 +98,10 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         if not editor_nodes:
             return
 
+        # Get frame range of the ROP node
+        start: int = int(instance.data["frameStartHandle"])
+        end: int = int(instance.data["frameEndHandle"])
+
         asset_remap = instance.data.setdefault("assetRemap", {})
         for node_id in editor_nodes:
             # Consider only geoclipsequence nodes
@@ -47,7 +114,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             )
 
             # Collect all their output files
-            files = self._get_geoclipsequence_output_files(node)
+            files = self._get_geoclipsequence_output_files(node, start, end)
 
             # Check if the layer is an explicit save layer, because if it is
             # then likely it is collected as its own instance by the
@@ -81,7 +148,29 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
                     f"{src} -> {asset_remap[src]}"
                 )
 
-    def _get_geoclipsequence_output_files(self, clip_node) -> list[str]:
+    def _get_geoclipsequence_output_files(
+        self, clip_node: hou.Node, start: int, end: int
+    ) -> list[str]:
+        """Return the output files for the given Geometry Clip Sequence node
+        that would be written out when executing the USD ROP for the given
+        frame range.
+
+        A Geometry Clip Sequence only writes out files for the frames that
+        appear in the ROP render range. If it has a start and end frame, then
+        it won't write out frames beyond those frame ranges. If it loops, then
+        it loops solely beyond the end frame, not before the start frame.
+
+        As such, we find the intersection of the frame ranges to determine the
+        files to be written out.
+
+        Args:
+            clip_node (hou.Node): The Geometry Clip Sequence node.
+            start (int): The ROP render start frame.
+            end (int): The ROP render end frame.
+
+        Returns:
+            list[str]: List of filepaths.
+        """
         # TODO: We may want to process this node in the Context Options of the
         #  USD ROP to be correct in the case of e.g. multishot workflows
         # Collect the manifest and topology file
@@ -90,14 +179,8 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             clip_node.evalParm('topologyfile')
         ]
 
-        # Collect the individual clip frames
-        # Compute number of frames
-        start_frame: int = int(clip_node.evalParm('startframe'))
-        loop_frames: int = 1 - clip_node.evalParm('loopframes')
-        end_frame: int = int(clip_node.evalParm('endframe') + loop_frames)
-
         saveclipfilepath: str = \
-            clip_node.parm('saveclipfilepath').evalAtFrame(start_frame)
+            clip_node.parm('saveclipfilepath').evalAtFrame(start)
 
         frame_collection, _ = clique.assemble(
             [saveclipfilepath],
@@ -114,12 +197,21 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             files.append(saveclipfilepath)
             return files
 
+        # Collect the clip frames that fall within the render range
+        # because those will be the clip frames to be written out.
+        frames = get_clip_frames_in_frame_range(
+            clip_start=int(clip_node.evalParm('startframe')),
+            clip_end=int(clip_node.evalParm('endframe')),
+            has_end_set=bool(clip_node.evalParm('setendframe')),
+            loop=bool(clip_node.evalParm('loopframes')),
+            range_start=start,
+            range_end=end
+        )
+
         # It's always expected to be one collection.
         frame_collection = frame_collection[0]
         frame_collection.indexes.clear()
-        frame_collection.indexes.update(
-            list(range(start_frame, end_frame + 1))
-        )
+        frame_collection.indexes.update(frames)
         files.extend(list(frame_collection))
         return files
 
