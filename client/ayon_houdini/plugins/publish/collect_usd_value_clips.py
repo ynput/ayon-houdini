@@ -149,11 +149,14 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
     def _get_geoclipsequence_output_files(
         self, clip_node: hou.Node, start: int, end: int
     ) -> list[str]:
-        """
+        """Return the output files for the given Geometry Clip Sequence node
+        that would be written out when executing the USD ROP for the given
+        frame range.
         
         A Geometry Clip Sequence only writes out files for the frames that
         appear in the ROP render range. If it has a start and end frame, then
-        it won't write out frames beyond those frame ranges.
+        it won't write out frames beyond those frame ranges. If it loops, then
+        it loops soley beyond the end frame, not before the start frame.
         
         As such, we find the intersection of the frame ranges to determine the
         files to be written out.
