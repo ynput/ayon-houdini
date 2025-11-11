@@ -196,7 +196,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             return files
 
         # Collect the clip frames that fall within the render range
-        # because those will the clip frames to be written out.
+        # because those will be the clip frames to be written out.
         frames = get_clip_frames_in_frame_range(
             clip_start=int(clip_node.evalParm('startframe')),
             clip_end=int(clip_node.evalParm('endframe')),
