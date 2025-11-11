@@ -153,9 +153,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         
         A Geometry Clip Sequence only writes out files for the frames that
         appear in the ROP render range. If it has a start and end frame, then
-        it won't write out frames beyond those frame ranges. The clip start
-        offset shifts the clip frame numbers from the render frame range, but
-        it does not shift the start and end frames of the clip itself.
+        it won't write out frames beyond those frame ranges.
         
         As such, we find the intersection of the frame ranges to determine the
         files to be written out.
@@ -193,11 +191,6 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             # Assume it's some form of static clip file in this scenario
             files.append(saveclipfilepath)
             return files
-
-        # Shift the render range by the clip start offset
-        clip_start_offset: int = int(clip_node.evalParm('clipstartoffset'))
-        start += clip_start_offset
-        end += clip_start_offset
 
         # Collect the clip frames that fall within the render range
         # because those will the clip frames to be written out.
