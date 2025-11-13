@@ -1027,8 +1027,8 @@ def update_houdini_vars_context():
             except OSError as e:
                 if e.errno != errno.EEXIST:
                     print(
-                        "Failed to create ${} dir. Maybe due to "
-                        "insufficient permissions.".format(var)
+                        f"Failed to create ${var} dir at '{new}'. "
+                        "Maybe due to insufficient permissions."
                     )
 
         hou.hscript("set {}={}".format(var, new))
