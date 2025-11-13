@@ -1027,7 +1027,7 @@ def update_houdini_vars_context():
             except OSError as e:
                 if e.errno != errno.EEXIST:
                     print(
-                        f"Failed to create ${var} dir at {new}. "
+                        f"Failed to create ${var} dir at '{new}'. "
                         "Maybe due to insufficient permissions."
                     )
 
