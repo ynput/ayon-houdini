@@ -2,6 +2,7 @@
 """Creator plugin for creating composite sequences."""
 from ayon_houdini.api import plugin
 from ayon_core.pipeline import CreatorError
+from ayon_core.lib import EnumDef
 
 import hou
 
@@ -16,6 +17,9 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
     icon = "fa5.eye"
 
     ext = ".exr"
+
+    # Default render target
+    render_target = "local"
 
     def get_publish_families(self):
         return ["imagesequence", "publish.hou"]
@@ -61,3 +65,22 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
             hou.ropNodeTypeCategory(),
             hou.cop2NodeTypeCategory()
         ]
+    
+    def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+        }
+
+        return [
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
+        ]
+
+    def get_pre_create_attr_defs(self):
+        attrs = super().get_pre_create_attr_defs()
+        # Use same attributes as for instance attributes
+        return attrs + self.get_instance_attr_defs()
