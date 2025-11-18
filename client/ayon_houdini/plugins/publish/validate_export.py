@@ -20,7 +20,7 @@ class ValidateExportParameterValue(plugin.HoudiniInstancePlugin):
     This is associated to render nodes where we can
     split export and render DL jobs.
 
-    Note: 
+    Note:
         This validator mostly fails when users change render target
         as changing render target doesn't change the export parameter
         on the rop node accordingly.

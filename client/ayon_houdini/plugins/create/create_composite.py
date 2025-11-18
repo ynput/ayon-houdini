@@ -65,7 +65,7 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
             hou.ropNodeTypeCategory(),
             hou.cop2NodeTypeCategory()
         ]
-    
+
     def get_instance_attr_defs(self):
         render_target_items = {
             "local": "Local machine rendering",

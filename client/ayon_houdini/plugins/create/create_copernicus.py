@@ -66,7 +66,7 @@ class CreateCopernicusROP(plugin.HoudiniCreator):
             "image_rop",
             "publish.hou"
         ]
-    
+
     def get_instance_attr_defs(self):
         render_target_items = {
             "local": "Local machine rendering",
