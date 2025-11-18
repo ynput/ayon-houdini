@@ -67,6 +67,24 @@ class CreateUSD(plugin.HoudiniCreator):
     def get_publish_families(self):
         return ["usd", "usdrop", "publish.hou"]
 
+    def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+        }
+
+        return [
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
+        ]
+
+    def get_pre_create_attr_defs(self):
+        attrs = super().get_pre_create_attr_defs()
+        return attrs + self.get_instance_attr_defs()
+
 
 class CreateUSDModel(CreateUSD):
     identifier = "io.ayon.creators.houdini.model.usd"
