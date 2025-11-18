@@ -15,6 +15,10 @@ class TemplatedWorkfileProfileModel(BaseSettingsModel):
         default_factory=list,
         title="Task names"
     )
+    folder_paths: list[str] = SettingsField(
+        default_factory=list,
+        title="Folder paths"
+    )
     path: str = SettingsField(
         title="Path to template"
     )
