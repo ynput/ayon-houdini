@@ -17,6 +17,9 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
 
     ext = ".exr"
 
+    def get_publish_families(self):
+        return ["imagesequence", "publish.hou"]
+
     def create(self, product_name, instance_data, pre_create_data):
         import hou  # noqa
 

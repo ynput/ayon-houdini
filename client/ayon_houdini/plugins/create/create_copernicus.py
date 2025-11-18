@@ -60,4 +60,5 @@ class CreateCopernicusROP(plugin.HoudiniCreator):
         return [
             "render",
             "image_rop",
+            "publish.hou"
         ]
