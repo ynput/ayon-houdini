@@ -2,6 +2,7 @@ from ayon_server.settings import (
     BaseSettingsModel,
     SettingsField,
     task_types_enum,
+    folder_types_enum,
 )
 
 
