@@ -25,7 +25,8 @@ class TemplatedWorkfileProfileModel(BaseSettingsModel):
         title="Folder paths"
     )
     path: str = SettingsField(
-        title="Path to template"
+        title="Path to template",
+        section="Template Configuration",
     )
     keep_placeholder: bool = SettingsField(
         False,
