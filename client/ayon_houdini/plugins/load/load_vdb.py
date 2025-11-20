@@ -5,7 +5,8 @@ import hou
 
 from ayon_houdini.api import (
     pipeline,
-    plugin
+    plugin,
+    lib
 )
 
 
@@ -97,3 +98,20 @@ class VdbLoader(plugin.HoudiniLoader):
 
     def switch(self, container, context):
         self.update(container, context)
+
+    def create_load_placeholder_node(
+        self, node_name: str, placeholder_data: dict
+    ) -> hou.Node:
+        """Define how to create a placeholder node for this loader for the
+        Workfile Template Builder system."""
+        # Create node
+        network = lib.find_active_network(
+            category=hou.sopNodeTypeCategory(),
+            default="/obj/geo1"
+        )
+        if not network:
+            network = hou.node("/obj").createNode("geo", "geo1")
+
+        node = network.createNode("object_merge", node_name=node_name)
+        node.moveToGoodPosition()
+        return node

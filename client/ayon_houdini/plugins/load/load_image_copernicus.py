@@ -153,3 +153,18 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
 
     def switch(self, container, representation):
         self.update(container, representation)
+
+    def create_load_placeholder_node(
+        self, node_name: str, placeholder_data: dict
+    ) -> hou.Node:
+        """Define how to create a placeholder node for this loader for the
+        Workfile Template Builder system."""
+        # Create node
+        network = lib.find_active_network(
+            category=hou.copNodeTypeCategory(),
+            default="/img/copnet1"
+        )
+        node = network.createNode("file", node_name=node_name)
+        node.moveToGoodPosition()
+        return node
+
