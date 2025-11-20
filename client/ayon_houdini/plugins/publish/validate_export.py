@@ -37,41 +37,24 @@ class ValidateExportParameterValue(plugin.HoudiniInstancePlugin):
     label = "Validate Export Toggle"
     actions = [FixParameterAction, SelectInvalidAction]
 
+    # Per ROP node type, define the export parameter and expected values
+    # for export and no export modes. The first entry is for export mode,
+    # the second for no export mode.
     export_info = {
         "arnold": {
-            "export_parameter": "ar_ass_export_enable",
-            "mode": {
-                "export": 1,
-                "no_export": 0
-            }
+            "ar_ass_export_enable": [1, 0]
         },
         "ifd": {
-            "export_parameter": "soho_outputmode",
-            "mode": {
-                "export": 1,
-                "no_export": 0
-            }
+            "soho_outputmode": [1, 0]
         },
         "Redshift_ROP": {
-            "export_parameter": "RS_archive_enable",
-            "mode": {
-                "export": 1,
-                "no_export": 0
-            }
+            "RS_archive_enable": [1, 0]
         },
         "vray_renderer": {
-            "export_parameter": "render_export_mode",
-            "mode": {
-                "export": "2",
-                "no_export": "1"
-            }
+            "render_export_mode": ["2", "1"]
         },
         "usdrender": {
-            "export_parameter": "runcommand",
-            "mode": {
-                "export": 0,
-                "no_export": 1
-            }
+            "runcommand": [0, 1]
         },
     }
 
@@ -81,9 +64,10 @@ class ValidateExportParameterValue(plugin.HoudiniInstancePlugin):
         if invalid:
             rop_node = invalid[0]
             node_type = rop_node.type().name()
+            required_parms = ", ".join(self.export_info[node_type])
             raise PublishValidationError(
-                f"ROP node {rop_node.path()} has incorrect value for export "
-                f"parm: {self.export_info[node_type]['export_parameter']}",
+                f"ROP node {rop_node.path()} has incorrect value for "
+                f"parms: {required_parms}",
                 title=self.label
             )
 
@@ -91,29 +75,35 @@ class ValidateExportParameterValue(plugin.HoudiniInstancePlugin):
     def get_invalid(cls, instance):
         # Check if export parameter value on rop node has the expected
         # value that aligns with the current render target.
-
         rop_node = hou.node(instance.data["instance_node"])
         node_type = rop_node.type().name()
-        export_parameter = cls.export_info[node_type]["export_parameter"]
-        export_mode = \
-            "export" if instance.data["splitRender"] else "no_export"
-        export_value = cls.export_info[node_type]["mode"][export_mode]
-        if rop_node.evalParm(export_parameter) != export_value:
-            return [rop_node]
+        for parm_name, (on, off) in cls.export_info[node_type].items():
+            required_value = (
+                on if instance.data["splitRender"] else off
+            )
+            parm = rop_node.parm(parm_name)
+            current_value = parm.eval()
+            if current_value != required_value:
+                cls.log.debug(
+                    f"ROP node {parm.path()} has invalid value {current_value}"
+                    f" but should be {required_value}"
+                )
+                return [rop_node]
 
     @classmethod
     def repair(cls, instance):
-
         if not cls.get_invalid(instance):
             # Already fixed
             return
 
-        # Align split parameter value on rop node to the render target.
         rop_node = hou.node(instance.data["instance_node"])
         node_type = rop_node.type().name()
-        export_parameter = cls.export_info[node_type]["export_parameter"]
-        export_mode = \
-            "export" if instance.data["splitRender"] else "no_export"
-        export_value = cls.export_info[node_type]["mode"][export_mode]
 
-        rop_node.setParms({export_parameter: export_value})
+        # Set required values
+        parm_values = {}
+        for parm_name, (on, off) in cls.export_info[node_type].items():
+            required_value = (
+                on if instance.data["splitRender"] else off
+            )
+            parm_values[parm_name] = required_value
+        rop_node.setParms(parm_values)
