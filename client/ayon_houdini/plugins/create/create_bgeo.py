@@ -18,7 +18,7 @@ class CreateBGEO(plugin.HoudiniCreator):
     render_target = "local"
 
     def get_publish_families(self):
-        return ["pointcache", "bgeo"]
+        return ["pointcache", "bgeo", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
 

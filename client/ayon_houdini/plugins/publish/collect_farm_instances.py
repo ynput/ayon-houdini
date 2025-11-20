@@ -29,6 +29,10 @@ class CollectFarmInstances(plugin.HoudiniInstancePlugin):
         }:
             instance.data["farm"] = False
             instance.data["splitRender"] = False
+            try:
+                instance.data["families"].remove("publish.hou")
+            except ValueError:
+                pass
             self.log.debug("Render on farm is disabled. "
                            "Skipping farm collecting.")
             return

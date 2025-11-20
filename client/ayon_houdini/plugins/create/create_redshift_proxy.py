@@ -16,6 +16,9 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
     # Default render target
     render_target = "local"
 
+    def get_publish_families(self):
+        return ["redshiftproxy", "publish.hou"]
+
     def create(self, product_name, instance_data, pre_create_data):
 
         # Redshift provides a `Redshift_Proxy_Output` node type which shows

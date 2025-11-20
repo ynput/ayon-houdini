@@ -29,7 +29,7 @@ class CreateModel(plugin.HoudiniCreator):
     render_target = "local"
 
     def get_publish_families(self):
-        return ["model", "abc"]
+        return ["model", "abc", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
         instance_data.update({"node_type": "alembic"})
