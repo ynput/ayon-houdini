@@ -5,7 +5,8 @@ import hou
 
 from ayon_houdini.api import (
     pipeline,
-    plugin
+    plugin,
+    lib,
 )
 
 
