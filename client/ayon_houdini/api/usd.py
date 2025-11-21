@@ -12,6 +12,14 @@ from pxr import Usd, Sdf, Tf, Vt, UsdRender
 
 log = logging.getLogger(__name__)
 
+# Expression to take last part of the folder path as default prim, but if
+# it starts with a digit then prefix it with underscore `_` matching the
+# behavior of `get_standard_default_prim_name` from AYON core.
+DEFAULT_PRIM_EXPRESSION: str = (
+    '/`ifs(strmatch("[0123456789]", strsplit(chs("folderPath"), "/", -1)[0])'
+    ', "_", "")``strsplit(chs("folderPath"), "/", -1)`'
+)
+
 
 def add_usd_output_processor(ropnode, processor):
     """Add USD Output Processor to USD Rop node.

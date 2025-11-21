@@ -3,6 +3,7 @@
 import inspect
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.usd import DEFAULT_PRIM_EXPRESSION
 from ayon_core.lib import EnumDef
 
 import hou
@@ -96,7 +97,7 @@ class CreateUSDModel(CreateUSD):
     additional_parameters = {
         # Set the 'default prim' by default to the folder name being
         # published to
-        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+        "defaultprim": DEFAULT_PRIM_EXPRESSION,
     }
 
     def get_detail_description(self):
@@ -118,7 +119,8 @@ class CreateUSDAssembly(CreateUSD):
     additional_parameters = {
         # Set the 'default prim' by default to the folder name being
         # published to
-        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+        "defaultprim": DEFAULT_PRIM_EXPRESSION,
+
     }
 
     def get_detail_description(self):
@@ -141,7 +143,7 @@ class CreateUSDGroom(CreateUSD):
     additional_parameters = {
         # Set the 'default prim' by default to the folder name being
         # published to
-        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+        "defaultprim": DEFAULT_PRIM_EXPRESSION,
     }
 
     def get_detail_description(self):
@@ -167,7 +169,7 @@ class CreateUSDLook(CreateUSD):
     additional_parameters = {
         # Set the 'default prim' by default to the folder name being
         # published to
-        "defaultprim": '/`strsplit(chs("folderPath"), "/", -1)`',
+        "defaultprim": DEFAULT_PRIM_EXPRESSION,
     }
 
     def get_detail_description(self):
