@@ -189,6 +189,7 @@ class HoudiniPlaceholderLoadPlugin(
                     dest_absolute
                 )
                 if value != original_value:
+                    # Escape characters
                     value = value.replace("`", "\\`").replace('"', '\\"')
                     cmd = (
                         'opparm -r '
