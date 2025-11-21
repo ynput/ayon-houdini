@@ -3,7 +3,7 @@
 import os
 import re
 import uuid
-from typing import List
+from typing import List, Union
 
 import hou
 from qtpy import QtCore, QtWidgets, QtGui
@@ -92,31 +92,68 @@ def is_valid_uuid(value) -> bool:
     return True
 
 
-def get_available_versions(node):
-    """Return the versions list for node.
+def get_available_versions_with_labels(
+    node,
+    include_latest=True,
+    include_hero=True
+) -> list[str]:
+    # Result ordered as version 1 value, version 1 label, version 2 value,
+    # version 2 label and so forth. Used for displaying in Houdini enum menus.
+    result: list[str] = []
+    for version in get_available_versions(node, include_latest, include_hero):
+        if version == "latest":
+            result.append("latest")
+            result.append("latest")
+        elif isinstance(version, int):
+            version: int
+            version_label: str = f"v{abs(version):03d}"
+            if version < 0:
+                # Hero version
+                version: str = "hero"
+                version_label = f"[{version_label}]"
+            result.append(str(version))
+            result.append(version_label)
+        else:
+            raise ValueError(f"Unknown value to provide label for: {version}")
+    return result
+
+
+def get_available_versions(
+        node,
+        include_latest=True,
+        include_hero=True,
+    ):
+    """Return the version as list for node.
 
     The versions are sorted with the latest version first and oldest lower
     version last.
 
     Args:
         node (hou.Node): Node to query selected products' versions for.
+        include_latest (bool): Whether to include a dedicated 'latest' option.
+        include_hero (bool): Whether to include hero version if it exists.
 
     Returns:
-        list[int]: Version numbers for the product
+        list[str | int]: Version label with version names for the product
     """
 
     project_name = node.evalParm("project_name") or get_current_project_name()
     folder_path = node.evalParm("folder_path")
     product_name = node.evalParm("product_name")
 
+    # Always include "latest" as an option
+    all_version_names: list[Union[str, int]] = []
+    if include_latest:
+        all_version_names.append("latest")
+
     if not all([project_name, folder_path, product_name]):
-        return []
+        return all_version_names
 
     folder_entity = get_folder_by_path(
         project_name, folder_path, fields={"id"}
     )
     if not folder_entity:
-        return []
+        return all_version_names
     product_entity = get_product_by_name(
         project_name,
         product_name=product_name,
@@ -124,18 +161,17 @@ def get_available_versions(node):
         fields={"id"},
     )
     if not product_entity:
-        return []
+        return all_version_names
 
-    # TODO: Support hero versions
     versions = get_versions(
         project_name,
         product_ids={product_entity["id"]},
         fields={"version"},
-        hero=False,
+        hero=include_hero,
     )
-    version_names = [version["version"] for version in versions]
-    version_names.reverse()
-    return version_names
+    for version in reversed(list(versions)):
+        all_version_names.append(version["version"])
+    return all_version_names
 
 
 def set_node_representation_from_context(
@@ -896,7 +932,8 @@ def set_to_latest_version(node):
         node (hou.OpNode): The HDA node.
     """
 
-    versions = get_available_versions(node)
+    # Get available versions, excluding the 'latest' key
+    versions = get_available_versions(node, include_latest=False)
     if versions:
         node.parm("version").set(str(versions[0]))
 
