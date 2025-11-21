@@ -129,26 +129,36 @@ class HoudiniPlaceholderLoadPlugin(
         If that parm exists also on the target node, then remap the references
         to start using the target node's parm instead.
         """
+        # Opt-out early if no dependent nodes to begin with
+        source_node_path = source_node.path()
+        dependencies = [
+            dependency_node for dependency_node
+            in source_node.dependents()
+            # Exclude self and its children
+            if not dependency_node.path().startswith(source_node_path)
+        ]
+        if not dependencies:
+            return
+
+        # Repath any parm references from the source node
         for source_parm in source_node.parms():
+            # Only care if this parm also exists on the target node
+            target_parm = target_node.parm(source_parm.name())
+            if not target_parm:
+                continue
+
             referencing_parms = source_parm.parmsReferencingThis()
             if not referencing_parms:
                 continue
 
             # Exclude any references from source node OR child nodes (e.g.
             # inner parts of an HDA)
-            source_node_path = source_node.path()
             referencing_parms = [
                 parm for parm in referencing_parms
                 if not parm.node().path().startswith(source_node_path)
             ]
             if not referencing_parms:
                 continue
-
-            # Only care if this parm also exists on the target node
-            target_parm = target_node.parm(source_parm.name())
-            if not target_parm:
-                continue
-
 
             for ref_parm in referencing_parms:
                 # For now do not support re-pathing expressions, we assume
