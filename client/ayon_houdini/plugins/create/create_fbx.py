@@ -20,7 +20,7 @@ class CreateFBX(plugin.HoudiniCreator):
     render_target = "local"
 
     def get_publish_families(self):
-        return ["fbx", "model"]
+        return ["fbx", "model", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
 
@@ -199,5 +199,5 @@ class CreateStaticMesh(CreateFBX):
     description = __doc__
 
     def get_publish_families(self):
-        return ["fbx", "staticMesh"]
+        return ["fbx", "staticMesh", "publish.hou"]
 
