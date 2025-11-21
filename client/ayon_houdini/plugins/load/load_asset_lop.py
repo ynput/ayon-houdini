@@ -57,9 +57,7 @@ class LOPLoadAssetLoader(load.LoaderPlugin):
             category=hou.lopNodeTypeCategory(),
             default="/stage"
         )
-        # `null` because `imprint` fails on the actual node type due to
-        # parm name `representation` already existing.
-        node = network.createNode("null", node_name=node_name)
+        node = network.createNode("ayon::lop_import", node_name=node_name)
         node.moveToGoodPosition()
         return node
 

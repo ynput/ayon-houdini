@@ -50,7 +50,7 @@ class HoudiniPlaceholderCreatePlugin(
         create_placeholders = self.collect_scene_placeholders()
 
         for node in create_placeholders:
-            placeholder_data = read(node)
+            placeholder_data = self._read(node)
             output.append(
                 CreatePlaceholderItem(node.path(), placeholder_data, self)
             )

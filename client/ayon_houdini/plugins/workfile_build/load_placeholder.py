@@ -1,3 +1,5 @@
+from functools import partial
+
 from ayon_core.pipeline.workfile.workfile_template_builder import (
     LoadPlaceholderItem,
     PlaceholderLoadMixin,
@@ -7,7 +9,6 @@ from ayon_houdini.api.workfile_template_builder import (
     HoudiniPlaceholderPlugin
 )
 from ayon_houdini.api.plugin import HoudiniCreator
-from ayon_houdini.api.lib import read, imprint
 
 import hou
 
@@ -47,7 +48,7 @@ class HoudiniPlaceholderLoadPlugin(
         HoudiniCreator.customize_node_look(placeholder_node)
 
         placeholder_data["plugin_identifier"] = self.identifier
-        imprint(placeholder_node, placeholder_data)
+        self._imprint(placeholder_node, placeholder_data)
 
     def populate_placeholder(self, placeholder):
         self.populate_load_placeholder(placeholder)
@@ -70,7 +71,7 @@ class HoudiniPlaceholderLoadPlugin(
         load_placeholders = self.collect_scene_placeholders()
 
         for node in load_placeholders:
-            placeholder_data = read(node)
+            placeholder_data = self._read(node)
             output.append(
                 LoadPlaceholderItem(node.path(), placeholder_data, self)
             )
@@ -107,6 +108,7 @@ class HoudiniPlaceholderLoadPlugin(
         node.setPosition(placeholder_node.position())
 
         self.transfer_node_connections(placeholder_node, node)
+        self.transfer_parm_references(placeholder_node, node)
 
     def transfer_node_connections(self, source_node, target_node):
         # Transfer input connections
@@ -120,3 +122,71 @@ class HoudiniPlaceholderLoadPlugin(
             for idx in range(len(output_node.inputs())):
                 if output_node.input(idx) == source_node:
                     output_node.setInput(idx, target_node)
+
+    def transfer_parm_references(self, source_node, target_node):
+        """Find any parms being referenced by other nodes on the source node.
+
+        If that parm exists also on the target node, then remap the references
+        to start using the target node's parm instead.
+        """
+        for source_parm in source_node.parms():
+            referencing_parms = source_parm.parmsReferencingThis()
+            if not referencing_parms:
+                continue
+
+            # Exclude any references from source node OR child nodes (e.g.
+            # inner parts of an HDA)
+            source_node_path = source_node.path()
+            referencing_parms = [
+                parm for parm in referencing_parms
+                if not parm.node().path().startswith(source_node_path)
+            ]
+            if not referencing_parms:
+                continue
+
+            # Only care if this parm also exists on the target node
+            target_parm = target_node.parm(source_parm.name())
+            if not target_parm:
+                continue
+
+
+            for ref_parm in referencing_parms:
+                # For now do not support re-pathing expressions, we assume
+                # solely simple channel references.
+                if ref_parm.keyframes():
+                    continue
+
+                src_relative_expr = ref_parm.referenceExpression(source_parm)
+                dest_relative_expr = ref_parm.referenceExpression(target_parm)
+                src_absolute = source_parm.path()
+                dest_absolute = target_parm.path()
+
+                # Update the reference
+                original_value = ref_parm.rawValue()
+                if not isinstance(original_value, str):
+                    # Can't repath non-string values
+                    # TODO: Log a warning
+                    continue
+
+                # Repath any absolute references or relative expression
+                # references from source parm to the target parm if we
+                # can find it in the value
+                value: str = original_value.replace(
+                    src_relative_expr,
+                    dest_relative_expr
+                ).replace(
+                    src_absolute,
+                    dest_absolute
+                )
+                if value != original_value:
+                    value = value.replace("`", "\\`").replace('"', '\\"')
+                    cmd = (
+                        'opparm -r '
+                        f'{ref_parm.node().path()} {ref_parm.name()} "{value}"'
+                    )
+                    if hou.isUIAvailable():
+                        # Somehow this only works if we defer it
+                        import hdefereval  # noqa
+                        hdefereval.executeDeferred(partial(hou.hscript, cmd))
+                    else:
+                        hou.hscript(cmd)
