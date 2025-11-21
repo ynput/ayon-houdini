@@ -8,7 +8,6 @@ from ayon_core.pipeline.create import CreateContext
 from ayon_houdini.api.workfile_template_builder import (
     HoudiniPlaceholderPlugin
 )
-from ayon_houdini.api.lib import read
 
 
 class HoudiniPlaceholderCreatePlugin(
