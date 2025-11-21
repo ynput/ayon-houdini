@@ -1,6 +1,6 @@
 name = "houdini"
 title = "Houdini"
-version = "0.8.3+dev"
+version = "0.9.0"
 app_host_name = "houdini"
 client_dir = "ayon_houdini"
 project_can_override_addon_version = True
