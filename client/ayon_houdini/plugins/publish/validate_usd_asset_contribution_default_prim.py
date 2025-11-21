@@ -8,6 +8,7 @@ from ayon_core.pipeline.publish import RepairAction, OptionalPyblishPluginMixin
 from ayon_core.pipeline.usdlib import get_standard_default_prim_name
 
 from ayon_houdini.api.action import SelectROPAction
+from ayon_houdini.api.usd import DEFAULT_PRIM_EXPRESSION
 from ayon_houdini.api import plugin
 
 
@@ -75,10 +76,7 @@ class ValidateUSDAssetContributionDefaultPrim(plugin.HoudiniInstancePlugin,
     @classmethod
     def repair(cls, instance):
         rop_node = hou.node(instance.data["instance_node"])
-        rop_node.parm("defaultprim").set(
-            '/`ifs(strmatch("[0-9]", strsplit(chs("folderPath"), "/", -1)[0])'
-            ', "_", "")``strsplit(chs("folderPath"), "/", -1)`'
-        )
+        rop_node.parm("defaultprim").set(DEFAULT_PRIM_EXPRESSION)
 
     @staticmethod
     def get_attr_values_from_data_for_plugin_name(
