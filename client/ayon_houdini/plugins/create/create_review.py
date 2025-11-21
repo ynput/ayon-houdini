@@ -25,7 +25,7 @@ class CreateReview(plugin.HoudiniCreator):
     # such as `rop.flipbook` for flipbook nodes
     # and `rop.opengl` for OpenGL nodes.
     def get_publish_families(self):
-        return ["review", "rop.opengl"]
+        return ["review", "rop.opengl", "publish.hou"]
 
     def apply_settings(self, project_settings):
         super(CreateReview, self).apply_settings(project_settings)

@@ -65,7 +65,7 @@ class CreateUSD(plugin.HoudiniCreator):
         ]
 
     def get_publish_families(self):
-        return ["usd", "usdrop"]
+        return ["usd", "usdrop", "publish.hou"]
 
     def get_instance_attr_defs(self):
         render_target_items = {
@@ -194,4 +194,4 @@ class CreateUSDLook(CreateUSD):
         """)
 
     def get_publish_families(self):
-        return ["usd", "look", "usdrop"]
+        return ["usd", "look", "usdrop", "publish.hou"]

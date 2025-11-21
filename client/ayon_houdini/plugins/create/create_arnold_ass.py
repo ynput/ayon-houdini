@@ -21,6 +21,9 @@ class CreateArnoldAss(plugin.HoudiniCreator):
     # Default render target
     render_target = "local"
 
+    def get_publish_families(self):
+        return ["ass", "publish.hou"]
+
     def create(self, product_name, instance_data, pre_create_data):
         import hou
 
