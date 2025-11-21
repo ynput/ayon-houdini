@@ -94,7 +94,7 @@ class USDReferenceLoader(plugin.HoudiniLoader):
             category=hou.lopNodeTypeCategory(),
             default="/stage"
         )
-        node = network.createNode("reference", node_name=node_name)
+        node = network.createNode("null", node_name=node_name)
         node.moveToGoodPosition()
         return node
 

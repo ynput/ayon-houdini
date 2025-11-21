@@ -88,6 +88,6 @@ class SopUsdImportLoader(plugin.HoudiniLoader):
         )
         if not network:
             network = hou.node("/obj").createNode("geo", "geo1")
-        node = network.createNode("usdimport", node_name=node_name)
+        node = network.createNode("null", node_name=node_name)
         node.moveToGoodPosition()
         return node

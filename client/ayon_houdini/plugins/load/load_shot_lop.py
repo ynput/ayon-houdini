@@ -57,7 +57,7 @@ class LOPLoadShotLoader(load.LoaderPlugin):
             category=hou.lopNodeTypeCategory(),
             default="/stage"
         )
-        node = network.createNode("ayon::load_shot", node_name=node_name)
+        node = network.createNode("null", node_name=node_name)
         node.moveToGoodPosition()
         return node
 

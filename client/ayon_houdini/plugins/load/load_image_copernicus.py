@@ -164,7 +164,7 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
             category=hou.copNodeTypeCategory(),
             default="/img/copnet1"
         )
-        node = network.createNode("file", node_name=node_name)
+        node = network.createNode("null", node_name=node_name)
         node.moveToGoodPosition()
         return node
 

@@ -175,6 +175,6 @@ class ImageLoader(plugin.HoudiniLoader):
             category=hou.cop2NodeTypeCategory(),
             default="/img/copnet1"
         )
-        node = network.createNode("file", node_name=node_name)
+        node = network.createNode("null", node_name=node_name)
         node.moveToGoodPosition()
         return node

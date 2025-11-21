@@ -57,7 +57,7 @@ class LOPLoadAssetLoader(load.LoaderPlugin):
             category=hou.lopNodeTypeCategory(),
             default="/stage"
         )
-        node = network.createNode("ayon::lop_import", node_name=node_name)
+        node = network.createNode("null", node_name=node_name)
         node.moveToGoodPosition()
         return node
 
