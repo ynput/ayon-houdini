@@ -7,7 +7,7 @@ project_can_override_addon_version = True
 
 ayon_server_version = ">=1.1.2"
 ayon_required_addons = {
-    "core": ">1.6.0",
+    "core": ">=1.6.11",
 }
 ayon_compatible_addons = {
     "deadline": ">0.5.16",
