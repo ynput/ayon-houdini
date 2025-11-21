@@ -134,7 +134,7 @@ def get_available_versions(
         include_hero (bool): Whether to include hero version if it exists.
 
     Returns:
-        list[str | int]: Version label with version names for the product
+        list[str | int]: Available version names for the product
     """
 
     project_name = node.evalParm("project_name") or get_current_project_name()
