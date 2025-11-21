@@ -257,7 +257,7 @@ def containerise(name,
         suffix (str, optional): Suffix of container, defaults to `_CON`.
 
     Returns:
-        container (str): Name of container assembly
+        container (hou.Node): Name of container assembly
 
     """
 
@@ -282,7 +282,7 @@ def containerise(name,
     lib.imprint(container, data)
 
     # "Parent" the container under the container network
-    hou.moveNodesTo([container], subnet)
+    container = hou.moveNodesTo([container], subnet)[0]
 
     subnet.node(container_name).moveToGoodPosition()
 
