@@ -169,7 +169,13 @@ def get_available_versions(
         fields={"version"},
         hero=include_hero,
     )
-    for version in reversed(list(versions)):
+    def _sort_versions(version: dict) -> float:
+        # Hero versions are negative and should be just below their non-hero
+        # positive equivalents, like 1, 2, 3, -4, 4.
+        num: int = version["version"]
+        return float(abs(num) - (int(num < 0) * 0.5))
+
+    for version in sorted(versions, key=_sort_versions, reverse=True):
         all_version_names.append(version["version"])
     return all_version_names
 
