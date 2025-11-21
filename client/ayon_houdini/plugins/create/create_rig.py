@@ -24,7 +24,7 @@ class CreateRig(plugin.HoudiniCreator):
         )
 
     def get_publish_families(self):
-        return ["rig", "bgeo"]
+        return ["rig", "bgeo", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
         instance = super().create(product_name, instance_data, pre_create_data)
