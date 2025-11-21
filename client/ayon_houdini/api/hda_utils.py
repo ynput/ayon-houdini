@@ -3,20 +3,17 @@
 import os
 import re
 import uuid
-from typing import List
+from typing import List, Union
 
 import hou
 from qtpy import QtCore, QtWidgets, QtGui
 
 import ayon_api
 from ayon_api import (
-    get_project,
     get_representation_by_id,
     get_versions,
     get_folder_by_path,
     get_product_by_name,
-    get_version_by_name,
-    get_representation_by_name,
     get_representations,
 )
 from ayon_core.pipeline import Anatomy
@@ -25,6 +22,7 @@ from ayon_core.pipeline.context_tools import (
     get_current_project_name,
     get_current_folder_path,
 )
+from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 from ayon_core.pipeline.load import (
     get_representation_context,
     get_representation_path_from_context,
@@ -32,7 +30,6 @@ from ayon_core.pipeline.load import (
 from ayon_core.style import load_stylesheet
 from ayon_core.tools.utils import SimpleFoldersWidget
 from ayon_houdini.api import lib
-from .usd import get_ayon_entity_uri_from_representation_context
 
 
 def load_adapted_stylesheet(widget: QtWidgets.QWidget) -> str:
@@ -95,31 +92,68 @@ def is_valid_uuid(value) -> bool:
     return True
 
 
-def get_available_versions(node):
-    """Return the versions list for node.
+def get_available_versions_with_labels(
+    node,
+    include_latest=True,
+    include_hero=True
+) -> list[str]:
+    # Result ordered as version 1 value, version 1 label, version 2 value,
+    # version 2 label and so forth. Used for displaying in Houdini enum menus.
+    result: list[str] = []
+    for version in get_available_versions(node, include_latest, include_hero):
+        if version == "latest":
+            result.append("latest")
+            result.append("latest")
+        elif isinstance(version, int):
+            version: int
+            version_label: str = f"v{abs(version):03d}"
+            if version < 0:
+                # Hero version
+                version: str = "hero"
+                version_label = f"[{version_label}]"
+            result.append(str(version))
+            result.append(version_label)
+        else:
+            raise ValueError(f"Unknown value to provide label for: {version}")
+    return result
+
+
+def get_available_versions(
+        node,
+        include_latest=True,
+        include_hero=True,
+    ):
+    """Return the version as list for node.
 
     The versions are sorted with the latest version first and oldest lower
     version last.
 
     Args:
         node (hou.Node): Node to query selected products' versions for.
+        include_latest (bool): Whether to include a dedicated 'latest' option.
+        include_hero (bool): Whether to include hero version if it exists.
 
     Returns:
-        list[int]: Version numbers for the product
+        list[str | int]: Available version names for the product
     """
 
     project_name = node.evalParm("project_name") or get_current_project_name()
     folder_path = node.evalParm("folder_path")
     product_name = node.evalParm("product_name")
 
+    # Always include "latest" as an option
+    all_version_names: list[Union[str, int]] = []
+    if include_latest:
+        all_version_names.append("latest")
+
     if not all([project_name, folder_path, product_name]):
-        return []
+        return all_version_names
 
     folder_entity = get_folder_by_path(
         project_name, folder_path, fields={"id"}
     )
     if not folder_entity:
-        return []
+        return all_version_names
     product_entity = get_product_by_name(
         project_name,
         product_name=product_name,
@@ -127,18 +161,17 @@ def get_available_versions(node):
         fields={"id"},
     )
     if not product_entity:
-        return []
+        return all_version_names
 
-    # TODO: Support hero versions
     versions = get_versions(
         project_name,
         product_ids={product_entity["id"]},
         fields={"version"},
-        hero=False,
+        hero=include_hero,
     )
-    version_names = [version["version"] for version in versions]
-    version_names.reverse()
-    return version_names
+    for version in reversed(list(versions)):
+        all_version_names.append(version["version"])
+    return all_version_names
 
 
 def set_node_representation_from_context(
@@ -227,8 +260,8 @@ def ensure_loader_expression_parm_defaults(node):
         parm.lock(locked)
 
 
-def get_representation_path(
-    project_name: str, representation_id: str, use_ayon_entity_uri: bool
+def _get_representation_path(
+    project_name: str, representation_id: str
 ) -> str:
     # Ignore invalid representation ids silently
     # TODO remove - added for backwards compatibility with OpenPype scenes
@@ -240,14 +273,11 @@ def get_representation_path(
         return ""
 
     context = get_representation_context(project_name, repre_entity)
-    if use_ayon_entity_uri:
-        path = get_ayon_entity_uri_from_representation_context(context)
-    else:
-        path = get_filepath_from_context(context)
-        # Load fails on UNC paths with backslashes and also
-        # fails to resolve @sourcename var with backslashed
-        # paths correctly. So we force forward slashes
-        path = path.replace("\\", "/")
+    path = get_filepath_from_context(context)
+    # Load fails on UNC paths with backslashes and also
+    # fails to resolve @sourcename var with backslashed
+    # paths correctly. So we force forward slashes
+    path = path.replace("\\", "/")
     return path
 
 
@@ -267,6 +297,30 @@ def _remove_format_spec(template: str, key: str) -> str:
     # to keep those parts in the resulting string
     pattern = f"({{{key}):[^}}]+(}})"
     return re.sub(pattern, r"\1\2", template)
+
+
+def _construct_ayon_entity_uri_str(
+        project_name: str,
+        folder_path: str,
+        product: str,
+        version: str,
+        representation_name: str
+) -> str:
+    """Wrap `construct_ayon_entity_uri` so that version allows digits
+    to be str."""
+    if version and version[-1].isdigit():
+        # Convert positive or negative digits to integer
+        try:
+            version: int = int(version)
+        except ValueError:
+            pass
+    return construct_ayon_entity_uri(
+        project_name=project_name,
+        folder_path=folder_path,
+        product=product,
+        version=version,
+        representation_name=representation_name,
+    )
 
 
 def get_filepath_from_context(context: dict):
@@ -396,6 +450,30 @@ def get_node_expected_representation_id(node) -> str:
     )
 
 
+def _resolve_entity_uri(entity_uri: str, resolve_roots: bool = False):
+    """Resolve AYON entity URI to a single entity context"""
+    response = ayon_api.post(
+        "resolve",
+        resolveRoots=resolve_roots,
+        uris=[entity_uri]
+    )
+    # Raise if endpoint failed
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"Unable to resolve AYON entity URI "
+            f"'{entity_uri}': {response.text}"
+        )
+
+    # Raise error if the response contains error information
+    data = response.data[0]
+    error = data.get("error")
+    if error:
+        raise RuntimeError(error)
+
+    # We require an entity response, otherwise we will error if none matched
+    return response.data[0]["entities"]
+
+
 def get_representation_id(
     project_name,
     folder_path,
@@ -413,7 +491,7 @@ def get_representation_id(
         representation_name (str): Representation name
 
     Returns:
-        str: Representation id or None if not found.
+        str: Representation id.
 
     Raises:
         ValueError: If the entity could not be resolved with input values.
@@ -432,48 +510,24 @@ def get_representation_id(
         missing = ", ".join(key for key, value in labels.items() if not value)
         raise ValueError(f"Load info incomplete. Found empty: {missing}")
 
+    entity_uri: str = _construct_ayon_entity_uri_str(
+        project_name=project_name,
+        folder_path=folder_path,
+        product=product_name,
+        version=version,
+        representation_name=representation_name
+    )
     try:
-        version = int(version.strip())
-    except ValueError:
+        entities = _resolve_entity_uri(entity_uri)
+    except RuntimeError as exc:
+        raise ValueError(exc)
+
+    if len(entities) != 1:
         raise ValueError(
-            f"Invalid version format: '{version}'\n"
-            "Make sure to set a valid version number."
+            f"Unable to find a matching entity for {entity_uri}"
         )
 
-    folder_entity = get_folder_by_path(
-        project_name, folder_path=folder_path, fields={"id"}
-    )
-    if not folder_entity:
-        # This may be due to the project not existing - so let's validate
-        # that first
-        if not get_project(project_name):
-            raise ValueError(f"Project not found: '{project_name}'")
-        raise ValueError(f"Folder not found: '{folder_path}'")
-
-    product_entity = get_product_by_name(
-        project_name,
-        product_name=product_name,
-        folder_id=folder_entity["id"],
-        fields={"id"},
-    )
-    if not product_entity:
-        raise ValueError(f"Product not found: '{product_name}'")
-
-    version_entity = get_version_by_name(
-        project_name, version, product_id=product_entity["id"], fields={"id"}
-    )
-    if not version_entity:
-        raise ValueError(f"Version not found: '{version}'")
-
-    representation_entity = get_representation_by_name(
-        project_name,
-        representation_name,
-        version_id=version_entity["id"],
-        fields={"id"},
-    )
-    if not representation_entity:
-        raise ValueError(f"Representation not found: '{representation_name}'.")
-    return representation_entity["id"]
+    return entities[0]["representationId"]
 
 
 def setup_flag_changed_callback(node):
@@ -838,37 +892,29 @@ def get_available_representations(node):
     if not all([project_name, folder_path, product_name, version]):
         return []
 
-    try:
-        version = int(version.strip())
-    except ValueError:
-        load_message_parm = node.parm("load_message")
-        load_message_parm.set(
-            f"Invalid version format: '{version}'\n"
-            "Make sure to set a valid version number."
-        )
-        return
+    # Use wildcard entity URI to find all representations in the context
+    # to also support version values like 'latest' and 'hero'
+    uri = _construct_ayon_entity_uri_str(
+        project_name,
+        folder_path,
+        product_name,
+        version,
+        representation_name="*"
+    )
+    entities = _resolve_entity_uri(uri)
+    representation_ids = {
+        entity["representationId"] for entity in entities
+    }
 
     representation_filter = None
     filter_parm = node.parm("representation_filter")
     if filter_parm and not filter_parm.isDisabled() and filter_parm.eval():
         representation_filter = filter_parm.eval().split(" ")
 
-    folder_entity = get_folder_by_path(
-        project_name, folder_path=folder_path, fields={"id"}
-    )
-    product_entity = get_product_by_name(
-        project_name,
-        product_name=product_name,
-        folder_id=folder_entity["id"],
-        fields={"id"},
-    )
-    version_entity = get_version_by_name(
-        project_name, version, product_id=product_entity["id"], fields={"id"}
-    )
     representations = get_representations(
         project_name,
-        version_ids={version_entity["id"]},
         fields={"name"},
+        representation_ids=representation_ids,
         representation_names=representation_filter,
     )
     representations_names = [n["name"] for n in representations]
@@ -886,7 +932,8 @@ def set_to_latest_version(node):
         node (hou.OpNode): The HDA node.
     """
 
-    versions = get_available_versions(node)
+    # Get available versions, excluding the 'latest' key
+    versions = get_available_versions(node, include_latest=False)
     if versions:
         node.parm("version").set(str(versions[0]))
 
@@ -950,13 +997,43 @@ def expression_get_representation_id() -> str:
 def expression_get_representation_path() -> str:
     cache = get_session_cache().setdefault("representation_path", {})
     project_name: str = hou.evalParm("project_name")
+    folder_path: str = hou.evalParm("folder_path")
+    product_name: str = hou.evalParm("product_name")
+    version: str = hou.evalParm("version")
+    representation_name: str = hou.evalParm("representation_name")
     repre_id: str = hou.evalParm("representation")
-    use_entity_uri = bool(hou.evalParm("use_ayon_entity_uri"))
-    hash_value = project_name, repre_id, use_entity_uri
+    use_entity_uri: bool = bool(hou.evalParm("use_ayon_entity_uri"))
+    hash_value = (
+        project_name,
+        folder_path,
+        product_name,
+        version,
+        representation_name,
+        use_entity_uri
+    )
     if hash_value in cache:
         return hou.text.expandString(cache[hash_value])
 
-    path = get_representation_path(project_name, repre_id, use_entity_uri)
+    if use_entity_uri:
+        # We construct the URL regardless of whether it succeeds to resolve
+        folder_path: str = hou.evalParm("folder_path")
+        product_name: str = hou.evalParm("product_name")
+        version: str = hou.evalParm("version")
+        if version and version[-1].isdigit():
+            # Convert positive or negative digits to integer
+            try:
+                version: int = int(version)
+            except ValueError:
+                pass
+        path = construct_ayon_entity_uri(
+            project_name=project_name,
+            folder_path=folder_path,
+            product=product_name,
+            version=version,
+            representation_name=representation_name,
+        )
+    else:
+        path = _get_representation_path(project_name, repre_id)
     cache[hash_value] = path
     return hou.text.expandString(path)
 
