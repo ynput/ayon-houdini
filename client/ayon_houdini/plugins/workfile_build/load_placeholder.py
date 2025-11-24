@@ -1,5 +1,3 @@
-from functools import partial
-
 from ayon_core.pipeline.workfile.workfile_template_builder import (
     LoadPlaceholderItem,
     PlaceholderLoadMixin,
