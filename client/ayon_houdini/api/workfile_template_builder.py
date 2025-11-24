@@ -133,16 +133,12 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         placeholder_node.destroy()
 
     def _imprint(self, placeholder_node, placeholder_data, update=False):
-        # Prefix the placeholder data
-        placeholder_data = {
-            self.attr_prefix + key: value
-            for key, value in placeholder_data.items()
-        }
         imprint(
             placeholder_node,
             placeholder_data,
             update=update,
-            folder="AYON Placeholder"
+            folder="AYON Placeholder",
+            prefix=self.attr_prefix
         )
 
     def _read(self, placeholder_node: hou.Node) -> dict[str, Any]:
