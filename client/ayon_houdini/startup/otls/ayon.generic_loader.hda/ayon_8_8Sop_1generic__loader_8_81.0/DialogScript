@@ -66,14 +66,7 @@
             default { "" }
             disablewhen "{ representation_old == \"\" }"
             menureplace {
-                [ "versions = hou.phm().get_available_versions(kwargs['node'])" ]
-                [ "" ]
-                [ "result = []" ]
-                [ "for version in versions:" ]
-                [ "    result.append(str(version))" ]
-                [ "    result.append(f\"v{version:03d}\")" ]
-                [ "    " ]
-                [ "return result" ]
+                [ "hou.phm().get_available_versions_with_labels(kwargs['node'])" ]
                 language python
             }
             parmtag { "script_callback_language" "python" }
