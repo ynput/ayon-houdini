@@ -84,7 +84,7 @@ class HoudiniPlaceholderLoadPlugin(
 
         # If placeholder node is an object merge then do not move the container
         # node, but instead set the object merge to point to the container node
-        if placeholder_node.type().name() == "object_merge":
+        if placeholder_node.type().category().name() == "Sop":
             name = container.name().removesuffix("_CON")
             node = target_context.createNode(
                 "object_merge",
