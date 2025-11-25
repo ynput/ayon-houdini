@@ -108,14 +108,20 @@ class HoudiniPlaceholderLoadPlugin(
         self.transfer_node_connections(placeholder_node, node)
 
     def transfer_node_connections(self, source_node, target_node):
+        """Transfer input and output connections from source to target node."""
         # Transfer input connections
-        for idx in range(len(source_node.inputs())):
-            input_node = source_node.input(idx)
-            if input_node is not None:
-                target_node.setInput(idx, input_node)
+        for conn in source_node.inputConnections():
+            target_node.setInput(
+                conn.inputIndex(),
+                conn.inputNode(),
+                conn.outputIndex(),
+            )
 
         # Transfer output connections
-        for output_node in source_node.outputs():
-            for idx in range(len(output_node.inputs())):
-                if output_node.input(idx) == source_node:
-                    output_node.setInput(idx, target_node)
+        for conn in source_node.outputConnections():
+            output_node = conn.outputNode()
+            output_node.setInput(
+                conn.inputIndex(),
+                target_node,
+                conn.outputIndex(),
+            )
