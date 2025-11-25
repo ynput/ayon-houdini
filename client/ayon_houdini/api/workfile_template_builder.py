@@ -15,7 +15,8 @@ from .lib import (
     imprint,
     read,
     lsattr,
-    get_main_window
+    get_main_window,
+    disconnect_node
 )
 from .plugin import HoudiniCreator
 
@@ -130,6 +131,14 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
 
     def delete_placeholder(self, placeholder):
         placeholder_node = hou.node(placeholder.scene_identifier)
+
+        # Connections should have been transferred but may also have been
+        # inserted to output nodes with the placeholder node, in that case
+        # the connection with placeholder node still exists, but we don't want
+        # Houdini to delete the node and then 'keep' the connection passed
+        # through from input node to output node.
+        disconnect_node(placeholder_node)
+
         placeholder_node.destroy()
 
     def _imprint(self, placeholder_node, placeholder_data, update=False):

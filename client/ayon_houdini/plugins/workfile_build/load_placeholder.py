@@ -108,7 +108,11 @@ class HoudiniPlaceholderLoadPlugin(
         self.transfer_node_connections(placeholder_node, node)
 
     def transfer_node_connections(self, source_node, target_node):
-        """Transfer input and output connections from source to target node."""
+        """Transfer input and output connections from source to target node.
+
+        The source node is the placeholder node.
+        The target node is the loaded container node.
+        """
         # Transfer input connections
         for conn in source_node.inputConnections():
             target_node.setInput(
@@ -119,9 +123,20 @@ class HoudiniPlaceholderLoadPlugin(
 
         # Transfer output connections
         for conn in source_node.outputConnections():
+            # When going through `merge` target nodes insert new
+            # connections so multiple loaded placeholders can all add into
+            # a single merge.
             output_node = conn.outputNode()
-            output_node.setInput(
-                conn.inputIndex(),
-                target_node,
-                conn.outputIndex(),
-            )
+            if output_node.type().name() == "merge":
+                # Insert the connection after the placeholder connection
+                output_node.insertInput(
+                    conn.inputIndex() + 1,
+                    target_node,
+                    conn.outputIndex(),
+                )
+            else:
+                output_node.setInput(
+                    conn.inputIndex(),
+                    target_node,
+                    conn.outputIndex(),
+                )

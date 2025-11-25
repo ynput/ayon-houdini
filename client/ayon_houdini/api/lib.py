@@ -1744,3 +1744,22 @@ def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
         return hou.text.expandString(matched_string)
 
     return re.sub(pattern, expand_match, text)
+
+
+def disconnect_connection(connection: hou.NodeConnection):
+    """Disconnect a connection."""
+    connection.outputNode().setInput(
+        connection.inputIndex(),
+        None
+    )
+
+
+def disconnect_node(node: hou.Node, inputs: bool=True, outputs: bool=True):
+    """Disconnect all input and output connections on given node."""
+    # Remove in reverse so indices do not shift along the way
+    if inputs:
+        for conn in reversed(node.inputConnections()):
+            disconnect_connection(conn)
+    if outputs:
+        for conn in reversed(node.outputConnections()):
+            disconnect_connection(conn)
