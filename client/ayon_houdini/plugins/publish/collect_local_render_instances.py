@@ -22,8 +22,8 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
     Agnostic Local Render Collector.
     """
 
-    # this plugin runs after Collect Render Products
-    order = pyblish.api.CollectorOrder + 0.12
+    # this plugin runs after Collect Render Colorspace
+    order = pyblish.api.CollectorOrder + 0.151
     families = ["mantra_rop",
                 "karma_rop",
                 "redshift_rop",
@@ -93,7 +93,6 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         #   would need to be detected in a renderer-specific way and the
         #   majority of production scenarios these would not be overridden.
         # TODO: Support renderer-specific explicit colorspace overrides
-        colorspace = get_scene_linear_colorspace()
 
         for aov_name, aov_filepaths in expected_files.items():
             dynamic_data = {}
@@ -146,10 +145,26 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 "frameEnd": instance.data["frameEndHandle"]
             }
 
+            # Transfer the instance colorspace information too, because these
+            # may represent scene display/view, etc.
+            for key in (
+                "colorspaceConfig",
+                "colorspace"
+                "colorspaceDisplay",
+                "colorspaceView",
+            ):
+                if key in instance.data:
+                    value: str = instance.data[key]
+                    self.log.debug(f"Transfering '{key}': {value}")
+                    aov_instance.data[key] = value
+
             # Set the colorspace for the representation
-            self.set_representation_colorspace(representation,
-                                               context,
-                                               colorspace=colorspace)
+            if "colorspace" in instance.data:
+                self.set_representation_colorspace(
+                    representation,
+                    context,
+                    colorspace=instance.data["colorspace"],
+                )
 
             aov_instance.data.update({
                 # 'label': label,
