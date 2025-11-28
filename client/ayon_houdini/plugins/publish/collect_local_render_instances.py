@@ -148,7 +148,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             # may represent scene display/view, etc.
             for key in (
                 "colorspaceConfig",
-                "colorspace"
+                "colorspace",
                 "colorspaceDisplay",
                 "colorspaceView",
             ):
