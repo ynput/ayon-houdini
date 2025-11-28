@@ -12,7 +12,6 @@ from ayon_core.pipeline.publish import (
     ColormanagedPyblishPluginMixin
 )
 from ayon_houdini.api import plugin
-from ayon_houdini.api.colorspace import get_scene_linear_colorspace
 
 
 class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
