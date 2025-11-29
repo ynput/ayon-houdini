@@ -295,7 +295,7 @@ def render_rop(ropnode, frame_range=None):
         raise RuntimeError("Render failed: {0}".format(exc))
 
 
-def imprint(node, data, update=False, folder="Extra"):
+def imprint(node, data, update=False, folder="Extra", prefix=""):
     """Store attributes with value on a node
 
     Depending on the type of attribute it creates the correct parameter
@@ -317,6 +317,9 @@ def imprint(node, data, update=False, folder="Extra"):
             add new.
         folder (str, optional): The folder name to add new parms into.
             Defaults to "Extra" due to legacy reasons.
+        prefix (str, optional): A prefix to add to the data to ensure
+            uniqueness. This prefix is added to the attribute name, but
+            not to the attribute labels.
 
     Returns:
         None
@@ -332,11 +335,12 @@ def imprint(node, data, update=False, folder="Extra"):
     update_parm_templates = []
     new_parm_templates = []
 
-    for key, value in data.items():
+    for label, value in data.items():
         if value is None:
             continue
 
-        parm_template = get_template_from_value(key, value)
+        key = prefix + label
+        parm_template = get_template_from_value(key, value, label=label)
 
         if key in current_parms:
             if node.evalParm(key) == value:
@@ -550,29 +554,32 @@ def get_main_window():
     return self._parent
 
 
-def get_template_from_value(key, value):
+def get_template_from_value(key, value, label=None):
+    if label is None:
+        label = key
+
     if isinstance(value, float):
         parm = hou.FloatParmTemplate(name=key,
-                                     label=key,
+                                     label=label,
                                      num_components=1,
                                      default_value=(value,))
     elif isinstance(value, bool):
         parm = hou.ToggleParmTemplate(name=key,
-                                      label=key,
+                                      label=label,
                                       default_value=value)
     elif isinstance(value, int):
         parm = hou.IntParmTemplate(name=key,
-                                   label=key,
+                                   label=label,
                                    num_components=1,
                                    default_value=(value,))
     elif isinstance(value, str):
         parm = hou.StringParmTemplate(name=key,
-                                      label=key,
+                                      label=label,
                                       num_components=1,
                                       default_value=(value,))
     elif isinstance(value, (dict, list, tuple)):
         parm = hou.StringParmTemplate(name=key,
-                                      label=key,
+                                      label=label,
                                       num_components=1,
                                       default_value=(
                                           JSON_PREFIX + json.dumps(value),))
@@ -1737,3 +1744,22 @@ def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
         return hou.text.expandString(matched_string)
 
     return re.sub(pattern, expand_match, text)
+
+
+def disconnect_connection(connection: hou.NodeConnection):
+    """Disconnect a connection."""
+    connection.outputNode().setInput(
+        connection.inputIndex(),
+        None
+    )
+
+
+def disconnect_node(node: hou.Node, inputs: bool=True, outputs: bool=True):
+    """Disconnect all input and output connections on given node."""
+    # Remove in reverse so indices do not shift along the way
+    if inputs:
+        for conn in reversed(node.inputConnections()):
+            disconnect_connection(conn)
+    if outputs:
+        for conn in reversed(node.outputConnections()):
+            disconnect_connection(conn)
