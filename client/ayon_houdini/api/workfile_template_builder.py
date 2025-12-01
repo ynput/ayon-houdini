@@ -1,3 +1,4 @@
+from typing import Any
 import hou
 
 from ayon_core.pipeline import registered_host
@@ -12,8 +13,10 @@ from ayon_core.tools.utils import show_message_dialog
 
 from .lib import (
     imprint,
+    read,
     lsattr,
-    get_main_window
+    get_main_window,
+    disconnect_node
 )
 from .plugin import HoudiniCreator
 
@@ -63,6 +66,8 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
     Inherited classes must still implement `populate_placeholder`
     """
 
+    attr_prefix: str = "AYON_placeholder_"
+
     def get_placeholder_node_name(self, placeholder_data):
         return self.identifier.replace(".", "_")
 
@@ -91,8 +96,7 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         HoudiniCreator.customize_node_look(placeholder_node)
 
         placeholder_data["plugin_identifier"] = self.identifier
-
-        imprint(placeholder_node, placeholder_data)
+        self._imprint(placeholder_node, placeholder_data)
 
     def collect_scene_placeholders(self):
         # Read the cache by identifier
@@ -100,12 +104,14 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
             self.identifier
         )
         if placeholder_nodes is None:
-            placeholder_nodes = []
 
-            nodes = lsattr("plugin_identifier", self.identifier)
-
-            for node in nodes:
-                placeholder_nodes.append(node)
+            placeholder_nodes = lsattr(self.attr_prefix + "plugin_identifier",
+                                       self.identifier)
+            if self.attr_prefix:
+                # Backwards compatibility: support cases without attr prefix
+                placeholder_nodes.extend(
+                    lsattr("plugin_identifier", self.identifier)
+                )
 
             # Set the cache by identifier
             self.builder.set_shared_populate_data(
@@ -116,7 +122,7 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
 
     def update_placeholder(self, placeholder_item, placeholder_data):
         placeholder_node = hou.node(placeholder_item.scene_identifier)
-        imprint(placeholder_node, placeholder_data, update=True)
+        self._imprint(placeholder_node, placeholder_data, update=True)
 
         # Update node name
         node_name = self.get_placeholder_node_name(placeholder_data)
@@ -125,7 +131,40 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
 
     def delete_placeholder(self, placeholder):
         placeholder_node = hou.node(placeholder.scene_identifier)
+
+        # Connections should have been transferred but may also have been
+        # inserted to output nodes with the placeholder node, in that case
+        # the connection with placeholder node still exists, but we don't want
+        # Houdini to delete the node and then 'keep' the connection passed
+        # through from input node to output node.
+        disconnect_node(placeholder_node)
+
         placeholder_node.destroy()
+
+    def _imprint(self, placeholder_node, placeholder_data, update=False):
+        imprint(
+            placeholder_node,
+            placeholder_data,
+            update=update,
+            folder="AYON Placeholder",
+            prefix=self.attr_prefix
+        )
+
+    def _read(self, placeholder_node: hou.Node) -> dict[str, Any]:
+        """Read attributes from the node, removing the placeholder prefix"""
+        data = read(placeholder_node)
+
+        # Convert prefixed attributes to the regular data keys overriding
+        # any backwards compatible keys that pre-existed from before we
+        # started adding prefixes.
+        for key in list(data):
+            if key.startswith(self.attr_prefix):
+                # Remove prefix and re-assign it
+                value = data.pop(key)
+                key = key[len(self.attr_prefix):]
+                data[key] = value
+
+        return data
 
 
 def build_workfile_template(*args, **kwargs):

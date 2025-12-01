@@ -34,6 +34,8 @@ class LOPLoadShotLoader(load.LoaderPlugin):
         nodes = [node]
         self[:] = nodes
 
+        return node
+
     def update(self, container, context):
         node = container["node"]
         hda_utils.set_node_representation_from_context(node, context)
@@ -44,3 +46,18 @@ class LOPLoadShotLoader(load.LoaderPlugin):
 
     def switch(self, container, context):
         self.update(container, context)
+
+    def create_load_placeholder_node(
+        self, node_name: str, placeholder_data: dict
+    ) -> hou.Node:
+        """Define how to create a placeholder node for this loader for the
+        Workfile Template Builder system."""
+        # Create node
+        network = find_active_network(
+            category=hou.lopNodeTypeCategory(),
+            default="/stage"
+        )
+        node = network.createNode("null", node_name=node_name)
+        node.moveToGoodPosition()
+        return node
+
