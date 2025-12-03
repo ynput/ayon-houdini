@@ -76,19 +76,23 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
         for file_path, frame in last_published_and_frames.items():
             if frame is None:
                 continue
+
+            # Last published filepath
             file_path = anatomy.fill_root(file_path)
             if not os.path.exists(file_path):
                 continue
-            target_file_name = frames_and_expected.get(frame)
-            if not target_file_name:
+
+            # Expected filepath for this render for that frame
+            target_filepath: str = frames_and_expected.get(frame)
+            if not target_filepath:
                 continue
 
-            out_path = os.path.join(staging_dir, target_file_name)
-
             # Copy only the frames that we won't render.
-            if frame and frame not in frames_to_fix:
-                self.log.debug(f"Copying '{file_path}' -> '{out_path}'")
-                shutil.copy(file_path, out_path)
+            if frame in frames_to_fix:
+                continue
+
+            self.log.debug(f"Copying '{file_path}' -> '{target_filepath}'")
+            shutil.copy(file_path, target_filepath)
 
     def get_expected_files_and_staging_dir(self, instance):
         """Get expected file names or frames.
