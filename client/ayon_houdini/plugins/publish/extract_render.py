@@ -20,6 +20,16 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
     def process(self, instance):
         creator_attribute = instance.data["creator_attributes"]
 
+        if (
+            creator_attribute.get("render_target")
+            == "local_export_farm_render"
+        ):
+            # Render the ROP and mark split render to be disabled
+            # so that farm submission plug-ins
+            # will only submit the Render Job with the render file
+            self.render_rop(instance)
+            instance.data["splitRender"] = False
+
         if instance.data.get("farm"):
             self.log.debug(
                 "Render should be processed on farm, skipping local render."

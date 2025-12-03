@@ -25,7 +25,9 @@ class CollectFarmInstances(plugin.HoudiniInstancePlugin):
 
         # Collect Render Target
         if creator_attribute.get("render_target") not in {
-            "farm_split", "farm"
+            "farm_split",
+            "farm",
+            "local_export_farm_render",
         }:
             instance.data["farm"] = False
             instance.data["splitRender"] = False
@@ -38,6 +40,6 @@ class CollectFarmInstances(plugin.HoudiniInstancePlugin):
             return
 
         instance.data["farm"] = True
-        instance.data["splitRender"] = (
-            creator_attribute.get("render_target") == "farm_split"
-        )
+        instance.data["splitRender"] = creator_attribute.get(
+            "render_target",
+        ) in {"farm_split", "local_export_farm_render"}
