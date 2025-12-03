@@ -54,13 +54,15 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
                            "last version published files.")
             return
 
-        staging_dir, expected_filenames = (
-            self.get_expected_files_and_staging_dir(instance)
-        )
+        expected_filepaths = self.get_expected_files_and_staging_dir(instance)
 
+        # We assume all outputs of this one instance end up in one folder, and
+        # hence there being just one 'staging dir'. We will take the first
+        # expected file's folder as staging directory.
+        staging_dir: str = os.path.dirname(expected_filepaths[0])
         os.makedirs(staging_dir, exist_ok=True)
 
-        expected_and_frames = collect_frames(expected_filenames)
+        expected_and_frames = collect_frames(expected_filepaths)
         frames_and_expected = {v: k for k, v in expected_and_frames.items()}
         frames_to_fix = clique.parse(frames_to_fix, "{ranges}")
 
@@ -97,11 +99,10 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             instance (pyblish.api.Instance): The instance to publish.
 
         Returns:
-            tuple[str, list[str]]: A 2-tuple of staging dir and the list of
-                expected frames for the current publish instance.
+            list[str]: Full paths to the expected filepaths for this publish
+                instance.
         """
-        expected_filenames = []
-        staging_dir = instance.data.get("stagingDir")
+        expected_filepaths: list[str] = []
         expected_files = instance.data.get("expectedFiles", [])
 
         # 'expectedFiles' are preferred over 'frames'
@@ -110,17 +111,18 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             # This can be Render products or submitted cache to farm.
             for expected in expected_files:
                 # expected.values() is a list of lists
-                expected_filenames.extend(sum(expected.values(), []))
+                expected_filepaths.extend(sum(expected.values(), []))
         else:
             # Products with frames or single file.
             frames = instance.data.get("frames", "")
+            staging_dir: str = instance.data.get("stagingDir")
             if isinstance(frames, str):
                 # single file.
-                expected_filenames.append("{}/{}".format(staging_dir, frames))
+                expected_filepaths.append("{}/{}".format(staging_dir, frames))
             else:
                 # list of frame.
-                expected_filenames.extend(
+                expected_filepaths.extend(
                     ["{}/{}".format(staging_dir, f) for f in frames]
                 )
 
-        return staging_dir, expected_filenames
+        return expected_filepaths
