@@ -399,6 +399,9 @@ def lsattr(attr, value=None, root="/", recurse_in_locked_nodes=True):
          value (object, Optional): The value to compare the attribute too.
             When the default None is provided the value check is skipped.
         root (str): The root path in Houdini to search in.
+        recurse_in_locked_nodes (bool): If True, the function will recurse
+            inside locked child nodes and include children of the locked
+            child nodes in the returned tuple.
     Returns:
         list: Matching nodes that have attribute with value.
     """
