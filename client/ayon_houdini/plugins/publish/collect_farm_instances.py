@@ -40,6 +40,7 @@ class CollectFarmInstances(plugin.HoudiniInstancePlugin):
             return
 
         instance.data["farm"] = True
-        instance.data["splitRender"] = creator_attribute.get(
-            "render_target",
-        ) in {"farm_split", "local_export_farm_render"}
+        instance.data["splitRender"] = (
+            creator_attribute.get("render_target")
+            in {"farm_split", "local_export_farm_render"}
+        )
