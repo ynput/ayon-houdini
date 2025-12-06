@@ -102,8 +102,17 @@ class HoudiniCreatorBase(object):
 
             nodes = []
             for id_type in [AYON_INSTANCE_ID, AVALON_INSTANCE_ID]:
-                nodes.extend(lsattr("id", id_type))
+                nodes.extend(
+                    lsattr("id", id_type, recurse_in_locked_nodes=False)
+                )
             for node in nodes:
+
+                # Exclude nodes that are not editable because they are
+                # inside a locked HDA, because those currently would fail
+                # to apply instance attributes, etc. - Fix #332
+                # TODO: Implement #333: Support creator instances in HDAs
+                if not node.isEditableInsideLockedHDA():
+                    continue
 
                 creator_identifier_parm = node.parm("creator_identifier")
                 if creator_identifier_parm:
