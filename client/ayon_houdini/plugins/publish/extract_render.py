@@ -20,13 +20,18 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
     def process(self, instance):
         creator_attribute = instance.data["creator_attributes"]
 
-        if instance.data.get("farm"):
+        do_local_render = (
+            creator_attribute.get("render_target")
+            in {"local", "local_export_farm_render"}
+        )
+
+        if instance.data.get("farm") and not do_local_render:
             self.log.debug(
                 "Render should be processed on farm, skipping local render."
             )
             return
 
-        if creator_attribute.get("render_target") == "local":
+        if do_local_render:
             # FIXME Render the entire frame range if any of the AOVs does
             #   not have a previously rendered version. This situation breaks
             #   the publishing.
@@ -34,6 +39,12 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             #   cannot render different frame ranges for each AOV; they always
             #   use the same frame range for all AOVs.
             self.render_rop(instance)
+
+        if (
+            creator_attribute.get("render_target")
+            == "local_export_farm_render"
+        ):
+            return
 
         # `ExpectedFiles` is a list that includes one dict.
         expected_files = instance.data["expectedFiles"][0]

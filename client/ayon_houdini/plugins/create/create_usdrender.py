@@ -73,7 +73,10 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
         if self.selected_nodes:
             parms["loppath"] = self.selected_nodes[0].path()
 
-        if pre_create_data.get("render_target") == "farm_split":
+        if pre_create_data.get("render_target") in {
+            "farm_split",
+            "local_export_farm_render",
+        }:
             # Do not trigger the husk render, only trigger the USD export
             parms["runcommand"] = False
             # By default, the render ROP writes out the render file to a
@@ -124,6 +127,7 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
             "local_no_render": "Use existing frames (local)",
             "farm": "Farm Rendering",
             "farm_split": "Farm Rendering - Split export & render jobs",
+            "local_export_farm_render": "Local Export & Farm Rendering",
         }
 
         return [
