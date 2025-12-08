@@ -390,7 +390,7 @@ def imprint(node, data, update=False, folder="Extra", prefix=""):
     node.setParmTemplateGroup(parm_group)
 
 
-def lsattr(attr, value=None, root="/"):
+def lsattr(attr, value=None, root="/", recurse_in_locked_nodes=True):
     """Return nodes that have `attr`
      When `value` is not None it will only return nodes matching that value
      for the given attribute.
@@ -399,6 +399,9 @@ def lsattr(attr, value=None, root="/"):
          value (object, Optional): The value to compare the attribute too.
             When the default None is provided the value check is skipped.
         root (str): The root path in Houdini to search in.
+        recurse_in_locked_nodes (bool): If True, the function will recurse
+            inside locked child nodes and include children of the locked
+            child nodes in the returned tuple.
     Returns:
         list: Matching nodes that have attribute with value.
     """
@@ -406,7 +409,9 @@ def lsattr(attr, value=None, root="/"):
         # Use allSubChildren() as allNodes() errors on nodes without
         # permission to enter without a means to continue of querying
         # the rest
-        nodes = hou.node(root).allSubChildren()
+        nodes = hou.node(root).allSubChildren(
+            recurse_in_locked_nodes=recurse_in_locked_nodes
+        )
         return [n for n in nodes if n.parm(attr)]
     return lsattrs({attr: value})
 
