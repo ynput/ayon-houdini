@@ -126,7 +126,7 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
             "local": "Local machine rendering",
             "local_no_render": "Use existing frames (local)",
             "farm": "Farm Rendering",
-            "farm_split": "Farm Rendering - Split export & render jobs",
+            "farm_split": "Farm Export & Farm Rendering",
             "local_export_farm_render": "Local Export & Farm Rendering",
         }
 

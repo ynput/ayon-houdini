@@ -38,7 +38,10 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
             "trange": 1,
         }
 
-        if pre_create_data.get("render_target") == "farm_split":
+        if pre_create_data.get("render_target") in {
+            "farm_split",
+            "local_export_farm_render",
+        }:
             parms["soho_outputmode"] = 1
 
         if self.selected_nodes:
@@ -82,7 +85,7 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
             "local": "Local machine rendering",
             "local_no_render": "Use existing frames (local)",
             "farm": "Farm Rendering",
-            "farm_split": "Farm Rendering - Split export & render jobs",
+            "farm_split": "Farm Export & Farm Rendering",
             "local_export_farm_render": "Local Export & Farm Rendering",
         }
 
