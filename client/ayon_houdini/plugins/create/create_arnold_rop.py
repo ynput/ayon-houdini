@@ -72,6 +72,7 @@ class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
             "local_no_render": "Use existing frames (local)",
             "farm": "Farm Rendering",
             "farm_split": "Farm Rendering - Split export & render jobs",
+            "local_export_farm_render": "Local Export & Farm Rendering",
         }
 
         return [
