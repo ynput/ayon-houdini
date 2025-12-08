@@ -58,7 +58,10 @@ class CreateVrayROP(plugin.RenderLegacyProductTypeCreator):
             "use_render_channels": 0,
         }
 
-        if pre_create_data.get("render_target") == "farm_split":
+        if pre_create_data.get("render_target") in {
+            "farm_split",
+            "local_export_farm_render",
+        }:
             # Setting render_export_mode to "2" because that's for
             # "Export only" ("1" is for "Export & Render")
             parms["render_export_mode"] = "2"

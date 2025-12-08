@@ -43,7 +43,10 @@ class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
             "ar_exr_half_precision": 1           # half precision
         }
 
-        if pre_create_data.get("render_target") == "farm_split":
+        if pre_create_data.get("render_target") in {
+            "farm_split",
+            "local_export_farm_render",
+        }:
             parms["ar_ass_export_enable"] = 1
 
         instance_node.setParms(parms)

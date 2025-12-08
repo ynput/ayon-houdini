@@ -93,7 +93,10 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
                     camera = node.path()
             parms["RS_renderCamera"] = camera or ""
 
-        if pre_create_data.get("render_target") == "farm_split":
+        if pre_create_data.get("render_target") in {
+            "farm_split",
+            "local_export_farm_render",
+        }:
             parms["RS_archive_enable"] = 1
 
         instance_node.setParms(parms)

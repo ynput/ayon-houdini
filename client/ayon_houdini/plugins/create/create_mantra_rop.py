@@ -38,7 +38,10 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
             "trange": 1,
         }
 
-        if pre_create_data.get("render_target") == "farm_split":
+        if pre_create_data.get("render_target") in {
+            "farm_split",
+            "local_export_farm_render",
+        }:
             parms["soho_outputmode"] = 1
 
         if self.selected_nodes:
