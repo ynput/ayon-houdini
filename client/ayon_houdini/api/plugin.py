@@ -471,6 +471,7 @@ class RenderLegacyProductTypeCreator(HoudiniCreator):
     # Overriding `product_type` avoids linters complaining that the attribute
     # is actually a property that can't be assigned to in `apply_settings`
     # because it inherits as property from `Creator`.
+    product_base_type = "render"
     product_type = "render"
     legacy_product_type = "render"
     use_legacy_product_type = False
