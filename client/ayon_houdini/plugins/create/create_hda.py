@@ -155,6 +155,7 @@ class CreateHDA(plugin.HoudiniCreator):
     label = "Houdini Digital Asset (Hda)"
     description = "Create a Houdini Digital Asset (HDA) product"
     product_type = "hda"
+    product_base_type = "hda"
     icon = "gears"
 
     def _check_existing(self, folder_path, product_name):

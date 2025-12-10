@@ -12,6 +12,7 @@ class CreateFBX(plugin.HoudiniCreator):
     identifier = "io.ayon.creators.houdini.model.fbx"
     label = "Model (FBX)"
     product_type = "model"
+    product_base_type = "model"
     icon = "cube"
     default_variants = ["Main"]
     description = "Create a static model as FBX file"
@@ -195,6 +196,7 @@ class CreateStaticMesh(CreateFBX):
     identifier = "io.openpype.creators.houdini.staticmesh.fbx"
     label = "Static Mesh (FBX)"
     product_type = "staticMesh"
+    product_base_type = "staticMesh"
     icon = "cube"
     description = __doc__
 

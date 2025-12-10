@@ -12,6 +12,7 @@ class CreateRig(plugin.HoudiniCreator):
     identifier = "io.ayon.creators.houdini.bgeo.rig"
     label = "Rig"
     product_type = "rig"
+    product_base_type = "rig"
     icon = "wheelchair"
 
     description = "APEX rig exported as BGEO file"

@@ -8,6 +8,7 @@ class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
     identifier = "io.openpype.creators.houdini.arnold_rop"
     label = "Arnold ROP"
     legacy_product_type = "arnold_rop"
+    product_base_type = "render"
     icon = "magic"
     description =  "Create Arnold ROP for rendering with Arnold"
 

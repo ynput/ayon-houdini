@@ -14,6 +14,7 @@ class CreateVrayROP(plugin.RenderLegacyProductTypeCreator):
     label = "VRay ROP"
     description = "Create V-Ray ROP for rendering with V-Ray"
     legacy_product_type = "vray_rop"
+    product_base_type = "render"
     icon = "magic"
     ext = "exr"
 

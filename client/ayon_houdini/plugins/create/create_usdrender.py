@@ -26,6 +26,7 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
     identifier = "io.openpype.creators.houdini.usdrender"
     label = "USD Render"
     legacy_product_type = "usdrender"
+    product_base_type = "render"
     icon = "magic"
     description = "Create USD Render"
 

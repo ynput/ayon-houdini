@@ -14,6 +14,7 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
     label = "Composite (COP2)"
     description = "Render legacy COP2 ROP to image sequence"
     product_type = "imagesequence"
+    product_base_type = "imagesequence"
     icon = "fa5.eye"
 
     ext = ".exr"

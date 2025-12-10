@@ -9,6 +9,7 @@ class CreateKarmaROP(plugin.RenderLegacyProductTypeCreator):
     identifier = "io.openpype.creators.houdini.karma_rop"
     label = "Karma ROP"
     legacy_product_type = "karma_rop"
+    product_base_type = "render"
     icon = "magic"
     description = "Create Karma ROP for rendering with Karma"
 

@@ -13,6 +13,7 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.camera"
     label = "Camera (Abc)"
     product_type = "camera"
+    product_base_type = "camera"
     icon = "camera"
     description = __doc__
 

@@ -10,6 +10,7 @@ class CreateUSDComponentBuilder(plugin.HoudiniCreator):
     identifier = "io.ayon.creators.houdini.componentbuilder"
     label = "USD Component Builder LOPs"
     product_type = "usd"
+    product_base_type = "usd"
     icon = "cubes"
     description = "Create USD from Component Builder LOPs"
 

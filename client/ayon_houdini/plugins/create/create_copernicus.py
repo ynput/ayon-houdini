@@ -14,6 +14,7 @@ class CreateCopernicusROP(plugin.HoudiniCreator):
     label = "Composite (Copernicus)"
     description = "Render using the Copernicus Image ROP"
     product_type = "render"
+    product_base_type = "render"
     icon = "fa5.eye"
 
     ext = ".exr"

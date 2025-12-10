@@ -14,6 +14,7 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
     label = "Redshift ROP"
     description = "Create Redshift ROP for rendering with Redshift"
     legacy_product_type = "redshift_rop"
+    product_base_type = "render"
     icon = "magic"
     ext = "exr"
     multi_layered_mode = "1"  # No Multi-Layered EXR File
