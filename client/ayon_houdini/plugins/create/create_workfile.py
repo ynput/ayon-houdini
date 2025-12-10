@@ -60,7 +60,10 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
             )
             self.log.info("Auto-creating workfile instance...")
             current_instance = CreatedInstance(
-                self.product_type, product_name, data, self
+                product_type=self.product_type,
+                product_name=product_name,
+                data=data,
+                creator=self,
             )
             self._add_instance_to_context(current_instance)
         elif (

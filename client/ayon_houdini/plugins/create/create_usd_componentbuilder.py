@@ -45,10 +45,11 @@ class CreateUSDComponentBuilder(plugin.HoudiniCreator):
             instance_data["instance_id"] = instance_node.path()
             instance_data["families"] = self.get_publish_families()
             instance = CreatedInstance(
-                self.product_type,
-                product_name,
-                instance_data,
-                self)
+                product_type=self.product_type,
+                product_name=product_name,
+                data=instance_data,
+                creator=self,
+            )
             self._add_instance_to_context(instance)
             self.imprint(instance_node, instance.data_to_store())
         except hou.Error as er:
