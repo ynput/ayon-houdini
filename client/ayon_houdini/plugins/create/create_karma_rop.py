@@ -67,7 +67,7 @@ class CreateKarmaROP(plugin.RenderLegacyProductTypeCreator):
         instance_node.setParms(parms)
 
         # Lock some AYON attributes
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(

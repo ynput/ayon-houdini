@@ -251,8 +251,10 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
         """
         for name in parameters:
+            parm = node.parm(name)
+            if not parm:
+                continue
             try:
-                parm = node.parm(name)
                 parm.lock(True)
             except AttributeError:
                 self.log.debug("missing lock pattern {}".format(name))

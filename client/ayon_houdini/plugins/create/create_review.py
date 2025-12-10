@@ -116,7 +116,7 @@ class CreateReview(plugin.HoudiniCreator):
                                        self.review_color_space,
                                        self.log)
 
-        to_lock = ["id", "productType"]
+        to_lock = ["id", "productBaseType", "productType"]
 
         self.lock_parameters(instance_node, to_lock)
 

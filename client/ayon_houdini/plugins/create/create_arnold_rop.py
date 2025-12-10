@@ -53,7 +53,7 @@ class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
         instance_node.setParms(parms)
 
         # Lock any parameters in this list
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(

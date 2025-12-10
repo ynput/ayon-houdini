@@ -59,6 +59,7 @@ class CreateUSDComponentBuilder(plugin.HoudiniCreator):
         to_lock = [
             # Lock some AYON attributes
             "productType",
+            "productBaseType",
             "id",
         ]
         self.lock_parameters(instance_node, to_lock)

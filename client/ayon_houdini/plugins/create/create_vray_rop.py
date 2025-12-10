@@ -99,7 +99,7 @@ class CreateVrayROP(plugin.RenderLegacyProductTypeCreator):
         instance_node.setParms(parms)
 
         # lock parameters from AYON
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(
