@@ -14,6 +14,7 @@ class CreateUSD(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.usd"
     label = "USD"
     product_type = "usd"
+    product_base_type = "usd"
     icon = "cubes"
     enabled = False
     description = "Create USD for generic use"
@@ -51,6 +52,7 @@ class CreateUSD(plugin.HoudiniCreator):
         to_lock = [
             # Lock some AYON attributes
             "productType",
+            "productBaseType",
             "id",
         ]
         self.lock_parameters(instance_node, to_lock)
@@ -91,6 +93,7 @@ class CreateUSDModel(CreateUSD):
     identifier = "io.ayon.creators.houdini.model.usd"
     label = "USD Asset Model"
     product_type = "model"
+    product_base_type = "model"
     enabled = True
     description = "Create USD Asset model"
 
@@ -113,6 +116,7 @@ class CreateUSDAssembly(CreateUSD):
     identifier = "io.ayon.creators.houdini.assembly.usd"
     label = "USD Asset Assembly"
     product_type = "assembly"
+    product_base_type = "assembly"
     enabled = True
     description = "Create USD Asset assembly"
 
@@ -136,6 +140,7 @@ class CreateUSDGroom(CreateUSD):
     identifier = "io.ayon.creators.houdini.groom.usd"
     label = "USD Asset Groom"
     product_type = "groom"
+    product_base_type = "groom"
     icon = "scissors"
     enabled = True
     description = "Create USD Asset groom of fur and or hairs"
@@ -162,6 +167,7 @@ class CreateUSDLook(CreateUSD):
     identifier = "io.openpype.creators.houdini.usd.look"
     label = "USD Asset Look"
     product_type = "look"
+    product_base_type = "look"
     icon = "paint-brush"
     enabled = True
     description = "Create USD Asset Look with localized textures"

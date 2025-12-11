@@ -10,6 +10,7 @@ class CreateArnoldAss(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.ass"
     label = "Arnold ASS"
     product_type = "ass"
+    product_base_type = "ass"
     icon = "magic"
     description = __doc__
 
@@ -55,7 +56,12 @@ class CreateArnoldAss(plugin.HoudiniCreator):
         instance_node.setParms(parms)
 
         # Lock any parameters in this list
-        to_lock = ["ar_ass_export_enable", "productType", "id"]
+        to_lock = [
+            "ar_ass_export_enable",
+            "productBaseType",
+            "productType",
+            "id"
+        ]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(

@@ -13,6 +13,7 @@ class CreateReview(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.review"
     label = "Review"
     product_type = "review"
+    product_base_type = "review"
     description = __doc__
     icon = "video-camera"
     review_color_space = ""
@@ -115,7 +116,7 @@ class CreateReview(plugin.HoudiniCreator):
                                        self.review_color_space,
                                        self.log)
 
-        to_lock = ["id", "productType"]
+        to_lock = ["id", "productBaseType", "productType"]
 
         self.lock_parameters(instance_node, to_lock)
 

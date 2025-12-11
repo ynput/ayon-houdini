@@ -14,6 +14,7 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
     label = "Redshift ROP"
     description = "Create Redshift ROP for rendering with Redshift"
     legacy_product_type = "redshift_rop"
+    product_base_type = "render"
     icon = "magic"
     ext = "exr"
     multi_layered_mode = "1"  # No Multi-Layered EXR File
@@ -102,7 +103,7 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
         instance_node.setParms(parms)
 
         # Lock some AYON attributes
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(

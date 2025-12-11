@@ -12,6 +12,7 @@ class CreateFBX(plugin.HoudiniCreator):
     identifier = "io.ayon.creators.houdini.model.fbx"
     label = "Model (FBX)"
     product_type = "model"
+    product_base_type = "model"
     icon = "cube"
     default_variants = ["Main"]
     description = "Create a static model as FBX file"
@@ -53,7 +54,7 @@ class CreateFBX(plugin.HoudiniCreator):
         instance_node.setParms(parms)
 
         # Lock any parameters in this list
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(
@@ -195,6 +196,7 @@ class CreateStaticMesh(CreateFBX):
     identifier = "io.openpype.creators.houdini.staticmesh.fbx"
     label = "Static Mesh (FBX)"
     product_type = "staticMesh"
+    product_base_type = "staticMesh"
     icon = "cube"
     description = __doc__
 

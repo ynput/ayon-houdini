@@ -10,6 +10,7 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.redshiftproxy"
     label = "Redshift Proxy"
     product_type = "redshiftproxy"
+    product_base_type = "redshiftproxy"
     icon = "magic"
     description = "Export Redshift Proxy (.rs)"
 
@@ -48,7 +49,12 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
         instance_node.setParms(parms)
 
         # Lock some AYON attributes
-        to_lock = ["productType", "id", "prim_to_detail_pattern"]
+        to_lock = [
+            "productType",
+            "productBaseType",
+            "id",
+            "prim_to_detail_pattern"
+        ]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(

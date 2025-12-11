@@ -9,6 +9,7 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
     identifier = "io.openpype.creators.houdini.mantra_rop"
     label = "Mantra ROP"
     legacy_product_type = "mantra_rop"
+    product_base_type = "render"
     icon = "magic"
     description = "Create Mantra ROP for rendering with Mantra"
 
@@ -63,7 +64,7 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
         instance_node.setParms(parms)
 
         # Lock some AYON attributes
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(
