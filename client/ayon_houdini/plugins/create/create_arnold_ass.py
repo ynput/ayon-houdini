@@ -19,6 +19,9 @@ class CreateArnoldAss(plugin.HoudiniCreator):
     # will override it by the value in the project settings
     ext = ".ass"
 
+    # If true the rop will be shown in the RenderView rop dropdown
+    show_in_viewport_menu = False
+
     # Default render target
     render_target = "local"
 
@@ -50,7 +53,8 @@ class CreateArnoldAss(plugin.HoudiniCreator):
             # Render frame range
             "trange": 1,
             # Arnold ROP settings
-            "ar_ass_export_enable": 1
+            "ar_ass_export_enable": 1,
+            "soho_viewport_menu": self.show_in_viewport_menu,
         }
 
         instance_node.setParms(parms)

@@ -33,7 +33,10 @@ class CreateArnoldAssModel(BaseSettingsModel):
         default_factory=list,
     )
     ext: str = SettingsField(title="Extension")
-
+    show_in_viewport_menu: bool = SettingsField(
+        title="Show in Viewport Menu",
+        default=False,
+    )
 
 class CreateStaticMeshModel(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
