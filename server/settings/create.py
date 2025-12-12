@@ -36,6 +36,12 @@ class CreateArnoldAssModel(BaseSettingsModel):
     show_in_viewport_menu: bool = SettingsField(
         title="Show in Viewport Menu",
         default=False,
+        description=(
+            "When disabled the Arnold ROP will not be listed in the render"
+            " view as a renderable candidate. Since this product is used for "
+            " `.ass` exports most of the time it's often not needed as a"
+            " renderable option."
+        )
     )
 
 class CreateStaticMeshModel(BaseSettingsModel):
