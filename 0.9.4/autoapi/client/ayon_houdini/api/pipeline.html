@@ -1,0 +1,641 @@
+<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=prev href=lib.html><link rel=next href=plugin.html><link rel=icon href=../../../../img/favicon.ico><meta name=generator content="mkdocs-1.6.1, mkdocs-material-9.7.0"><title>pipeline - ayon-houdini</title><link rel=stylesheet href=../../../../assets/stylesheets/main.618322db.min.css><link rel=stylesheet href=../../../../assets/stylesheets/palette.ab4e12ef.min.css><script src=https://unpkg.com/iframe-worker/shim></script><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback"><style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style><link rel=stylesheet href=../../../../assets/_mkdocstrings.css><link rel=stylesheet href=../../../../css/custom.css><script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script></head> <body dir=ltr data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#client.ayon_houdini.api.pipeline class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <div data-md-color-scheme=default data-md-component=outdated hidden> </div> <header class="md-header md-header--shadow" data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=../../../../index.html title=ayon-houdini class="md-header__button md-logo" aria-label=ayon-houdini data-md-component=logo> <img src=../../../../img/ay-symbol-blackw-full.png alt=logo> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg> </label> <div class=md-header__title data-md-component=header-title> <div class=md-header__ellipsis> <div class=md-header__topic> <span class=md-ellipsis> ayon-houdini </span> </div> <div class=md-header__topic data-md-component=header-topic> <span class=md-ellipsis> pipeline </span> </div> </div> </div> <form class=md-header__option data-md-component=palette> <input class=md-option data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to light mode" type=radio name=__palette id=__palette_0> <label class="md-header__button md-icon" title="Switch to light mode" for=__palette_1 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg> </label> <input class=md-option data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme=default data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to dark mode" type=radio name=__palette id=__palette_1> <label class="md-header__button md-icon" title="Switch to dark mode" for=__palette_0 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg> </label> </form> <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg> </label> <nav class=md-search__options aria-label=Search> <button type=reset class="md-search__icon md-icon" title=Clear aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg> </button> </nav> </form> <div class=md-search__output> <div class=md-search__scrollwrap tabindex=0 data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list role=presentation></ol> </div> </div> </div> </div> </div> <div class=md-header__source> <a href=https://github.com/ynput/ayon-houdini title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg> </div> <div class=md-source__repository> GitHub </div> </a> </div> </nav> </header> <div class=md-container data-md-component=container> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=../../../../index.html title=ayon-houdini class="md-nav__button md-logo" aria-label=ayon-houdini data-md-component=logo> <img src=../../../../img/ay-symbol-blackw-full.png alt=logo> </a> ayon-houdini </label> <div class=md-nav__source> <a href=https://github.com/ynput/ayon-houdini title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg> </div> <div class=md-source__repository> GitHub </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../../../index.html class=md-nav__link> <span class=md-ellipsis> Home </span> </a> </li> <li class=md-nav__item> <a href=../../../../license.html class=md-nav__link> <span class=md-ellipsis> License </span> </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3 checked> <label class=md-nav__link for=__nav_3 id=__nav_3_label tabindex> <span class=md-ellipsis> Reference </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_3_label aria-expanded=true> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> Reference </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1 checked> <label class=md-nav__link for=__nav_3_1 id=__nav_3_1_label tabindex=0> <span class=md-ellipsis> client </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_3_1_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1> <span class="md-nav__icon md-icon"></span> client </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1_1 checked> <label class=md-nav__link for=__nav_3_1_1 id=__nav_3_1_1_label tabindex=0> <span class=md-ellipsis> ayon_houdini </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=3 aria-labelledby=__nav_3_1_1_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1_1> <span class="md-nav__icon md-icon"></span> ayon_houdini </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../addon.html class=md-nav__link> <span class=md-ellipsis> addon </span> </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1_1_2 checked> <label class=md-nav__link for=__nav_3_1_1_2 id=__nav_3_1_1_2_label tabindex=0> <span class=md-ellipsis> api </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=4 aria-labelledby=__nav_3_1_1_2_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1_1_2> <span class="md-nav__icon md-icon"></span> api </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=action.html class=md-nav__link> <span class=md-ellipsis> action </span> </a> </li> <li class=md-nav__item> <a href=colorspace.html class=md-nav__link> <span class=md-ellipsis> colorspace </span> </a> </li> <li class=md-nav__item> <a href=creator_node_shelves.html class=md-nav__link> <span class=md-ellipsis> creator_node_shelves </span> </a> </li> <li class=md-nav__item> <a href=hda_utils.html class=md-nav__link> <span class=md-ellipsis> hda_utils </span> </a> </li> <li class=md-nav__item> <a href=lib.html class=md-nav__link> <span class=md-ellipsis> lib </span> </a> </li> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> <span class=md-ellipsis> pipeline </span> <span class="md-nav__icon md-icon"></span> </label> <a href=pipeline.html class="md-nav__link md-nav__link--active"> <span class=md-ellipsis> pipeline </span> </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline class=md-nav__link> <span class=md-ellipsis> pipeline </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.HoudiniHost class=md-nav__link> <span class=md-ellipsis> HoudiniHost </span> </a> <nav class=md-nav aria-label=HoudiniHost> <ul class=md-nav__list> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.HoudiniHost.create_context_node class=md-nav__link> <span class=md-ellipsis> create_context_node </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.containerise class=md-nav__link> <span class=md-ellipsis> containerise </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.get_or_create_avalon_container class=md-nav__link> <span class=md-ellipsis> get_or_create_avalon_container </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.on_new class=md-nav__link> <span class=md-ellipsis> on_new </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.parse_container class=md-nav__link> <span class=md-ellipsis> parse_container </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=plugin.html class=md-nav__link> <span class=md-ellipsis> plugin </span> </a> </li> <li class=md-nav__item> <a href=shelves.html class=md-nav__link> <span class=md-ellipsis> shelves </span> </a> </li> <li class=md-nav__item> <a href=usd.html class=md-nav__link> <span class=md-ellipsis> usd </span> </a> </li> <li class=md-nav__item> <a href=workfile_template_builder.html class=md-nav__link> <span class=md-ellipsis> workfile_template_builder </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../hooks/set_default_display_and_view.html class=md-nav__link> <span class=md-ellipsis> hooks </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../plugins/create/convert_legacy.html class=md-nav__link> <span class=md-ellipsis> plugins </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../startup/husdplugins/outputprocessors/ayon_uri_processor.html class=md-nav__link> <span class=md-ellipsis> startup </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class=md-nav__item> <a href=../version.html class=md-nav__link> <span class=md-ellipsis> version </span> </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../../../server/settings/conversion.html class=md-nav__link> <span class=md-ellipsis> server </span> <span class="md-nav__icon md-icon"></span> </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline class=md-nav__link> <span class=md-ellipsis> pipeline </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.HoudiniHost class=md-nav__link> <span class=md-ellipsis> HoudiniHost </span> </a> <nav class=md-nav aria-label=HoudiniHost> <ul class=md-nav__list> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.HoudiniHost.create_context_node class=md-nav__link> <span class=md-ellipsis> create_context_node </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.containerise class=md-nav__link> <span class=md-ellipsis> containerise </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.get_or_create_avalon_container class=md-nav__link> <span class=md-ellipsis> get_or_create_avalon_container </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.on_new class=md-nav__link> <span class=md-ellipsis> on_new </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.pipeline.parse_container class=md-nav__link> <span class=md-ellipsis> parse_container </span> </a> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <nav class=md-path aria-label=Navigation> <ol class=md-path__list> <li class=md-path__item> <a href=../../../../index.html class=md-path__link> <span class=md-ellipsis> Home </span> </a> </li> <li class=md-path__item> <a href=../addon.html class=md-path__link> <span class=md-ellipsis> Reference </span> </a> </li> <li class=md-path__item> <a href=../addon.html class=md-path__link> <span class=md-ellipsis> client </span> </a> </li> <li class=md-path__item> <a href=../addon.html class=md-path__link> <span class=md-ellipsis> ayon_houdini </span> </a> </li> <li class=md-path__item> <a href=action.html class=md-path__link> <span class=md-ellipsis> api </span> </a> </li> </ol> </nav> <article class="md-content__inner md-typeset"> <h1>pipeline</h1> <div class="doc doc-object doc-module"> <a id=client.ayon_houdini.api.pipeline></a> <div class="doc doc-contents first"> <p>Pipeline tools for AYON Houdini integration.</p> <div class="doc doc-children"> <div class="doc doc-object doc-class"> <h2 id=client.ayon_houdini.api.pipeline.HoudiniHost class="doc doc-heading"> <code>HoudiniHost</code> </h2> <div class="doc doc-contents "> <p class="doc doc-class-bases"> Bases: <code><span title=ayon_core.host.HostBase>HostBase</span></code>, <code><span title=ayon_core.host.IWorkfileHost>IWorkfileHost</span></code>, <code><span title=ayon_core.host.ILoadHost>ILoadHost</span></code>, <code><span title=ayon_core.host.IPublishHost>IPublishHost</span></code></p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/pipeline.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 58</span>
+<span class=normal> 59</span>
+<span class=normal> 60</span>
+<span class=normal> 61</span>
+<span class=normal> 62</span>
+<span class=normal> 63</span>
+<span class=normal> 64</span>
+<span class=normal> 65</span>
+<span class=normal> 66</span>
+<span class=normal> 67</span>
+<span class=normal> 68</span>
+<span class=normal> 69</span>
+<span class=normal> 70</span>
+<span class=normal> 71</span>
+<span class=normal> 72</span>
+<span class=normal> 73</span>
+<span class=normal> 74</span>
+<span class=normal> 75</span>
+<span class=normal> 76</span>
+<span class=normal> 77</span>
+<span class=normal> 78</span>
+<span class=normal> 79</span>
+<span class=normal> 80</span>
+<span class=normal> 81</span>
+<span class=normal> 82</span>
+<span class=normal> 83</span>
+<span class=normal> 84</span>
+<span class=normal> 85</span>
+<span class=normal> 86</span>
+<span class=normal> 87</span>
+<span class=normal> 88</span>
+<span class=normal> 89</span>
+<span class=normal> 90</span>
+<span class=normal> 91</span>
+<span class=normal> 92</span>
+<span class=normal> 93</span>
+<span class=normal> 94</span>
+<span class=normal> 95</span>
+<span class=normal> 96</span>
+<span class=normal> 97</span>
+<span class=normal> 98</span>
+<span class=normal> 99</span>
+<span class=normal>100</span>
+<span class=normal>101</span>
+<span class=normal>102</span>
+<span class=normal>103</span>
+<span class=normal>104</span>
+<span class=normal>105</span>
+<span class=normal>106</span>
+<span class=normal>107</span>
+<span class=normal>108</span>
+<span class=normal>109</span>
+<span class=normal>110</span>
+<span class=normal>111</span>
+<span class=normal>112</span>
+<span class=normal>113</span>
+<span class=normal>114</span>
+<span class=normal>115</span>
+<span class=normal>116</span>
+<span class=normal>117</span>
+<span class=normal>118</span>
+<span class=normal>119</span>
+<span class=normal>120</span>
+<span class=normal>121</span>
+<span class=normal>122</span>
+<span class=normal>123</span>
+<span class=normal>124</span>
+<span class=normal>125</span>
+<span class=normal>126</span>
+<span class=normal>127</span>
+<span class=normal>128</span>
+<span class=normal>129</span>
+<span class=normal>130</span>
+<span class=normal>131</span>
+<span class=normal>132</span>
+<span class=normal>133</span>
+<span class=normal>134</span>
+<span class=normal>135</span>
+<span class=normal>136</span>
+<span class=normal>137</span>
+<span class=normal>138</span>
+<span class=normal>139</span>
+<span class=normal>140</span>
+<span class=normal>141</span>
+<span class=normal>142</span>
+<span class=normal>143</span>
+<span class=normal>144</span>
+<span class=normal>145</span>
+<span class=normal>146</span>
+<span class=normal>147</span>
+<span class=normal>148</span>
+<span class=normal>149</span>
+<span class=normal>150</span>
+<span class=normal>151</span>
+<span class=normal>152</span>
+<span class=normal>153</span>
+<span class=normal>154</span>
+<span class=normal>155</span>
+<span class=normal>156</span>
+<span class=normal>157</span>
+<span class=normal>158</span>
+<span class=normal>159</span>
+<span class=normal>160</span>
+<span class=normal>161</span>
+<span class=normal>162</span>
+<span class=normal>163</span>
+<span class=normal>164</span>
+<span class=normal>165</span>
+<span class=normal>166</span>
+<span class=normal>167</span>
+<span class=normal>168</span>
+<span class=normal>169</span>
+<span class=normal>170</span>
+<span class=normal>171</span>
+<span class=normal>172</span>
+<span class=normal>173</span>
+<span class=normal>174</span>
+<span class=normal>175</span>
+<span class=normal>176</span>
+<span class=normal>177</span>
+<span class=normal>178</span>
+<span class=normal>179</span>
+<span class=normal>180</span>
+<span class=normal>181</span>
+<span class=normal>182</span>
+<span class=normal>183</span>
+<span class=normal>184</span>
+<span class=normal>185</span>
+<span class=normal>186</span>
+<span class=normal>187</span>
+<span class=normal>188</span>
+<span class=normal>189</span>
+<span class=normal>190</span>
+<span class=normal>191</span>
+<span class=normal>192</span>
+<span class=normal>193</span>
+<span class=normal>194</span>
+<span class=normal>195</span>
+<span class=normal>196</span>
+<span class=normal>197</span>
+<span class=normal>198</span>
+<span class=normal>199</span>
+<span class=normal>200</span>
+<span class=normal>201</span>
+<span class=normal>202</span>
+<span class=normal>203</span>
+<span class=normal>204</span>
+<span class=normal>205</span>
+<span class=normal>206</span>
+<span class=normal>207</span>
+<span class=normal>208</span>
+<span class=normal>209</span>
+<span class=normal>210</span>
+<span class=normal>211</span>
+<span class=normal>212</span>
+<span class=normal>213</span>
+<span class=normal>214</span>
+<span class=normal>215</span>
+<span class=normal>216</span>
+<span class=normal>217</span>
+<span class=normal>218</span>
+<span class=normal>219</span>
+<span class=normal>220</span>
+<span class=normal>221</span>
+<span class=normal>222</span>
+<span class=normal>223</span>
+<span class=normal>224</span>
+<span class=normal>225</span>
+<span class=normal>226</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>class</span><span class=w> </span><span class=nc>HoudiniHost</span><span class=p>(</span><span class=n>HostBase</span><span class=p>,</span> <span class=n>IWorkfileHost</span><span class=p>,</span> <span class=n>ILoadHost</span><span class=p>,</span> <span class=n>IPublishHost</span><span class=p>):</span>
+    <span class=n>name</span> <span class=o>=</span> <span class=s2>&quot;houdini&quot;</span>
+
+    <span class=k>def</span><span class=w> </span><span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=nb>super</span><span class=p>(</span><span class=n>HoudiniHost</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>_op_events</span> <span class=o>=</span> <span class=p>{}</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>_has_been_setup</span> <span class=o>=</span> <span class=kc>False</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>get_app_information</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=kn>from</span><span class=w> </span><span class=nn>ayon_core.host</span><span class=w> </span><span class=kn>import</span> <span class=n>ApplicationInformation</span>
+
+        <span class=n>hou_name</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>applicationName</span><span class=p>()</span>
+        <span class=n>license_name</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>licenseCategory</span><span class=p>()</span><span class=o>.</span><span class=n>name</span><span class=p>()</span>
+        <span class=k>if</span> <span class=n>hou_name</span> <span class=o>==</span> <span class=s2>&quot;houdinicore&quot;</span><span class=p>:</span>
+            <span class=n>app_name</span> <span class=o>=</span> <span class=s2>&quot;Houdini Core&quot;</span>
+
+        <span class=k>elif</span> <span class=n>hou_name</span> <span class=o>==</span> <span class=s2>&quot;houdinifx&quot;</span><span class=p>:</span>
+            <span class=n>app_name</span> <span class=o>=</span> <span class=s2>&quot;Houdini FX&quot;</span>
+
+        <span class=k>elif</span> <span class=n>hou_name</span> <span class=o>==</span> <span class=s2>&quot;happrentice&quot;</span><span class=p>:</span>
+            <span class=n>app_name</span> <span class=o>=</span> <span class=s2>&quot;Houdini&quot;</span>
+        <span class=k>else</span><span class=p>:</span>
+            <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&quot;Unknown houdini app name: </span><span class=si>{</span><span class=n>hou_name</span><span class=si>}</span><span class=s2>&quot;</span><span class=p>)</span>
+            <span class=n>app_name</span> <span class=o>=</span> <span class=s2>&quot;Houdini&quot;</span>
+
+        <span class=n>full_app_name</span> <span class=o>=</span> <span class=sa>f</span><span class=s2>&quot;</span><span class=si>{</span><span class=n>app_name</span><span class=si>}</span><span class=s2> </span><span class=si>{</span><span class=n>license_name</span><span class=si>}</span><span class=s2>&quot;</span>
+
+        <span class=k>return</span> <span class=n>ApplicationInformation</span><span class=p>(</span>
+            <span class=n>app_name</span><span class=o>=</span><span class=n>full_app_name</span><span class=p>,</span>
+            <span class=n>app_version</span><span class=o>=</span><span class=n>hou</span><span class=o>.</span><span class=n>applicationVersionString</span><span class=p>(),</span>
+        <span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>install</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=n>pyblish</span><span class=o>.</span><span class=n>api</span><span class=o>.</span><span class=n>register_host</span><span class=p>(</span><span class=s2>&quot;houdini&quot;</span><span class=p>)</span>
+        <span class=n>pyblish</span><span class=o>.</span><span class=n>api</span><span class=o>.</span><span class=n>register_host</span><span class=p>(</span><span class=s2>&quot;hython&quot;</span><span class=p>)</span>
+        <span class=n>pyblish</span><span class=o>.</span><span class=n>api</span><span class=o>.</span><span class=n>register_host</span><span class=p>(</span><span class=s2>&quot;hpython&quot;</span><span class=p>)</span>
+
+        <span class=n>pyblish</span><span class=o>.</span><span class=n>api</span><span class=o>.</span><span class=n>register_plugin_path</span><span class=p>(</span><span class=n>PUBLISH_PATH</span><span class=p>)</span>
+        <span class=n>register_loader_plugin_path</span><span class=p>(</span><span class=n>LOAD_PATH</span><span class=p>)</span>
+        <span class=n>register_creator_plugin_path</span><span class=p>(</span><span class=n>CREATE_PATH</span><span class=p>)</span>
+        <span class=n>register_inventory_action_path</span><span class=p>(</span><span class=n>INVENTORY_PATH</span><span class=p>)</span>
+        <span class=n>register_workfile_build_plugin_path</span><span class=p>(</span><span class=n>WORKFILE_BUILD_PATH</span><span class=p>)</span>
+
+        <span class=n>log</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Installing callbacks ... &quot;</span><span class=p>)</span>
+        <span class=c1># register_event_callback(&quot;init&quot;, on_init)</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>_register_callbacks</span><span class=p>()</span>
+        <span class=n>register_event_callback</span><span class=p>(</span><span class=s2>&quot;workfile.save.before&quot;</span><span class=p>,</span> <span class=n>before_workfile_save</span><span class=p>)</span>
+        <span class=n>register_event_callback</span><span class=p>(</span><span class=s2>&quot;before.save&quot;</span><span class=p>,</span> <span class=n>before_save</span><span class=p>)</span>
+        <span class=n>register_event_callback</span><span class=p>(</span><span class=s2>&quot;save&quot;</span><span class=p>,</span> <span class=n>on_save</span><span class=p>)</span>
+        <span class=n>register_event_callback</span><span class=p>(</span><span class=s2>&quot;open&quot;</span><span class=p>,</span> <span class=n>on_open</span><span class=p>)</span>
+        <span class=n>register_event_callback</span><span class=p>(</span><span class=s2>&quot;new&quot;</span><span class=p>,</span> <span class=n>on_new</span><span class=p>)</span>
+        <span class=n>register_event_callback</span><span class=p>(</span><span class=s2>&quot;taskChanged&quot;</span><span class=p>,</span> <span class=n>on_task_changed</span><span class=p>)</span>
+
+        <span class=bp>self</span><span class=o>.</span><span class=n>_has_been_setup</span> <span class=o>=</span> <span class=kc>True</span>
+
+        <span class=c1># Manually call on_new callback as it doesn&#39;t get called when AYON</span>
+        <span class=c1># launches for the first time on a context, only when going to</span>
+        <span class=c1># File -&gt; New</span>
+        <span class=n>on_new</span><span class=p>()</span>
+
+        <span class=k>if</span> <span class=ow>not</span> <span class=n>IS_HEADLESS</span><span class=p>:</span>
+            <span class=kn>import</span><span class=w> </span><span class=nn>hdefereval</span>  <span class=c1># noqa, hdefereval is only available in ui mode</span>
+            <span class=c1># Defer generation of shelves due to issue on Windows where shelf</span>
+            <span class=c1># initialization during start up delays Houdini UI by minutes</span>
+            <span class=c1># making it extremely slow to launch.</span>
+            <span class=n>hdefereval</span><span class=o>.</span><span class=n>executeDeferred</span><span class=p>(</span><span class=n>shelves</span><span class=o>.</span><span class=n>generate_shelves</span><span class=p>)</span>
+            <span class=n>hdefereval</span><span class=o>.</span><span class=n>executeDeferred</span><span class=p>(</span><span class=n>creator_node_shelves</span><span class=o>.</span><span class=n>install</span><span class=p>)</span>
+            <span class=k>if</span> <span class=n>env_value_to_bool</span><span class=p>(</span><span class=s2>&quot;AYON_WORKFILE_TOOL_ON_START&quot;</span><span class=p>):</span>
+                <span class=n>hdefereval</span><span class=o>.</span><span class=n>executeDeferred</span><span class=p>(</span>
+                    <span class=k>lambda</span><span class=p>:</span> <span class=n>host_tools</span><span class=o>.</span><span class=n>show_workfiles</span><span class=p>(</span>
+                        <span class=n>parent</span><span class=o>=</span><span class=n>hou</span><span class=o>.</span><span class=n>qt</span><span class=o>.</span><span class=n>mainWindow</span><span class=p>()</span>
+                    <span class=p>)</span>
+                <span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>workfile_has_unsaved_changes</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=k>return</span> <span class=n>hou</span><span class=o>.</span><span class=n>hipFile</span><span class=o>.</span><span class=n>hasUnsavedChanges</span><span class=p>()</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>get_workfile_extensions</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=k>return</span> <span class=p>[</span><span class=s2>&quot;.hip&quot;</span><span class=p>,</span> <span class=s2>&quot;.hiplc&quot;</span><span class=p>,</span> <span class=s2>&quot;.hipnc&quot;</span><span class=p>]</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>save_workfile</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>dst_path</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+        <span class=c1># Force forwards slashes to avoid segfault</span>
+        <span class=k>if</span> <span class=n>dst_path</span><span class=p>:</span>
+            <span class=n>dst_path</span> <span class=o>=</span> <span class=n>dst_path</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>&quot;</span><span class=se>\\</span><span class=s2>&quot;</span><span class=p>,</span> <span class=s2>&quot;/&quot;</span><span class=p>)</span>
+        <span class=n>hou</span><span class=o>.</span><span class=n>hipFile</span><span class=o>.</span><span class=n>save</span><span class=p>(</span><span class=n>file_name</span><span class=o>=</span><span class=n>dst_path</span><span class=p>,</span>
+                         <span class=n>save_to_recent_files</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>dst_path</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>open_workfile</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>filepath</span><span class=p>):</span>
+        <span class=c1># Force forwards slashes to avoid segfault</span>
+        <span class=n>filepath</span> <span class=o>=</span> <span class=n>filepath</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>&quot;</span><span class=se>\\</span><span class=s2>&quot;</span><span class=p>,</span> <span class=s2>&quot;/&quot;</span><span class=p>)</span>
+
+        <span class=k>try</span><span class=p>:</span>
+            <span class=n>hou</span><span class=o>.</span><span class=n>hipFile</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=n>filepath</span><span class=p>,</span>
+                             <span class=n>suppress_save_prompt</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span>
+                             <span class=n>ignore_load_warnings</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+        <span class=k>except</span> <span class=n>hou</span><span class=o>.</span><span class=n>LoadWarning</span> <span class=k>as</span> <span class=n>exc</span><span class=p>:</span>
+            <span class=n>log</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span><span class=n>exc</span><span class=p>)</span>
+
+        <span class=k>return</span> <span class=n>filepath</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>get_current_workfile</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=n>current_filepath</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>hipFile</span><span class=o>.</span><span class=n>path</span><span class=p>()</span>
+        <span class=k>if</span> <span class=p>(</span><span class=n>os</span><span class=o>.</span><span class=n>path</span><span class=o>.</span><span class=n>basename</span><span class=p>(</span><span class=n>current_filepath</span><span class=p>)</span> <span class=o>==</span> <span class=s2>&quot;untitled.hip&quot;</span> <span class=ow>and</span>
+                <span class=ow>not</span> <span class=n>os</span><span class=o>.</span><span class=n>path</span><span class=o>.</span><span class=n>exists</span><span class=p>(</span><span class=n>current_filepath</span><span class=p>)):</span>
+            <span class=c1># By default a new scene in houdini is saved in the current</span>
+            <span class=c1># working directory as &quot;untitled.hip&quot; so we need to capture</span>
+            <span class=c1># that and consider it &#39;not saved&#39; when it&#39;s in that state.</span>
+            <span class=k>return</span> <span class=kc>None</span>
+
+        <span class=k>return</span> <span class=n>current_filepath</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>get_containers</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=k>return</span> <span class=n>ls</span><span class=p>()</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>_register_callbacks</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=k>for</span> <span class=n>event</span> <span class=ow>in</span> <span class=bp>self</span><span class=o>.</span><span class=n>_op_events</span><span class=o>.</span><span class=n>copy</span><span class=p>()</span><span class=o>.</span><span class=n>values</span><span class=p>():</span>
+            <span class=k>if</span> <span class=n>event</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span>
+                <span class=k>continue</span>
+
+            <span class=k>try</span><span class=p>:</span>
+                <span class=n>hou</span><span class=o>.</span><span class=n>hipFile</span><span class=o>.</span><span class=n>removeEventCallback</span><span class=p>(</span><span class=n>event</span><span class=p>)</span>
+            <span class=k>except</span> <span class=ne>RuntimeError</span> <span class=k>as</span> <span class=n>e</span><span class=p>:</span>
+                <span class=n>log</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=n>e</span><span class=p>)</span>
+
+        <span class=bp>self</span><span class=o>.</span><span class=n>_op_events</span><span class=p>[</span><span class=n>on_file_event_callback</span><span class=p>]</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>hipFile</span><span class=o>.</span><span class=n>addEventCallback</span><span class=p>(</span>
+            <span class=n>on_file_event_callback</span>
+        <span class=p>)</span>
+
+    <span class=nd>@staticmethod</span>
+    <span class=k>def</span><span class=w> </span><span class=nf>create_context_node</span><span class=p>():</span>
+<span class=w>        </span><span class=sd>&quot;&quot;&quot;Helper for creating context holding node.</span>
+
+<span class=sd>        Returns:</span>
+<span class=sd>            hou.Node: context node</span>
+
+<span class=sd>        &quot;&quot;&quot;</span>
+        <span class=n>parent_name</span><span class=p>,</span> <span class=n>name</span>  <span class=o>=</span> <span class=n>CONTEXT_CONTAINER</span><span class=o>.</span><span class=n>rsplit</span><span class=p>(</span><span class=s2>&quot;/&quot;</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+        <span class=n>obj_network</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=n>parent_name</span><span class=p>)</span>
+        <span class=n>op_ctx</span> <span class=o>=</span> <span class=n>obj_network</span><span class=o>.</span><span class=n>createNode</span><span class=p>(</span><span class=s2>&quot;subnet&quot;</span><span class=p>,</span>
+                                        <span class=n>node_name</span><span class=o>=</span><span class=n>name</span><span class=p>,</span>
+                                        <span class=n>run_init_scripts</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span>
+                                        <span class=n>load_contents</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+
+        <span class=n>op_ctx</span><span class=o>.</span><span class=n>moveToGoodPosition</span><span class=p>()</span>
+        <span class=n>op_ctx</span><span class=o>.</span><span class=n>setBuiltExplicitly</span><span class=p>(</span><span class=kc>False</span><span class=p>)</span>
+        <span class=n>op_ctx</span><span class=o>.</span><span class=n>setCreatorState</span><span class=p>(</span><span class=s2>&quot;AYON&quot;</span><span class=p>)</span>
+        <span class=n>op_ctx</span><span class=o>.</span><span class=n>setComment</span><span class=p>(</span><span class=s2>&quot;AYON node to hold context metadata&quot;</span><span class=p>)</span>
+        <span class=n>op_ctx</span><span class=o>.</span><span class=n>setColor</span><span class=p>(</span><span class=n>hou</span><span class=o>.</span><span class=n>Color</span><span class=p>((</span><span class=mf>0.081</span><span class=p>,</span> <span class=mf>0.798</span><span class=p>,</span> <span class=mf>0.810</span><span class=p>)))</span>
+        <span class=n>op_ctx</span><span class=o>.</span><span class=n>setDisplayFlag</span><span class=p>(</span><span class=kc>False</span><span class=p>)</span>
+        <span class=n>op_ctx</span><span class=o>.</span><span class=n>hide</span><span class=p>(</span><span class=kc>True</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>op_ctx</span>
+
+    <span class=nd>@staticmethod</span>
+    <span class=k>def</span><span class=w> </span><span class=nf>get_context_node</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=s2>&quot;Optional[hou.OpNode]&quot;</span><span class=p>:</span>
+        <span class=k>return</span> <span class=p>(</span>
+            <span class=n>hou</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=n>CONTEXT_CONTAINER</span><span class=p>)</span>
+            <span class=ow>or</span> <span class=n>hou</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=n>LEGACY_CONTEXT_CONTAINER</span><span class=p>)</span>
+        <span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>update_context_data</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>data</span><span class=p>,</span> <span class=n>changes</span><span class=p>):</span>
+        <span class=n>context_node</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>get_context_node</span><span class=p>()</span> <span class=ow>or</span> <span class=bp>self</span><span class=o>.</span><span class=n>create_context_node</span><span class=p>()</span>
+        <span class=n>lib</span><span class=o>.</span><span class=n>imprint</span><span class=p>(</span><span class=n>context_node</span><span class=p>,</span> <span class=n>data</span><span class=p>,</span> <span class=n>update</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>get_context_data</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>dict</span><span class=p>:</span>
+        <span class=n>context_node</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>get_context_node</span><span class=p>()</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=n>context_node</span><span class=p>:</span>
+            <span class=k>return</span> <span class=p>{}</span>
+        <span class=k>return</span> <span class=n>lib</span><span class=o>.</span><span class=n>read</span><span class=p>(</span><span class=n>context_node</span><span class=p>)</span>
+</code></pre></div></td></tr></table></div> </details> <div class="doc doc-children"> <div class="doc doc-object doc-function"> <h3 id=client.ayon_houdini.api.pipeline.HoudiniHost.create_context_node class="doc doc-heading"> <code class="highlight language-python"><span class=n>create_context_node</span><span class=p>()</span></code> <span class="doc doc-labels"> <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small> </span> </h3> <div class="doc doc-contents "> <p>Helper for creating context holding node.</p> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> </td> <td> <div class=doc-md-description> <p>hou.Node: context node</p> </div> </td> </tr> </tbody> </table> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/pipeline.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>187</span>
+<span class=normal>188</span>
+<span class=normal>189</span>
+<span class=normal>190</span>
+<span class=normal>191</span>
+<span class=normal>192</span>
+<span class=normal>193</span>
+<span class=normal>194</span>
+<span class=normal>195</span>
+<span class=normal>196</span>
+<span class=normal>197</span>
+<span class=normal>198</span>
+<span class=normal>199</span>
+<span class=normal>200</span>
+<span class=normal>201</span>
+<span class=normal>202</span>
+<span class=normal>203</span>
+<span class=normal>204</span>
+<span class=normal>205</span>
+<span class=normal>206</span>
+<span class=normal>207</span>
+<span class=normal>208</span>
+<span class=normal>209</span></pre></div></td><td class=code><div><pre><span></span><code><span class=nd>@staticmethod</span>
+<span class=k>def</span><span class=w> </span><span class=nf>create_context_node</span><span class=p>():</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Helper for creating context holding node.</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        hou.Node: context node</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=n>parent_name</span><span class=p>,</span> <span class=n>name</span>  <span class=o>=</span> <span class=n>CONTEXT_CONTAINER</span><span class=o>.</span><span class=n>rsplit</span><span class=p>(</span><span class=s2>&quot;/&quot;</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+    <span class=n>obj_network</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=n>parent_name</span><span class=p>)</span>
+    <span class=n>op_ctx</span> <span class=o>=</span> <span class=n>obj_network</span><span class=o>.</span><span class=n>createNode</span><span class=p>(</span><span class=s2>&quot;subnet&quot;</span><span class=p>,</span>
+                                    <span class=n>node_name</span><span class=o>=</span><span class=n>name</span><span class=p>,</span>
+                                    <span class=n>run_init_scripts</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span>
+                                    <span class=n>load_contents</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+
+    <span class=n>op_ctx</span><span class=o>.</span><span class=n>moveToGoodPosition</span><span class=p>()</span>
+    <span class=n>op_ctx</span><span class=o>.</span><span class=n>setBuiltExplicitly</span><span class=p>(</span><span class=kc>False</span><span class=p>)</span>
+    <span class=n>op_ctx</span><span class=o>.</span><span class=n>setCreatorState</span><span class=p>(</span><span class=s2>&quot;AYON&quot;</span><span class=p>)</span>
+    <span class=n>op_ctx</span><span class=o>.</span><span class=n>setComment</span><span class=p>(</span><span class=s2>&quot;AYON node to hold context metadata&quot;</span><span class=p>)</span>
+    <span class=n>op_ctx</span><span class=o>.</span><span class=n>setColor</span><span class=p>(</span><span class=n>hou</span><span class=o>.</span><span class=n>Color</span><span class=p>((</span><span class=mf>0.081</span><span class=p>,</span> <span class=mf>0.798</span><span class=p>,</span> <span class=mf>0.810</span><span class=p>)))</span>
+    <span class=n>op_ctx</span><span class=o>.</span><span class=n>setDisplayFlag</span><span class=p>(</span><span class=kc>False</span><span class=p>)</span>
+    <span class=n>op_ctx</span><span class=o>.</span><span class=n>hide</span><span class=p>(</span><span class=kc>True</span><span class=p>)</span>
+    <span class=k>return</span> <span class=n>op_ctx</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> </div> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.pipeline.containerise class="doc doc-heading"> <code class="highlight language-python"><span class=n>containerise</span><span class=p>(</span><span class=n>name</span><span class=p>,</span> <span class=n>namespace</span><span class=p>,</span> <span class=n>nodes</span><span class=p>,</span> <span class=n>context</span><span class=p>,</span> <span class=n>loader</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span> <span class=n>suffix</span><span class=o>=</span><span class=s1>&#39;&#39;</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Bundle <code>nodes</code> into a subnet and imprint it with metadata</p> <p>Containerisation enables a tracking of version, author and origin for loaded products.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>name</code> </td> <td> <code><span title=str>str</span></code> </td> <td> <div class=doc-md-description> <p>Name of resulting assembly</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>namespace</code> </td> <td> <code><span title=str>str</span></code> </td> <td> <div class=doc-md-description> <p>Namespace under which to host container</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>nodes</code> </td> <td> <code><span title=list>list</span></code> </td> <td> <div class=doc-md-description> <p>Long names of nodes to containerise</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>context</code> </td> <td> <code><span title=dict>dict</span></code> </td> <td> <div class=doc-md-description> <p>Loaded product context information</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>loader</code> </td> <td> <code><span title=str>str</span></code> </td> <td> <div class=doc-md-description> <p>Name of loader used to produce this container.</p> </div> </td> <td> <code>None</code> </td> </tr> <tr class=doc-section-item> <td> <code>suffix</code> </td> <td> <code><span title=str>str</span></code> </td> <td> <div class=doc-md-description> <p>Suffix of container, defaults to <code>_CON</code>.</p> </div> </td> <td> <code>&#39;&#39;</code> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td><code>container</code></td> <td> <code><span title=hou.Node>Node</span></code> </td> <td> <div class=doc-md-description> <p>Name of container assembly</p> </div> </td> </tr> </tbody> </table> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/pipeline.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>240</span>
+<span class=normal>241</span>
+<span class=normal>242</span>
+<span class=normal>243</span>
+<span class=normal>244</span>
+<span class=normal>245</span>
+<span class=normal>246</span>
+<span class=normal>247</span>
+<span class=normal>248</span>
+<span class=normal>249</span>
+<span class=normal>250</span>
+<span class=normal>251</span>
+<span class=normal>252</span>
+<span class=normal>253</span>
+<span class=normal>254</span>
+<span class=normal>255</span>
+<span class=normal>256</span>
+<span class=normal>257</span>
+<span class=normal>258</span>
+<span class=normal>259</span>
+<span class=normal>260</span>
+<span class=normal>261</span>
+<span class=normal>262</span>
+<span class=normal>263</span>
+<span class=normal>264</span>
+<span class=normal>265</span>
+<span class=normal>266</span>
+<span class=normal>267</span>
+<span class=normal>268</span>
+<span class=normal>269</span>
+<span class=normal>270</span>
+<span class=normal>271</span>
+<span class=normal>272</span>
+<span class=normal>273</span>
+<span class=normal>274</span>
+<span class=normal>275</span>
+<span class=normal>276</span>
+<span class=normal>277</span>
+<span class=normal>278</span>
+<span class=normal>279</span>
+<span class=normal>280</span>
+<span class=normal>281</span>
+<span class=normal>282</span>
+<span class=normal>283</span>
+<span class=normal>284</span>
+<span class=normal>285</span>
+<span class=normal>286</span>
+<span class=normal>287</span>
+<span class=normal>288</span>
+<span class=normal>289</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>containerise</span><span class=p>(</span><span class=n>name</span><span class=p>,</span>
+                 <span class=n>namespace</span><span class=p>,</span>
+                 <span class=n>nodes</span><span class=p>,</span>
+                 <span class=n>context</span><span class=p>,</span>
+                 <span class=n>loader</span><span class=o>=</span><span class=kc>None</span><span class=p>,</span>
+                 <span class=n>suffix</span><span class=o>=</span><span class=s2>&quot;&quot;</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Bundle `nodes` into a subnet and imprint it with metadata</span>
+
+<span class=sd>    Containerisation enables a tracking of version, author and origin</span>
+<span class=sd>    for loaded products.</span>
+
+<span class=sd>    Arguments:</span>
+<span class=sd>        name (str): Name of resulting assembly</span>
+<span class=sd>        namespace (str): Namespace under which to host container</span>
+<span class=sd>        nodes (list): Long names of nodes to containerise</span>
+<span class=sd>        context (dict): Loaded product context information</span>
+<span class=sd>        loader (str, optional): Name of loader used to produce this container.</span>
+<span class=sd>        suffix (str, optional): Suffix of container, defaults to `_CON`.</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        container (hou.Node): Name of container assembly</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+
+    <span class=c1># Get AYON Containers subnet</span>
+    <span class=n>subnet</span> <span class=o>=</span> <span class=n>get_or_create_ayon_container</span><span class=p>()</span>
+
+    <span class=c1># Create proper container name</span>
+    <span class=n>container_name</span> <span class=o>=</span> <span class=s2>&quot;</span><span class=si>{}</span><span class=s2>_</span><span class=si>{}</span><span class=s2>&quot;</span><span class=o>.</span><span class=n>format</span><span class=p>(</span><span class=n>name</span><span class=p>,</span> <span class=n>suffix</span> <span class=ow>or</span> <span class=s2>&quot;CON&quot;</span><span class=p>)</span>
+    <span class=n>container</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=s2>&quot;/obj/</span><span class=si>{}</span><span class=s2>&quot;</span><span class=o>.</span><span class=n>format</span><span class=p>(</span><span class=n>name</span><span class=p>))</span>
+    <span class=n>container</span><span class=o>.</span><span class=n>setName</span><span class=p>(</span><span class=n>container_name</span><span class=p>,</span> <span class=n>unique_name</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+
+    <span class=n>data</span> <span class=o>=</span> <span class=p>{</span>
+        <span class=s2>&quot;schema&quot;</span><span class=p>:</span> <span class=s2>&quot;ayon:container-3.0&quot;</span><span class=p>,</span>
+        <span class=s2>&quot;id&quot;</span><span class=p>:</span> <span class=n>AYON_CONTAINER_ID</span><span class=p>,</span>
+        <span class=s2>&quot;name&quot;</span><span class=p>:</span> <span class=n>name</span><span class=p>,</span>
+        <span class=s2>&quot;namespace&quot;</span><span class=p>:</span> <span class=n>namespace</span><span class=p>,</span>
+        <span class=s2>&quot;loader&quot;</span><span class=p>:</span> <span class=nb>str</span><span class=p>(</span><span class=n>loader</span><span class=p>),</span>
+        <span class=s2>&quot;representation&quot;</span><span class=p>:</span> <span class=n>context</span><span class=p>[</span><span class=s2>&quot;representation&quot;</span><span class=p>][</span><span class=s2>&quot;id&quot;</span><span class=p>],</span>
+        <span class=s2>&quot;project_name&quot;</span><span class=p>:</span> <span class=n>context</span><span class=p>[</span><span class=s2>&quot;project&quot;</span><span class=p>][</span><span class=s2>&quot;name&quot;</span><span class=p>]</span>
+    <span class=p>}</span>
+
+    <span class=n>lib</span><span class=o>.</span><span class=n>imprint</span><span class=p>(</span><span class=n>container</span><span class=p>,</span> <span class=n>data</span><span class=p>)</span>
+
+    <span class=c1># &quot;Parent&quot; the container under the container network</span>
+    <span class=n>container</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>moveNodesTo</span><span class=p>([</span><span class=n>container</span><span class=p>],</span> <span class=n>subnet</span><span class=p>)[</span><span class=mi>0</span><span class=p>]</span>
+
+    <span class=n>subnet</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=n>container_name</span><span class=p>)</span><span class=o>.</span><span class=n>moveToGoodPosition</span><span class=p>()</span>
+
+    <span class=k>return</span> <span class=n>container</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.pipeline.get_or_create_avalon_container class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_or_create_avalon_container</span><span class=p>()</span></code> </h2> <div class="doc doc-contents "> <p>Deprecated, please use <code>get_or_create_ayon_container</code> instead.</p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/pipeline.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>486</span>
+<span class=normal>487</span>
+<span class=normal>488</span>
+<span class=normal>489</span>
+<span class=normal>490</span>
+<span class=normal>491</span>
+<span class=normal>492</span>
+<span class=normal>493</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>get_or_create_avalon_container</span><span class=p>():</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Deprecated, please use `get_or_create_ayon_container` instead.&quot;&quot;&quot;</span>
+    <span class=n>warnings</span><span class=o>.</span><span class=n>warn</span><span class=p>(</span>
+        <span class=s2>&quot;get_or_create_avalon_container is deprecated, &quot;</span>
+        <span class=s2>&quot;please use get_or_create_ayon_container instead.&quot;</span><span class=p>,</span>
+        <span class=ne>DeprecationWarning</span>
+    <span class=p>)</span>
+    <span class=k>return</span> <span class=n>get_or_create_ayon_container</span><span class=p>()</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.pipeline.on_new class="doc doc-heading"> <code class="highlight language-python"><span class=n>on_new</span><span class=p>()</span></code> </h2> <div class="doc doc-contents "> <p>Set project resolution and fps when create a new file</p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/pipeline.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>439</span>
+<span class=normal>440</span>
+<span class=normal>441</span>
+<span class=normal>442</span>
+<span class=normal>443</span>
+<span class=normal>444</span>
+<span class=normal>445</span>
+<span class=normal>446</span>
+<span class=normal>447</span>
+<span class=normal>448</span>
+<span class=normal>449</span>
+<span class=normal>450</span>
+<span class=normal>451</span>
+<span class=normal>452</span>
+<span class=normal>453</span>
+<span class=normal>454</span>
+<span class=normal>455</span>
+<span class=normal>456</span>
+<span class=normal>457</span>
+<span class=normal>458</span>
+<span class=normal>459</span>
+<span class=normal>460</span>
+<span class=normal>461</span>
+<span class=normal>462</span>
+<span class=normal>463</span>
+<span class=normal>464</span>
+<span class=normal>465</span>
+<span class=normal>466</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>on_new</span><span class=p>():</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Set project resolution and fps when create a new file&quot;&quot;&quot;</span>
+
+    <span class=k>if</span> <span class=n>hou</span><span class=o>.</span><span class=n>hipFile</span><span class=o>.</span><span class=n>isLoadingHipFile</span><span class=p>():</span>
+        <span class=c1># This event also triggers when Houdini opens a file due to the</span>
+        <span class=c1># new event being registered to &#39;afterClear&#39;. As such we can skip</span>
+        <span class=c1># &#39;new&#39; logic if the user is opening a file anyway</span>
+        <span class=n>log</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span><span class=s2>&quot;Skipping on new callback due to scene being opened.&quot;</span><span class=p>)</span>
+        <span class=k>return</span>
+
+    <span class=n>log</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s2>&quot;Running callback on new..&quot;</span><span class=p>)</span>
+    <span class=n>_set_context_settings</span><span class=p>()</span>
+
+    <span class=c1># It seems that the current frame always gets reset to frame 1 on</span>
+    <span class=c1># new scene. So we enforce current frame to be at the start of the playbar</span>
+    <span class=c1># with execute deferred</span>
+    <span class=k>def</span><span class=w> </span><span class=nf>_enforce_start_frame</span><span class=p>():</span>
+        <span class=n>start</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>playbar</span><span class=o>.</span><span class=n>playbackRange</span><span class=p>()[</span><span class=mi>0</span><span class=p>]</span>
+        <span class=n>hou</span><span class=o>.</span><span class=n>setFrame</span><span class=p>(</span><span class=n>start</span><span class=p>)</span>
+
+    <span class=k>if</span> <span class=n>hou</span><span class=o>.</span><span class=n>isUIAvailable</span><span class=p>():</span>
+        <span class=kn>import</span><span class=w> </span><span class=nn>hdefereval</span>
+        <span class=n>hdefereval</span><span class=o>.</span><span class=n>executeDeferred</span><span class=p>(</span><span class=n>lib</span><span class=o>.</span><span class=n>start_workfile_template_builder</span><span class=p>)</span>
+        <span class=n>hdefereval</span><span class=o>.</span><span class=n>executeDeferred</span><span class=p>(</span><span class=n>_enforce_start_frame</span><span class=p>)</span>
+    <span class=k>else</span><span class=p>:</span>
+        <span class=c1># Run without execute deferred when no UI is available because</span>
+        <span class=c1># without UI `hdefereval` is not available to import</span>
+        <span class=n>_enforce_start_frame</span><span class=p>()</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.pipeline.parse_container class="doc doc-heading"> <code class="highlight language-python"><span class=n>parse_container</span><span class=p>(</span><span class=n>container</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Return the container node's full container data.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>container</code> </td> <td> <code><span title=hou.Node>Node</span></code> </td> <td> <div class=doc-md-description> <p>A container node name.</p> </div> </td> <td> <em>required</em> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td><code>dict</code></td> <td> </td> <td> <div class=doc-md-description> <p>The container schema data for this container node.</p> </div> </td> </tr> </tbody> </table> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/pipeline.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>292</span>
+<span class=normal>293</span>
+<span class=normal>294</span>
+<span class=normal>295</span>
+<span class=normal>296</span>
+<span class=normal>297</span>
+<span class=normal>298</span>
+<span class=normal>299</span>
+<span class=normal>300</span>
+<span class=normal>301</span>
+<span class=normal>302</span>
+<span class=normal>303</span>
+<span class=normal>304</span>
+<span class=normal>305</span>
+<span class=normal>306</span>
+<span class=normal>307</span>
+<span class=normal>308</span>
+<span class=normal>309</span>
+<span class=normal>310</span>
+<span class=normal>311</span>
+<span class=normal>312</span>
+<span class=normal>313</span>
+<span class=normal>314</span>
+<span class=normal>315</span>
+<span class=normal>316</span>
+<span class=normal>317</span>
+<span class=normal>318</span>
+<span class=normal>319</span>
+<span class=normal>320</span>
+<span class=normal>321</span>
+<span class=normal>322</span>
+<span class=normal>323</span>
+<span class=normal>324</span>
+<span class=normal>325</span>
+<span class=normal>326</span>
+<span class=normal>327</span>
+<span class=normal>328</span>
+<span class=normal>329</span>
+<span class=normal>330</span>
+<span class=normal>331</span>
+<span class=normal>332</span>
+<span class=normal>333</span>
+<span class=normal>334</span>
+<span class=normal>335</span>
+<span class=normal>336</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>parse_container</span><span class=p>(</span><span class=n>container</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Return the container node&#39;s full container data.</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        container (hou.Node): A container node name.</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        dict: The container schema data for this container node.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=c1># Read only relevant parms</span>
+    <span class=c1># TODO: Clean up this hack replacing `lib.read(container)`</span>
+
+    <span class=n>data</span> <span class=o>=</span> <span class=p>{}</span>
+    <span class=k>for</span> <span class=n>name</span> <span class=ow>in</span> <span class=p>[</span><span class=s2>&quot;name&quot;</span><span class=p>,</span> <span class=s2>&quot;namespace&quot;</span><span class=p>,</span> <span class=s2>&quot;loader&quot;</span><span class=p>,</span> <span class=s2>&quot;representation&quot;</span><span class=p>,</span> <span class=s2>&quot;id&quot;</span><span class=p>]:</span>
+        <span class=n>parm</span> <span class=o>=</span> <span class=n>container</span><span class=o>.</span><span class=n>parm</span><span class=p>(</span><span class=n>name</span><span class=p>)</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=n>parm</span><span class=p>:</span>
+            <span class=k>return</span> <span class=p>{}</span>
+
+        <span class=n>value</span> <span class=o>=</span> <span class=n>parm</span><span class=o>.</span><span class=n>eval</span><span class=p>()</span>
+
+        <span class=c1># test if value is json encoded dict</span>
+        <span class=k>if</span> <span class=nb>isinstance</span><span class=p>(</span><span class=n>value</span><span class=p>,</span> <span class=nb>str</span><span class=p>)</span> <span class=ow>and</span> <span class=n>value</span><span class=o>.</span><span class=n>startswith</span><span class=p>(</span><span class=n>JSON_PREFIX</span><span class=p>):</span>
+            <span class=k>try</span><span class=p>:</span>
+                <span class=n>value</span> <span class=o>=</span> <span class=n>json</span><span class=o>.</span><span class=n>loads</span><span class=p>(</span><span class=n>value</span><span class=p>[</span><span class=nb>len</span><span class=p>(</span><span class=n>JSON_PREFIX</span><span class=p>):])</span>
+            <span class=k>except</span> <span class=n>json</span><span class=o>.</span><span class=n>JSONDecodeError</span><span class=p>:</span>
+                <span class=c1># not a json</span>
+                <span class=k>pass</span>
+        <span class=n>data</span><span class=p>[</span><span class=n>name</span><span class=p>]</span> <span class=o>=</span> <span class=n>value</span>
+
+    <span class=c1># Support project name in container as optional attribute</span>
+    <span class=k>for</span> <span class=n>name</span> <span class=ow>in</span> <span class=p>[</span><span class=s2>&quot;project_name&quot;</span><span class=p>]:</span>
+        <span class=n>parm</span> <span class=o>=</span> <span class=n>container</span><span class=o>.</span><span class=n>parm</span><span class=p>(</span><span class=n>name</span><span class=p>)</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=n>parm</span><span class=p>:</span>
+            <span class=k>continue</span>
+        <span class=n>data</span><span class=p>[</span><span class=n>name</span><span class=p>]</span> <span class=o>=</span> <span class=n>parm</span><span class=o>.</span><span class=n>eval</span><span class=p>()</span>
+
+    <span class=c1># Backwards compatibility pre-schemas for containers</span>
+    <span class=n>data</span><span class=p>[</span><span class=s2>&quot;schema&quot;</span><span class=p>]</span> <span class=o>=</span> <span class=n>data</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&quot;schema&quot;</span><span class=p>,</span> <span class=s2>&quot;ayon:container-3.0&quot;</span><span class=p>)</span>
+
+    <span class=c1># Append transient data</span>
+    <span class=n>data</span><span class=p>[</span><span class=s2>&quot;objectName&quot;</span><span class=p>]</span> <span class=o>=</span> <span class=n>container</span><span class=o>.</span><span class=n>path</span><span class=p>()</span>
+    <span class=n>data</span><span class=p>[</span><span class=s2>&quot;node&quot;</span><span class=p>]</span> <span class=o>=</span> <span class=n>container</span>
+
+    <span class=k>return</span> <span class=n>data</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> </div> </div> </div> </article> </div> <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script> </div> </main> <footer class=md-footer> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-copyright> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"annotate": null, "base": "../../../..", "features": ["navigation.sections", "navigation.path", "navigation.prune"], "search": "../../../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script> <script src=../../../../assets/javascripts/bundle.e71a0d61.min.js></script> </body> </html>
