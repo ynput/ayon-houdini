@@ -138,7 +138,7 @@ def get_available_representations_with_labels(node: hou.OpNode) -> list[str]:
 
         is_current_representation = name == current_representation
         if is_current_representation:
-            label = f"{name}\t✓"
+            label = f"{label}\t✓"
 
         result.extend([name, label])
     return result
