@@ -3,6 +3,7 @@
 import os
 import re
 import uuid
+from functools import lru_cache
 from typing import List, Union
 
 import hou
@@ -14,6 +15,7 @@ from ayon_api import (
     get_versions,
     get_folder_by_path,
     get_product_by_name,
+    get_version_by_id,
     get_representations,
 )
 from ayon_core.pipeline import Anatomy
@@ -951,11 +953,25 @@ def set_to_latest_version(node):
 
 
 # region Parm Expressions
+
+@lru_cache(maxsize=100)
+def _cached_get_representation_by_id(project_name: str, representation_id: str) -> dict:
+    return get_representation_by_id(project_name, representation_id)
+
+@lru_cache(maxsize=100)
+def _cached_get_version_by_id(project_name: str, version_id: str) -> dict:
+    return get_version_by_id(project_name, version_id)
+
+
 # Callbacks used for expression on HDAs (e.g. Load Asset or Load Shot LOP)
 # Note that these are called many times, sometimes even multiple times when
 # the Parameters tab is open on the node. So some caching is performed to
 # avoid expensive re-querying.
 def expression_clear_cache(subkey=None) -> bool:
+
+    _cached_get_representation_by_id.cache_clear()
+    _cached_get_version_by_id.cache_clear()
+
     # Clear full cache if no subkey provided
     if subkey is None:
         if hasattr(hou.session, "ayon_cache"):
@@ -1043,5 +1059,20 @@ def expression_get_representation_path() -> str:
     cache[hash_value] = path
     return hou.text.expandString(path)
 
+
+def expression_get_version_entity() -> dict:
+    """Get the version entity."""
+    project_name = hou.evalParm("project_name")
+    representation_id = hou.evalParm("representation")
+
+    representation = _cached_get_representation_by_id(
+        project_name,
+        representation_id,
+    )
+    if not representation:
+        return {}
+
+    version_id = representation["versionId"]
+    return _cached_get_version_by_id(project_name, version_id)
 
 # endregion

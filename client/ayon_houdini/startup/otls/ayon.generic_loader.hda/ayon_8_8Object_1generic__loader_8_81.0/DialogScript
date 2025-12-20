@@ -16,7 +16,7 @@
 
     groupsimple {
         name    "info2"
-        label   "Info"
+        label   "Load Settings"
         parmtag { "script_callback" "hou.phm().refresh_available_versions(kwargs['node'])" }
         parmtag { "script_callback_language" "python" }
 
@@ -134,6 +134,41 @@
             type    toggle
             default { "0" }
             help    "When enabled, loads the filepath using the AYON Entity URI instead of the resolved filepath."
+        }
+    }
+
+    groupcollapsible {
+        name    "folder1"
+        label   "Info"
+
+        parm {
+            name    "info_author"
+            label   "Author"
+            type    string
+            default { [ "from ayon_houdini.api import hda_utils\n\nversion = hda_utils.expression_get_version_entity()\nreturn version.get(\"author\") or \"\"" python ] }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "info_date"
+            label   "Date"
+            type    string
+            default { [ "import datetime\nfrom ayon_houdini.api import hda_utils\n\nversion = hda_utils.expression_get_version_entity()\n\niso_time = version.get(\"updatedAt\") or version.get(\"createdAt\")\nif not iso_time:\n    return \"n/a\"\n\ndate = datetime.datetime.fromisoformat(iso_time)\ndate_local = date.astimezone()\nreturn date_local.strftime('%Y-%m-%d %H:%M:%S %Z')" python ] }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "info_status"
+            label   "Status"
+            type    string
+            default { [ "from ayon_houdini.api import hda_utils\n\nversion = hda_utils.expression_get_version_info()\nreturn version.get(\"status\") or \"\"" python ] }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "nodes_referencing_file"
+            label   "Nodes Referencing File"
+            type    oplist
+            default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
+            parmtag { "oprelative" "/" }
+            parmtag { "script_callback_language" "python" }
         }
     }
 
@@ -506,12 +541,4 @@
         }
     }
 
-    parm {
-        name    "nodes_referencing_file"
-        label   "Nodes Referencing File"
-        type    oplist
-        default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
-        parmtag { "oprelative" "/" }
-        parmtag { "script_callback_language" "python" }
-    }
 }
