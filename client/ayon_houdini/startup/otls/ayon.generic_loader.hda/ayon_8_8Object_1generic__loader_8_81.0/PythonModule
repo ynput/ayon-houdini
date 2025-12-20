@@ -4,7 +4,7 @@ from ayon_houdini.api.hda_utils import (
     update_thumbnail,
     setup_flag_changed_callback,
     get_available_versions_with_labels,
-    get_available_representations,
+    get_available_representations_with_labels,
     select_product_name,
     set_to_latest_version,
     expression_clear_cache
