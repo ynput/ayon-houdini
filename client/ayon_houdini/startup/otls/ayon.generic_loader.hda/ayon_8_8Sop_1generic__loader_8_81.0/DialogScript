@@ -77,14 +77,7 @@
             type    string
             default { "" }
             menureplace {
-                [ "representations_names = hou.phm().get_available_representations(kwargs['node'])" ]
-                [ "" ]
-                [ "result = []" ]
-                [ "for name in representations_names:" ]
-                [ "    result.append(name)" ]
-                [ "    result.append(name)" ]
-                [ "    " ]
-                [ "return result" ]
+                [ "hou.phm().get_available_representations_with_labels(kwargs['node'])" ]
                 language python
             }
             parmtag { "script_callback_language" "python" }

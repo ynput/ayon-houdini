@@ -102,21 +102,47 @@ def get_available_versions_with_labels(
     # Result ordered as version 1 value, version 1 label, version 2 value,
     # version 2 label and so forth. Used for displaying in Houdini enum menus.
     result: list[str] = []
+    current_version: str = node.evalParm("version")
+
     for version in get_available_versions(node, include_latest, include_hero):
+
         if version == "latest":
-            result.append("latest")
-            result.append("latest")
+            value = "latest"
+            label = "latest"
         elif isinstance(version, int):
-            version: int
-            version_label: str = f"v{abs(version):03d}"
+            version_label = f"v{abs(version):03d}"
             if version < 0:
                 # Hero version
                 version: str = "hero"
                 version_label = f"[{version_label}]"
-            result.append(str(version))
-            result.append(version_label)
+            value = str(version)
+            label = version_label
         else:
             raise ValueError(f"Unknown value to provide label for: {version}")
+
+        is_current_version = value == current_version
+        if is_current_version:
+            label = f"{label}\t✓"
+
+        result.extend([value, label])
+
+    return result
+
+
+def get_available_representations_with_labels(node: hou.OpNode) -> list[str]:
+
+    current_representation = node.evalParm("representation_name")
+    representations_names = get_available_representations(node)
+
+    result: list[str] = []
+    for name in representations_names:
+        label = name
+
+        is_current_representation = name == current_representation
+        if is_current_representation:
+            label = f"{label}\t✓"
+
+        result.extend([name, label])
     return result
 
 
