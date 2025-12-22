@@ -1,10 +1,10 @@
-"""Heper functions for load HDA"""
+"""Helper functions for load HDA"""
 
+import datetime
 import os
 import re
 import uuid
-from functools import lru_cache
-from typing import List, Union
+from typing import Iterable, List, Optional, Union
 
 import hou
 from qtpy import QtCore, QtWidgets, QtGui
@@ -482,13 +482,85 @@ def _resolve_entity_uri(entity_uri: str, resolve_roots: bool = False):
     return response.data[0]["entities"]
 
 
+def _resolve_one_entity_uri(entity_uri: str) -> dict:
+    """Resolve an entity URI to a single entity.
+
+    Args:
+        entity_uri (str): The entity URI to resolve.
+
+    Raises:
+        ValueError: If the entity could not be resolved with input values.
+
+    """
+    try:
+        entities = _resolve_entity_uri(entity_uri)
+    except RuntimeError as exc:
+        raise ValueError(exc)
+
+    if not entities:
+        raise ValueError(f"Unable to find a matching entity for {entity_uri}")
+
+    if len(entities) > 1:
+        raise ValueError(
+            f"Multiple entities found for {entity_uri}: {entities}"
+        )
+
+    return entities[0]
+
+
+def get_version_id(
+    project_name: str,
+    folder_path: str,
+    product_name: str,
+    version: str,
+) -> str:
+    """Get version id.
+    """
+    entity_uri: str = _construct_ayon_entity_uri_str(
+        project_name=project_name,
+        folder_path=folder_path,
+        product=product_name,
+        version=version,
+        representation_name="",
+    )
+    version_from_uri = _resolve_one_entity_uri(entity_uri)
+    return version_from_uri["versionId"]
+
+
+def get_version(
+    project_name: str,
+    folder_path: str,
+    product_name: str,
+    version: str,
+) -> dict:
+    """Get version entity.
+
+    Args:
+        project_name (str): Project name.
+        folder_path (str): Folder name.
+        product_name (str): Product name.
+        version (str): Version name as string.
+
+    Returns:
+        dict: Version entity.
+
+    """
+    version_id = get_version_id(
+        project_name,
+        folder_path,
+        product_name,
+        version,
+    )
+    return get_version_by_id(project_name, version_id)
+
+
 def get_representation_id(
-    project_name,
-    folder_path,
-    product_name,
-    version,
-    representation_name,
-):
+    project_name: str,
+    folder_path: str,
+    product_name: str,
+    version: str,
+    representation_name: str,
+) -> str:
     """Get representation id.
 
     Args:
@@ -525,17 +597,44 @@ def get_representation_id(
         version=version,
         representation_name=representation_name
     )
-    try:
-        entities = _resolve_entity_uri(entity_uri)
-    except RuntimeError as exc:
-        raise ValueError(exc)
+    representation_from_uri = _resolve_one_entity_uri(entity_uri)
+    return representation_from_uri["representationId"]
 
-    if len(entities) != 1:
-        raise ValueError(
-            f"Unable to find a matching entity for {entity_uri}"
-        )
 
-    return entities[0]["representationId"]
+def get_representation(
+    project_name: str,
+    folder_path: str,
+    product_name: str,
+    version: str,
+    representation_name: str,
+    fields: Optional[Iterable[str]] = None,
+) -> dict:
+    """Get representation entity.
+
+    Args:
+        project_name (str): Project name
+        folder_path (str): Folder name
+        product_name (str): Product name
+        version (str): Version name as string
+        representation_name (str): Representation name
+        fields (Optional[Iterable[str]]): Fields to return.
+
+    Returns:
+        dict: Representation entity.
+
+    """
+    representation_id = get_representation_id(
+        project_name,
+        folder_path,
+        product_name,
+        version,
+        representation_name,
+    )
+    return get_representation_by_id(
+        project_name,
+        representation_id,
+        fields=fields,
+    )
 
 
 def setup_flag_changed_callback(node):
@@ -954,23 +1053,11 @@ def set_to_latest_version(node):
 
 # region Parm Expressions
 
-@lru_cache(maxsize=100)
-def _cached_get_representation_by_id(project_name: str, representation_id: str) -> dict:
-    return get_representation_by_id(project_name, representation_id)
-
-@lru_cache(maxsize=100)
-def _cached_get_version_by_id(project_name: str, version_id: str) -> dict:
-    return get_version_by_id(project_name, version_id)
-
-
 # Callbacks used for expression on HDAs (e.g. Load Asset or Load Shot LOP)
 # Note that these are called many times, sometimes even multiple times when
 # the Parameters tab is open on the node. So some caching is performed to
 # avoid expensive re-querying.
 def expression_clear_cache(subkey=None) -> bool:
-
-    _cached_get_representation_by_id.cache_clear()
-    _cached_get_version_by_id.cache_clear()
 
     # Clear full cache if no subkey provided
     if subkey is None:
@@ -987,33 +1074,105 @@ def expression_clear_cache(subkey=None) -> bool:
     return False
 
 
-def expression_get_representation_id() -> str:
-    project_name = hou.evalParm("project_name")
-    folder_path = hou.evalParm("folder_path")
-    product_name = hou.evalParm("product_name")
-    version = hou.evalParm("version")
-    representation_name = hou.evalParm("representation_name")
+def get_version_info(node: hou.OpNode | None = None) -> dict:
+    """Get the version info for the node.
 
-    node = hou.pwd()
-    hash_value = (
+    Args:
+        node (hou.OpNode): The node to get the version info for.
+              If not provided, the current node is used.
+
+    Returns:
+        dict: The version entity.
+
+    """
+    node = node or hou.pwd()
+    project_name = node.evalParm("project_name")
+    folder_path = node.evalParm("folder_path")
+    product_name = node.evalParm("product_name")
+    version = node.evalParm("version")
+
+    cache_key = (project_name, folder_path, product_name, version)
+    cache = get_session_cache().setdefault("version_info", {})
+    if cache_key not in cache:
+        cache[cache_key] = get_version(
+            project_name,
+            folder_path,
+            product_name,
+            version,
+        )
+    return cache[cache_key]
+
+
+def get_version_formatted_time(
+    node: hou.OpNode | None = None,
+    fmt: str = "%Y-%m-%d %H:%M:%S %Z",
+) -> str:
+    """Get the updated or created formatted time of the version.
+
+    Args:
+        node: The node to get the version for.
+              If not provided, the current node is used.
+        fmt: The format of the time string.
+            Defaults to "%Y-%m-%d %H:%M:%S %Z".
+
+    Returns:
+        str: The updated or created time of the version in local time.
+
+    """
+    version = get_version_info(node)
+    if not version:
+        return ""
+
+    iso_time = version.get("updatedAt") or version.get("createdAt") or ""
+
+    date = datetime.datetime.fromisoformat(iso_time)
+    date_local = date.astimezone()
+    return date_local.strftime(fmt)
+
+
+def get_representation_info(node: hou.OpNode | None = None) -> dict:
+    """Get the representation info for the node.
+
+    Args:
+        node (hou.OpNode): The node to get the representation info for.
+              If not provided, the current node is used.
+
+    Returns:
+        dict: The representation info.
+
+    """
+    node = node or hou.pwd()
+    project_name = node.evalParm("project_name")
+    folder_path = node.evalParm("folder_path")
+    product_name = node.evalParm("product_name")
+    version = node.evalParm("version")
+    representation_name = node.evalParm("representation_name")
+
+    cache_key = (
         project_name,
         folder_path,
         product_name,
         version,
         representation_name,
     )
-    cache = get_session_cache().setdefault("representation_ids", {})
-    if hash_value in cache:
-        return cache[hash_value]
+    cache = get_session_cache().setdefault("representation_info", {})
+    if cache_key not in cache:
+        cache[cache_key] = get_representation(
+            project_name,
+            folder_path,
+            product_name,
+            version,
+            representation_name,
+            fields={
+                "id",
+                "createdAt",
+                "updatedAt",
+                "tags",
+                "status",
+            },
+        )
 
-    try:
-        repre_id = get_node_expected_representation_id(node)
-    except ValueError:
-        # Ignore invalid parameters
-        repre_id = ""
-
-    cache[hash_value] = repre_id
-    return repre_id
+    return cache[cache_key]
 
 
 def expression_get_representation_path() -> str:
@@ -1038,9 +1197,6 @@ def expression_get_representation_path() -> str:
 
     if use_entity_uri:
         # We construct the URL regardless of whether it succeeds to resolve
-        folder_path: str = hou.evalParm("folder_path")
-        product_name: str = hou.evalParm("product_name")
-        version: str = hou.evalParm("version")
         if version and version[-1].isdigit():
             # Convert positive or negative digits to integer
             try:
@@ -1059,20 +1215,5 @@ def expression_get_representation_path() -> str:
     cache[hash_value] = path
     return hou.text.expandString(path)
 
-
-def expression_get_version_entity() -> dict:
-    """Get the version entity."""
-    project_name = hou.evalParm("project_name")
-    representation_id = hou.evalParm("representation")
-
-    representation = _cached_get_representation_by_id(
-        project_name,
-        representation_id,
-    )
-    if not representation:
-        return {}
-
-    version_id = representation["versionId"]
-    return _cached_get_version_by_id(project_name, version_id)
 
 # endregion

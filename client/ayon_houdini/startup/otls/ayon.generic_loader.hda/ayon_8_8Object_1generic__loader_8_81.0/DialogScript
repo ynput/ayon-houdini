@@ -138,49 +138,13 @@
     }
 
     groupcollapsible {
-        name    "folder1"
-        label   "Info"
-
-        parm {
-            name    "info_author"
-            label   "Author"
-            type    string
-            default { [ "from ayon_houdini.api import hda_utils\n\nversion = hda_utils.expression_get_version_entity()\nreturn version.get(\"author\") or \"\"" python ] }
-            parmtag { "script_callback_language" "python" }
-        }
-        parm {
-            name    "info_date"
-            label   "Date"
-            type    string
-            default { [ "import datetime\nfrom ayon_houdini.api import hda_utils\n\nversion = hda_utils.expression_get_version_entity()\n\niso_time = version.get(\"updatedAt\") or version.get(\"createdAt\")\nif not iso_time:\n    return \"n/a\"\n\ndate = datetime.datetime.fromisoformat(iso_time)\ndate_local = date.astimezone()\nreturn date_local.strftime('%Y-%m-%d %H:%M:%S %Z')" python ] }
-            parmtag { "script_callback_language" "python" }
-        }
-        parm {
-            name    "info_status"
-            label   "Status"
-            type    string
-            default { [ "from ayon_houdini.api import hda_utils\n\nversion = hda_utils.expression_get_version_info()\nreturn version.get(\"status\") or \"\"" python ] }
-            parmtag { "script_callback_language" "python" }
-        }
-        parm {
-            name    "nodes_referencing_file"
-            label   "Nodes Referencing File"
-            type    oplist
-            default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
-            parmtag { "oprelative" "/" }
-            parmtag { "script_callback_language" "python" }
-        }
-    }
-
-    groupcollapsible {
         name    "info_display2"
-        label   "Info Display"
+        label   "Display Settings"
 
         parm {
             name    "show_thumbnail"
             label   "Show Entity Thumbnail"
             type    toggle
-            joinnext
             default { "0" }
             parmtag { "script_callback" "hou.phm().on_thumbnail_show_changed(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
@@ -233,49 +197,44 @@
             parmtag { "script_callback" "hou.phm().update_thumbnail(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
         }
-        parm {
-            name    "show_pipeline_parms"
-            label   "Show Pipeline Parms"
-            type    toggle
-            default { "0" }
-        }
     }
 
-    group {
-        name    "ayon_folder0"
-        label   "Ayon"
-        hidewhen "{ show_pipeline_parms == 0 }"
+    groupcollapsible {
+        name    "folder2"
+        label   "Info"
+        grouptag { "sidefx::switcher" "folder1" }
 
-        parm {
-            name    "name"
-            label   "Name"
-            type    label
-            default { "$OS" }
-        }
-        parm {
-            name    "namespace"
-            label   "Namespace"
-            type    label
-            default { "`opfullpath(\".\")`" }
-        }
-        parm {
-            name    "loader"
+        groupcollapsible {
+            name    "folder3"
             label   "Loader"
-            type    label
-            default { "FilePathLoader" }
+            parmtag { "group_default" "0" }
+
+            parm {
+                name    "name"
+                label   "Name"
+                type    label
+                default { "$OS" }
+            }
+            parm {
+                name    "namespace"
+                label   "Namespace"
+                type    label
+                default { "`opfullpath(\".\")`" }
+            }
+            parm {
+                name    "loader"
+                label   "Loader"
+                type    label
+                default { "FilePathLoader" }
+            }
+            parm {
+                name    "id"
+                label   "ID"
+                type    label
+                default { "ayon.load.container" }
+            }
         }
-        parm {
-            name    "id"
-            label   "ID"
-            type    label
-            default { "ayon.load.container" }
-        }
-        parm {
-            name    "representation"
-            label   "Representation ID"
-            type    string
-            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_id()" python ] }
-        }
+
         parm {
             name    "version_name"
             label   "Current Version Label"
@@ -290,6 +249,70 @@
             invisible
             default { "`chs(\"product_name\")`" }
         }
+        groupcollapsible {
+            name    "folder4"
+            label   "Info"
+            parmtag { "group_default" "1" }
+            grouptag { "sidefx::switcher" "folder2" }
+
+            parm {
+                name    "version_id"
+                label   "Version ID"
+                type    string
+                default { [ "hou.phm().get_version_info().get(\"id\") or \"\"" python ] }
+            }
+            parm {
+                name    "representation"
+                label   "Representation ID"
+                type    string
+                default { [ "hou.phm().get_representation_info().get(\"id\") or \"\"" python ] }
+            }
+            parm {
+                name    "info_author"
+                label   "Author"
+                type    string
+                default { [ "hou.phm().get_version_info().get(\"author\") or \"\"" python ] }
+                parmtag { "script_callback_language" "python" }
+            }
+            parm {
+                name    "info_date"
+                label   "Date"
+                type    string
+                default { [ "hou.phm().get_version_formatted_time()" python ] }
+                parmtag { "script_callback_language" "python" }
+            }
+            parm {
+                name    "info_status"
+                label   "Status"
+                type    string
+                default { [ "hou.phm().get_version_info().get(\"status\") or \"\"" python ] }
+                parmtag { "script_callback_language" "python" }
+            }
+            parm {
+                name    "info_comment"
+                label   "Comment"
+                type    string
+                default { [ "hou.phm().get_version_info().get(\"attrib\", {}).get(\"comment\") or \"\"" python ] }
+                parmtag { "script_callback_language" "python" }
+            }
+        }
+
+        groupcollapsible {
+            name    "folder5"
+            label   "Usage"
+            parmtag { "group_default" "1" }
+            grouptag { "sidefx::switcher" "folder4" }
+
+            parm {
+                name    "nodes_referencing_file"
+                label   "Nodes Referencing File"
+                type    oplist
+                default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
+                parmtag { "oprelative" "/" }
+                parmtag { "script_callback_language" "python" }
+            }
+        }
+
     }
 
     group {
@@ -450,7 +473,7 @@
     }
 
     group {
-        name    "ayon_folder0_2"
+        name    "ayon_folder0_1_1"
         label   "Subnet"
         invisibletab
 
