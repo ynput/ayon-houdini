@@ -541,6 +541,10 @@ def get_version_id(
     version: str,
 ) -> str:
     """Get version id.
+
+    Raises:
+        ValueError: When none or multiple version entities were found.
+
     """
     entity_uri: str = _construct_ayon_entity_uri_str(
         project_name=project_name,
@@ -569,6 +573,9 @@ def get_version(
 
     Returns:
         dict: Version entity.
+
+    Raises:
+        ValueError: When none or multiple version entities were found.
 
     """
     version_id = get_version_id(
