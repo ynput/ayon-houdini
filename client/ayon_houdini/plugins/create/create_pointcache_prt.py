@@ -96,7 +96,7 @@ class CreatePRTPointCache(plugin.HoudiniCreator):
 
     def set_node_staging_dir(
             self, node, staging_dir, instance, pre_create_data):
-        node.parm("file").set(f"{staging_dir}/$OS$F4.prt")
+        node.parm("file").set(f"{staging_dir}/$OS.$F4.prt")
 
     def get_network_categories(self):
         return [
