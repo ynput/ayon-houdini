@@ -22,7 +22,7 @@ class CreatePRTPointCache(plugin.HoudiniCreator):
     icon = "cubes"
     description = "Create PRT ROP to export pointcache data"
 
-    # you can get it from 
+    # Enable if `PRT_ROPDriver` type exists.
     enabled = hou.ropNodeTypeCategory().nodeType("PRT_ROPDriver") is not None
 
     # Default render target
