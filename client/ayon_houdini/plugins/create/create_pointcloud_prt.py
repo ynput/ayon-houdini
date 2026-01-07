@@ -29,6 +29,8 @@ class CreatePRTPointCloud(plugin.HoudiniCreator):
     render_target = "local"
 
     def get_publish_families(self):
+        # The pointcache family is included because all of its validators
+        # also apply to the pointcache family
         return ["pointcloud", "pointcache", "prt", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
