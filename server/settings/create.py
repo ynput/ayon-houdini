@@ -185,7 +185,14 @@ class CreatePluginsModel(BaseSettingsModel):
         title="Create PointCache (Bgeo)")
     CreatePRTPointCloud: CreatorModel = SettingsField(
         default_factory=CreatorModel,
-        title="Create PointCloud (PRT)")
+        title="Create PointCloud (PRT)",
+        description=(
+            "Create point cloud instances for publishing with the PRT "
+            "representation. It requires the PRT_ROPDriver to be installed, "
+            "which can be found at: "
+            "https://github.com/flipswitchingmonkey/houdini_PRTROP"
+        )
+    )
     CreateRedshiftProxy: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Redshift Proxy")

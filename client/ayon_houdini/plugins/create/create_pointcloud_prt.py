@@ -1,12 +1,6 @@
 
 
 # -*- coding: utf-8 -*-
-"""Creator plugin for creating PRTs (Thinkbox Krakatoa Particle Files).
-
-It requires PRT_ROPDriver to be installed.
-Find it on https://github.com/flipswitchingmonkey/houdini_PRTROP
-"""
-
 from ayon_houdini.api import plugin
 from ayon_core.lib import EnumDef
 
@@ -14,13 +8,19 @@ import hou
 
 
 class CreatePRTPointCloud(plugin.HoudiniCreator):
-    """PRT pointcloud"""
+    """PRT pointcloud Creator
+    
+    Create point cloud instances for publishing with
+    the PRT representation. It requires the PRT_ROPDriver to be installed,
+    which can be found at: 
+        https://github.com/flipswitchingmonkey/houdini_PRTROP
+    """
     identifier = "io.openpype.creators.houdini.pointcloud.prt"
     label = "PointCloud (PRT)"
     product_type = "pointcloud"
     product_base_type = "pointcloud"
     icon = "cubes"
-    description = "Create PRT ROP to export pointcloud data"
+    description = __doc__
 
     # Enable if `PRT_ROPDriver` type exists.
     enabled = hou.ropNodeTypeCategory().nodeType("PRT_ROPDriver") is not None
