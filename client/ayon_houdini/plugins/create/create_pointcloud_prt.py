@@ -37,7 +37,7 @@ class CreatePRTPointCloud(plugin.HoudiniCreator):
             "creator_attributes", dict())
         creator_attributes["render_target"] = pre_create_data["render_target"]
 
-        instance = super(CreatePRTPointCloud, self).create(
+        instance = super().create(
             product_name,
             instance_data,
             pre_create_data)
