@@ -13,14 +13,14 @@ from ayon_core.lib import EnumDef
 import hou
 
 
-class CreatePRTPointCache(plugin.HoudiniCreator):
-    """PRT pointcache"""
-    identifier = "io.openpype.creators.houdini.pointcache.prt"
-    label = "PointCache (PRT)"
-    product_type = "pointcache"
-    product_base_type = "pointcache"
+class CreatePRTPointCloud(plugin.HoudiniCreator):
+    """PRT pointcloud"""
+    identifier = "io.openpype.creators.houdini.pointcloud.prt"
+    label = "PointCloud (PRT)"
+    product_type = "pointcloud"
+    product_base_type = "pointcloud"
     icon = "cubes"
-    description = "Create PRT ROP to export pointcache data"
+    description = "Create PRT ROP to export pointcloud data"
 
     # Enable if `PRT_ROPDriver` type exists.
     enabled = hou.ropNodeTypeCategory().nodeType("PRT_ROPDriver") is not None
@@ -29,7 +29,7 @@ class CreatePRTPointCache(plugin.HoudiniCreator):
     render_target = "local"
 
     def get_publish_families(self):
-        return ["pointcache", "prt", "publish.hou"]
+        return ["pointcloud", "pointcache", "prt", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
         instance_data.update({"node_type": "PRT_ROPDriver"})
@@ -37,7 +37,7 @@ class CreatePRTPointCache(plugin.HoudiniCreator):
             "creator_attributes", dict())
         creator_attributes["render_target"] = pre_create_data["render_target"]
 
-        instance = super(CreatePRTPointCache, self).create(
+        instance = super(CreatePRTPointCloud, self).create(
             product_name,
             instance_data,
             pre_create_data)
