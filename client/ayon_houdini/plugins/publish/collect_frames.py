@@ -46,9 +46,12 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
         # Create collection using frame pattern.
         # e.g. 'pointcacheBgeoCache_AB010.1001.bgeo'
         # will be <Collection "pointcacheBgeoCache_AB010.%d.bgeo [1001]">
+        # we use a customized pattern as
+        # clique.PATTERNS["frames"] supports only `.1001.exr` not `_1001.exr`.
+        pattern = "[_.](?P<index>(?P<padding>0*)\\d+)\\.\\D+\\d?$"
         frame_collection, _ = clique.assemble(
             [file_name],
-            patterns=[clique.PATTERNS["frames"]],
+            patterns=[pattern],
             minimum_items=1
         )
 
