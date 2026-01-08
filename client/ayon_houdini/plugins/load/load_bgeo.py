@@ -69,7 +69,9 @@ class BgeoLoader(plugin.HoudiniLoader):
         if is_sequence:
             folder, filename = os.path.split(path)
             filename = re.sub(
-                r"(.*)\.(\d+)\.(bgeo.*)", "\\1.$F4.\\3", filename
+                r"(.*)\.(\d+)\.(bgeo.*)",
+                BgeoLoader.replace_with_frame_token,
+                filename
             )
             path = os.path.join(folder, filename)
 

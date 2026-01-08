@@ -122,9 +122,11 @@ class ImageLoader(plugin.HoudiniLoader):
         is_sequence = bool(representation["context"].get("frame"))
         if is_sequence:
             folder, filename = os.path.split(path)
-            filename = re.sub(r"(.*)\.(\d+){}$".format(re.escape(ext)),
-                              "\\1.$F4{}".format(ext),
-                              filename)
+            filename = re.sub(
+                r"(.*)\.(\d+)\.({}$)".format(re.escape(ext[1:])),
+                ImageLoader.replace_with_frame_token,
+                filename
+            )
             path = os.path.join(folder, filename)
 
         path = os.path.normpath(path)

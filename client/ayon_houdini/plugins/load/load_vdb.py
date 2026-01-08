@@ -65,7 +65,11 @@ class VdbLoader(plugin.HoudiniLoader):
         is_sequence = bool(representation["context"].get("frame"))
         if is_sequence:
             folder, filename = os.path.split(path)
-            filename = re.sub(r"(.*)\.(\d+)\.vdb$", "\\1.$F4.vdb", filename)
+            filename = re.sub(
+                r"(.*)\.(\d+)\.(vdb$)",
+                VdbLoader.replace_with_frame_token,
+                filename
+            )
             path = os.path.join(folder, filename)
 
         path = os.path.normpath(path)

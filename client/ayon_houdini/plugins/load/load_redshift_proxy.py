@@ -98,7 +98,11 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
         is_sequence = bool(representation["context"].get("frame"))
         if is_sequence:
             folder, filename = os.path.split(path)
-            filename = re.sub(r"(.*)\.(\d+)\.(rs.*)", "\\1.$F4.\\3", filename)
+            filename = re.sub(
+                r"(.*)\.(\d+)\.(rs.*)",
+                RedshiftProxyLoader.replace_with_frame_token,
+                filename
+            )
             path = os.path.join(folder, filename)
 
         path = os.path.normpath(path)
