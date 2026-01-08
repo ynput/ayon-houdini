@@ -544,24 +544,24 @@ class HoudiniLoader(load.LoaderPlugin):
                         break
 
         return path
-    
+
     @staticmethod
     def replace_with_frame_token(match):
         """Replace with frame token
 
         Helper function used in re.sub to replace the frame number within
         a match with $F token followed by the correct frame padding.
-        
+
         Args:
             match: Description
         """
         prefix = match.group(1)
         frame_digits = match.group(2)
         suffix = match.group(3)
-        
+
         # Calculate the number of digits (padding)
         padding = len(frame_digits)
-        
+
         return f"{prefix}.$F{padding}.{suffix}"
 
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
