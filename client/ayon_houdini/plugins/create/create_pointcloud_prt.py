@@ -8,10 +8,10 @@ import hou
 
 class CreatePRTPointCloud(plugin.HoudiniCreator):
     """PRT pointcloud Creator
-    
+
     Create point cloud instances for publishing with
     the PRT representation. It requires the PRT_ROPDriver to be installed,
-    which can be found at: 
+    which can be found at:
         https://github.com/flipswitchingmonkey/houdini_PRTROP
     """
     identifier = "io.openpype.creators.houdini.pointcloud.prt"
