@@ -1,6 +1,5 @@
+import inspect
 
-
-# -*- coding: utf-8 -*-
 from ayon_houdini.api import plugin
 from ayon_core.lib import EnumDef
 
@@ -20,13 +19,15 @@ class CreatePRTPointCloud(plugin.HoudiniCreator):
     product_type = "pointcloud"
     product_base_type = "pointcloud"
     icon = "cubes"
-    description = __doc__
+    description = "PRT pointcloud creator"
 
-    # Enable if `PRT_ROPDriver` type exists.
-    enabled = hou.ropNodeTypeCategory().nodeType("PRT_ROPDriver") is not None
+    enabled = False  # configurable in settings
 
     # Default render target
     render_target = "local"
+
+    def get_detail_description(self) -> str:
+        return inspect.cleandoc(self.__doc__)
 
     def get_publish_families(self):
         # The pointcache family is included because all of its validators
