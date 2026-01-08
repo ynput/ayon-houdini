@@ -13,7 +13,7 @@ class CreatePRTPointCloud(plugin.HoudiniCreator):
     It requires the PRT_ROPDriver to be installed, which can be found at:
         https://github.com/flipswitchingmonkey/houdini_PRTROP
     """
-    identifier = "io.openpype.creators.houdini.pointcloud.prt"
+    identifier = "io.ayon.creators.houdini.pointcloud.prt"
     label = "PointCloud (PRT)"
     product_type = "pointcloud"
     product_base_type = "pointcloud"
