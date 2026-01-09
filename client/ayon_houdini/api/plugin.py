@@ -559,9 +559,9 @@ class HoudiniLoader(load.LoaderPlugin):
 
         folder, filename = os.path.split(filepath)
 
-        # Assume the frame number is always the last digit 
+        # Assume the frame number is always the last digit
         pattern = re.compile(r"""
-            (.*?)               # everything before the frame number (non-greedy)
+            (.*?)            # everything before the frame number (non-greedy)
             (\d+)                # the frame number
             (\.[^.]+(?:\..+)*)$  # extension (one or more dot segments)
         """, re.VERBOSE)

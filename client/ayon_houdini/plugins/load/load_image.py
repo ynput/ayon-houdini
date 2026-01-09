@@ -1,5 +1,4 @@
 import os
-import re
 import hou
 
 from ayon_core.pipeline import AYON_CONTAINER_ID

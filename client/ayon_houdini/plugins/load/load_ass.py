@@ -1,6 +1,4 @@
 import os
-import re
-
 import hou
 
 from ayon_houdini.api import (
