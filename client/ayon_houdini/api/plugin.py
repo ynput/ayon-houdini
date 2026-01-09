@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Houdini specific AYON/Pyblish plugin definitions."""
 import os
+import re
 from typing import Dict, Optional
 
 import hou
@@ -546,23 +547,30 @@ class HoudiniLoader(load.LoaderPlugin):
         return path
 
     @staticmethod
-    def replace_with_frame_token(match):
+    def replace_with_frame_token(filepath):
         """Replace with frame token
 
-        Helper function used in re.sub to replace the frame number within
-        a match with $F token followed by the correct frame padding.
+        Replace the frame number within a filepath with
+        $F token followed by the correct frame padding.
 
         Args:
-            match: Description
+            filepath (str): file path to convert.
         """
-        prefix = match.group(1)
-        frame_digits = match.group(2)
-        suffix = match.group(3)
 
-        # Calculate the number of digits (padding)
-        padding = len(frame_digits)
+        folder, filename = os.path.split(filepath)
 
-        return f"{prefix}.$F{padding}.{suffix}"
+        # Assume the frame number is always the last digit 
+        pattern = re.compile(r"""
+            (.*?)               # everything before the frame number (non-greedy)
+            (\d+)                # the frame number
+            (\.[^.]+(?:\..+)*)$  # extension (one or more dot segments)
+        """, re.VERBOSE)
+        match = pattern.match(filename)
+        head, frame, tail = match.groups()
+        padding = len(frame)
+
+        filename = f"{head}$F{padding}{tail}"
+        return os.path.join(folder, filename)
 
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
     """Base class for Houdini instance publish plugins."""

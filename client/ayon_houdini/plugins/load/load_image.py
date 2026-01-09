@@ -116,18 +116,11 @@ class ImageLoader(plugin.HoudiniLoader):
     @staticmethod
     def format_path(path, representation):
         """Format file path correctly for single image or sequence."""
-        ext = os.path.splitext(path)[-1]
 
         # The path is either a single file or sequence in a folder.
         is_sequence = bool(representation["context"].get("frame"))
         if is_sequence:
-            folder, filename = os.path.split(path)
-            filename = re.sub(
-                r"(.*)\.(\d+)\.({}$)".format(re.escape(ext[1:])),
-                ImageLoader.replace_with_frame_token,
-                filename
-            )
-            path = os.path.join(folder, filename)
+            path = ImageLoader.replace_with_frame_token(path)
 
         path = os.path.normpath(path)
         path = path.replace("\\", "/")
