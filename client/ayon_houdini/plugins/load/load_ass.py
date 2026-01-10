@@ -1,4 +1,3 @@
-import os
 import hou
 
 from ayon_houdini.api import (
@@ -57,26 +56,6 @@ class AssLoader(plugin.HoudiniLoader):
     def remove(self, container):
         node = container["node"]
         node.destroy()
-
-    def format_path(self, context):
-        """Format file path correctly for single ass.* or ass.* sequence.
-
-        Args:
-            context (dict): representation context to be loaded.
-
-        Returns:
-             str: Formatted path to be used by the input node.
-
-        """
-        path = self.filepath_from_context(context)
-        # The path is either a single file or sequence in a folder.
-        is_sequence = bool(context["representation"]["context"].get("frame"))
-        if is_sequence:
-            path = self.replace_with_frame_token(path)
-
-        path = os.path.normpath(path)
-        path = path.replace("\\", "/")
-        return path
 
     def switch(self, container, context):
         self.update(container, context)

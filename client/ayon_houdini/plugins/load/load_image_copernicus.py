@@ -1,4 +1,3 @@
-import os
 import hou
 
 from ayon_core.pipeline import AYON_CONTAINER_ID
@@ -61,10 +60,6 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
         return super().apply_settings(project_settings)
 
     def load(self, context, name=None, namespace=None, data=None):
-        # Format file name, Houdini only wants forward slashes
-        path = self.filepath_from_context(context)
-        path = self.format_path(path, representation=context["representation"])
-
         # Define node name
         namespace = namespace if namespace else context["folder"]["name"]
         node_name = "{}_{}".format(namespace, name) if namespace else name
@@ -82,7 +77,7 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
         node.moveToGoodPosition()
 
         node.setParms({
-            "filename": path,
+            "filename": self.format_path(context),
             # Add the default "C" file AOV
             "aovs": 1,
             "aov1": "C",
@@ -107,11 +102,8 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
         node = container["node"]
 
         # Update the file path
-        file_path = self.filepath_from_context(context)
-        file_path = self.format_path(file_path, repre_entity)
-
         parms = {
-            "filename": file_path,
+            "filename": self.format_path(context),
             "representation": repre_entity["id"],
         }
 
@@ -131,19 +123,6 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
 
         if parent.path() == f"{pipeline.AYON_CONTAINERS}/{COPNET_NAME}":
             parent.destroy()
-
-    @staticmethod
-    def format_path(path, representation):
-        """Format file path correctly for single image or sequence."""
-
-        # The path is either a single file or sequence in a folder.
-        is_sequence = bool(representation["context"].get("frame"))
-        if is_sequence:
-            path = ImageCopernicusLoader.replace_with_frame_token(path)
-
-        path = os.path.normpath(path)
-        path = path.replace("\\", "/")
-        return path
 
     def switch(self, container, representation):
         self.update(container, representation)

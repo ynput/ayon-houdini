@@ -572,6 +572,26 @@ class HoudiniLoader(load.LoaderPlugin):
         filename = f"{head}$F{padding}{tail}"
         return os.path.join(folder, filename)
 
+    def format_path(self, context):
+        """Format file path correctly for single file or file sequence.
+
+        Args:
+            context (dict): representation context to be loaded.
+
+        Returns:
+             str: Formatted path to be used by the input node.
+
+        """
+        path = self.filepath_from_context(context)
+        # The path is either a single file or sequence in a folder.
+        is_sequence = bool(context["representation"]["context"].get("frame"))
+        if is_sequence:
+            path = self.replace_with_frame_token(path)
+
+        path = os.path.normpath(path)
+        path = path.replace("\\", "/")
+        return path
+
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
     """Base class for Houdini instance publish plugins."""
 
