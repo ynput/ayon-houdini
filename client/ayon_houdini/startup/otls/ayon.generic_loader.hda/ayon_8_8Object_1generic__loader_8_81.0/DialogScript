@@ -198,55 +198,23 @@
         grouptag { "sidefx::switcher" "folder1" }
 
         groupcollapsible {
-            name    "folder3"
-            label   "Loader"
-            parmtag { "group_default" "0" }
+            name    "folder5"
+            label   "Usage"
+            parmtag { "group_default" "1" }
 
             parm {
-                name    "name"
-                label   "Name"
-                type    label
-                default { "$OS" }
-            }
-            parm {
-                name    "namespace"
-                label   "Namespace"
-                type    label
-                default { "`opfullpath(\".\")`" }
-            }
-            parm {
-                name    "loader"
-                label   "Loader"
-                type    label
-                default { "FilePathLoader" }
-            }
-            parm {
-                name    "id"
-                label   "ID"
-                type    label
-                default { "ayon.load.container" }
+                name    "nodes_referencing_file"
+                label   "Nodes Referencing File"
+                type    oplist
+                default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
+                parmtag { "oprelative" "/" }
+                parmtag { "script_callback_language" "python" }
             }
         }
 
-        parm {
-            name    "version_name"
-            label   "Current Version Label"
-            type    label
-            invisible
-            default { "" }
-        }
-        parm {
-            name    "subset_name"
-            label   "Subset (backwards compatibility)"
-            type    label
-            invisible
-            default { "`chs(\"product_name\")`" }
-        }
         groupcollapsible {
             name    "folder4"
-            label   "Info"
-            parmtag { "group_default" "1" }
-            grouptag { "sidefx::switcher" "folder2" }
+            label   "Metadata"
 
             parm {
                 name    "version_id"
@@ -291,21 +259,49 @@
         }
 
         groupcollapsible {
-            name    "folder5"
-            label   "Usage"
-            parmtag { "group_default" "1" }
-            grouptag { "sidefx::switcher" "folder4" }
+            name    "folder3"
+            label   "Loader"
 
             parm {
-                name    "nodes_referencing_file"
-                label   "Nodes Referencing File"
-                type    oplist
-                default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
-                parmtag { "oprelative" "/" }
-                parmtag { "script_callback_language" "python" }
+                name    "name"
+                label   "Name"
+                type    label
+                default { "$OS" }
+            }
+            parm {
+                name    "namespace"
+                label   "Namespace"
+                type    label
+                default { "`opfullpath(\".\")`" }
+            }
+            parm {
+                name    "loader"
+                label   "Loader"
+                type    label
+                default { "FilePathLoader" }
+            }
+            parm {
+                name    "id"
+                label   "ID"
+                type    label
+                default { "ayon.load.container" }
             }
         }
 
+        parm {
+            name    "version_name"
+            label   "Current Version Label"
+            type    label
+            invisible
+            default { "" }
+        }
+        parm {
+            name    "subset_name"
+            label   "Subset (backwards compatibility)"
+            type    label
+            invisible
+            default { "`chs(\"product_name\")`" }
+        }
     }
 
     group {
