@@ -221,12 +221,16 @@
                 label   "Version ID"
                 type    string
                 default { [ "hou.phm().get_version_info().get(\"id\") or \"\"" python ] }
+                parmtag { "script_action" "from ayon_houdini.api import hda_utils\n\nhda_utils.show_version_info(kwargs[\"node\"])" }
+                parmtag { "script_action_icon" "BUTTONS_info" }
             }
             parm {
                 name    "representation"
                 label   "Representation ID"
                 type    string
                 default { [ "hou.phm().get_representation_info().get(\"id\") or \"\"" python ] }
+                parmtag { "script_action" "from ayon_houdini.api import hda_utils\n\nhda_utils.show_representation_info(kwargs[\"node\"])" }
+                parmtag { "script_action_icon" "BUTTONS_info" }
             }
             parm {
                 name    "info_author"

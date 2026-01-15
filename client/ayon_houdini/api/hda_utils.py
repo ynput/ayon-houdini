@@ -1,6 +1,7 @@
 """Helper functions for load HDA"""
 
 import datetime
+import json
 import os
 import re
 import uuid
@@ -1248,5 +1249,42 @@ def expression_get_representation_path() -> str:
     cache[hash_value] = path
     return hou.text.expandString(path)
 
+
+# endregion
+
+
+# region Parm Buttons
+
+def show_info(
+    info: dict,
+    title: str = "Info",
+    text: str = "",
+) -> None:
+    """Show info in a dialog."""
+    info_text = json.dumps(info, indent=4)
+
+    button = hou.ui.displayMessage(
+        title=title,
+        text=text,
+        buttons=('Copy', 'Close'),
+        details_label="details_label",
+        details=info_text,
+        details_expanded=True,
+        close_choice=1,
+    )
+    if button == 0:  # copy
+        hou.ui.copyTextToClipboard(info_text)
+
+
+def show_version_info(node: hou.OpNode) -> None:
+    """Show version detail for the given node in a dialog."""
+    info = get_version_info(node)
+    show_info(info, title="Version Detail")
+
+
+def show_representation_info(node: hou.OpNode) -> None:
+    """Show representation detail for the given node in a dialog."""
+    info = get_representation_info(node)
+    show_info(info, title="Representation Detail")
 
 # endregion
