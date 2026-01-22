@@ -48,27 +48,46 @@ class ValidateProductName(plugin.HoudiniInstancePlugin,
         rop_node = hou.node(instance.data["instance_node"])
 
         # Check product name
+        project_entity = instance.context.data["projectEntity"]
+        project_settings = instance.context.data["project_settings"]
         folder_entity = instance.data["folderEntity"]
         task_entity = instance.data["taskEntity"]
-        task_name = task_type = None
-        if task_entity:
-            task_name = task_entity["name"]
-            task_type = task_entity["taskType"]
+        product_base_type = instance.data.get("productBaseType")
+        if not product_base_type:
+            product_base_type = instance.data["productType"]
+
+        get_product_name_kwargs = {}
+        if getattr(get_product_name, "use_entities", False):
+            get_product_name_kwargs.update({
+                "folder_entity": folder_entity,
+                "task_entity": task_entity,
+                "product_base_type": product_base_type,
+            })
+        else:
+            task_name = task_type = None
+            if task_entity:
+                task_name = task_entity["name"]
+                task_type = task_entity["taskType"]
+            get_product_name_kwargs.update({
+                "task_name": task_name,
+                "task_type": task_type,
+            })
+
         product_name = get_product_name(
             project_name=instance.context.data["projectName"],
-            task_name=task_name,
-            task_type=task_type,
             host_name=instance.context.data["hostName"],
             product_type=instance.data["productType"],
             variant=instance.data["variant"],
+            project_entity=project_entity,
+            project_settings=project_settings,
             dynamic_data={
                 "folder": {
                     "label": folder_entity["label"],
                     "name": folder_entity["name"],
+                    "type": folder_entity["folderType"]
                 },
-                # Backwards compatibility
-                "asset": folder_entity["name"],
             },
+            **get_product_name_kwargs,
         )
 
         if instance.data.get("productName") != product_name:
@@ -83,26 +102,47 @@ class ValidateProductName(plugin.HoudiniInstancePlugin,
         rop_node = hou.node(instance.data["instance_node"])
 
         # Check product name
+        project_entity = instance.context.data["projectEntity"]
+        project_settings = instance.context.data["project_settings"]
         folder_entity = instance.data["folderEntity"]
         task_entity = instance.data["taskEntity"]
-        task_name = task_type = None
-        if task_entity:
-            task_name = task_entity["name"]
-            task_type = task_entity["taskType"]
+
+        product_base_type = instance.data.get("productBaseType")
+        if not product_base_type:
+            product_base_type = instance.data["productType"]
+
+        get_product_name_kwargs = {}
+        if getattr(get_product_name, "use_entities", False):
+            get_product_name_kwargs.update({
+                "folder_entity": folder_entity,
+                "task_entity": task_entity,
+                "product_base_type": product_base_type,
+            })
+        else:
+            task_name = task_type = None
+            if task_entity:
+                task_name = task_entity["name"]
+                task_type = task_entity["taskType"]
+            get_product_name_kwargs.update({
+                "task_name": task_name,
+                "task_type": task_type,
+            })
+
         product_name = get_product_name(
             project_name=instance.context.data["projectName"],
-            task_name=task_name,
-            task_type=task_type,
             host_name=instance.context.data["hostName"],
             product_type=instance.data["productType"],
             variant=instance.data["variant"],
+            project_entity=project_entity,
+            project_settings=project_settings,
             dynamic_data={
-                "asset": folder_entity["name"],
                 "folder": {
-                            "label": folder_entity["label"],
-                            "name": folder_entity["name"]
-                            }
-                }
+                    "label": folder_entity["label"],
+                    "name": folder_entity["name"],
+                    "type": folder_entity["folderType"]
+                },
+            },
+            **get_product_name_kwargs,
         )
 
         instance.data["productName"] = product_name
