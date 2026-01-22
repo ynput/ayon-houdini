@@ -347,7 +347,9 @@ class CreateHDA(plugin.HoudiniCreator):
         task_entity,
         variant,
         host_name,
-        instance
+        instance,
+        project_entity=None,
+        product_type=None,
     ):
         """
         Pass product name from product name templates as dynamic data.
