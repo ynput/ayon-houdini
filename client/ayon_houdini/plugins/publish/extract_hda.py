@@ -46,7 +46,6 @@ class ExtractHDA(plugin.HoudiniExtractorPlugin):
         if hda_file_path == "Embedded":
             _, hda_file_path = tempfile.mkstemp(suffix=".hda")
 
-            # with tempfile.NamedTemporaryFile("w", suffix=".hda", delete=False) as tmp:
             instance.context.data["cleanupFullPaths"].append(hda_file_path)
 
         with revert_original_parm_template_group(hda_node):
