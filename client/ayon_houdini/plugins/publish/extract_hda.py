@@ -43,7 +43,7 @@ class ExtractHDA(plugin.HoudiniExtractorPlugin):
 
         # if the HDA is embedded, we need to save it so that it can be copied
         # to the staging and publish directories
-        if hda_file_path.lower() == "embedded":
+        if hda_file_path == "Embedded":
             _, hda_file_path = tempfile.mkstemp(suffix=".hda")
 
             # with tempfile.NamedTemporaryFile("w", suffix=".hda", delete=False) as tmp:
