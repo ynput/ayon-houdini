@@ -77,7 +77,7 @@ class ExtractHDA(plugin.HoudiniExtractorPlugin):
 
         file = os.path.basename(hda_file_path)
         staging_dir = os.path.dirname(hda_file_path)
-        self.log.info("Using HDA from {}".format(hda_file_path))
+        self.log.debug(f"Using HDA from {hda_file_path}")
 
         representation = {
             'name': 'hda',
