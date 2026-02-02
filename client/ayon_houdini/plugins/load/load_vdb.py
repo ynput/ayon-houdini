@@ -1,6 +1,3 @@
-import os
-import re
-
 import hou
 
 from ayon_houdini.api import (
@@ -39,9 +36,8 @@ class VdbLoader(plugin.HoudiniLoader):
 
         # Explicitly create a file node
         file_node = container.createNode("file", node_name=node_name)
-        path = self.filepath_from_context(context)
         file_node.setParms(
-            {"file": self.format_path(path, context["representation"])})
+            {"file": self.format_path(context)})
 
         # Set display on last node
         file_node.setDisplayFlag(True)
@@ -58,20 +54,6 @@ class VdbLoader(plugin.HoudiniLoader):
             suffix="",
         )
 
-    @staticmethod
-    def format_path(path, representation):
-        """Format file path correctly for single vdb or vdb sequence."""
-        # The path is either a single file or sequence in a folder.
-        is_sequence = bool(representation["context"].get("frame"))
-        if is_sequence:
-            folder, filename = os.path.split(path)
-            filename = re.sub(r"(.*)\.(\d+)\.vdb$", "\\1.$F4.vdb", filename)
-            path = os.path.join(folder, filename)
-
-        path = os.path.normpath(path)
-        path = path.replace("\\", "/")
-        return path
-
     def update(self, container, context):
         repre_entity = context["representation"]
         node = container["node"]
@@ -84,10 +66,7 @@ class VdbLoader(plugin.HoudiniLoader):
             return
 
         # Update the file path
-        file_path = self.filepath_from_context(context)
-        file_path = self.format_path(file_path, repre_entity)
-
-        file_node.setParms({"file": file_path})
+        file_node.setParms({"file": self.format_path(context)})
 
         # Update attribute
         node.setParms({"representation": repre_entity["id"]})
