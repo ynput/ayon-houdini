@@ -1,5 +1,3 @@
-import os
-import re
 import hou
 
 from ayon_core.pipeline.load import LoadError
@@ -43,9 +41,7 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
         # Enable by default
         container.setParms({
             "RS_objprop_proxy_enable": True,
-            "RS_objprop_proxy_file": self.format_path(
-                self.filepath_from_context(context),
-                context["representation"])
+            "RS_objprop_proxy_file": self.format_path(context)
         })
 
         # Remove the file node, it only loads static meshes
@@ -75,12 +71,10 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
     def update(self, container, context):
         repre_entity = context["representation"]
         # Update the file path
-        file_path = self.filepath_from_context(context)
 
         node = container["node"]
         node.setParms({
-            "RS_objprop_proxy_file": self.format_path(
-                file_path, repre_entity)
+            "RS_objprop_proxy_file": self.format_path(context)
         })
 
         # Update attribute
@@ -89,21 +83,6 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
     def remove(self, container):
         node = container["node"]
         node.destroy()
-
-    @staticmethod
-    def format_path(path, representation):
-        """Format file path correctly for single redshift proxy
-        or redshift proxy sequence."""
-        # The path is either a single file or sequence in a folder.
-        is_sequence = bool(representation["context"].get("frame"))
-        if is_sequence:
-            folder, filename = os.path.split(path)
-            filename = re.sub(r"(.*)\.(\d+)\.(rs.*)", "\\1.$F4.\\3", filename)
-            path = os.path.join(folder, filename)
-
-        path = os.path.normpath(path)
-        path = path.replace("\\", "/")
-        return path
 
     def create_load_placeholder_node(
         self, node_name: str, placeholder_data: dict
