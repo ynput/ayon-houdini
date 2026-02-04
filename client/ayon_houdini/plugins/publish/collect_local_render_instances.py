@@ -1,6 +1,7 @@
 import os
-import warnings
 import pyblish.api
+
+from ayon_core.lib import is_func_signature_supported
 from ayon_core.pipeline.farm.patterning import match_aov_pattern
 from ayon_core.pipeline.farm.pyblish_functions import (
     get_product_name_and_group_from_template,
@@ -189,29 +190,30 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         instance.data["integrate"] = False
 
     def _get_product_name_and_group(
-        self, instance, product_type, dynamic_data
+        self, instance, product_base_type, dynamic_data
     ):
         """Get product name and group
 
-        This method matches the logic in farm that gets
-         `product_name` and `group_name` respecting
-         `use_legacy_product_names_for_renders` logic in core settings.
-
         Args:
             instance (pyblish.api.Instance): The instance to publish.
-            product_type (str): Product type.
+            product_base_type (str): Product base type.
             dynamic_data (dict): Dynamic data (camera, aov, ...)
 
         Returns:
             tuple (str, str): product name and group name
 
         """
-
-        return get_product_name_and_group_from_template(
+        kwargs = dict(
             project_name=instance.context.data["projectName"],
             task_entity=instance.context.data["taskEntity"],
             host_name=instance.context.data["hostName"],
-            product_type=product_type,
+            product_base_type=product_base_type,
+            product_type=product_base_type,
             variant=instance.data["variant"],
-            dynamic_data=dynamic_data
+            dynamic_data=dynamic_data,
         )
+        if not is_func_signature_supported(
+            get_product_name_and_group_from_template, **kwargs
+        ):
+            kwargs["product_type"] = kwargs.pop("product_base_type")
+        return get_product_name_and_group_from_template(**kwargs)
