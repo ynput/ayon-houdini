@@ -83,7 +83,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         context = instance.context
         expected_files = next(iter(instance.data["expectedFiles"]), {})
 
-        product_type = "render"  # is always render
+        product_base_type = "render"  # is always render
 
         # NOTE: The assumption that the output image's colorspace is the
         #   scene linear role may be incorrect. Certain renderers, like
@@ -103,7 +103,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
 
             product_name, product_group = self._get_product_name_and_group(
                 instance,
-                product_type,
+                product_base_type,
                 dynamic_data
             )
 
@@ -171,8 +171,9 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 "folderPath": instance.data["folderPath"],
                 "frameStartHandle": instance.data["frameStartHandle"],
                 "frameEndHandle": instance.data["frameEndHandle"],
-                "productType": product_type,
-                "family": product_type,
+                "productType": product_base_type,
+                "productBaseType": product_base_type,
+                "family": product_base_type,
                 "productName": product_name,
                 "productGroup": product_group,
                 "families": ["render.local.hou", "review"],
