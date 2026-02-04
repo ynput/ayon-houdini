@@ -4,7 +4,6 @@ import pyblish.api
 from ayon_core.pipeline.farm.patterning import match_aov_pattern
 from ayon_core.pipeline.farm.pyblish_functions import (
     get_product_name_and_group_from_template,
-    _get_legacy_product_name_and_group
 )
 from ayon_core.pipeline.publish import (
     get_plugin_settings,
@@ -207,30 +206,6 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             tuple (str, str): product name and group name
 
         """
-        project_settings = instance.context.data.get("project_settings")
-
-        use_legacy_product_name = True
-        try:
-            use_legacy_product_name = (
-                project_settings
-                ["core"]
-                ["tools"]
-                ["creator"]
-                ["use_legacy_product_names_for_renders"]
-            )
-        except KeyError:
-            warnings.warn(
-                ("use_legacy_for_renders not found in project settings. "
-                 "Using legacy product name for renders. Please update "
-                 "your ayon-core version."), DeprecationWarning)
-
-        if use_legacy_product_name:
-            return _get_legacy_product_name_and_group(
-                product_type=product_type,
-                source_product_name=instance.data["productName"],
-                task_name=instance.data["task"],
-                dynamic_data=dynamic_data
-            )
 
         return get_product_name_and_group_from_template(
             project_name=instance.context.data["projectName"],
