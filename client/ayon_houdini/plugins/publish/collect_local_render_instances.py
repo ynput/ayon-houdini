@@ -80,7 +80,8 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         # Using this minimal version of instance_skeleton_data instead of
         # ayon_core.pipeline.farm.pyblish_functions.create_skeleton_instance
         # Reason: to avoid polluting instance data.
-        # Note: Frame data like frameStart and handleStart are added in later publisher plugins
+        # Note: Frame data like frameStart and handleStart
+        # are added in later publisher plugins
         instance_skeleton_data = {
             "productType": product_base_type,
             "productBaseType": product_base_type,
@@ -95,16 +96,17 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             "multipartExr": instance.data["multipartExr"],
             "creator_attributes": instance.data["creator_attributes"],
             "publish_attributes": instance.data["publish_attributes"],
-            
+
             # Houdini specific data items.
             "instance_node": instance.data["instance_node"],
         }
-        
+
         if instance.data.get("review"):
             instance_skeleton_data["families"].append("review")
 
         if instance.data.get("renderlayer"):
-            instance_skeleton_data["renderlayer"] = instance.data["renderlayer"]
+            instance_skeleton_data["renderlayer"] = \
+                instance.data["renderlayer"]
 
         # Include the instance colorspace information too, because these
         # may represent scene display/view, etc.
@@ -144,7 +146,9 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             # like the "stagingDir" for each representation which we will make
             # absolute again.
             for representation in aov_instance_data["representations"]:
-                representation["stagingDir"] = anatomy.fill_root(representation["stagingDir"])
+                representation["stagingDir"] = anatomy.fill_root(
+                    representation["stagingDir"]
+                )
 
                 # Set the colorspace for the representation
                 if "colorspace" in instance.data:
