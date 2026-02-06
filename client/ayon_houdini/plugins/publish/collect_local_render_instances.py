@@ -12,6 +12,12 @@ from ayon_core.pipeline.publish import (
     ColormanagedPyblishPluginMixin
 )
 from ayon_houdini.api import plugin
+try:
+    from ayon_core.pipeline.farm.pyblish_functions import (
+        _get_legacy_product_name_and_group,
+    )
+except ImportError:
+    _get_legacy_product_name_and_group = None
 
 
 class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
@@ -204,6 +210,28 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             tuple (str, str): product name and group name
 
         """
+        use_legacy_product_name = False
+        if _get_legacy_product_name_and_group is not None:
+            project_settings = instance.context.data["project_settings"]
+            try:
+                use_legacy_product_name = (
+                    project_settings
+                    ["core"]
+                    ["tools"]
+                    ["creator"]
+                    ["use_legacy_product_names_for_renders"]
+                )
+            except KeyError:
+                pass
+
+        if use_legacy_product_name:
+            return _get_legacy_product_name_and_group(
+                product_base_type,
+                dynamic_data.get("productName"),
+                instance.context.data["taskEntity"]["name"],
+                dynamic_data
+            )
+
         kwargs = dict(
             project_name=instance.context.data["projectName"],
             folder_entity=instance.context.data["folderEntity"],
