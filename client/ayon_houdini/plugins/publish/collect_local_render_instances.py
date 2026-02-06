@@ -1,23 +1,13 @@
-import os
 import pyblish.api
-
-from ayon_core.lib import is_func_signature_supported
-from ayon_core.pipeline.farm.patterning import match_aov_pattern
-from ayon_core.pipeline.farm.pyblish_functions import (
-    get_product_name_and_group_from_template,
-)
 from ayon_core.pipeline.publish import (
     get_plugin_settings,
     apply_plugin_settings_automatically,
     ColormanagedPyblishPluginMixin
 )
+from ayon_core.pipeline.farm.pyblish_functions import (
+    create_instances_for_aov
+)
 from ayon_houdini.api import plugin
-try:
-    from ayon_core.pipeline.farm.pyblish_functions import (
-        _get_legacy_product_name_and_group,
-    )
-except ImportError:
-    _get_legacy_product_name_and_group = None
 
 
 class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
@@ -85,11 +75,59 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 "like pointing to an invalid LOP or SOP path")
             return
 
-        # Create Instance for each AOV.
-        context = instance.context
-        expected_files = next(iter(instance.data["expectedFiles"]), {})
-
         product_base_type = "render"  # is always render
+
+        # Using this minimal version of instance_skeleton_data instead of
+        # ayon_core.pipeline.farm.pyblish_functions.create_skeleton_instance
+        # Reason: to avoid polluting instance data.
+        # Note: Frame data like frameStart and handleStart are added in later publisher plugins
+        instance_skeleton_data = {
+            "productType": product_base_type,
+            "productBaseType": product_base_type,
+            "productName": instance.data["productName"],
+            "task": instance.data["task"],
+            "family": product_base_type,
+            "families": ["render.local.hou"],
+            "folderPath": instance.data["folderPath"],
+            "frameStartHandle": instance.data["frameStartHandle"],
+            "frameEndHandle": instance.data["frameEndHandle"],
+            "comment": instance.data.get("comment"),
+            "multipartExr": instance.data["multipartExr"],
+            "creator_attributes": instance.data["creator_attributes"],
+            "publish_attributes": instance.data["publish_attributes"],
+            
+            # Houdini specific data items.
+            "instance_node": instance.data["instance_node"],
+        }
+        
+        if instance.data.get("review"):
+            instance_skeleton_data["families"].append("review")
+
+        if instance.data.get("renderlayer"):
+            instance_skeleton_data["renderlayer"] = instance.data["renderlayer"]
+
+        # Include the instance colorspace information too, because these
+        # may represent scene display/view, etc.
+        for key in (
+                "colorspaceConfig",
+                "colorspace",
+                "colorspaceDisplay",
+                "colorspaceView",
+        ):
+            if key in instance.data:
+                value: str = instance.data[key]
+                instance_skeleton_data[key] = value
+
+        # Create Instance for each AOV.
+        aov_instances = create_instances_for_aov(
+            instance=instance,
+            skeleton=instance_skeleton_data,
+            aov_filter=self.aov_filter,
+            # list of extensions that shouldn't be published
+            skip_integration_repre_list=[],
+            # Don't explicitly skip review.
+            do_not_add_review=False
+        )
 
         # NOTE: The assumption that the output image's colorspace is the
         #   scene linear role may be incorrect. Certain renderers, like
@@ -98,153 +136,29 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         #   would need to be detected in a renderer-specific way and the
         #   majority of production scenarios these would not be overridden.
         # TODO: Support renderer-specific explicit colorspace overrides
+        # Add the instances directly to the current publish context
 
-        for aov_name, aov_filepaths in expected_files.items():
-            dynamic_data = {}
-            if aov_name:
-                dynamic_data["aov"] = aov_name
+        anatomy = instance.context.data["anatomy"]
+        for aov_instance_data in aov_instances:
+            # The `create_instances_for_aov` makes some paths rootless paths,
+            # like the "stagingDir" for each representation which we will make
+            # absolute again.
+            for representation in aov_instance_data["representations"]:
+                representation["stagingDir"] = anatomy.fill_root(representation["stagingDir"])
 
-            if instance.data.get("renderlayer"):
-                dynamic_data["renderlayer"] = instance.data["renderlayer"]
+                # Set the colorspace for the representation
+                if "colorspace" in instance.data:
+                    self.set_representation_colorspace(
+                        representation,
+                        instance.context,
+                        colorspace=instance.data["colorspace"],
+                    )
 
-            product_name, product_group = self._get_product_name_and_group(
-                instance,
-                product_base_type,
-                dynamic_data
+            aov_instance = instance.context.create_instance(
+                aov_instance_data["productName"]
             )
-
-            # Create instance for each AOV
-            aov_instance = context.create_instance(product_name)
-
-            # Prepare Representation for each AOV
-            aov_filenames = [os.path.basename(path) for path in aov_filepaths]
-            staging_dir = os.path.dirname(aov_filepaths[0])
-            ext = aov_filepaths[0].split(".")[-1]
-
-            # Decide if instance is reviewable
-            if instance.data.get("multipartExr", False):
-                # Add preview tag because its multipartExr.
-                preview = True
-            else:
-                # Add Preview tag if the AOV matches the filter.
-                preview = match_aov_pattern(
-                    "houdini", self.aov_filter, aov_filenames[0]
-                )
-
-            preview = preview and instance.data.get("review", False)
-
-            # Support Single frame.
-            # The integrator wants single files to be a single
-            #  filename instead of a list.
-            # More info: https://github.com/ynput/ayon-core/issues/238
-            if len(aov_filenames) == 1:
-                aov_filenames = aov_filenames[0]
-
-            representation = {
-                "stagingDir": staging_dir,
-                "ext": ext,
-                "name": ext,
-                "tags": ["review"] if preview else [],
-                "files": aov_filenames,
-                "frameStart": instance.data["frameStartHandle"],
-                "frameEnd": instance.data["frameEndHandle"]
-            }
-
-            # Transfer the instance colorspace information too, because these
-            # may represent scene display/view, etc.
-            for key in (
-                "colorspaceConfig",
-                "colorspace",
-                "colorspaceDisplay",
-                "colorspaceView",
-            ):
-                if key in instance.data:
-                    value: str = instance.data[key]
-                    self.log.debug(f"Transfering '{key}': {value}")
-                    aov_instance.data[key] = value
-
-            # Set the colorspace for the representation
-            if "colorspace" in instance.data:
-                self.set_representation_colorspace(
-                    representation,
-                    context,
-                    colorspace=instance.data["colorspace"],
-                )
-
-            aov_instance.data.update({
-                # 'label': label,
-                "task": instance.data["task"],
-                "folderPath": instance.data["folderPath"],
-                "frameStartHandle": instance.data["frameStartHandle"],
-                "frameEndHandle": instance.data["frameEndHandle"],
-                "productType": product_base_type,
-                "productBaseType": product_base_type,
-                "family": product_base_type,
-                "productName": product_name,
-                "productGroup": product_group,
-                "families": ["render.local.hou", "review"],
-                "instance_node": instance.data["instance_node"],
-                # The following three items are necessary for
-                # `ExtractLastPublished`
-                "publish_attributes": instance.data["publish_attributes"],
-                "stagingDir": staging_dir,
-                "frames": aov_filenames,
-                "representations": [representation]
-            })
+            aov_instance.data.update(aov_instance_data)
 
         # Skip integrating original render instance.
         # We are not removing it because it's used to trigger the render.
         instance.data["integrate"] = False
-
-    def _get_product_name_and_group(
-        self, instance, product_base_type, dynamic_data
-    ):
-        """Get product name and group
-
-        Args:
-            instance (pyblish.api.Instance): The instance to publish.
-            product_base_type (str): Product base type.
-            dynamic_data (dict): Dynamic data (camera, aov, ...)
-
-        Returns:
-            tuple (str, str): product name and group name
-
-        """
-        use_legacy_product_name = False
-        if _get_legacy_product_name_and_group is not None:
-            project_settings = instance.context.data["project_settings"]
-            try:
-                use_legacy_product_name = (
-                    project_settings
-                    ["core"]
-                    ["tools"]
-                    ["creator"]
-                    ["use_legacy_product_names_for_renders"]
-                )
-            except KeyError:
-                pass
-
-        if use_legacy_product_name:
-            return _get_legacy_product_name_and_group(
-                product_base_type,
-                dynamic_data.get("productName"),
-                instance.context.data["taskEntity"]["name"],
-                dynamic_data
-            )
-
-        kwargs = dict(
-            project_name=instance.context.data["projectName"],
-            folder_entity=instance.context.data["folderEntity"],
-            task_entity=instance.context.data["taskEntity"],
-            host_name=instance.context.data["hostName"],
-            product_base_type=product_base_type,
-            product_type=product_base_type,
-            variant=instance.data["variant"],
-            dynamic_data=dynamic_data,
-        )
-        if not is_func_signature_supported(
-            get_product_name_and_group_from_template, **kwargs
-        ):
-            kwargs["product_type"] = kwargs.pop("product_base_type")
-            kwargs.pop("folder_entity")
-        return get_product_name_and_group_from_template(**kwargs)
