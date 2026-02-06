@@ -206,6 +206,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         """
         kwargs = dict(
             project_name=instance.context.data["projectName"],
+            folder_entity=instance.context.data["folderEntity"],
             task_entity=instance.context.data["taskEntity"],
             host_name=instance.context.data["hostName"],
             product_base_type=product_base_type,
@@ -217,4 +218,5 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             get_product_name_and_group_from_template, **kwargs
         ):
             kwargs["product_type"] = kwargs.pop("product_base_type")
+            kwargs.pop("folder_entity")
         return get_product_name_and_group_from_template(**kwargs)
