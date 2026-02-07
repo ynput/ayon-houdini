@@ -114,7 +114,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
 
         context = instance.context
         # In ideal case this plugin should run after plugin
-        #   "Collect instance anatomy data" but because is running before
+        #   "CollectAnatomyInstanceData" but because is running before
         #   the entities has to be fetched here
         project_name = context.data["projectName"]
         folder_path = instance.data["folderPath"]
