@@ -29,6 +29,9 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
 
     label = "Collect local render instances"
 
+    # Non-picklable instance data to transfer to AOV instances.
+    transfer_keys = {}
+
     use_deadline_aov_filter = False
     aov_filter = {"host_name": "houdini",
                   "value": [".*([Bb]eauty).*"]}
@@ -91,6 +94,8 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         instance_skeleton_data.pop("handleStart")
         instance_skeleton_data.pop("handleEnd")
 
+        # `create_skeleton_instance` only adds `render` and `review`
+        # Houdini local render also needs `ender.local.hou`
         instance_skeleton_data["families"].append("render.local.hou")
         instance_skeleton_data.update({
             "frameStartHandle": instance.data["frameStartHandle"],
@@ -104,22 +109,19 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         aov_instances = create_instances_for_aov(
             instance=instance,
             skeleton=instance_skeleton_data,
-            aov_filter=self.aov_filter,
-            # list of extensions that shouldn't be published
-            skip_integration_repre_list=[],
-            # Don't explicitly skip review.
-            do_not_add_review=False
+            aov_filter=self.aov_filter,  # Use specified filter in settings.
+            skip_integration_repre_list=[], # Extensions to skip publishing.
+            do_not_add_review=False  # Don't explicitly skip review.
         )
 
-        # NOTE: The assumption that the output image's colorspace is the
-        #   scene linear role may be incorrect. Certain renderers, like
-        #   Karma allow overriding explicitly the output colorspace of the
-        #   image. Such override are currently not considered since these
-        #   would need to be detected in a renderer-specific way and the
-        #   majority of production scenarios these would not be overridden.
-        # TODO: Support renderer-specific explicit colorspace overrides
-        # Add the instances directly to the current publish context
+        # Add non-picklable instance data to AOV instances after creation
+        if self.transfer_keys:
+            for aov_instance in aov_instances:
+                for key in self.transfer_keys:
+                    if key in instance.data:
+                        aov_instance[key] = instance.data[key]
 
+        # Create instances for each AOV
         anatomy = instance.context.data["anatomy"]
         for aov_instance_data in aov_instances:
             # The `create_instances_for_aov` makes some paths rootless paths,
