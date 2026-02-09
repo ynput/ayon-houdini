@@ -2,6 +2,7 @@ import copy
 import os
 import re
 
+import ayon_api
 import pyblish.api
 
 from ayon_core.pipeline import KnownPublishError
@@ -111,9 +112,31 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         # Store on the instance
         instance.data["usdConfiguredSavePaths"] = save_layers
 
+        context = instance.context
+        # In ideal case this plugin should run after plugin
+        #   "CollectAnatomyInstanceData" but because is running before
+        #   the entities has to be fetched here
+        project_name = context.data["projectName"]
+        folder_path = instance.data["folderPath"]
+        task_name = instance.data.get("task")
+        folder_entity = instance.data.get("folderEntity")
+        task_entity = instance.data.get("taskEntity")
+        if not folder_entity and folder_path:
+            folder_entity = ayon_api.get_folder_by_path(
+                project_name, folder_path
+            )
+            instance.data["folderEntity"] = folder_entity
+
+        if not task_entity and folder_entity and task_name:
+            task_entity = ayon_api.get_task_by_name(
+                project_name,
+                folder_entity["id"],
+                task_name
+            )
+            instance.data["taskEntity"] = task_entity
+
         # Create configured layer instances so User can disable updating
         # specific configured layers for publishing.
-        context = instance.context
         for layer, save_path, creator_node in save_layers:
             name = os.path.basename(save_path)
             layer_inst = context.create_instance(name)
@@ -138,25 +161,50 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             layer_inst.data["usd_layer"] = layer
             layer_inst.data["usd_layer_save_path"] = save_path
 
-            project_name = context.data["projectName"]
+            product_base_type = "usd"
             variant_base = instance.data["variant"]
+
+            get_product_name_kwargs = {}
+            if getattr(get_product_name, "use_entities", False):
+                get_product_name_kwargs.update({
+                    "folder_entity": folder_entity,
+                    "task_entity": task_entity,
+                    "product_base_type": product_base_type,
+                })
+            else:
+                task_name = task_type = None
+                if task_entity:
+                    task_name = task_entity["name"]
+                    task_type = task_entity["taskType"]
+                get_product_name_kwargs.update({
+                    "task_name": task_name,
+                    "task_type": task_type,
+                })
+
             product_name = get_product_name(
-                project_name=project_name,
-                # TODO: This should use task from `instance`
-                task_name=context.data["anatomyData"]["task"]["name"],
-                task_type=context.data["anatomyData"]["task"]["type"],
-                host_name=context.data["hostName"],
-                product_type="usd",
+                project_name=instance.context.data["projectName"],
+                host_name=instance.context.data["hostName"],
+                product_type=instance.data["productType"],
                 variant=variant_base + "_" + variant,
-                project_settings=context.data["project_settings"]
+                project_settings=context.data["project_settings"],
+                project_entity=context.data["projectEntity"],
+                dynamic_data={
+                    "folder": {
+                        "label": folder_entity["label"],
+                        "name": folder_entity["name"],
+                        "type": folder_entity["folderType"]
+                    },
+                },
+                **get_product_name_kwargs,
             )
 
             label = "{0} -> {1}".format(instance.data["name"], product_name)
-            family = "usd"
-            layer_inst.data["family"] = family
-            layer_inst.data["families"] = [family]
+
+            layer_inst.data["family"] = product_base_type
+            layer_inst.data["families"] = [product_base_type]
+            layer_inst.data["productBaseType"] = product_base_type
+            layer_inst.data["productType"] = product_base_type
             layer_inst.data["productName"] = product_name
-            layer_inst.data["productType"] = instance.data["productType"]
             layer_inst.data["label"] = label
             layer_inst.data["folderPath"] = instance.data["folderPath"]
             layer_inst.data["task"] = instance.data.get("task")
