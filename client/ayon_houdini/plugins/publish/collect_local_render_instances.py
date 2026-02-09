@@ -95,7 +95,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         instance_skeleton_data.pop("handleEnd")
 
         # `create_skeleton_instance` only adds `render` and `review`
-        # Houdini local render also needs `ender.local.hou`
+        # Houdini local render also needs `render.local.hou`
         instance_skeleton_data["families"].append("render.local.hou")
         instance_skeleton_data.update({
             "frameStartHandle": instance.data["frameStartHandle"],
