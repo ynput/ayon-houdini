@@ -347,28 +347,19 @@ class CreateHDA(plugin.HoudiniCreator):
         task_entity,
         variant,
         host_name,
-        instance
+        instance,
+        project_entity=None,
+        product_type=None,
     ):
         """
         Pass product name from product name templates as dynamic data.
         """
-        dynamic_data = super(CreateHDA, self).get_dynamic_data(
-            project_name,
-            folder_entity,
-            task_entity,
-            variant,
-            host_name,
-            instance
-        )
-
-        dynamic_data.update(
-            {
-                "asset": folder_entity["name"],
-                "folder": {
-                            "label": folder_entity["label"],
-                            "name": folder_entity["name"]
-                }
+        # TODO remove when ayon-core does support folder label to be used
+        #   in product name templates
+        return {
+            "folder": {
+                "label": folder_entity["label"],
+                "name": folder_entity["name"],
+                "type": folder_entity["folderType"],
             }
-        )
-
-        return dynamic_data
+        }
