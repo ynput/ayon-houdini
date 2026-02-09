@@ -5,6 +5,7 @@ from ayon_core.pipeline.publish import (
     ColormanagedPyblishPluginMixin
 )
 from ayon_core.pipeline.farm.pyblish_functions import (
+    create_skeleton_instance,
     create_instances_for_aov
 )
 from ayon_houdini.api import plugin
@@ -75,50 +76,29 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 "like pointing to an invalid LOP or SOP path")
             return
 
-        product_base_type = "render"  # is always render
+        # Use same logic as how instances get created for farm submissions
+        instance_skeleton_data =  create_skeleton_instance(
+            instance,
+            # TODO: These should be fixed in core to just allow the default
+            #  None to work
+            families_transfer=[],
+            instance_transfer={},
+        )
+        # Remove frame data like frameStart and handleStart
+        # as they are added in later publisher plugins
+        instance_skeleton_data.pop("frameStart")
+        instance_skeleton_data.pop("frameEnd")
+        instance_skeleton_data.pop("handleStart")
+        instance_skeleton_data.pop("handleEnd")
 
-        # Using this minimal version of instance_skeleton_data instead of
-        # ayon_core.pipeline.farm.pyblish_functions.create_skeleton_instance
-        # Reason: to avoid polluting instance data.
-        # Note: Frame data like frameStart and handleStart
-        # are added in later publisher plugins
-        instance_skeleton_data = {
-            "productType": product_base_type,
-            "productBaseType": product_base_type,
-            "productName": instance.data["productName"],
-            "task": instance.data["task"],
-            "family": product_base_type,
-            "families": ["render.local.hou"],
-            "folderPath": instance.data["folderPath"],
+        instance_skeleton_data["families"].append("render.local.hou")
+        instance_skeleton_data.update({
             "frameStartHandle": instance.data["frameStartHandle"],
             "frameEndHandle": instance.data["frameEndHandle"],
-            "comment": instance.data.get("comment"),
-            "multipartExr": instance.data["multipartExr"],
+            "instance_node": instance.data["instance_node"],
             "creator_attributes": instance.data["creator_attributes"],
             "publish_attributes": instance.data["publish_attributes"],
-
-            # Houdini specific data items.
-            "instance_node": instance.data["instance_node"],
-        }
-
-        if instance.data.get("review"):
-            instance_skeleton_data["families"].append("review")
-
-        if instance.data.get("renderlayer"):
-            instance_skeleton_data["renderlayer"] = \
-                instance.data["renderlayer"]
-
-        # Include the instance colorspace information too, because these
-        # may represent scene display/view, etc.
-        for key in (
-                "colorspaceConfig",
-                "colorspace",
-                "colorspaceDisplay",
-                "colorspaceView",
-        ):
-            if key in instance.data:
-                value: str = instance.data[key]
-                instance_skeleton_data[key] = value
+        })
 
         # Create Instance for each AOV.
         aov_instances = create_instances_for_aov(
