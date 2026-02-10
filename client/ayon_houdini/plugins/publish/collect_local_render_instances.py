@@ -89,10 +89,11 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         )
         # Remove frame data like frameStart and handleStart
         # as they are added in later publisher plugins
-        instance_skeleton_data.pop("frameStart")
-        instance_skeleton_data.pop("frameEnd")
-        instance_skeleton_data.pop("handleStart")
-        instance_skeleton_data.pop("handleEnd")
+        for key in (
+            "frameStart", "frameEnd",
+            "handleStart", "handleEnd",
+        ):
+            instance_skeleton_data.pop(key, None)
 
         # `create_skeleton_instance` only adds `render` and `review`
         # Houdini local render also needs `render.local.hou`
