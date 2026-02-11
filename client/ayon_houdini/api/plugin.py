@@ -210,10 +210,11 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             instance_data["instance_id"] = instance_node.path()
             instance_data["families"] = self.get_publish_families()
             instance = CreatedInstance(
-                self.product_type,
-                product_name,
-                instance_data,
-                self)
+                product_type=self.product_type,
+                product_base_type=self.product_base_type,
+                product_name=product_name,
+                data=instance_data,
+                creator=self)
 
             if self.enable_staging_path_management:
                 staging_dir_info = self.get_staging_dir(instance)
@@ -474,16 +475,6 @@ class RenderLegacyProductTypeCreator(HoudiniCreator):
     # because it inherits as property from `Creator`.
     product_base_type = "render"
     product_type = "render"
-    legacy_product_type = "render"
-    use_legacy_product_type = False
-
-    def apply_settings(self, project_settings):
-        super().apply_settings(project_settings)
-        use_legacy_product_type = project_settings["houdini"]["create"].get(
-            "render_rops_use_legacy_product_type", False
-        )
-        if use_legacy_product_type:
-            self.product_type = self.legacy_product_type
 
 
 class HoudiniLoader(load.LoaderPlugin):
