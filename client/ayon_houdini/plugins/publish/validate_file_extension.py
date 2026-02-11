@@ -22,7 +22,7 @@ class ValidateFileExtension(plugin.HoudiniInstancePlugin):
     families = ["camera", "vdbcache"]
     label = "Output File Extension"
 
-    product_type_extensions = {
+    product_base_type_extensions = {
         "camera": ".abc",
         "vdbcache": ".vdb",
     }
@@ -39,11 +39,11 @@ class ValidateFileExtension(plugin.HoudiniInstancePlugin):
     @classmethod
     def get_invalid(cls, instance):
         # Get expected extension
-        product_type = instance.data.get("productType")
-        extension = cls.product_type_extensions.get(product_type, None)
+        product_base_type = instance.data.get("productBaseType")
+        extension = cls.product_base_type_extensions.get(product_base_type, None)
         if extension is None:
             raise PublishValidationError(
-                "Unsupported product type: {}".format(product_type),
+                "Unsupported product base type: {}".format(product_base_type),
                 title=cls.label)
 
         # Perform extension check
