@@ -16,7 +16,8 @@ from ayon_houdini.api import (
 class HdaLoader(plugin.HoudiniLoader):
     """Load Houdini Digital Asset file."""
 
-    product_types = {"hda"}
+    product_base_types = {"hda"}
+    product_types = product_base_types
     label = "Load Hda"
     representations = {"hda"}
     order = -10

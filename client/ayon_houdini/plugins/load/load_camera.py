@@ -91,7 +91,9 @@ def transfer_non_default_values(src, dest, ignore=None):
 class CameraLoader(plugin.HoudiniLoader):
     """Load camera from an Alembic file"""
 
-    product_types = {"camera"}
+    product_base_types = {"camera"}
+    product_types = product_base_types
+
     label = "Load Camera (abc)"
     representations = {"abc"}
     order = -10
