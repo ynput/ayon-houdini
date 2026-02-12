@@ -859,11 +859,18 @@ class SelectProductDialog(QtWidgets.QDialog):
 
         product_base_types = [product_base_type] if product_base_type else None
 
-        products = ayon_api.get_products(
-            self.project_name,
-            folder_ids=[self.folder_id],
-            product_base_types=product_base_types,
-        )
+        kwargs = {
+            "project_name": self.project_name,
+            "folder_ids": [self.folder_id],
+        }
+
+        if ayon_api.get_server_version_tuple() >= (1, 14, 0):
+            kwargs["product_base_types"] = product_base_types
+        else:
+            kwargs["product_types"] = product_base_types
+
+        products = ayon_api.get_products(**kwargs)
+
 
         return list(sorted(product["name"] for product in products))
 

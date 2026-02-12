@@ -39,8 +39,8 @@ class ValidateFileExtension(plugin.HoudiniInstancePlugin):
     @classmethod
     def get_invalid(cls, instance):
         # Get expected extension
-        product_base_type = instance.data.get("productBaseType")
-        extension = cls.product_base_type_extensions.get(product_base_type, None)
+        product_base_type = instance.data["productBaseType"]
+        extension = cls.product_base_type_extensions.get(product_base_type)
         if extension is None:
             raise PublishValidationError(
                 "Unsupported product base type: {}".format(product_base_type),

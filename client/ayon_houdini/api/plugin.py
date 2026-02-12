@@ -209,8 +209,13 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             instance_data["instance_node"] = instance_node.path()
             instance_data["instance_id"] = instance_node.path()
             instance_data["families"] = self.get_publish_families()
+            product_type = (
+                instance_data.get("productType")
+                or self.product_type
+                or self.product_base_type
+            )
             instance = CreatedInstance(
-                product_type=self.product_type,
+                product_type=product_type,
                 product_base_type=self.product_base_type,
                 product_name=product_name,
                 data=instance_data,

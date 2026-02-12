@@ -131,7 +131,7 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
         if not cls.instance_matches_plugin_families(instance):
             return []
 
-        if instance.data.get("productBaseType") in cls.ignore_product_base_types:
+        if instance.data["productBaseType"] in cls.ignore_product_base_types:
             return []
 
         return [
