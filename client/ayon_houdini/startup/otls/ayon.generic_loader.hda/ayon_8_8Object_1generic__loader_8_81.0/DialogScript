@@ -16,7 +16,7 @@
 
     groupsimple {
         name    "info2"
-        label   "Info"
+        label   "Load Settings"
         parmtag { "script_callback" "hou.phm().refresh_available_versions(kwargs['node'])" }
         parmtag { "script_callback_language" "python" }
 
@@ -132,13 +132,12 @@
 
     groupcollapsible {
         name    "info_display2"
-        label   "Info Display"
+        label   "Display Settings"
 
         parm {
             name    "show_thumbnail"
             label   "Show Entity Thumbnail"
             type    toggle
-            joinnext
             default { "0" }
             parmtag { "script_callback" "hou.phm().on_thumbnail_show_changed(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
@@ -191,49 +190,108 @@
             parmtag { "script_callback" "hou.phm().update_thumbnail(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
         }
-        parm {
-            name    "show_pipeline_parms"
-            label   "Show Pipeline Parms"
-            type    toggle
-            default { "0" }
-        }
     }
 
-    group {
-        name    "ayon_folder0"
-        label   "Ayon"
-        hidewhen "{ show_pipeline_parms == 0 }"
+    groupcollapsible {
+        name    "folder2"
+        label   "Info"
+        grouptag { "sidefx::switcher" "folder1" }
 
-        parm {
-            name    "name"
-            label   "Name"
-            type    label
-            default { "$OS" }
+        groupcollapsible {
+            name    "folder5"
+            label   "Usage"
+            parmtag { "group_default" "1" }
+
+            parm {
+                name    "nodes_referencing_file"
+                label   "Nodes Referencing File"
+                type    oplist
+                default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
+                parmtag { "oprelative" "/" }
+                parmtag { "script_callback_language" "python" }
+            }
         }
-        parm {
-            name    "namespace"
-            label   "Namespace"
-            type    label
-            default { "`opfullpath(\".\")`" }
+
+        groupcollapsible {
+            name    "folder4"
+            label   "Metadata"
+
+            parm {
+                name    "version_id"
+                label   "Version ID"
+                type    string
+                default { [ "hou.phm().get_version_info().get(\"id\") or \"\"" python ] }
+                parmtag { "script_action" "from ayon_houdini.api import hda_utils\n\nhda_utils.show_version_info(kwargs[\"node\"])" }
+                parmtag { "script_action_icon" "BUTTONS_info" }
+            }
+            parm {
+                name    "representation"
+                label   "Representation ID"
+                type    string
+                default { [ "hou.phm().get_representation_info().get(\"id\") or \"\"" python ] }
+                parmtag { "script_action" "from ayon_houdini.api import hda_utils\n\nhda_utils.show_representation_info(kwargs[\"node\"])" }
+                parmtag { "script_action_icon" "BUTTONS_info" }
+            }
+            parm {
+                name    "info_author"
+                label   "Author"
+                type    string
+                default { [ "hou.phm().get_version_info().get(\"author\") or \"\"" python ] }
+                parmtag { "script_callback_language" "python" }
+            }
+            parm {
+                name    "info_date"
+                label   "Date"
+                type    string
+                default { [ "hou.phm().get_version_formatted_time()" python ] }
+                parmtag { "script_callback_language" "python" }
+            }
+            parm {
+                name    "info_status"
+                label   "Status"
+                type    string
+                default { [ "hou.phm().get_version_info().get(\"status\") or \"\"" python ] }
+                parmtag { "script_callback_language" "python" }
+            }
+            parm {
+                name    "info_comment"
+                label   "Comment"
+                type    string
+                default { [ "hou.phm().get_version_info().get(\"attrib\", {}).get(\"comment\") or \"\"" python ] }
+                parmtag { "script_callback_language" "python" }
+            }
         }
-        parm {
-            name    "loader"
+
+        groupcollapsible {
+            name    "folder3"
             label   "Loader"
-            type    label
-            default { "FilePathLoader" }
+
+            parm {
+                name    "name"
+                label   "Name"
+                type    label
+                default { "$OS" }
+            }
+            parm {
+                name    "namespace"
+                label   "Namespace"
+                type    label
+                default { "`opfullpath(\".\")`" }
+            }
+            parm {
+                name    "loader"
+                label   "Loader"
+                type    label
+                default { "FilePathLoader" }
+            }
+            parm {
+                name    "id"
+                label   "ID"
+                type    label
+                default { "ayon.load.container" }
+            }
         }
-        parm {
-            name    "id"
-            label   "ID"
-            type    label
-            default { "ayon.load.container" }
-        }
-        parm {
-            name    "representation"
-            label   "Representation ID"
-            type    string
-            default { [ "from ayon_houdini.api import hda_utils\nreturn hda_utils.expression_get_representation_id()" python ] }
-        }
+
         parm {
             name    "version_name"
             label   "Current Version Label"
@@ -408,7 +466,7 @@
     }
 
     group {
-        name    "ayon_folder0_2"
+        name    "ayon_folder0_1_1"
         label   "Subnet"
         invisibletab
 
@@ -499,12 +557,4 @@
         }
     }
 
-    parm {
-        name    "nodes_referencing_file"
-        label   "Nodes Referencing File"
-        type    oplist
-        default { [ "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" python ] }
-        parmtag { "oprelative" "/" }
-        parmtag { "script_callback_language" "python" }
-    }
 }
