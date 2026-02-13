@@ -414,6 +414,10 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for key, value in settings.items():
             setattr(self, key, value)
 
+        self.product_type_items = self._convert_product_type_items(
+            self.product_type_items
+        )
+
     def get_staging_dir(self, instance) -> Optional[StagingDir]:
         """Get Staging Dir
 
