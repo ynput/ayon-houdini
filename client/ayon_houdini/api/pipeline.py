@@ -365,6 +365,9 @@ def before_save():
 
 
 def on_save():
+    if not hou.isUIAvailable():
+        log.debug("Batch mode detected, ignoring `on_save` callbacks..")
+        return
 
     log.info("Running callback on save..")
 
