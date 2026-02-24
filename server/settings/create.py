@@ -1,6 +1,19 @@
 from ayon_server.settings import BaseSettingsModel, SettingsField
 
 
+class ProductTypeItemModel(BaseSettingsModel):
+    _layout = "compact"
+    product_type: str = SettingsField(
+        title="Product Type",
+        decription="Product type name"
+    )
+    label: str = SettingsField(
+        "",
+        title="Label",
+        description="Label to display in UI for the product type",
+    )
+
+
 # Creator Plugins
 class CreatorModel(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
@@ -8,6 +21,14 @@ class CreatorModel(BaseSettingsModel):
         title="Default Products",
         default_factory=list,
     )
+    product_type_items: list[ProductTypeItemModel] = SettingsField(
+        default_factory=list,
+        title="Product Type Items",
+        description=(
+            "Optional list of product types taht this plugin can create."
+        )
+    )
+
 
 def review_node_types_enum():
     return [
@@ -18,8 +39,15 @@ def review_node_types_enum():
 class CreateReviewModel(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
     default_variants: list[str] = SettingsField(
-        title="Default Products",
+        title="Default Product Variants",
         default_factory=list,
+    )
+    product_type_items: list[ProductTypeItemModel] = SettingsField(
+        default_factory=list,
+        title="Product Type Items",
+        description=(
+            "Optional list of product types taht this plugin can create."
+        )
     )
     node_type: str = SettingsField(
         title="Default Node Type",
@@ -29,8 +57,15 @@ class CreateReviewModel(BaseSettingsModel):
 class CreateArnoldAssModel(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
     default_variants: list[str] = SettingsField(
-        title="Default Products",
+        title="Default Product Variants",
         default_factory=list,
+    )
+    product_type_items: list[ProductTypeItemModel] = SettingsField(
+        default_factory=list,
+        title="Product Type Items",
+        description=(
+            "Optional list of product types taht this plugin can create."
+        )
     )
     ext: str = SettingsField(title="Extension")
     show_in_viewport_menu: bool = SettingsField(
@@ -48,7 +83,14 @@ class CreateStaticMeshModel(BaseSettingsModel):
     enabled: bool = SettingsField(title="Enabled")
     default_variants: list[str] = SettingsField(
         default_factory=list,
-        title="Default Products"
+        title="Default Product Variants",
+    )
+    product_type_items: list[ProductTypeItemModel] = SettingsField(
+        default_factory=list,
+        title="Product Type Items",
+        description=(
+            "Optional list of product types taht this plugin can create."
+        )
     )
     static_mesh_prefix: str = SettingsField("S", title="Static Mesh Prefix")
     collision_prefixes: list[str] = SettingsField(
@@ -92,6 +134,13 @@ class WorkfileModel(BaseSettingsModel):
         description=(
             "Workfile cannot be disabled by user in UI."
             " Requires core addon 1.4.1 or newer."
+        )
+    )
+    product_type_items: list[ProductTypeItemModel] = SettingsField(
+        default_factory=list,
+        title="Product Type Items",
+        description=(
+            "Optional list of product types taht this plugin can create."
         )
     )
 

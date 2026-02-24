@@ -209,11 +209,16 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             instance_data["instance_node"] = instance_node.path()
             instance_data["instance_id"] = instance_node.path()
             instance_data["families"] = self.get_publish_families()
+            product_type = (
+                instance_data.get("productType")
+                or self.product_base_type
+            )
             instance = CreatedInstance(
-                self.product_type,
-                product_name,
-                instance_data,
-                self)
+                product_type=product_type,
+                product_base_type=self.product_base_type,
+                product_name=product_name,
+                data=instance_data,
+                creator=self)
 
             if self.enable_staging_path_management:
                 staging_dir_info = self.get_staging_dir(instance)
@@ -408,6 +413,10 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for key, value in settings.items():
             setattr(self, key, value)
 
+        self.product_type_items = self._convert_product_type_items(
+            self.product_type_items
+        )
+
     def get_staging_dir(self, instance) -> Optional[StagingDir]:
         """Get Staging Dir
 
@@ -474,16 +483,6 @@ class RenderLegacyProductTypeCreator(HoudiniCreator):
     # because it inherits as property from `Creator`.
     product_base_type = "render"
     product_type = "render"
-    legacy_product_type = "render"
-    use_legacy_product_type = False
-
-    def apply_settings(self, project_settings):
-        super().apply_settings(project_settings)
-        use_legacy_product_type = project_settings["houdini"]["create"].get(
-            "render_rops_use_legacy_product_type", False
-        )
-        if use_legacy_product_type:
-            self.product_type = self.legacy_product_type
 
 
 class HoudiniLoader(load.LoaderPlugin):

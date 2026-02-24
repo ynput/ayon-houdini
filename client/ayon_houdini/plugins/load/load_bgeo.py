@@ -12,7 +12,8 @@ class BgeoLoader(plugin.HoudiniLoader):
     """Load bgeo files to Houdini."""
 
     label = "Load bgeo"
-    product_types = {"model", "pointcache", "bgeo"}
+    product_base_types = {"model", "pointcache", "bgeo"}
+    product_types = product_base_types
     representations = {
         "bgeo", "bgeosc", "bgeogz",
         "bgeo.sc", "bgeo.gz", "bgeo.lzma", "bgeo.bz2"}

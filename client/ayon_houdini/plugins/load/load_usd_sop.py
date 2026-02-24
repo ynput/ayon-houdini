@@ -11,7 +11,8 @@ class SopUsdImportLoader(plugin.HoudiniLoader):
     """Load USD to SOPs via `usdimport`"""
 
     label = "Load USD to SOPs"
-    product_types = {"*"}
+    product_base_types = {"*"}
+    product_types = product_base_types
     representations = {"usd"}
     order = -6
     icon = "code-fork"

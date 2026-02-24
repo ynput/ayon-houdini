@@ -41,12 +41,12 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
 
         # In some cases representation name is not the the extension
         # TODO: Preferably we remove this very specific naming
-        product_type = instance.data["productType"]
+        product_base_type = instance.data["productBaseType"]
         name = {
             "bgeo": "bgeo",
             "rs": "rs",
             "ass": "ass"
-        }.get(product_type, ext)
+        }.get(product_base_type, ext)
 
         representation = {
             "name": name,

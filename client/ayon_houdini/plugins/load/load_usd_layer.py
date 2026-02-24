@@ -12,10 +12,11 @@ from ayon_houdini.api import (
 class USDSublayerLoader(plugin.HoudiniLoader):
     """Sublayer USD file in Solaris"""
 
-    product_types = {
+    product_base_types = {
         "usd",
         "usdCamera",
     }
+    product_types = product_base_types
     label = "Sublayer USD"
     representations = {"usd", "usda", "usdlc", "usdnc", "abc"}
     order = 1
