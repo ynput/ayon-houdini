@@ -211,7 +211,6 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             instance_data["families"] = self.get_publish_families()
             product_type = (
                 instance_data.get("productType")
-                or self.product_type
                 or self.product_base_type
             )
             instance = CreatedInstance(
