@@ -1,0 +1,457 @@
+<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=prev href=collect_usd_rop_layer_and_stage.html><link rel=next href=collect_vray_rop.html><link rel=icon href=../../../../../img/favicon.ico><meta name=generator content="mkdocs-1.6.1, mkdocs-material-9.7.3"><title>collect_usd_value_clips - ayon-houdini</title><link rel=stylesheet href=../../../../../assets/stylesheets/main.484c7ddc.min.css><link rel=stylesheet href=../../../../../assets/stylesheets/palette.ab4e12ef.min.css><script src=https://unpkg.com/iframe-worker/shim></script><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback"><style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style><link rel=stylesheet href=../../../../../assets/_mkdocstrings.css><link rel=stylesheet href=../../../../../css/custom.css><script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script></head> <body dir=ltr data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#client.ayon_houdini.plugins.publish.collect_usd_value_clips class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <div data-md-color-scheme=default data-md-component=outdated hidden> </div> <header class="md-header md-header--shadow" data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=../../../../../index.html title=ayon-houdini class="md-header__button md-logo" aria-label=ayon-houdini data-md-component=logo> <img src=../../../../../img/ay-symbol-blackw-full.png alt=logo> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg> </label> <div class=md-header__title data-md-component=header-title> <div class=md-header__ellipsis> <div class=md-header__topic> <span class=md-ellipsis> ayon-houdini </span> </div> <div class=md-header__topic data-md-component=header-topic> <span class=md-ellipsis> collect_usd_value_clips </span> </div> </div> </div> <form class=md-header__option data-md-component=palette> <input class=md-option data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to light mode" type=radio name=__palette id=__palette_0> <label class="md-header__button md-icon" title="Switch to light mode" for=__palette_1 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg> </label> <input class=md-option data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme=default data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to dark mode" type=radio name=__palette id=__palette_1> <label class="md-header__button md-icon" title="Switch to dark mode" for=__palette_0 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg> </label> </form> <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg> </label> <nav class=md-search__options aria-label=Search> <button type=reset class="md-search__icon md-icon" title=Clear aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg> </button> </nav> </form> <div class=md-search__output> <div class=md-search__scrollwrap tabindex=0 data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list role=presentation></ol> </div> </div> </div> </div> </div> <div class=md-header__source> <a href=https://github.com/ynput/ayon-houdini title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg> </div> <div class=md-source__repository> GitHub </div> </a> </div> </nav> </header> <div class=md-container data-md-component=container> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=../../../../../index.html title=ayon-houdini class="md-nav__button md-logo" aria-label=ayon-houdini data-md-component=logo> <img src=../../../../../img/ay-symbol-blackw-full.png alt=logo> </a> ayon-houdini </label> <div class=md-nav__source> <a href=https://github.com/ynput/ayon-houdini title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg> </div> <div class=md-source__repository> GitHub </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../../../../index.html class=md-nav__link> <span class=md-ellipsis> Home </span> </a> </li> <li class=md-nav__item> <a href=../../../../../license.html class=md-nav__link> <span class=md-ellipsis> License </span> </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3 checked> <label class=md-nav__link for=__nav_3 id=__nav_3_label tabindex> <span class=md-ellipsis> Reference </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_3_label aria-expanded=true> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> Reference </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1 checked> <label class=md-nav__link for=__nav_3_1 id=__nav_3_1_label tabindex=0> <span class=md-ellipsis> client </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_3_1_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1> <span class="md-nav__icon md-icon"></span> client </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1_1 checked> <label class=md-nav__link for=__nav_3_1_1 id=__nav_3_1_1_label tabindex=0> <span class=md-ellipsis> ayon_houdini </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=3 aria-labelledby=__nav_3_1_1_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1_1> <span class="md-nav__icon md-icon"></span> ayon_houdini </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../addon.html class=md-nav__link> <span class=md-ellipsis> addon </span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../../api/action.html class=md-nav__link> <span class=md-ellipsis> api </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../../hooks/set_default_display_and_view.html class=md-nav__link> <span class=md-ellipsis> hooks </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1_1_4 checked> <label class=md-nav__link for=__nav_3_1_1_4 id=__nav_3_1_1_4_label tabindex=0> <span class=md-ellipsis> plugins </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=4 aria-labelledby=__nav_3_1_1_4_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1_1_4> <span class="md-nav__icon md-icon"></span> plugins </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../create/convert_legacy.html class=md-nav__link> <span class=md-ellipsis> create </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../inventory/select_containers.html class=md-nav__link> <span class=md-ellipsis> inventory </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../load/actions.html class=md-nav__link> <span class=md-ellipsis> load </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1_1_4_4 checked> <label class=md-nav__link for=__nav_3_1_1_4_4 id=__nav_3_1_1_4_4_label tabindex=0> <span class=md-ellipsis> publish </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=5 aria-labelledby=__nav_3_1_1_4_4_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1_1_4_4> <span class="md-nav__icon md-icon"></span> publish </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=collect_arnold_rop.html class=md-nav__link> <span class=md-ellipsis> collect_arnold_rop </span> </a> </li> <li class=md-nav__item> <a href=collect_cache_farm.html class=md-nav__link> <span class=md-ellipsis> collect_cache_farm </span> </a> </li> <li class=md-nav__item> <a href=collect_componentbuilder_lop.html class=md-nav__link> <span class=md-ellipsis> collect_componentbuilder_lop </span> </a> </li> <li class=md-nav__item> <a href=collect_current_file.html class=md-nav__link> <span class=md-ellipsis> collect_current_file </span> </a> </li> <li class=md-nav__item> <a href=collect_farm_instances.html class=md-nav__link> <span class=md-ellipsis> collect_farm_instances </span> </a> </li> <li class=md-nav__item> <a href=collect_files_for_cleaning_up.html class=md-nav__link> <span class=md-ellipsis> collect_files_for_cleaning_up </span> </a> </li> <li class=md-nav__item> <a href=collect_frames.html class=md-nav__link> <span class=md-ellipsis> collect_frames </span> </a> </li> <li class=md-nav__item> <a href=collect_frames_fix.html class=md-nav__link> <span class=md-ellipsis> collect_frames_fix </span> </a> </li> <li class=md-nav__item> <a href=collect_inputs.html class=md-nav__link> <span class=md-ellipsis> collect_inputs </span> </a> </li> <li class=md-nav__item> <a href=collect_karma_rop.html class=md-nav__link> <span class=md-ellipsis> collect_karma_rop </span> </a> </li> <li class=md-nav__item> <a href=collect_local_render_instances.html class=md-nav__link> <span class=md-ellipsis> collect_local_render_instances </span> </a> </li> <li class=md-nav__item> <a href=collect_mantra_rop.html class=md-nav__link> <span class=md-ellipsis> collect_mantra_rop </span> </a> </li> <li class=md-nav__item> <a href=collect_output_node.html class=md-nav__link> <span class=md-ellipsis> collect_output_node </span> </a> </li> <li class=md-nav__item> <a href=collect_redshift_rop.html class=md-nav__link> <span class=md-ellipsis> collect_redshift_rop </span> </a> </li> <li class=md-nav__item> <a href=collect_render_colorspace.html class=md-nav__link> <span class=md-ellipsis> collect_render_colorspace </span> </a> </li> <li class=md-nav__item> <a href=collect_render_products.html class=md-nav__link> <span class=md-ellipsis> collect_render_products </span> </a> </li> <li class=md-nav__item> <a href=collect_renderlayer.html class=md-nav__link> <span class=md-ellipsis> collect_renderlayer </span> </a> </li> <li class=md-nav__item> <a href=collect_review_data.html class=md-nav__link> <span class=md-ellipsis> collect_review_data </span> </a> </li> <li class=md-nav__item> <a href=collect_reviewable_instances.html class=md-nav__link> <span class=md-ellipsis> collect_reviewable_instances </span> </a> </li> <li class=md-nav__item> <a href=collect_rop_frame_range.html class=md-nav__link> <span class=md-ellipsis> collect_rop_frame_range </span> </a> </li> <li class=md-nav__item> <a href=collect_slapcomps.html class=md-nav__link> <span class=md-ellipsis> collect_slapcomps </span> </a> </li> <li class=md-nav__item> <a href=collect_staticmesh_type.html class=md-nav__link> <span class=md-ellipsis> collect_staticmesh_type </span> </a> </li> <li class=md-nav__item> <a href=collect_task_handles.html class=md-nav__link> <span class=md-ellipsis> collect_task_handles </span> </a> </li> <li class=md-nav__item> <a href=collect_usd_layers.html class=md-nav__link> <span class=md-ellipsis> collect_usd_layers </span> </a> </li> <li class=md-nav__item> <a href=collect_usd_look_assets.html class=md-nav__link> <span class=md-ellipsis> collect_usd_look_assets </span> </a> </li> <li class=md-nav__item> <a href=collect_usd_render.html class=md-nav__link> <span class=md-ellipsis> collect_usd_render </span> </a> </li> <li class=md-nav__item> <a href=collect_usd_rop_layer_and_stage.html class=md-nav__link> <span class=md-ellipsis> collect_usd_rop_layer_and_stage </span> </a> </li> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> <span class=md-ellipsis> collect_usd_value_clips </span> <span class="md-nav__icon md-icon"></span> </label> <a href=collect_usd_value_clips.html class="md-nav__link md-nav__link--active"> <span class=md-ellipsis> collect_usd_value_clips </span> </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#client.ayon_houdini.plugins.publish.collect_usd_value_clips class=md-nav__link> <span class=md-ellipsis> collect_usd_value_clips </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.plugins.publish.collect_usd_value_clips.CollectUSDValueClips class=md-nav__link> <span class=md-ellipsis> CollectUSDValueClips </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.plugins.publish.collect_usd_value_clips.get_clip_frames_in_frame_range class=md-nav__link> <span class=md-ellipsis> get_clip_frames_in_frame_range </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=collect_vray_rop.html class=md-nav__link> <span class=md-ellipsis> collect_vray_rop </span> </a> </li> <li class=md-nav__item> <a href=collect_workfile.html class=md-nav__link> <span class=md-ellipsis> collect_workfile </span> </a> </li> <li class=md-nav__item> <a href=collect_workscene_fps.html class=md-nav__link> <span class=md-ellipsis> collect_workscene_fps </span> </a> </li> <li class=md-nav__item> <a href=extract_active_view_thumbnail.html class=md-nav__link> <span class=md-ellipsis> extract_active_view_thumbnail </span> </a> </li> <li class=md-nav__item> <a href=extract_hda.html class=md-nav__link> <span class=md-ellipsis> extract_hda </span> </a> </li> <li class=md-nav__item> <a href=extract_last_published.html class=md-nav__link> <span class=md-ellipsis> extract_last_published </span> </a> </li> <li class=md-nav__item> <a href=extract_render.html class=md-nav__link> <span class=md-ellipsis> extract_render </span> </a> </li> <li class=md-nav__item> <a href=extract_rop.html class=md-nav__link> <span class=md-ellipsis> extract_rop </span> </a> </li> <li class=md-nav__item> <a href=extract_usd.html class=md-nav__link> <span class=md-ellipsis> extract_usd </span> </a> </li> <li class=md-nav__item> <a href=increment_current_file.html class=md-nav__link> <span class=md-ellipsis> increment_current_file </span> </a> </li> <li class=md-nav__item> <a href=save_scene.html class=md-nav__link> <span class=md-ellipsis> save_scene </span> </a> </li> <li class=md-nav__item> <a href=validate_abc_primitive_to_detail.html class=md-nav__link> <span class=md-ellipsis> validate_abc_primitive_to_detail </span> </a> </li> <li class=md-nav__item> <a href=validate_alembic_face_sets.html class=md-nav__link> <span class=md-ellipsis> validate_alembic_face_sets </span> </a> </li> <li class=md-nav__item> <a href=validate_alembic_input_node.html class=md-nav__link> <span class=md-ellipsis> validate_alembic_input_node </span> </a> </li> <li class=md-nav__item> <a href=validate_animation_settings.html class=md-nav__link> <span class=md-ellipsis> validate_animation_settings </span> </a> </li> <li class=md-nav__item> <a href=validate_bypass.html class=md-nav__link> <span class=md-ellipsis> validate_bypass </span> </a> </li> <li class=md-nav__item> <a href=validate_camera_rop.html class=md-nav__link> <span class=md-ellipsis> validate_camera_rop </span> </a> </li> <li class=md-nav__item> <a href=validate_cop_output_node.html class=md-nav__link> <span class=md-ellipsis> validate_cop_output_node </span> </a> </li> <li class=md-nav__item> <a href=validate_export.html class=md-nav__link> <span class=md-ellipsis> validate_export </span> </a> </li> <li class=md-nav__item> <a href=validate_export_is_a_single_frame.html class=md-nav__link> <span class=md-ellipsis> validate_export_is_a_single_frame </span> </a> </li> <li class=md-nav__item> <a href=validate_fbx_output_node.html class=md-nav__link> <span class=md-ellipsis> validate_fbx_output_node </span> </a> </li> <li class=md-nav__item> <a href=validate_file_extension.html class=md-nav__link> <span class=md-ellipsis> validate_file_extension </span> </a> </li> <li class=md-nav__item> <a href=validate_frame_range.html class=md-nav__link> <span class=md-ellipsis> validate_frame_range </span> </a> </li> <li class=md-nav__item> <a href=validate_frame_range_frames_to_fix.html class=md-nav__link> <span class=md-ellipsis> validate_frame_range_frames_to_fix </span> </a> </li> <li class=md-nav__item> <a href=validate_frame_token.html class=md-nav__link> <span class=md-ellipsis> validate_frame_token </span> </a> </li> <li class=md-nav__item> <a href=validate_houdini_license_category.html class=md-nav__link> <span class=md-ellipsis> validate_houdini_license_category </span> </a> </li> <li class=md-nav__item> <a href=validate_instance_in_context.html class=md-nav__link> <span class=md-ellipsis> validate_instance_in_context </span> </a> </li> <li class=md-nav__item> <a href=validate_mesh_is_static.html class=md-nav__link> <span class=md-ellipsis> validate_mesh_is_static </span> </a> </li> <li class=md-nav__item> <a href=validate_mkpaths_toggled.html class=md-nav__link> <span class=md-ellipsis> validate_mkpaths_toggled </span> </a> </li> <li class=md-nav__item> <a href=validate_no_errors.html class=md-nav__link> <span class=md-ellipsis> validate_no_errors </span> </a> </li> <li class=md-nav__item> <a href=validate_primitive_hierarchy_paths.html class=md-nav__link> <span class=md-ellipsis> validate_primitive_hierarchy_paths </span> </a> </li> <li class=md-nav__item> <a href=validate_product_name.html class=md-nav__link> <span class=md-ellipsis> validate_product_name </span> </a> </li> <li class=md-nav__item> <a href=validate_render_product_paths_unique.html class=md-nav__link> <span class=md-ellipsis> validate_render_product_paths_unique </span> </a> </li> <li class=md-nav__item> <a href=validate_render_products.html class=md-nav__link> <span class=md-ellipsis> validate_render_products </span> </a> </li> <li class=md-nav__item> <a href=validate_resolution.html class=md-nav__link> <span class=md-ellipsis> validate_resolution </span> </a> </li> <li class=md-nav__item> <a href=validate_review_colorspace.html class=md-nav__link> <span class=md-ellipsis> validate_review_colorspace </span> </a> </li> <li class=md-nav__item> <a href=validate_scene_review.html class=md-nav__link> <span class=md-ellipsis> validate_scene_review </span> </a> </li> <li class=md-nav__item> <a href=validate_sop_output_node.html class=md-nav__link> <span class=md-ellipsis> validate_sop_output_node </span> </a> </li> <li class=md-nav__item> <a href=validate_unreal_staticmesh_naming.html class=md-nav__link> <span class=md-ellipsis> validate_unreal_staticmesh_naming </span> </a> </li> <li class=md-nav__item> <a href=validate_usd_asset_contribution_default_prim.html class=md-nav__link> <span class=md-ellipsis> validate_usd_asset_contribution_default_prim </span> </a> </li> <li class=md-nav__item> <a href=validate_usd_look_assignments.html class=md-nav__link> <span class=md-ellipsis> validate_usd_look_assignments </span> </a> </li> <li class=md-nav__item> <a href=validate_usd_look_disallowed_types.html class=md-nav__link> <span class=md-ellipsis> validate_usd_look_disallowed_types </span> </a> </li> <li class=md-nav__item> <a href=validate_usd_look_material_defs.html class=md-nav__link> <span class=md-ellipsis> validate_usd_look_material_defs </span> </a> </li> <li class=md-nav__item> <a href=validate_usd_output_node.html class=md-nav__link> <span class=md-ellipsis> validate_usd_output_node </span> </a> </li> <li class=md-nav__item> <a href=validate_usd_render_arnold.html class=md-nav__link> <span class=md-ellipsis> validate_usd_render_arnold </span> </a> </li> <li class=md-nav__item> <a href=validate_usd_render_product_names.html class=md-nav__link> <span class=md-ellipsis> validate_usd_render_product_names </span> </a> </li> <li class=md-nav__item> <a href=validate_usd_render_product_paths.html class=md-nav__link> <span class=md-ellipsis> validate_usd_render_product_paths </span> </a> </li> <li class=md-nav__item> <a href=validate_usd_rop_default_prim.html class=md-nav__link> <span class=md-ellipsis> validate_usd_rop_default_prim </span> </a> </li> <li class=md-nav__item> <a href=validate_vdb_output_node.html class=md-nav__link> <span class=md-ellipsis> validate_vdb_output_node </span> </a> </li> <li class=md-nav__item> <a href=validate_wait_for_render.html class=md-nav__link> <span class=md-ellipsis> validate_wait_for_render </span> </a> </li> <li class=md-nav__item> <a href=validate_workfile_paths.html class=md-nav__link> <span class=md-ellipsis> validate_workfile_paths </span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../workfile_build/create_placeholder.html class=md-nav__link> <span class=md-ellipsis> workfile_build </span> <span class="md-nav__icon md-icon"></span> </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../../startup/husdplugins/outputprocessors/ayon_uri_processor.html class=md-nav__link> <span class=md-ellipsis> startup </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class=md-nav__item> <a href=../../version.html class=md-nav__link> <span class=md-ellipsis> version </span> </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../../../../server/settings/conversion.html class=md-nav__link> <span class=md-ellipsis> server </span> <span class="md-nav__icon md-icon"></span> </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#client.ayon_houdini.plugins.publish.collect_usd_value_clips class=md-nav__link> <span class=md-ellipsis> collect_usd_value_clips </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.plugins.publish.collect_usd_value_clips.CollectUSDValueClips class=md-nav__link> <span class=md-ellipsis> CollectUSDValueClips </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.plugins.publish.collect_usd_value_clips.get_clip_frames_in_frame_range class=md-nav__link> <span class=md-ellipsis> get_clip_frames_in_frame_range </span> </a> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <nav class=md-path aria-label=Navigation> <ol class=md-path__list> <li class=md-path__item> <a href=../../../../../index.html class=md-path__link> <span class=md-ellipsis> Home </span> </a> </li> <li class=md-path__item> <a href=../../addon.html class=md-path__link> <span class=md-ellipsis> Reference </span> </a> </li> <li class=md-path__item> <a href=../../addon.html class=md-path__link> <span class=md-ellipsis> client </span> </a> </li> <li class=md-path__item> <a href=../../addon.html class=md-path__link> <span class=md-ellipsis> ayon_houdini </span> </a> </li> <li class=md-path__item> <a href=../create/convert_legacy.html class=md-path__link> <span class=md-ellipsis> plugins </span> </a> </li> <li class=md-path__item> <a href=collect_arnold_rop.html class=md-path__link> <span class=md-ellipsis> publish </span> </a> </li> </ol> </nav> <article class="md-content__inner md-typeset"> <h1>collect_usd_value_clips</h1> <div class="doc doc-object doc-module"> <a id=client.ayon_houdini.plugins.publish.collect_usd_value_clips></a> <div class="doc doc-contents first"> <div class="doc doc-children"> <div class="doc doc-object doc-class"> <h2 id=client.ayon_houdini.plugins.publish.collect_usd_value_clips.CollectUSDValueClips class="doc doc-heading"> <code>CollectUSDValueClips</code> </h2> <div class="doc doc-contents "> <p class="doc doc-class-bases"> Bases: <code><span title=ayon_houdini.api.plugin.HoudiniInstancePlugin>HoudiniInstancePlugin</span></code></p> <p>Collect USD value clips that are to be written out for a USD publish.</p> <p>It detects sequence clips inside the current stage to be written on executing a USD ROP.</p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/plugins/publish/collect_usd_value_clips.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 74</span>
+<span class=normal> 75</span>
+<span class=normal> 76</span>
+<span class=normal> 77</span>
+<span class=normal> 78</span>
+<span class=normal> 79</span>
+<span class=normal> 80</span>
+<span class=normal> 81</span>
+<span class=normal> 82</span>
+<span class=normal> 83</span>
+<span class=normal> 84</span>
+<span class=normal> 85</span>
+<span class=normal> 86</span>
+<span class=normal> 87</span>
+<span class=normal> 88</span>
+<span class=normal> 89</span>
+<span class=normal> 90</span>
+<span class=normal> 91</span>
+<span class=normal> 92</span>
+<span class=normal> 93</span>
+<span class=normal> 94</span>
+<span class=normal> 95</span>
+<span class=normal> 96</span>
+<span class=normal> 97</span>
+<span class=normal> 98</span>
+<span class=normal> 99</span>
+<span class=normal>100</span>
+<span class=normal>101</span>
+<span class=normal>102</span>
+<span class=normal>103</span>
+<span class=normal>104</span>
+<span class=normal>105</span>
+<span class=normal>106</span>
+<span class=normal>107</span>
+<span class=normal>108</span>
+<span class=normal>109</span>
+<span class=normal>110</span>
+<span class=normal>111</span>
+<span class=normal>112</span>
+<span class=normal>113</span>
+<span class=normal>114</span>
+<span class=normal>115</span>
+<span class=normal>116</span>
+<span class=normal>117</span>
+<span class=normal>118</span>
+<span class=normal>119</span>
+<span class=normal>120</span>
+<span class=normal>121</span>
+<span class=normal>122</span>
+<span class=normal>123</span>
+<span class=normal>124</span>
+<span class=normal>125</span>
+<span class=normal>126</span>
+<span class=normal>127</span>
+<span class=normal>128</span>
+<span class=normal>129</span>
+<span class=normal>130</span>
+<span class=normal>131</span>
+<span class=normal>132</span>
+<span class=normal>133</span>
+<span class=normal>134</span>
+<span class=normal>135</span>
+<span class=normal>136</span>
+<span class=normal>137</span>
+<span class=normal>138</span>
+<span class=normal>139</span>
+<span class=normal>140</span>
+<span class=normal>141</span>
+<span class=normal>142</span>
+<span class=normal>143</span>
+<span class=normal>144</span>
+<span class=normal>145</span>
+<span class=normal>146</span>
+<span class=normal>147</span>
+<span class=normal>148</span>
+<span class=normal>149</span>
+<span class=normal>150</span>
+<span class=normal>151</span>
+<span class=normal>152</span>
+<span class=normal>153</span>
+<span class=normal>154</span>
+<span class=normal>155</span>
+<span class=normal>156</span>
+<span class=normal>157</span>
+<span class=normal>158</span>
+<span class=normal>159</span>
+<span class=normal>160</span>
+<span class=normal>161</span>
+<span class=normal>162</span>
+<span class=normal>163</span>
+<span class=normal>164</span>
+<span class=normal>165</span>
+<span class=normal>166</span>
+<span class=normal>167</span>
+<span class=normal>168</span>
+<span class=normal>169</span>
+<span class=normal>170</span>
+<span class=normal>171</span>
+<span class=normal>172</span>
+<span class=normal>173</span>
+<span class=normal>174</span>
+<span class=normal>175</span>
+<span class=normal>176</span>
+<span class=normal>177</span>
+<span class=normal>178</span>
+<span class=normal>179</span>
+<span class=normal>180</span>
+<span class=normal>181</span>
+<span class=normal>182</span>
+<span class=normal>183</span>
+<span class=normal>184</span>
+<span class=normal>185</span>
+<span class=normal>186</span>
+<span class=normal>187</span>
+<span class=normal>188</span>
+<span class=normal>189</span>
+<span class=normal>190</span>
+<span class=normal>191</span>
+<span class=normal>192</span>
+<span class=normal>193</span>
+<span class=normal>194</span>
+<span class=normal>195</span>
+<span class=normal>196</span>
+<span class=normal>197</span>
+<span class=normal>198</span>
+<span class=normal>199</span>
+<span class=normal>200</span>
+<span class=normal>201</span>
+<span class=normal>202</span>
+<span class=normal>203</span>
+<span class=normal>204</span>
+<span class=normal>205</span>
+<span class=normal>206</span>
+<span class=normal>207</span>
+<span class=normal>208</span>
+<span class=normal>209</span>
+<span class=normal>210</span>
+<span class=normal>211</span>
+<span class=normal>212</span>
+<span class=normal>213</span>
+<span class=normal>214</span>
+<span class=normal>215</span>
+<span class=normal>216</span>
+<span class=normal>217</span>
+<span class=normal>218</span>
+<span class=normal>219</span>
+<span class=normal>220</span>
+<span class=normal>221</span>
+<span class=normal>222</span>
+<span class=normal>223</span>
+<span class=normal>224</span>
+<span class=normal>225</span>
+<span class=normal>226</span>
+<span class=normal>227</span>
+<span class=normal>228</span>
+<span class=normal>229</span>
+<span class=normal>230</span>
+<span class=normal>231</span>
+<span class=normal>232</span>
+<span class=normal>233</span>
+<span class=normal>234</span>
+<span class=normal>235</span>
+<span class=normal>236</span>
+<span class=normal>237</span>
+<span class=normal>238</span>
+<span class=normal>239</span>
+<span class=normal>240</span>
+<span class=normal>241</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>class</span><span class=w> </span><span class=nc>CollectUSDValueClips</span><span class=p>(</span><span class=n>plugin</span><span class=o>.</span><span class=n>HoudiniInstancePlugin</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Collect USD value clips that are to be written out for a USD publish.</span>
+
+<span class=sd>    It detects sequence clips inside the current stage</span>
+<span class=sd>    to be written on executing a USD ROP.</span>
+
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=n>label</span> <span class=o>=</span> <span class=s2>&quot;Collect USD Value Clips&quot;</span>
+    <span class=c1># Run after core plugin `CollectResourcesPath`</span>
+    <span class=n>order</span> <span class=o>=</span> <span class=n>pyblish</span><span class=o>.</span><span class=n>api</span><span class=o>.</span><span class=n>CollectorOrder</span> <span class=o>+</span> <span class=mf>0.496</span>
+    <span class=n>families</span> <span class=o>=</span> <span class=p>[</span><span class=s2>&quot;usd&quot;</span><span class=p>]</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>process</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>instance</span><span class=p>):</span>
+        <span class=c1># For each layer in the output layer stack process any USD Value Clip</span>
+        <span class=c1># nodes that are listed as &#39;editor nodes&#39; in that graph.</span>
+        <span class=k>for</span> <span class=n>layer</span> <span class=ow>in</span> <span class=n>instance</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&quot;layers&quot;</span><span class=p>,</span> <span class=p>[]):</span>
+            <span class=bp>self</span><span class=o>.</span><span class=n>_get_layer_value_clips</span><span class=p>(</span><span class=n>layer</span><span class=p>,</span> <span class=n>instance</span><span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>_get_layer_value_clips</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>layer</span><span class=p>,</span> <span class=n>instance</span><span class=p>):</span>
+        <span class=n>info_prim</span> <span class=o>=</span> <span class=n>layer</span><span class=o>.</span><span class=n>GetPrimAtPath</span><span class=p>(</span><span class=s2>&quot;/HoudiniLayerInfo&quot;</span><span class=p>)</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=n>info_prim</span><span class=p>:</span>
+            <span class=k>return</span>
+
+        <span class=n>editor_nodes</span> <span class=o>=</span> <span class=n>info_prim</span><span class=o>.</span><span class=n>customData</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&quot;HoudiniEditorNodes&quot;</span><span class=p>)</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=n>editor_nodes</span><span class=p>:</span>
+            <span class=k>return</span>
+
+        <span class=c1># Get frame range of the ROP node</span>
+        <span class=n>start</span><span class=p>:</span> <span class=nb>int</span> <span class=o>=</span> <span class=nb>int</span><span class=p>(</span><span class=n>instance</span><span class=o>.</span><span class=n>data</span><span class=p>[</span><span class=s2>&quot;frameStartHandle&quot;</span><span class=p>])</span>
+        <span class=n>end</span><span class=p>:</span> <span class=nb>int</span> <span class=o>=</span> <span class=nb>int</span><span class=p>(</span><span class=n>instance</span><span class=o>.</span><span class=n>data</span><span class=p>[</span><span class=s2>&quot;frameEndHandle&quot;</span><span class=p>])</span>
+
+        <span class=n>asset_remap</span> <span class=o>=</span> <span class=n>instance</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>setdefault</span><span class=p>(</span><span class=s2>&quot;assetRemap&quot;</span><span class=p>,</span> <span class=p>{})</span>
+        <span class=k>for</span> <span class=n>node_id</span> <span class=ow>in</span> <span class=n>editor_nodes</span><span class=p>:</span>
+            <span class=c1># Consider only geoclipsequence nodes</span>
+            <span class=n>node</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>nodeBySessionId</span><span class=p>(</span><span class=n>node_id</span><span class=p>)</span>
+            <span class=k>if</span> <span class=n>node</span><span class=o>.</span><span class=n>type</span><span class=p>()</span><span class=o>.</span><span class=n>name</span><span class=p>()</span> <span class=o>!=</span> <span class=s2>&quot;geoclipsequence&quot;</span><span class=p>:</span>
+                <span class=k>continue</span>
+
+            <span class=bp>self</span><span class=o>.</span><span class=n>log</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span>
+                <span class=sa>f</span><span class=s2>&quot;Collecting outputs for Geometry Clip Sequence: </span><span class=si>{</span><span class=n>node</span><span class=o>.</span><span class=n>path</span><span class=p>()</span><span class=si>}</span><span class=s2>&quot;</span>
+            <span class=p>)</span>
+
+            <span class=c1># Collect all their output files</span>
+            <span class=n>files</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_get_geoclipsequence_output_files</span><span class=p>(</span><span class=n>node</span><span class=p>,</span> <span class=n>start</span><span class=p>,</span> <span class=n>end</span><span class=p>)</span>
+
+            <span class=c1># Check if the layer is an explicit save layer, because if it is</span>
+            <span class=c1># then likely it is collected as its own instance by the</span>
+            <span class=c1># CollectUsdLayers plug-in and we want to attach the files to that</span>
+            <span class=c1># layer instance instead.</span>
+            <span class=n>target_instance</span> <span class=o>=</span> <span class=n>instance</span>
+            <span class=k>if</span> <span class=n>info_prim</span><span class=o>.</span><span class=n>customData</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&quot;HoudiniSaveControl&quot;</span><span class=p>)</span> <span class=o>==</span> <span class=s2>&quot;Explicit&quot;</span><span class=p>:</span>
+                <span class=n>override_instance</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_find_instance_by_explict_save_layer</span><span class=p>(</span>
+                    <span class=n>instance</span><span class=p>,</span>
+                    <span class=n>layer</span>
+                <span class=p>)</span>
+                <span class=k>if</span> <span class=n>override_instance</span><span class=p>:</span>
+                    <span class=n>target_instance</span> <span class=o>=</span> <span class=n>override_instance</span>
+
+            <span class=c1># Set up transfers</span>
+            <span class=n>transfers</span> <span class=o>=</span> <span class=n>target_instance</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>setdefault</span><span class=p>(</span><span class=s2>&quot;transfers&quot;</span><span class=p>,</span> <span class=p>[])</span>
+            <span class=n>resources_dir</span> <span class=o>=</span> <span class=n>target_instance</span><span class=o>.</span><span class=n>data</span><span class=p>[</span><span class=s2>&quot;resourcesDir&quot;</span><span class=p>]</span>
+            <span class=n>resources_dir_name</span> <span class=o>=</span> <span class=n>os</span><span class=o>.</span><span class=n>path</span><span class=o>.</span><span class=n>basename</span><span class=p>(</span><span class=n>resources_dir</span><span class=p>)</span>
+            <span class=k>for</span> <span class=n>src</span> <span class=ow>in</span> <span class=n>files</span><span class=p>:</span>
+                <span class=c1># Make relative transfers of these files and remap</span>
+                <span class=c1># them to relative paths from the published USD layer</span>
+                <span class=n>src_name</span> <span class=o>=</span> <span class=n>os</span><span class=o>.</span><span class=n>path</span><span class=o>.</span><span class=n>basename</span><span class=p>(</span><span class=n>src</span><span class=p>)</span>
+                <span class=n>transfers</span><span class=o>.</span><span class=n>append</span><span class=p>(</span>
+                    <span class=p>(</span><span class=n>src</span><span class=p>,</span> <span class=n>os</span><span class=o>.</span><span class=n>path</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=n>resources_dir</span><span class=p>,</span> <span class=n>src_name</span><span class=p>))</span>
+                <span class=p>)</span>
+
+                <span class=n>asset_remap</span><span class=p>[</span><span class=n>src</span><span class=p>]</span> <span class=o>=</span> <span class=sa>f</span><span class=s2>&quot;./</span><span class=si>{</span><span class=n>resources_dir_name</span><span class=si>}</span><span class=s2>/</span><span class=si>{</span><span class=n>src_name</span><span class=si>}</span><span class=s2>&quot;</span>
+
+                <span class=bp>self</span><span class=o>.</span><span class=n>log</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span>
+                    <span class=s2>&quot;Registering transfer &amp; remap: &quot;</span>
+                    <span class=sa>f</span><span class=s2>&quot;</span><span class=si>{</span><span class=n>src</span><span class=si>}</span><span class=s2> -&gt; </span><span class=si>{</span><span class=n>asset_remap</span><span class=p>[</span><span class=n>src</span><span class=p>]</span><span class=si>}</span><span class=s2>&quot;</span>
+                <span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>_get_geoclipsequence_output_files</span><span class=p>(</span>
+        <span class=bp>self</span><span class=p>,</span> <span class=n>clip_node</span><span class=p>:</span> <span class=n>hou</span><span class=o>.</span><span class=n>Node</span><span class=p>,</span> <span class=n>start</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>end</span><span class=p>:</span> <span class=nb>int</span>
+    <span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>list</span><span class=p>[</span><span class=nb>str</span><span class=p>]:</span>
+<span class=w>        </span><span class=sd>&quot;&quot;&quot;Return the output files for the given Geometry Clip Sequence node</span>
+<span class=sd>        that would be written out when executing the USD ROP for the given</span>
+<span class=sd>        frame range.</span>
+
+<span class=sd>        A Geometry Clip Sequence only writes out files for the frames that</span>
+<span class=sd>        appear in the ROP render range. If it has a start and end frame, then</span>
+<span class=sd>        it won&#39;t write out frames beyond those frame ranges. If it loops, then</span>
+<span class=sd>        it loops solely beyond the end frame, not before the start frame.</span>
+
+<span class=sd>        As such, we find the intersection of the frame ranges to determine the</span>
+<span class=sd>        files to be written out.</span>
+
+<span class=sd>        Args:</span>
+<span class=sd>            clip_node (hou.Node): The Geometry Clip Sequence node.</span>
+<span class=sd>            start (int): The ROP render start frame.</span>
+<span class=sd>            end (int): The ROP render end frame.</span>
+
+<span class=sd>        Returns:</span>
+<span class=sd>            list[str]: List of filepaths.</span>
+<span class=sd>        &quot;&quot;&quot;</span>
+        <span class=c1># TODO: We may want to process this node in the Context Options of the</span>
+        <span class=c1>#  USD ROP to be correct in the case of e.g. multishot workflows</span>
+        <span class=c1># Collect the manifest and topology file</span>
+        <span class=n>files</span><span class=p>:</span> <span class=nb>list</span><span class=p>[</span><span class=nb>str</span><span class=p>]</span> <span class=o>=</span> <span class=p>[</span>
+            <span class=n>clip_node</span><span class=o>.</span><span class=n>evalParm</span><span class=p>(</span><span class=s1>&#39;manifestfile&#39;</span><span class=p>),</span>
+            <span class=n>clip_node</span><span class=o>.</span><span class=n>evalParm</span><span class=p>(</span><span class=s1>&#39;topologyfile&#39;</span><span class=p>)</span>
+        <span class=p>]</span>
+
+        <span class=n>saveclipfilepath</span><span class=p>:</span> <span class=nb>str</span> <span class=o>=</span> \
+            <span class=n>clip_node</span><span class=o>.</span><span class=n>parm</span><span class=p>(</span><span class=s1>&#39;saveclipfilepath&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>evalAtFrame</span><span class=p>(</span><span class=n>start</span><span class=p>)</span>
+
+        <span class=n>frame_collection</span><span class=p>,</span> <span class=n>_</span> <span class=o>=</span> <span class=n>clique</span><span class=o>.</span><span class=n>assemble</span><span class=p>(</span>
+            <span class=p>[</span><span class=n>saveclipfilepath</span><span class=p>],</span>
+            <span class=n>patterns</span><span class=o>=</span><span class=p>[</span><span class=n>clique</span><span class=o>.</span><span class=n>PATTERNS</span><span class=p>[</span><span class=s2>&quot;frames&quot;</span><span class=p>]],</span>
+            <span class=n>minimum_items</span><span class=o>=</span><span class=mi>1</span>
+        <span class=p>)</span>
+
+        <span class=c1># Skip if no frame pattern detected.</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=n>frame_collection</span><span class=p>:</span>
+            <span class=bp>self</span><span class=o>.</span><span class=n>log</span><span class=o>.</span><span class=n>warning</span><span class=p>(</span>
+                <span class=sa>f</span><span class=s2>&quot;Unable detect frame sequence in filepath: </span><span class=si>{</span><span class=n>saveclipfilepath</span><span class=si>}</span><span class=s2>&quot;</span>
+            <span class=p>)</span>
+            <span class=c1># Assume it&#39;s some form of static clip file in this scenario</span>
+            <span class=n>files</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>saveclipfilepath</span><span class=p>)</span>
+            <span class=k>return</span> <span class=n>files</span>
+
+        <span class=c1># Collect the clip frames that fall within the render range</span>
+        <span class=c1># because those will be the clip frames to be written out.</span>
+        <span class=n>frames</span> <span class=o>=</span> <span class=n>get_clip_frames_in_frame_range</span><span class=p>(</span>
+            <span class=n>clip_start</span><span class=o>=</span><span class=nb>int</span><span class=p>(</span><span class=n>clip_node</span><span class=o>.</span><span class=n>evalParm</span><span class=p>(</span><span class=s1>&#39;startframe&#39;</span><span class=p>)),</span>
+            <span class=n>clip_end</span><span class=o>=</span><span class=nb>int</span><span class=p>(</span><span class=n>clip_node</span><span class=o>.</span><span class=n>evalParm</span><span class=p>(</span><span class=s1>&#39;endframe&#39;</span><span class=p>)),</span>
+            <span class=n>has_end_set</span><span class=o>=</span><span class=nb>bool</span><span class=p>(</span><span class=n>clip_node</span><span class=o>.</span><span class=n>evalParm</span><span class=p>(</span><span class=s1>&#39;setendframe&#39;</span><span class=p>)),</span>
+            <span class=n>loop</span><span class=o>=</span><span class=nb>bool</span><span class=p>(</span><span class=n>clip_node</span><span class=o>.</span><span class=n>evalParm</span><span class=p>(</span><span class=s1>&#39;loopframes&#39;</span><span class=p>)),</span>
+            <span class=n>range_start</span><span class=o>=</span><span class=n>start</span><span class=p>,</span>
+            <span class=n>range_end</span><span class=o>=</span><span class=n>end</span>
+        <span class=p>)</span>
+
+        <span class=c1># It&#39;s always expected to be one collection.</span>
+        <span class=n>frame_collection</span> <span class=o>=</span> <span class=n>frame_collection</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span>
+        <span class=n>frame_collection</span><span class=o>.</span><span class=n>indexes</span><span class=o>.</span><span class=n>clear</span><span class=p>()</span>
+        <span class=n>frame_collection</span><span class=o>.</span><span class=n>indexes</span><span class=o>.</span><span class=n>update</span><span class=p>(</span><span class=n>frames</span><span class=p>)</span>
+        <span class=n>files</span><span class=o>.</span><span class=n>extend</span><span class=p>(</span><span class=nb>list</span><span class=p>(</span><span class=n>frame_collection</span><span class=p>))</span>
+        <span class=k>return</span> <span class=n>files</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>_find_instance_by_explict_save_layer</span><span class=p>(</span>
+        <span class=bp>self</span><span class=p>,</span>
+        <span class=n>instance</span><span class=p>:</span> <span class=n>pyblish</span><span class=o>.</span><span class=n>api</span><span class=o>.</span><span class=n>Instance</span><span class=p>,</span>
+        <span class=n>layer</span>
+    <span class=p>)</span> <span class=o>-&gt;</span> <span class=n>Optional</span><span class=p>[</span><span class=n>pyblish</span><span class=o>.</span><span class=n>api</span><span class=o>.</span><span class=n>Instance</span><span class=p>]:</span>
+<span class=w>        </span><span class=sd>&quot;&quot;&quot;Find the target instance (in context) for the given layer if it&#39;s</span>
+<span class=sd>        an explicit save layer.</span>
+
+<span class=sd>        If the layer is an explicit save layer, then try to find if there&#39;s a</span>
+<span class=sd>        publish instance for it and return it instead. Otherwise, return the</span>
+<span class=sd>        input instance.</span>
+<span class=sd>        &quot;&quot;&quot;</span>
+        <span class=k>for</span> <span class=n>other_instance</span> <span class=ow>in</span> <span class=n>instance</span><span class=o>.</span><span class=n>context</span><span class=p>:</span>
+            <span class=c1># Skip self</span>
+            <span class=k>if</span> <span class=n>instance</span> <span class=ow>is</span> <span class=n>other_instance</span><span class=p>:</span>
+                <span class=k>continue</span>
+
+            <span class=k>if</span> <span class=n>other_instance</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s2>&quot;usd_layer&quot;</span><span class=p>)</span> <span class=ow>is</span> <span class=n>layer</span><span class=p>:</span>
+                <span class=bp>self</span><span class=o>.</span><span class=n>log</span><span class=o>.</span><span class=n>debug</span><span class=p>(</span>
+                    <span class=s2>&quot;Setting explicit save layer target instance: &quot;</span>
+                    <span class=sa>f</span><span class=s2>&quot;</span><span class=si>{</span><span class=n>other_instance</span><span class=si>}</span><span class=s2>&quot;</span>
+                <span class=p>)</span>
+                <span class=k>return</span> <span class=n>other_instance</span>
+        <span class=k>return</span> <span class=kc>None</span>
+</code></pre></div></td></tr></table></div> </details> <div class="doc doc-children"> </div> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.plugins.publish.collect_usd_value_clips.get_clip_frames_in_frame_range class="doc doc-heading"> <code class="highlight language-python"><span class=n>get_clip_frames_in_frame_range</span><span class=p>(</span><span class=n>clip_start</span><span class=p>,</span> <span class=n>clip_end</span><span class=p>,</span> <span class=n>has_end_set</span><span class=p>,</span> <span class=n>loop</span><span class=p>,</span> <span class=n>range_start</span><span class=p>,</span> <span class=n>range_end</span><span class=p>)</span></code> </h2> <div class="doc doc-contents "> <p>Calculate which clip frames are visible in the given frame range.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>clip_start</code> </td> <td> <code><span title=int>int</span></code> </td> <td> <div class=doc-md-description> <p>Start frame of clip (X)</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>clip_end</code> </td> <td> <code><span title=int>int</span></code> </td> <td> <div class=doc-md-description> <p>End frame of clip (Y)</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>has_end_set</code> </td> <td> <code><span title=bool>bool</span></code> </td> <td> <div class=doc-md-description> <p>Whether clip end applies or it's infinite.</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>loop</code> </td> <td> <code><span title=bool>bool</span></code> </td> <td> <div class=doc-md-description> <p>Whether clip loops after end</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>range_start</code> </td> <td> <code><span title=int>int</span></code> </td> <td> <div class=doc-md-description> <p>Start of query range (e.g., 1001)</p> </div> </td> <td> <em>required</em> </td> </tr> <tr class=doc-section-item> <td> <code>range_end</code> </td> <td> <code><span title=int>int</span></code> </td> <td> <div class=doc-md-description> <p>End of query range (e.g., 1100)</p> </div> </td> <td> <em>required</em> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> </td> <td> <div class=doc-md-description> <p>set[int]: Set of clip frames visible in the range</p> </div> </td> </tr> </tbody> </table> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/plugins/publish/collect_usd_value_clips.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>11</span>
+<span class=normal>12</span>
+<span class=normal>13</span>
+<span class=normal>14</span>
+<span class=normal>15</span>
+<span class=normal>16</span>
+<span class=normal>17</span>
+<span class=normal>18</span>
+<span class=normal>19</span>
+<span class=normal>20</span>
+<span class=normal>21</span>
+<span class=normal>22</span>
+<span class=normal>23</span>
+<span class=normal>24</span>
+<span class=normal>25</span>
+<span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span>
+<span class=normal>52</span>
+<span class=normal>53</span>
+<span class=normal>54</span>
+<span class=normal>55</span>
+<span class=normal>56</span>
+<span class=normal>57</span>
+<span class=normal>58</span>
+<span class=normal>59</span>
+<span class=normal>60</span>
+<span class=normal>61</span>
+<span class=normal>62</span>
+<span class=normal>63</span>
+<span class=normal>64</span>
+<span class=normal>65</span>
+<span class=normal>66</span>
+<span class=normal>67</span>
+<span class=normal>68</span>
+<span class=normal>69</span>
+<span class=normal>70</span>
+<span class=normal>71</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>get_clip_frames_in_frame_range</span><span class=p>(</span>
+        <span class=n>clip_start</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span>
+        <span class=n>clip_end</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span>
+        <span class=n>has_end_set</span><span class=p>:</span> <span class=nb>bool</span><span class=p>,</span>
+        <span class=n>loop</span><span class=p>:</span> <span class=nb>bool</span><span class=p>,</span>
+        <span class=n>range_start</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span>
+        <span class=n>range_end</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>&quot;&quot;&quot;Calculate which clip frames are visible in the given frame range.</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        clip_start: Start frame of clip (X)</span>
+<span class=sd>        clip_end: End frame of clip (Y)</span>
+<span class=sd>        has_end_set: Whether clip end applies or it&#39;s infinite.</span>
+<span class=sd>        loop: Whether clip loops after end</span>
+<span class=sd>        range_start: Start of query range (e.g., 1001)</span>
+<span class=sd>        range_end: End of query range (e.g., 1100)</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        set[int]: Set of clip frames visible in the range</span>
+<span class=sd>    &quot;&quot;&quot;</span>
+    <span class=n>visible_frames</span> <span class=o>=</span> <span class=nb>set</span><span class=p>()</span>
+
+    <span class=c1># Case 1: No end frame - clip runs infinitely from start</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>has_end_set</span><span class=p>:</span>
+        <span class=k>if</span> <span class=n>clip_start</span> <span class=o>&lt;=</span> <span class=n>range_end</span><span class=p>:</span>
+            <span class=c1># All frames from max(clip_start, range_start) to range_end are</span>
+            <span class=c1># included</span>
+            <span class=n>start</span> <span class=o>=</span> <span class=nb>max</span><span class=p>(</span><span class=n>clip_start</span><span class=p>,</span> <span class=n>range_start</span><span class=p>)</span>
+            <span class=n>visible_frames</span> <span class=o>=</span> <span class=nb>set</span><span class=p>(</span><span class=nb>range</span><span class=p>(</span><span class=n>start</span><span class=p>,</span> <span class=n>range_end</span> <span class=o>+</span> <span class=mi>1</span><span class=p>))</span>
+        <span class=k>return</span> <span class=n>visible_frames</span>
+
+    <span class=c1># Case 2: Has end frame, no loop - clip plays once</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=n>loop</span><span class=p>:</span>
+        <span class=c1># Houdini exports an additional frame when not looping</span>
+        <span class=n>actual_clip_end</span> <span class=o>=</span> <span class=n>clip_end</span> <span class=o>+</span> <span class=mi>1</span>
+        <span class=c1># Intersection of [clip_start, actual_clip_end]</span>
+        <span class=c1># and [range_start, range_end]</span>
+        <span class=n>intersection_start</span> <span class=o>=</span> <span class=nb>max</span><span class=p>(</span><span class=n>clip_start</span><span class=p>,</span> <span class=n>range_start</span><span class=p>)</span>
+        <span class=n>intersection_end</span> <span class=o>=</span> <span class=nb>min</span><span class=p>(</span><span class=n>actual_clip_end</span><span class=p>,</span> <span class=n>range_end</span><span class=p>)</span>
+        <span class=k>if</span> <span class=n>intersection_start</span> <span class=o>&lt;=</span> <span class=n>intersection_end</span><span class=p>:</span>
+            <span class=n>visible_frames</span> <span class=o>=</span> <span class=nb>set</span><span class=p>(</span>
+                <span class=nb>range</span><span class=p>(</span><span class=n>intersection_start</span><span class=p>,</span> <span class=n>intersection_end</span> <span class=o>+</span> <span class=mi>1</span><span class=p>))</span>
+        <span class=k>return</span> <span class=n>visible_frames</span>
+
+    <span class=c1># Case 3: Has end frame and loops</span>
+    <span class=n>loop_duration</span> <span class=o>=</span> <span class=n>clip_end</span> <span class=o>-</span> <span class=n>clip_start</span> <span class=o>+</span> <span class=mi>1</span>
+
+    <span class=k>for</span> <span class=n>frame</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>range_start</span><span class=p>,</span> <span class=n>range_end</span> <span class=o>+</span> <span class=mi>1</span><span class=p>):</span>
+        <span class=k>if</span> <span class=n>frame</span> <span class=o>&lt;</span> <span class=n>clip_start</span><span class=p>:</span>
+            <span class=c1># Before clip starts: not visible</span>
+            <span class=k>continue</span>
+        <span class=k>elif</span> <span class=n>frame</span> <span class=o>&lt;=</span> <span class=n>clip_end</span><span class=p>:</span>
+            <span class=c1># Within first play of clip</span>
+            <span class=n>visible_frames</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>frame</span><span class=p>)</span>
+        <span class=k>else</span><span class=p>:</span>
+            <span class=c1># After first play: map to looped frame</span>
+            <span class=n>offset</span> <span class=o>=</span> <span class=p>(</span><span class=n>frame</span> <span class=o>-</span> <span class=n>clip_start</span><span class=p>)</span> <span class=o>%</span> <span class=n>loop_duration</span>
+            <span class=n>looped_frame</span> <span class=o>=</span> <span class=n>clip_start</span> <span class=o>+</span> <span class=n>offset</span>
+            <span class=n>visible_frames</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>looped_frame</span><span class=p>)</span>
+
+    <span class=k>return</span> <span class=n>visible_frames</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> </div> </div> </div> </article> </div> <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script> </div> </main> <footer class=md-footer> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-copyright> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"annotate": null, "base": "../../../../..", "features": ["navigation.sections", "navigation.path", "navigation.prune"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script> <script src=../../../../../assets/javascripts/bundle.79ae519e.min.js></script> </body> </html>
