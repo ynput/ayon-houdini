@@ -72,7 +72,30 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         rop_node = hou.node(instance.data["instance_node"])
 
         save_layers = []
-        for layer in instance.data.get("layers", []):
+        stack = list(instance.data.get("layers", []))
+        processed = set(stack)
+        for layer in stack:
+            # We need to proceed into sublayers and external references
+            # because these can also have configured save paths that we need
+            # to collect. This logic mimics Houdini's `scenegraphlayers` model
+            # used by the Scene Graph Layers panel in Solaris. Fix: #361
+            # Note: We use `list` over `set` here just to match the behavior of
+            #  Houdini's Scene Graph Layers panel to increase our chances the
+            #  sorting of the layers is somewhat similar to what artists see in
+            #  the panel. (It's purely for cosmetic reasons though)
+            child_sublayers = list(layer.subLayerPaths)
+            child_refs = list(ref for ref in layer.externalReferences
+                              if ref and ref not in layer.subLayerPaths)
+            for child_layer in child_sublayers:
+                child_layer = Sdf.Layer.FindOrOpen(child_layer)
+                if child_layer not in processed:
+                    stack.append(child_layer)
+                    processed.add(child_layer)
+            for child_layer in child_refs:
+                child_layer = Sdf.Layer.FindOrOpen(child_layer)
+                if child_layer not in processed:
+                    stack.append(child_layer)
+                    processed.add(child_layer)
 
             info = layer.GetPrimAtPath("/HoudiniLayerInfo")
             if not info:
