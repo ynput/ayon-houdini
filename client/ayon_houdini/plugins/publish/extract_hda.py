@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-import os
 import contextlib
+import os
+import tempfile
 
 import hou
 import pyblish.api
@@ -38,6 +39,15 @@ class ExtractHDA(plugin.HoudiniExtractorPlugin):
         hda_def.setVersion(str(next_version))
         hda_def.setOptions(hda_options)
 
+        hda_file_path = hda_def.libraryFilePath()
+
+        # if the HDA is embedded, we need to save it so that it can be copied
+        # to the staging and publish directories
+        if hda_file_path == "Embedded":
+            _, hda_file_path = tempfile.mkstemp(suffix=".hda")
+
+            instance.context.data["cleanupFullPaths"].append(hda_file_path)
+
         with revert_original_parm_template_group(hda_node):
             # Remove our own custom parameters so that if the HDA definition
             # has "Save Spare Parameters" enabled, we don't save our custom
@@ -59,14 +69,14 @@ class ExtractHDA(plugin.HoudiniExtractorPlugin):
             hda_node.setParmTemplateGroup(parm_group)
 
             # Save the HDA file
-            hda_def.save(hda_def.libraryFilePath(), hda_node, hda_options)
+            hda_def.save(hda_file_path, hda_node, hda_options)
 
         if "representations" not in instance.data:
             instance.data["representations"] = []
 
-        file = os.path.basename(hda_def.libraryFilePath())
-        staging_dir = os.path.dirname(hda_def.libraryFilePath())
-        self.log.info("Using HDA from {}".format(hda_def.libraryFilePath()))
+        file = os.path.basename(hda_file_path)
+        staging_dir = os.path.dirname(hda_file_path)
+        self.log.debug(f"Using HDA from {hda_file_path}")
 
         representation = {
             'name': 'hda',
