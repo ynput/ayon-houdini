@@ -76,7 +76,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         stack: list[Sdf.Layer] = list(instance.data.get("layers", []))
         processed: set[str] = set(layer.identifier for layer in stack)
 
-        def _add_layer(layer_identifier):
+        def _add_layer(layer_identifier: str):
             """Add a child layer to track in the stack"""
             if layer_identifier in processed:
                 return
