@@ -76,8 +76,11 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         stack: list[Sdf.Layer] = list(instance.data.get("layers", []))
         processed: set[str] = set(layer.identifier for layer in stack)
 
-        def _add_layer(layer_identifier: str):
+        def _add_layer(layer_identifier: str, relative_to: Sdf.Layer):
             """Add a child layer to track in the stack"""
+            layer_identifier = relative_to.ComputeAbsolutePath(
+                layer_identifier
+            )
             if layer_identifier in processed:
                 return
             processed.add(layer_identifier)
@@ -105,7 +108,7 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             child_refs = list(ref for ref in layer.externalReferences
                               if ref and ref not in layer.subLayerPaths)
             for child_layer in child_sublayers + child_refs:
-                _add_layer(child_layer)
+                _add_layer(child_layer, relative_to=layer)
 
             info = layer.GetPrimAtPath("/HoudiniLayerInfo")
             if not info:
