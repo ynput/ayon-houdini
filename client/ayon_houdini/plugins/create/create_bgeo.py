@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Creator plugin for creating pointcache bgeo files."""
-import inspect 
+import inspect
 from ayon_houdini.api import plugin
 from ayon_core.pipeline import CreatorError
 import hou
@@ -168,9 +168,9 @@ class CreateAnim(CreateBGEO):
 
     def get_detail_description(self):
         return inspect.cleandoc(
-            """Write a BGEO output file as `animation` product type. This can be
-            used to publish APEX animations which are in essence just SOP-level
-            data representing APEX animation data."""
+            """Write a BGEO output file as `animation` product type. This can
+             be used to publish APEX animations which are in essence just
+             SOP-level data representing APEX animation data."""
         )
 
     def get_publish_families(self):

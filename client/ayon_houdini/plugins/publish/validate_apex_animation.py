@@ -50,7 +50,7 @@ class ValidateAPEXAnim(plugin.HoudiniInstancePlugin):
         # TODO: Check if this is a bgeo scene.
         # Same as the error in the Rig Tree
         # Invalid Hierarchy: No valid roots found, possible closed polygon
- 
+
         anim_paths = set(geo.extractPackedPaths('/anim**'))
         if not anim_paths:
             error = (
@@ -59,7 +59,7 @@ class ValidateAPEXAnim(plugin.HoudiniInstancePlugin):
                 " Please check your RigTree."
             )
             return [output_node, error]
-        
+
         all_paths = set(geo.extractPackedPaths('/**')) - set("/")
 
         if all_paths != anim_paths:
@@ -68,9 +68,9 @@ class ValidateAPEXAnim(plugin.HoudiniInstancePlugin):
                 " have 'animation' folder in RigTree."
             )
             return [output_node, error]
-        
+
         return [None, None]
-    
+
     @classmethod
     def get_invalid(cls, instance):
         node, _ = cls.get_invalid_with_message(instance)
