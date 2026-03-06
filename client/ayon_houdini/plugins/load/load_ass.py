@@ -10,7 +10,8 @@ from ayon_houdini.api import (
 class AssLoader(plugin.HoudiniLoader):
     """Load .ass with Arnold Procedural"""
 
-    product_types = {"ass"}
+    product_base_types = {"ass"}
+    product_types = product_base_types
     label = "Load Arnold Procedural"
     representations = {"ass"}
     order = -10

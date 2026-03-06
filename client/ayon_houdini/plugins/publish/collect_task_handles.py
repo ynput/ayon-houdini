@@ -35,13 +35,14 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
     label = "Collect Task Handles"
     use_asset_handles = True
 
-    ignore_product_types: set[str] = {"rig"}
+    ignore_product_base_types: set[str] = {"rig"}
 
     def process(self, instance):
 
         # Do no check asset handles for products that are essentially not
         # intended to be time-based
-        if instance.data.get("productType") in self.ignore_product_types:
+        if instance.data.get(
+                "productBaseType") in self.ignore_product_base_types:
             return
 
         # Only process instances without already existing handles data
@@ -130,7 +131,7 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
         if not cls.instance_matches_plugin_families(instance):
             return []
 
-        if instance.data.get("productType") in cls.ignore_product_types:
+        if instance.data["productBaseType"] in cls.ignore_product_base_types:
             return []
 
         return [

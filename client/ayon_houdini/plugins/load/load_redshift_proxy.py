@@ -12,7 +12,8 @@ from ayon_houdini.api import (
 class RedshiftProxyLoader(plugin.HoudiniLoader):
     """Load Redshift Proxy"""
 
-    product_types = {"redshiftproxy"}
+    product_base_types = {"redshiftproxy"}
+    product_types = product_base_types
     label = "Load Redshift Proxy"
     representations = {"rs"}
     order = -10
