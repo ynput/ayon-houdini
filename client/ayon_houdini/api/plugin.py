@@ -561,7 +561,7 @@ class HoudiniLoader(load.LoaderPlugin):
 
         # Assume the frame number is always the last digit
         pattern = re.compile(r"""
-            (.*)                # Everything before the last dot (greedy)
+            (.*)                # Everything before the last frame separator (greedy)
             ([._])              # The literal dot or underscore before the frame number
             (\d+)                # the frame number
             (\.[^.]+(?:\..+)*)$  # extension (one or more dot segments)
