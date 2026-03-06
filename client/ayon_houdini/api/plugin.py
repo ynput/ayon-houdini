@@ -562,15 +562,15 @@ class HoudiniLoader(load.LoaderPlugin):
         # Assume the frame number is always the last digit
         pattern = re.compile(r"""
             (.*)                # Everything before the last dot (greedy)
-            \.                  # The literal dot before the frame number
+            ([._])              # The literal dot or underscore before the frame number
             (\d+)                # the frame number
             (\.[^.]+(?:\..+)*)$  # extension (one or more dot segments)
         """, re.VERBOSE)
         match = pattern.match(filename)
-        head, frame, tail = match.groups()
+        head, sep, frame, tail = match.groups()
         padding = len(frame)
 
-        filename = f"{head}.$F{padding}{tail}"
+        filename = f"{head}{sep}$F{padding}{tail}"
         return os.path.join(folder, filename)
 
     def format_path(self, context):
