@@ -599,6 +599,133 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
 
+    def create_runtime_instance(
+            self,
+            instance: pyblish.api.Instance,
+            families_to_append: list[str] = [],
+            aov_filter: str = "",
+            transfer_keys: set = {
+                "creator_attributes",
+                "publish_attributes"
+            },
+            transfer_transient_data_keys: set = {
+                "instance_node"
+            }
+        ):
+        """Create Runtime Instances.
+
+        This heavily depends on farm logic where expected files.
+        Where it creates a runtime instances from "expectedFiles" dict
+        in instance data.
+            {
+                "item_1": ["file1", "file2", ...],
+                "item_2": "file",
+            }
+        Example:
+        >>> expected_files = instance.data.setdefault("expectedFiles", list())
+        >>> expected_files.append({"cache": files_sequence_list})
+        >>> self.create_runtime_instance(instance)
+
+        Note:
+            If product base type is render, it'll trigger the logic for
+            creating aov instances. Otherwise, it'll use the logic for
+            creating cache instances which expects simpler instance data.
+
+        Args:
+            instance (pyblish.api.Instance): Source publish instance.
+            families_to_append (list[str]): Families to add to new instances.
+            aov_filter (str): This is used for enabling generating review
+                if aov regex is applied to filename.
+            transfer_keys (set[str]): These will be safely deep copied
+            transfer_transient_data_keys (set[str]): These will transfer,
+                but won't be a unique copy so they are passed by reference.
+
+        """
+
+        from copy import deepcopy
+        from ayon_core.pipeline.farm.pyblish_functions import (
+            create_skeleton_instance,
+            create_instances_for_aov,
+            create_instances_for_cache
+        )
+
+        # Use same logic as how instances get created for farm submissions
+        instance_skeleton_data =  create_skeleton_instance(
+            instance,
+            # TODO: These should be fixed in core to just allow the default
+            #  None to work
+            families_transfer=[],
+            instance_transfer={},
+        )
+        self.post_process_skeleton_data(instance,
+                                        instance_skeleton_data,
+                                        families_to_append)
+
+        instances_data = []
+        if instance.data.get("productBaseType") == "render":
+            instances_data = create_instances_for_aov(
+                instance=instance,
+                skeleton=instance_skeleton_data,
+                aov_filter=aov_filter,  # Use specified filter in settings.
+                skip_integration_repre_list=[], # Extensions to skip.
+                do_not_add_review=False  # Don't explicitly skip review.
+            )
+        else:
+            instances_data = create_instances_for_cache(
+                instance,
+                instance_skeleton_data
+            )
+
+        # Create instances for each AOV
+        anatomy = instance.context.data["anatomy"]
+        for aov_instance_data in instances_data:
+
+            # Copy instance data to AOV instances after creation
+            for key in transfer_keys:
+                if key in instance.data:
+                    aov_instance_data[key] = deepcopy(instance.data[key])
+
+            for key in transfer_transient_data_keys:
+                if key in instance.data:
+                    aov_instance_data[key] = instance.data[key]
+
+            # The `create_instances_for_aov` makes some paths rootless paths,
+            # like the "stagingDir" for each representation which we will make
+            # absolute again.
+            for representation in aov_instance_data["representations"]:
+                representation["stagingDir"] = anatomy.fill_root(
+                    representation["stagingDir"]
+                )
+
+    def post_process_skeleton_data(
+            self,
+            instance: pyblish.api.Instance,
+            instance_skeleton_data: dict,
+            families_to_append: list[str] = []
+        ):
+        """Post process skeleton data
+        Applies Houdini specific logic to skeleton data.
+        Args:
+            instance (pyblish.api.Instance): The publish instance.
+            instance_skeleton_data (dict): data to modify.
+        """
+        # Remove frame data like frameStart and handleStart
+        # as they are added in later publisher plugins
+        for key in (
+            "frameStart", "frameEnd",
+            "handleStart", "handleEnd",
+         ):
+            instance_skeleton_data.pop(key, None)
+
+        # `create_skeleton_instance` only adds `render` and `review`
+        # Houdini local render also needs `render.local.hou`
+        if families_to_append:
+            instance_skeleton_data["families"].extend(families_to_append)
+        instance_skeleton_data.update({
+            "frameStartHandle": instance.data["frameStartHandle"],
+            "frameEndHandle": instance.data["frameEndHandle"],
+        })
+
 
 class HoudiniContextPlugin(pyblish.api.ContextPlugin):
     """Base class for Houdini context publish plugins."""
