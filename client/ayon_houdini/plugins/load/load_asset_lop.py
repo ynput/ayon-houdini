@@ -10,7 +10,8 @@ class LOPLoadAssetLoader(load.LoaderPlugin):
 
     product_types = {"*"}
     label = "Load Asset (LOPs)"
-    representations = ["usd", "abc", "usda", "usdc"]
+    representations = {"*"}
+    extensions = ["usd", "abc", "usda", "usdc"]
     order = -10
     icon = "code-fork"
     color = "orange"

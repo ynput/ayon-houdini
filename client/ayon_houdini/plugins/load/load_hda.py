@@ -18,7 +18,8 @@ class HdaLoader(plugin.HoudiniLoader):
 
     product_types = {"hda"}
     label = "Load Hda"
-    representations = {"hda"}
+    representations = {"*"}
+    extensions = {"hda"}
     order = -10
     icon = "code-fork"
     color = "orange"
