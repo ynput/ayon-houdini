@@ -11,7 +11,7 @@ class LOPLoadShotLoader(load.LoaderPlugin):
     product_types = {"*"}
     label = "Load Shot (LOPs)"
     representations = {"*"}
-    extensions = ["usd", "abc", "usda", "usdc"]
+    extensions = {"usd", "usda", "usdc", "usdlc", "usdnc", "abc"}
     order = -10
     icon = "code-fork"
     color = "orange"
