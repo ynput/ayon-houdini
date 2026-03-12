@@ -13,7 +13,8 @@ class BgeoLoader(plugin.HoudiniLoader):
 
     label = "Load bgeo"
     product_types = {"model", "pointcache", "bgeo"}
-    representations = {
+    representations = {"*"}
+    extensions = {
         "bgeo", "bgeosc", "bgeogz",
         "bgeo.sc", "bgeo.gz", "bgeo.lzma", "bgeo.bz2"}
     order = -10
