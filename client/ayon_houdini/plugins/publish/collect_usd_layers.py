@@ -1,3 +1,4 @@
+from __future__ import annotations
 import copy
 import os
 import re
@@ -72,8 +73,28 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         rop_node = hou.node(instance.data["instance_node"])
 
         save_layers = []
-        stack = list(instance.data.get("layers", []))
-        processed = set(stack)
+        stack: list[Sdf.Layer] = list(instance.data.get("layers", []))
+        processed: set[str] = set(layer.identifier for layer in stack)
+
+        def _add_layer(layer_identifier: str, relative_to: Sdf.Layer):
+            """Add a child layer to track in the stack"""
+            layer_identifier = relative_to.ComputeAbsolutePath(
+                layer_identifier
+            )
+            if layer_identifier in processed:
+                return
+            processed.add(layer_identifier)
+            child_layer = Sdf.Layer.FindOrOpen(layer_identifier)
+            if child_layer is None:
+                # The layer may not exist yet, if e.g. it has not been computed
+                # or saved by Solaris yet.
+                # TODO: We'll need to pinpoint which layers this may happen for
+                self.log.warning(
+                    "Unable to find Sdf Layer for %s", layer_identifier
+                )
+                return
+            stack.append(child_layer)
+
         for layer in stack:
             # We need to proceed into sublayers and external references
             # because these can also have configured save paths that we need
@@ -86,16 +107,8 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             child_sublayers = list(layer.subLayerPaths)
             child_refs = list(ref for ref in layer.externalReferences
                               if ref and ref not in layer.subLayerPaths)
-            for child_layer in child_sublayers:
-                child_layer = Sdf.Layer.FindOrOpen(child_layer)
-                if child_layer not in processed:
-                    stack.append(child_layer)
-                    processed.add(child_layer)
-            for child_layer in child_refs:
-                child_layer = Sdf.Layer.FindOrOpen(child_layer)
-                if child_layer not in processed:
-                    stack.append(child_layer)
-                    processed.add(child_layer)
+            for child_layer in child_sublayers + child_refs:
+                _add_layer(child_layer, relative_to=layer)
 
             info = layer.GetPrimAtPath("/HoudiniLayerInfo")
             if not info:
