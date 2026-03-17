@@ -17,49 +17,6 @@ from ayon_core.pipeline.load import (
 import hou
 
 
-def containerise(
-    name,
-    namespace,
-    nodes,
-    context,
-    loader=None,
-    suffix="",
-):
-    """Bundle `nodes` into a subnet and imprint it with metadata
-
-    Containerisation enables a tracking of version, author and origin
-    for loaded products.
-
-    Arguments:
-        name (str): Name of resulting assembly
-        namespace (str): Namespace under which to host container
-        nodes (list): Long names of nodes to containerise
-        context (dict): Loaded product context information
-        loader (str, optional): Name of loader used to produce this container.
-        suffix (str, optional): Suffix of container, defaults to `_CON`.
-        members (list, optional): List of member nodes to add to container.
-
-    Returns:
-        container (hou.Node): Name of container assembly
-
-    """
-
-    container = pipeline.containerise(
-        name,
-        namespace,
-        nodes,
-        context,
-        loader,
-        suffix
-    )
-    node_list = [node.path() for node in nodes]
-    print(f"Containerised nodes: {node_list} into container: {container}")
-    additional_data = {"members": node_list}
-    lib.imprint(container, additional_data)
-
-    return container
-
-
 class LayoutLoader(plugin.HoudiniLoader):
     """Layout Loader (json)"""
 
@@ -304,20 +261,23 @@ class LayoutLoader(plugin.HoudiniLoader):
         repre_contexts_by_version_id = self._get_repre_contexts_by_version_id(
             data, context
         )
-        containers: list[hou.Node] = [null_node]
+        container_members: list[hou.Node] = []
         for element in data:
             loaded_containers = self._process_element(
                 element,
                 repre_contexts_by_version_id
             )
-            containers.extend(loaded_containers)
+            container_members.extend(loaded_containers)
 
-        self[:] = containers
+        self[:] = [null_node]
 
-        return containerise(
+        self.imprint(null_node, {
+            "members": [node.path() for node in container_members],
+        })
+        return pipeline.containerise(
             node_name,
             namespace,
-            containers,
+            [null_node],
             context,
             self.__class__.__name__,
             suffix=""
@@ -334,9 +294,9 @@ class LayoutLoader(plugin.HoudiniLoader):
         repre_contexts_by_version_id = self._get_repre_contexts_by_version_id(
             data, context
         )
-
+        members = self.read(container["node"])
         member_containers: list[hou.Node] = [
-            hou.node(member) for member in container.get("members", [])
+            hou.node(member) for member in members.get("members", [])
         ]
         updated_containers: list[hou.Node] = []
         for element in data:
@@ -358,11 +318,13 @@ class LayoutLoader(plugin.HoudiniLoader):
                     element, repre_contexts_by_version_id
                 )
                 updated_containers.extend(loaded_containers)
+        self.imprint(container["node"], {
+            "members": [node.path() for node in updated_containers],
+        })
         container_node = container["node"]
         container_node.setParms({
             "filepath": self.filepath_from_context(context),
-            "representation": str(repre_entity["id"]),
-            "members": [node.path() for node in updated_containers]
+            "representation": str(repre_entity["id"])
         })
 
     def switch(self, container, context):
@@ -371,3 +333,17 @@ class LayoutLoader(plugin.HoudiniLoader):
     def remove(self, container) -> None:
         node = container["node"]
         node.destroy()
+
+    def imprint(self, node: hou.Node, data: dict):
+        members = data.pop("members", None)
+        if members is not None:
+            # Handle members data in a special way if you want
+            pass
+        super().imprint(node, data)
+
+    def read(self, node: hou.Node) -> dict:
+        data = super().read(node)
+
+        # Handle loading back the data of 'members'
+        # if inherited `read` does not support it natively
+        return data
