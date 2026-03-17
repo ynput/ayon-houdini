@@ -5,7 +5,7 @@ from typing import Any, Optional
 
 import ayon_api
 
-from ayon_houdini.api import plugin, lib, pipeline
+from ayon_houdini.api import plugin, pipeline
 
 from ayon_core.pipeline.load import (
     get_representation_contexts,
