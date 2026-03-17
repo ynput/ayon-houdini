@@ -12,7 +12,8 @@ class VdbLoader(plugin.HoudiniLoader):
 
     product_types = {"vdbcache"}
     label = "Load VDB"
-    representations = {"vdb"}
+    representations = {"*"}
+    extensions = {"vdb"}
     order = -10
     icon = "code-fork"
     color = "orange"
