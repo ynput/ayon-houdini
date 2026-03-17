@@ -93,7 +93,8 @@ class CameraLoader(plugin.HoudiniLoader):
 
     product_types = {"camera"}
     label = "Load Camera (abc)"
-    representations = {"abc"}
+    representations = {"*"}
+    extensions = {"abc"}
     order = -10
 
     icon = "code-fork"

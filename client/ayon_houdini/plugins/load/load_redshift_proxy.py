@@ -14,7 +14,8 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
 
     product_types = {"redshiftproxy"}
     label = "Load Redshift Proxy"
-    representations = {"rs"}
+    representations = {"*"}
+    extensions = {"rs"}
     order = -10
     icon = "code-fork"
     color = "orange"
