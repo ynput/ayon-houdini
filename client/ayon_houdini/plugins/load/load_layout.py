@@ -1,7 +1,7 @@
 from __future__ import annotations
 import json
 import collections
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 import ayon_api
 
@@ -15,6 +15,8 @@ from ayon_core.pipeline.load import (
 )
 
 import hou
+
+MEMBER_ATTR_NAME = "AYON_layout_members"
 
 
 class LayoutLoader(plugin.HoudiniLoader):
@@ -35,6 +37,8 @@ class LayoutLoader(plugin.HoudiniLoader):
             "fbx", "abc", "usd", "vdb", "bgeo"
         ])
     }
+    # Settings
+    remove_layout_container_members = False
 
     def _get_repre_contexts_by_version_id(
         self,
@@ -227,22 +231,7 @@ class LayoutLoader(plugin.HoudiniLoader):
                 list of 16 floats.
         """
         hou_matrix = hou.Matrix4(matrix)
-        translate = hou_matrix.extractTranslates()
-        rotate = hou_matrix.extractRotates()
-        scale = hou_matrix.extractScales()
-        self.log.info(f"Setting transformation for node '{node}': "
-                      f"translate={translate}, rotate={rotate}, scale={scale}")
-        node.setParms({
-            "tx": translate[0],
-            "ty": translate[1],
-            "tz": translate[2],
-            "rx": rotate[0],
-            "ry": rotate[1],
-            "rz": rotate[2],
-            "sx": scale[0],
-            "sy": scale[1],
-            "sz": scale[2],
-        })
+        node.setParmTransform(hou_matrix)
 
     def load(self, context, name=None, namespace=None, data=None):
         obj = hou.node("/obj")
@@ -271,10 +260,7 @@ class LayoutLoader(plugin.HoudiniLoader):
 
         self[:] = [null_node]
 
-        self.imprint(null_node, {
-            "members": [node.path() for node in container_members],
-        })
-        return pipeline.containerise(
+        container = pipeline.containerise(
             node_name,
             namespace,
             [null_node],
@@ -282,6 +268,9 @@ class LayoutLoader(plugin.HoudiniLoader):
             self.__class__.__name__,
             suffix=""
         )
+        self._set_members(null_node, container_members)
+
+        return container
 
     def update(self, container, context):
         repre_entity = context["representation"]
@@ -294,10 +283,7 @@ class LayoutLoader(plugin.HoudiniLoader):
         repre_contexts_by_version_id = self._get_repre_contexts_by_version_id(
             data, context
         )
-        members = self.read(container["node"])
-        member_containers: list[hou.Node] = [
-            hou.node(member) for member in members.get("members", [])
-        ]
+        member_containers = self._get_members(container["node"])
         updated_containers: list[hou.Node] = []
         for element in data:
             # Find a matching container node among the members
@@ -318,10 +304,9 @@ class LayoutLoader(plugin.HoudiniLoader):
                     element, repre_contexts_by_version_id
                 )
                 updated_containers.extend(loaded_containers)
-        self.imprint(container["node"], {
-            "members": [node.path() for node in updated_containers],
-        })
+
         container_node = container["node"]
+        self._set_members(container_node, updated_containers)
         container_node.setParms({
             "filepath": self.filepath_from_context(context),
             "representation": str(repre_entity["id"])
@@ -332,18 +317,32 @@ class LayoutLoader(plugin.HoudiniLoader):
 
     def remove(self, container) -> None:
         node = container["node"]
+        if self.remove_layout_container_members:
+            members = self._get_members(node)
+            for member in members:
+                member.destroy()
         node.destroy()
 
-    def imprint(self, node: hou.Node, data: dict):
-        members = data.pop("members", None)
-        if members is not None:
-            # Handle members data in a special way if you want
-            pass
-        super().imprint(node, data)
+    def _get_members(self, node: hou.OpNode) -> List[hou.OpNode]:
+        return node.parm(MEMBER_ATTR_NAME).evalAsNodes()
 
-    def read(self, node: hou.Node) -> dict:
-        data = super().read(node)
+    def _set_members(self, node: hou.OpNode, members: List[hou.OpNode]):
+        # Add/set a parm of type node operator list
+        parm = node.parm(MEMBER_ATTR_NAME)
+        if not parm:
+            # Add parm
+            parm_template = hou.StringParmTemplate(
+                name=MEMBER_ATTR_NAME ,
+                label="Layout Members",
+                num_components=1,
+                string_type=hou.stringParmType.NodeReferenceList,
+                # tags={"opfilter": "!!OBJ!!", "oprelative": "."}  # only OBJ nodes
+            )
+            parm_template_group = node.parmTemplateGroup()
+            parm_template_group.append(parm_template)
+            node.setParmTemplateGroup(parm_template_group)
+            parm = node.parm(MEMBER_ATTR_NAME)
 
-        # Handle loading back the data of 'members'
-        # if inherited `read` does not support it natively
-        return data
+        # Set value
+        nodes_str = " ".join(node.path() for node in members)
+        parm.set(nodes_str)

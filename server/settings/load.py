@@ -31,6 +31,20 @@ class CameraLoaderModel(BaseSettingsModel):
     )
 
 
+class LayoutLoaderModel(BaseSettingsModel):
+    remove_layout_container_members: bool = SettingsField(
+        False,
+        title="Remove Layout Container Members during removing container",
+        description=(
+            "Whether to remove the members of the layout container when the "
+            "container is removed. This can be useful to clean up any nodes "
+            "that were created as members of the layout container, but it can "
+            "also potentially remove nodes that were not created by the loader "
+            "if they were added as members of the container."
+        )
+    )
+
+
 # Load Plugins
 class LoadUseAYONEntityURIModel(BaseSettingsModel):
     use_ayon_entity_uri: bool = SettingsField(
@@ -65,6 +79,10 @@ class LoadPluginsModel(BaseSettingsModel):
     ImageCopernicusLoader: EnabledLoadPluginsModel = SettingsField(
         default_factory=EnabledLoadPluginsModel,
         title="Load Image (Copernicus)"
+    )
+    LayoutLoader: LayoutLoaderModel = SettingsField(
+        default_factory=LayoutLoaderModel,
+        title="Load Layout"
     )
     LOPLoadAssetLoader: LoadUseAYONEntityURIModel = SettingsField(
         default_factory=LoadUseAYONEntityURIModel,
