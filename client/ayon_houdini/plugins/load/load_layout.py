@@ -324,9 +324,23 @@ class LayoutLoader(plugin.HoudiniLoader):
         node.destroy()
 
     def _get_members(self, node: hou.OpNode) -> List[hou.OpNode]:
+        """Get the member nodes of the layout container.
+
+        Args:
+            node (hou.OpNode): The node representing the layout container.
+
+        Returns:
+            List[hou.OpNode]: The list of member nodes of the layout container.
+        """
         return node.parm(MEMBER_ATTR_NAME).evalAsNodes()
 
     def _set_members(self, node: hou.OpNode, members: List[hou.OpNode]):
+        """Set the member nodes of the layout container.
+
+        Args:
+            node (hou.OpNode): The node representing the layout container.
+            members (List[hou.OpNode]): The list of member nodes to set.
+        """
         # Add/set a parm of type node operator list
         parm = node.parm(MEMBER_ATTR_NAME)
         if not parm:
