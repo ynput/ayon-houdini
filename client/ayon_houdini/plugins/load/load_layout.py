@@ -238,8 +238,8 @@ class LayoutLoader(plugin.HoudiniLoader):
         namespace = namespace if namespace else context["folder"]["name"]
         node_name = "{}_{}".format(namespace, name) if namespace else name
 
-        null_node = obj.createNode("null", node_name=node_name)
-        null_node.moveToGoodPosition()
+        subset_node = obj.createNode("subnet", node_name=node_name)
+        subset_node.moveToGoodPosition()
 
         path = self.filepath_from_context(context)
         self.log.info(f">>> loading json [ {path} ]")
@@ -258,17 +258,17 @@ class LayoutLoader(plugin.HoudiniLoader):
             )
             container_members.extend(loaded_containers)
 
-        self[:] = [null_node]
+        self[:] = [subset_node]
 
         container = pipeline.containerise(
             node_name,
             namespace,
-            [null_node],
+            [subset_node],
             context,
             self.__class__.__name__,
             suffix=""
         )
-        self._set_members(null_node, container_members)
+        self._set_members(container, container_members)
 
         return container
 
