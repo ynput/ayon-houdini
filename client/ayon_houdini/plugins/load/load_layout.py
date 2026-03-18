@@ -336,7 +336,8 @@ class LayoutLoader(plugin.HoudiniLoader):
                 label="Layout Members",
                 num_components=1,
                 string_type=hou.stringParmType.NodeReferenceList,
-                # tags={"opfilter": "!!OBJ!!", "oprelative": "."}  # only OBJ nodes
+                # only OBJ nodes
+                # tags={"opfilter": "!!OBJ!!", "oprelative": "."}
             )
             parm_template_group = node.parmTemplateGroup()
             parm_template_group.append(parm_template)

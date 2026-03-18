@@ -39,8 +39,8 @@ class LayoutLoaderModel(BaseSettingsModel):
             "Whether to remove the members of the layout container when the "
             "container is removed. This can be useful to clean up any nodes "
             "that were created as members of the layout container, but it can "
-            "also potentially remove nodes that were not created by the loader "
-            "if they were added as members of the container."
+            "also potentially remove nodes that were not created by the "
+            "loader if they were added as members of the container."
         )
     )
 
