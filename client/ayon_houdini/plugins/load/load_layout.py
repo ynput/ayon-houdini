@@ -97,11 +97,11 @@ class LayoutLoader(plugin.HoudiniLoader):
         return dict(output)
 
     def _get_loader_name(self, element: dict[str, Any]) -> Optional[str]:
-        """_summary_
+        """Return the name of the loader plugin to use for the given element
+        data.
 
         Args:
-            product_type (str): The type of the product.
-            extension (str): The file extension of the product.
+            element (dict[str, Any]): element data from layout json
 
         Raises:
             LoadError: If the product type or extension is not supported.
