@@ -41,8 +41,7 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
 
         # Do no check asset handles for products that are essentially not
         # intended to be time-based
-        if instance.data.get(
-                "productBaseType") in self.ignore_product_base_types:
+        if instance.data["productBaseType"] in self.ignore_product_base_types:
             return
 
         # Only process instances without already existing handles data
