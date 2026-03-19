@@ -230,7 +230,8 @@ class LayoutLoader(plugin.HoudiniLoader):
             self.set_transformation(container, element)
         return containers
 
-    def set_transformation(self, container, element):
+    def set_transformation(
+            self, container: hou.Node, element: dict[str, Any]) -> None:
         """Set the transformation of the container root node based on the
         element data.
 
@@ -242,7 +243,8 @@ class LayoutLoader(plugin.HoudiniLoader):
         self._set_transformation_by_matrix(container,
                                            hou_transform_matrix)
 
-    def _set_transformation_by_matrix(self, node, matrix):
+    def _set_transformation_by_matrix(
+            self, node: hou.Node, matrix: list[float]) -> None:
         """Set the transformation of a node based on a 4x4
         transformation matrix.
 
@@ -354,7 +356,8 @@ class LayoutLoader(plugin.HoudiniLoader):
         """
         return node.parm(MEMBER_ATTR_NAME).evalAsNodes()
 
-    def _set_members(self, node: hou.OpNode, members: List[hou.OpNode]):
+    def _set_members(
+            self, node: hou.OpNode, members: List[hou.OpNode]) -> None:
         """Set the member nodes of the layout container.
 
         Args:
