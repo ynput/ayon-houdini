@@ -199,7 +199,7 @@ class LayoutLoader(plugin.HoudiniLoader):
         element data.
 
         Args:
-            container (str): container node name.
+            container (hou.Node): container node name.
             element (dict[str, Any]): element data from layout json
         """
         hou_transform_matrix = element["transform_matrix"]
@@ -208,16 +208,31 @@ class LayoutLoader(plugin.HoudiniLoader):
         instance_name = element["instance_name"]
         for object_data in element.get("object_transform", []):
             for obj_name, transform_matrix in object_data.items():
-                expected_name: str = f"{instance_name}:{obj_name}*"
+                expected_name: str = f"{instance_name}*"
                 # TODO: support different networks
-                obj_root = hou.node("/obj").glob(expected_name)
-                if not obj_root:
+                obj = next(
+                    (node for node in container.glob(expected_name)),
+                    None
+                )
+                if not obj:
                     self.log.warning(
-                        f"No transforms found for: {expected_name}"
+                        f"No node found for: {expected_name}"
                     )
                     continue
+                # connect transform node to the object node
+                obj_transform_node = next(
+                    (node for node in container.glob(f"{obj_name}_xform")),
+                    None
+                )
+                if not obj_transform_node:
+                    obj_transform_node = container.createNode(
+                        "xform", node_name=f"{obj_name}_xform"
+                    )
+                    # Connect transform node to object node
+                    obj_transform_node.setInput(0, obj)
+
                 self._set_transformation_by_matrix(
-                    obj_root,
+                    obj_transform_node,
                     transform_matrix
                 )
 
@@ -226,12 +241,21 @@ class LayoutLoader(plugin.HoudiniLoader):
         transformation matrix.
 
         Args:
-            node (str): node name.
+            node (hou.Node): node name.
             matrix (list): 4x4 transformation matrix as a flat
                 list of 16 floats.
         """
         hou_matrix = hou.Matrix4(matrix)
-        node.setParmTransform(hou_matrix)
+        if isinstance(node, hou.SopNode):
+            tx, ty, tz = hou_matrix.extractTranslates()
+            rx, ry, rz = hou_matrix.extractRotates()
+            sx, sy, sz = hou_matrix.extractScales()
+
+            node.parmTuple("t").set((tx, ty, tz))
+            node.parmTuple("r").set((rx, ry, rz))
+            node.parmTuple("s").set((sx, sy, sz))
+        else:
+            node.setParmTransform(hou_matrix)
 
     def load(self, context, name=None, namespace=None, data=None):
         obj = hou.node("/obj")
