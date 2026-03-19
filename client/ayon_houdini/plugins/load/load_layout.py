@@ -308,7 +308,6 @@ class LayoutLoader(plugin.HoudiniLoader):
         container_node = container["node"]
         self._set_members(container_node, updated_containers)
         container_node.setParms({
-            "filepath": self.filepath_from_context(context),
             "representation": str(repre_entity["id"])
         })
 
