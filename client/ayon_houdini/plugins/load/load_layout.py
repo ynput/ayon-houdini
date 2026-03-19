@@ -18,11 +18,37 @@ import hou
 
 MEMBER_ATTR_NAME = "AYON_layout_members"
 
+# The Extract Layout logic in Maya was built to export transformation matrices
+# that match the matrices in Unreal. We will need to convert that back to
+# match Houdini's coordinate system and conventions.
+def unreal_matrix_to_houdini(unreal_matrix: list[list[float]]) -> hou.Matrix4:
+    """
+    Convert an Unreal Engine 4x4 matrix to a Houdini hou.Matrix4.
+
+    Args:
+        unreal_matrix: list[list[float]] - A 4x4 matrix represented as
+            a list of 4 lists, each containing 4 floats.
+
+    Returns:
+        hou.Matrix4 in Houdini's right-handed, Y-up coordinate system.
+    """
+
+    def _remap(v):
+        return hou.Vector3(v[0], v[2], v[1])
+
+    houdini_matrix = hou.Matrix4(unreal_matrix)
+    trs = houdini_matrix.explode()
+    trs["translate"] = _remap(trs["translate"])
+    trs["rotate"] = _remap(trs["rotate"])
+    trs["scale"] = _remap(trs["scale"])
+    return hou.hmath.buildTransform(trs)
+
 
 class LayoutLoader(plugin.HoudiniLoader):
     """Layout Loader (json)"""
 
-    product_types = {"layout"}
+    product_base_types = {"layout"}
+    product_types = product_base_types
     representations = {"json"}
 
     label = "Load Layout"
@@ -70,8 +96,7 @@ class LayoutLoader(plugin.HoudiniLoader):
             output[version_id].append(repre_context)
         return dict(output)
 
-    @staticmethod
-    def _get_loader_name(product_type: str, extension: str) -> Optional[str]:
+    def _get_loader_name(self, element: dict[str, Any]) -> Optional[str]:
         """_summary_
 
         Args:
@@ -84,7 +109,25 @@ class LayoutLoader(plugin.HoudiniLoader):
         Returns:
             Optional[str]: The name of the loader plugin, or None if not found.
         """
-        if product_type in {
+
+        # Find exact loader if layout was generated from same host
+        # hosts: list[str] = element.get("host", [])
+        # element_loader: str = element.get("loader")
+        # same_host = ...implement same host check...
+        # if same_host and element_loader:
+        #     # TODO: Check if it exists
+        #     return element_loader
+
+        # Otherwise use a dedicated loader based on product type and extension
+        product_base_type: str = (
+            element.get("product_base_type")
+            # Backwards compatibility
+            or element.get("product_type")
+            or element.get("family")
+        )
+        extension = element.get("extension", "")
+
+        if product_base_type in {
             "model", "animation", "pointcache", "gpuCache"
         }:
             if extension == "abc":
@@ -94,9 +137,9 @@ class LayoutLoader(plugin.HoudiniLoader):
             else:
                 raise LoadError(
                     f"Unsupported extension '{extension}' "
-                    f"for product type '{product_type}'"
+                    f"for product type '{product_base_type}'"
                 )
-        elif product_type == "vdbcache":
+        elif product_base_type == "vdbcache":
             return "VdbLoader"
 
         return None
@@ -135,12 +178,7 @@ class LayoutLoader(plugin.HoudiniLoader):
 
         repre_contexts.sort(key=_sort_by_preferred_order)
 
-        product_type = element.get("product_type")
-        extension = element.get("extension", "")
-        if product_type is None:
-            # Backwards compatibility
-            product_type = element.get("family")
-        loader_name = self._get_loader_name(product_type, extension)
+        loader_name = self._get_loader_name(element)
         # Find loader plugin
         # TODO: Cache the loaders by name once
         loader = get_loaders_by_name().get(loader_name, None)
@@ -181,8 +219,6 @@ class LayoutLoader(plugin.HoudiniLoader):
         self.log.info(f"Loaded element with loader '{loader_name}': {result}")
         if isinstance(result, hou.Node):
             containers: list[hou.node] = [result]
-        elif isinstance(result, list):
-            containers: list[hou.node] = result
         else:
             self.log.warning(
                 f"Loader {loader} returned invalid container data: {result}"
@@ -205,36 +241,6 @@ class LayoutLoader(plugin.HoudiniLoader):
         hou_transform_matrix = element["transform_matrix"]
         self._set_transformation_by_matrix(container,
                                            hou_transform_matrix)
-        instance_name = element["instance_name"]
-        for object_data in element.get("object_transform", []):
-            for obj_name, transform_matrix in object_data.items():
-                expected_name: str = f"{instance_name}*"
-                # TODO: support different networks
-                obj = next(
-                    (node for node in container.glob(expected_name)),
-                    None
-                )
-                if not obj:
-                    self.log.warning(
-                        f"No node found for: {expected_name}"
-                    )
-                    continue
-                # connect transform node to the object node
-                obj_transform_node = next(
-                    (node for node in container.glob(f"{obj_name}_xform")),
-                    None
-                )
-                if not obj_transform_node:
-                    obj_transform_node = container.createNode(
-                        "xform", node_name=f"{obj_name}_xform"
-                    )
-                    # Connect transform node to object node
-                    obj_transform_node.setInput(0, obj)
-
-                self._set_transformation_by_matrix(
-                    obj_transform_node,
-                    transform_matrix
-                )
 
     def _set_transformation_by_matrix(self, node, matrix):
         """Set the transformation of a node based on a 4x4
@@ -245,17 +251,8 @@ class LayoutLoader(plugin.HoudiniLoader):
             matrix (list): 4x4 transformation matrix as a flat
                 list of 16 floats.
         """
-        hou_matrix = hou.Matrix4(matrix)
-        if isinstance(node, hou.SopNode):
-            tx, ty, tz = hou_matrix.extractTranslates()
-            rx, ry, rz = hou_matrix.extractRotates()
-            sx, sy, sz = hou_matrix.extractScales()
-
-            node.parmTuple("t").set((tx, ty, tz))
-            node.parmTuple("r").set((rx, ry, rz))
-            node.parmTuple("s").set((sx, sy, sz))
-        else:
-            node.setParmTransform(hou_matrix)
+        hou_matrix = unreal_matrix_to_houdini(matrix)
+        node.setParmTransform(hou_matrix)
 
     def load(self, context, name=None, namespace=None, data=None):
         obj = hou.node("/obj")

@@ -283,8 +283,7 @@ def containerise(name,
 
     # "Parent" the container under the container network
     container = hou.moveNodesTo([container], subnet)[0]
-
-    subnet.node(container_name).moveToGoodPosition()
+    container.moveToGoodPosition()
 
     return container
 
