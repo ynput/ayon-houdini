@@ -13,7 +13,8 @@ class AssLoader(plugin.HoudiniLoader):
     product_base_types = {"ass"}
     product_types = product_base_types
     label = "Load Arnold Procedural"
-    representations = {"ass"}
+    representations = {"*"}
+    extensions = {"ass"}
     order = -10
     icon = "code-fork"
     color = "orange"

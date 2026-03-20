@@ -16,7 +16,8 @@ class SetFrameRangeLoader(plugin.HoudiniLoader):
         "usd",
     }
     product_types = product_base_types
-    representations = {"abc", "vdb", "usd"}
+    representations = {"*"}
+    extensions = {"abc", "vdb", "usd", "usda", "usdc", "usdlc", "usdnc"}
 
     label = "Set frame range"
     order = 11
@@ -54,7 +55,8 @@ class SetFrameRangeWithHandlesLoader(plugin.HoudiniLoader):
         "usd",
     }
     product_types = product_base_types
-    representations = {"abc", "vdb", "usd"}
+    representations = {"*"}
+    extensions = {"abc", "vdb", "usd", "usda", "usdc", "usdlc", "usdnc"}
 
     label = "Set frame range (with handles)"
     order = 12

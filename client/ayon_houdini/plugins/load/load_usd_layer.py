@@ -18,7 +18,8 @@ class USDSublayerLoader(plugin.HoudiniLoader):
     }
     product_types = product_base_types
     label = "Sublayer USD"
-    representations = {"usd", "usda", "usdlc", "usdnc", "abc"}
+    representations = {"*"}
+    extensions = {"usd", "usda", "usdlc", "usdnc", "abc"}
     order = 1
 
     icon = "code-fork"
