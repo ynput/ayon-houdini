@@ -29,7 +29,7 @@ def get_image_ayon_container():
 class ImageLoader(plugin.HoudiniLoader):
     """Load images into COP2"""
 
-    product_types = {
+    product_base_types = {
         "imagesequence",
         "review",
         "render",
@@ -37,6 +37,7 @@ class ImageLoader(plugin.HoudiniLoader):
         "image",
         "online",
     }
+    product_types = product_base_types
     label = "Load Image (COP2)"
     representations = {"*"}
     order = -9
