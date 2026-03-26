@@ -54,7 +54,7 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
             camera_node = camera_path_parm.evalAsNode()
             path = camera_path_parm.evalAsString()
             if not camera_node:
-                return "Camera path does not exist test: '{}'".format(path)
+                return "Camera path does not exist: '{}'".format(path)
             type_name = camera_node.type().name()
             if type_name not in {"cam", "lopimportcam"}:
                 return "Camera path is not a camera: '{}' (type: {})".format(
