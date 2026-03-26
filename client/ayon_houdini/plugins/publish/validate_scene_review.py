@@ -47,16 +47,29 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
             return "Scene path does not exist: '{}'".format(path)
 
     def get_invalid_camera_path(self, rop_node):
-        camera_path_parm = rop_node.parm("camera")
-        camera_node = camera_path_parm.evalAsNode()
-        path = camera_path_parm.evalAsString()
-        if not camera_node:
-            return "Camera path does not exist: '{}'".format(path)
-        type_name = camera_node.type().name()
-        if type_name not in {"cam", "lopimportcam"}:
-            return "Camera path is not a camera: '{}' (type: {})".format(
-                path, type_name
-            )
+        opsource = rop_node.parm("opsource").eval()
+
+        if opsource != 1:
+            camera_path_parm = rop_node.parm("camera")
+            camera_node = camera_path_parm.evalAsNode()
+            path = camera_path_parm.evalAsString()
+            if not camera_node:
+                return "Camera path does not exist test: '{}'".format(path)
+            type_name = camera_node.type().name()
+            if type_name not in {"cam", "lopimportcam"}:
+                return "Camera path is not a camera: '{}' (type: {})".format(
+                    path, type_name
+                )
+        else:
+            lop_path = rop_node.parm("loppath").evalAsString()
+            camera_path_parm = rop_node.parm("cameraprim")
+
+            stage = hou.node(lop_path).stage()
+
+            if not stage.GetPrimAtPath(camera_path_parm.evalAsString()):
+                return "Camera prim does not exist: '{}'".format(
+                    camera_path_parm.evalAsString()
+                )
 
     def get_invalid_resolution(self, rop_node):
 
