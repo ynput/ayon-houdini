@@ -49,7 +49,8 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
     def get_invalid_camera_path(self, rop_node):
         opsource = rop_node.parm("opsource").eval()
 
-        if opsource != 1:
+        if opsource == 0:
+            # Object-level
             camera_path_parm = rop_node.parm("camera")
             camera_node = camera_path_parm.evalAsNode()
             path = camera_path_parm.evalAsString()
@@ -60,7 +61,8 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
                 return "Camera path is not a camera: '{}' (type: {})".format(
                     path, type_name
                 )
-        else:
+        elif opsource == 1:
+            # LOP-level
             lop_path = rop_node.parm("loppath").evalAsString()
             camera_path_parm = rop_node.parm("cameraprim")
 
@@ -70,6 +72,8 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
                 return "Camera prim does not exist: '{}'".format(
                     camera_path_parm.evalAsString()
                 )
+        else:
+            return "Unsupported camera source type: {}".format(opsource)
 
     def get_invalid_resolution(self, rop_node):
 
