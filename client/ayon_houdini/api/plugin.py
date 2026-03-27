@@ -177,12 +177,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
     settings_name = None
     add_publish_button = False
     default_staging_dir = "$HIP/ayon"
-selected_nodes = []
-settings_name = None
-add_publish_button = False
-default_staging_dir = "$HIP/ayon"    
-enable_staging_path_management = True
-skip_discovery = True
+    enable_staging_path_management = True
+    skip_discovery = True
 
 
     settings_category = SETTINGS_CATEGORY
