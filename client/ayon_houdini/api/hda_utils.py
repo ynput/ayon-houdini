@@ -1,4 +1,4 @@
-"""Heper functions for load HDA"""
+"""Helper functions for load HDA"""
 
 from __future__ import annotations
 import os
