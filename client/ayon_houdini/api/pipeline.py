@@ -283,8 +283,7 @@ def containerise(name,
 
     # "Parent" the container under the container network
     container = hou.moveNodesTo([container], subnet)[0]
-
-    subnet.node(container_name).moveToGoodPosition()
+    container.moveToGoodPosition()
 
     return container
 
@@ -365,6 +364,9 @@ def before_save():
 
 
 def on_save():
+    if not hou.isUIAvailable():
+        log.debug("Batch mode detected, ignoring `on_save` callbacks..")
+        return
 
     log.info("Running callback on save..")
 

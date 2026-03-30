@@ -153,7 +153,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
 
         Applies Houdini specific logic to skeleton data.
         Args:
-            instance (pyblish.api.Instance): The publish instance.
+            instance (pyblish.api.Instance): The instance to publish.
             instance_skeleton_data (dict): data to modify.
         """
 
