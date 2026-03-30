@@ -151,3 +151,27 @@ class CreateRig(CreateBGEO):
 
     def set_trange(self, node):
         pass
+
+
+class CreateAnim(CreateBGEO):
+    """APEX Animation (bgeo) creator."""
+    identifier = "io.ayon.creators.houdini.bgeo.anim"
+    label = "APEX Animation"
+    product_type = "animation"
+    product_base_type = "animation"
+    icon = "male"
+
+    description = "APEX Animation data exported as BGEO file"
+
+    # Default render target
+    render_target = "local"
+
+    def get_detail_description(self):
+        return inspect.cleandoc(
+            """Write a BGEO output file as `animation` product type. This can
+             be used to publish APEX animations which are in essence just
+             SOP-level data representing APEX animation data."""
+        )
+
+    def get_publish_families(self):
+        return ["anim", "apex", "bgeo", "publish.hou"]
