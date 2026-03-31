@@ -47,6 +47,9 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
             return "Scene path does not exist: '{}'".format(path)
 
     def get_invalid_camera_path(self, rop_node):
+
+        import pxr
+
         opsource = rop_node.parm("opsource").eval()
 
         if opsource == 0:
@@ -64,14 +67,17 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
         elif opsource == 1:
             # LOP-level
             lop_path = rop_node.parm("loppath").evalAsString()
-            camera_path_parm = rop_node.parm("cameraprim")
+            camera_path = rop_node.parm("cameraprim").evalAsString()
 
             stage = hou.node(lop_path).stage()
+            camera_prim = stage.GetPrimAtPath(camera_path)
 
-            if not stage.GetPrimAtPath(camera_path_parm.evalAsString()):
-                return "Camera prim does not exist: '{}'".format(
-                    camera_path_parm.evalAsString()
-                )
+            if not camera_prim or not camera_prim.IsValid():
+                return f"Camera prim path does not exist: '{camera_path}'"
+            
+            if not camera_prim.IsA(pxr.UsdGeom.Camera):
+                return f"Camera path '{camera_path}' is not a camera."
+
         else:
             return "Unsupported camera source type: {}".format(opsource)
 
