@@ -64,7 +64,7 @@ class CollectFilesForCleaningUpModel(BaseSettingsModel):
     families: list[str] = SettingsField(
         default_factory=list,
         enum_resolver=product_types_enum,
-        conditionalEnum=True,
+        conditional_enum=True,
         title="Product Types"
     )
 
@@ -157,6 +157,9 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateMeshIsStatic: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Mesh is Static")
+    ValidateSingleFrame: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate Single Frame")
     ValidateReviewColorspace: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Review Colorspace")
@@ -233,6 +236,11 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     "ValidateMeshIsStatic": {
         "enabled": True,
         "optional": True,
+        "active": True
+    },
+    "ValidateSingleFrame": {
+        "enabled": True,
+        "optional": False,
         "active": True
     },
     "ValidateReviewColorspace": {

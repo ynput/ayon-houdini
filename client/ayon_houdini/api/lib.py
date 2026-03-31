@@ -13,7 +13,7 @@ import ayon_api
 
 import hou
 
-from ayon_core.lib import StringTemplate
+from ayon_core.lib import StringTemplate, get_version_from_path
 from ayon_core.settings import get_current_project_settings
 from ayon_core.pipeline import (
     Anatomy,
@@ -66,19 +66,19 @@ def get_output_parameter(node):
             future development.
 
     Args:
-        node(hou.Node): node instance
+        node (hou.Node): node instance
 
     Returns:
         hou.Parm
     """
 
-    node_type = node.type().name()
+    node_type: str = node.type().name()
 
     # Figure out which type of node is being rendered
     if node_type in {"alembic", "rop_alembic"}:
         return node.parm("filename")
     elif node_type == "arnold":
-        if node_type.evalParm("ar_ass_export_enable"):
+        if node.evalParm("ar_ass_export_enable"):
             return node.parm("ar_ass_file")
         return node.parm("ar_picture")
     elif node_type in {
@@ -89,6 +89,9 @@ def get_output_parameter(node):
     }:
         return node.parm("sopoutput")
     elif node_type == "comp":
+        return node.parm("copoutput")
+    elif node_type in {"image", "image_rop"}:
+        # Copernicus
         return node.parm("copoutput")
     elif node_type == "fetch":
         fetched_node = hou.node(node.parm("source").eval())
@@ -109,6 +112,8 @@ def get_output_parameter(node):
         return node.parm("outputimage")
     elif node_type == "vray_renderer":
         return node.parm("SettingsOutput_img_file_path")
+    elif node_type == "PRT_ROPDriver":
+        return node.parm("file")
 
     raise TypeError("Node type '%s' not supported" % node_type)
 
@@ -295,7 +300,7 @@ def render_rop(ropnode, frame_range=None):
         raise RuntimeError("Render failed: {0}".format(exc))
 
 
-def imprint(node, data, update=False):
+def imprint(node, data, update=False, folder="Extra", prefix=""):
     """Store attributes with value on a node
 
     Depending on the type of attribute it creates the correct parameter
@@ -315,6 +320,11 @@ def imprint(node, data, update=False):
         update (bool, optional): flag if imprint should update
             already existing data or leave them untouched and only
             add new.
+        folder (str, optional): The folder name to add new parms into.
+            Defaults to "Extra" due to legacy reasons.
+        prefix (str, optional): A prefix to add to the data to ensure
+            uniqueness. This prefix is added to the attribute name, but
+            not to the attribute labels.
 
     Returns:
         None
@@ -330,11 +340,12 @@ def imprint(node, data, update=False):
     update_parm_templates = []
     new_parm_templates = []
 
-    for key, value in data.items():
+    for label, value in data.items():
         if value is None:
             continue
 
-        parm_template = get_template_from_value(key, value)
+        key = prefix + label
+        parm_template = get_template_from_value(key, value, label=label)
 
         if key in current_parms:
             if node.evalParm(key) == value:
@@ -355,12 +366,12 @@ def imprint(node, data, update=False):
 
     # Add new parm templates
     if new_parm_templates:
-        parm_folder = parm_group.findFolder("Extra")
+        parm_folder = parm_group.findFolder(folder)
 
         # if folder doesn't exist yet, create one and append to it,
         # else append to existing one
         if not parm_folder:
-            parm_folder = hou.FolderParmTemplate("folder", "Extra")
+            parm_folder = hou.FolderParmTemplate("folder", folder)
             parm_folder.setParmTemplates(new_parm_templates)
             parm_group.append(parm_folder)
         else:
@@ -384,7 +395,7 @@ def imprint(node, data, update=False):
     node.setParmTemplateGroup(parm_group)
 
 
-def lsattr(attr, value=None, root="/"):
+def lsattr(attr, value=None, root="/", recurse_in_locked_nodes=True):
     """Return nodes that have `attr`
      When `value` is not None it will only return nodes matching that value
      for the given attribute.
@@ -393,6 +404,9 @@ def lsattr(attr, value=None, root="/"):
          value (object, Optional): The value to compare the attribute too.
             When the default None is provided the value check is skipped.
         root (str): The root path in Houdini to search in.
+        recurse_in_locked_nodes (bool): If True, the function will recurse
+            inside locked child nodes and include children of the locked
+            child nodes in the returned tuple.
     Returns:
         list: Matching nodes that have attribute with value.
     """
@@ -400,7 +414,9 @@ def lsattr(attr, value=None, root="/"):
         # Use allSubChildren() as allNodes() errors on nodes without
         # permission to enter without a means to continue of querying
         # the rest
-        nodes = hou.node(root).allSubChildren()
+        nodes = hou.node(root).allSubChildren(
+            recurse_in_locked_nodes=recurse_in_locked_nodes
+        )
         return [n for n in nodes if n.parm(attr)]
     return lsattrs({attr: value})
 
@@ -548,29 +564,32 @@ def get_main_window():
     return self._parent
 
 
-def get_template_from_value(key, value):
+def get_template_from_value(key, value, label=None):
+    if label is None:
+        label = key
+
     if isinstance(value, float):
         parm = hou.FloatParmTemplate(name=key,
-                                     label=key,
+                                     label=label,
                                      num_components=1,
                                      default_value=(value,))
     elif isinstance(value, bool):
         parm = hou.ToggleParmTemplate(name=key,
-                                      label=key,
+                                      label=label,
                                       default_value=value)
     elif isinstance(value, int):
         parm = hou.IntParmTemplate(name=key,
-                                   label=key,
+                                   label=label,
                                    num_components=1,
                                    default_value=(value,))
     elif isinstance(value, str):
         parm = hou.StringParmTemplate(name=key,
-                                      label=key,
+                                      label=label,
                                       num_components=1,
                                       default_value=(value,))
     elif isinstance(value, (dict, list, tuple)):
         parm = hou.StringParmTemplate(name=key,
-                                      label=key,
+                                      label=label,
                                       num_components=1,
                                       default_value=(
                                           JSON_PREFIX + json.dumps(value),))
@@ -897,6 +916,23 @@ def get_current_context_template_data_with_entity_attrs():
     template_data["folderAttributes"] = folder_attributes
     template_data["taskAttributes"] = task_attributes
 
+    # Add 'version' key with the current workfile version.
+    # We do not use `registered_host().get_current_workfile()` here because
+    # this method may be called `on_new()` during integration installation
+    # where the host itself is not yet registered.
+    filepath = hou.hipFile.path()
+    if (
+            os.path.basename(filepath) == "untitled.hip"
+            and not os.path.exists(filepath)
+    ):
+        filepath = None
+    version: int = 0
+    if filepath:
+        version_str = get_version_from_path(filepath)
+        if version_str:
+            version = int(version_str)
+    template_data["workfile_version"] = version
+
     return template_data
 
 
@@ -1008,8 +1044,8 @@ def update_houdini_vars_context():
             except OSError as e:
                 if e.errno != errno.EEXIST:
                     print(
-                        "Failed to create ${} dir. Maybe due to "
-                        "insufficient permissions.".format(var)
+                        f"Failed to create ${var} dir at '{new}'. "
+                        "Maybe due to insufficient permissions."
                     )
 
         hou.hscript("set {}={}".format(var, new))
@@ -1415,11 +1451,11 @@ def find_active_network(category, default):
 
     Arguments:
         category (hou.NodeTypeCategory): The node network category type.
-        default (str): The default path to fallback to if no active pane
-            is found with the given category, e.g. "/obj"
+        default (Optional[str]): The default path to fallback to if no active
+            pane is found with the given category, e.g. "/obj"
 
     Returns:
-        hou.Node: The node network to return.
+        Optional[hou.Node]: The node network to return.
 
     """
     # Find network editors that are current tab of given category
@@ -1434,7 +1470,7 @@ def find_active_network(category, default):
             continue
 
         pwd = pane.pwd()
-        if pwd.type().category() != category:
+        if pwd.childTypeCategory() != category:
             continue
 
         if not pwd.isEditable():
@@ -1443,7 +1479,9 @@ def find_active_network(category, default):
         return pwd
 
     # Default to the fallback if no valid candidate was found
-    return hou.node(default)
+    if default is not None:
+        return hou.node(default)
+    return None
 
 
 def update_content_on_context_change():
@@ -1631,3 +1669,108 @@ def format_as_collections(
     result = [collection.format(pattern) for collection in collections]
     result.extend(remainder)
     return result
+
+
+def save_slapcomp_to_file(
+        slapcomp_out: hou.CopNode,
+        filepath: str
+):
+    """Save slapcomp to file
+
+    Args:
+    slapcomp_out (hou.CopNode): A Block to Geometry Copernicus node
+        to export as geometry.
+    filepath (str): where to save the slapcomp. It can be
+        a relative or absolute path.
+    """
+
+    sopnet = slapcomp_out.parent().createNode("sopnet")
+    copnet = sopnet.createNode("copnet")
+    blocktogeo = copnet.createNode("blocktogeo")
+    blocktogeo.parm("blockpath").set(slapcomp_out.path())
+
+    # Create the destination folder as `saveToFile`
+    # doesn't create missing intermediate directories.
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            print(
+                f"Failed to create {os.path.dirname(filepath)}"
+                " dir. Maybe due to insufficient permissions."
+            )
+        raise
+
+    copnet.geometry().saveToFile(filepath)
+
+    # Clean up.
+    sopnet.destroy()
+
+
+def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
+    r"""Expand Houdini String with More Control
+
+    It applies the `hou.text.expandString` function selectively.
+    Sometimes, we need to expand only Houdini variables like `$HIP`.
+    Other times, we want to expand only Houdini expressions,
+        such as `chs('AYON_productName')`.
+
+    Example Patterns:
+        \$[a-zA-Z0-9_]+  ➜ Any sub string that starts by a $ sign
+            followed by letters, numbders and underscores.
+        `[^`]+`  ➜ Any substring enclosed backticks.
+
+    Example:
+        >>> expand_houdini_string(
+                "~/documents/ayon/`chs('AYON_productName')`",
+                pattern=r"\$[a-zA-Z0-9_]+"
+            )
+        "~/documents/ayon/`chs('AYON_productName')`"
+        >>> expand_houdini_string(
+                "./ayon/`chs('AYON_productName')`",
+                pattern=r"\$[a-zA-Z0-9_]+"
+            )
+        "./ayon/`chs('AYON_productName')`"
+        >>> expand_houdini_string(
+                "$HIP/ayon/`chs('AYON_productName')`",
+                pattern=r"\$[a-zA-Z0-9_]+"
+            )
+        "H:/AYON/projects/AY_CG_demo/assets/characters/sloth/work/FX/ayon/`chs('AYON_productName')`"
+        >>> expand_houdini_string(
+                "$HIP/ayon/`chs('AYON_productName')`",
+                pattern= r"`[^`]+`"
+            )  # Used for HDA product.
+        "$HIP/ayon/"
+
+    Args:
+        text(str): text to expand.
+        pattern(str): regex pattern to apply.
+
+    Returns:
+        str: expanded text.
+    """
+
+    def expand_match(match):
+        matched_string  = match.group(0)
+        return hou.text.expandString(matched_string)
+
+    return re.sub(pattern, expand_match, text)
+
+
+def disconnect_connection(connection: hou.NodeConnection):
+    """Disconnect a connection."""
+    connection.outputNode().setInput(
+        connection.inputIndex(),
+        None
+    )
+
+
+def disconnect_node(node: hou.Node, inputs: bool=True, outputs: bool=True):
+    """Disconnect all input and output connections on given node."""
+    # Remove in reverse so indices do not shift along the way
+    if inputs:
+        for conn in reversed(node.inputConnections()):
+            disconnect_connection(conn)
+    if outputs:
+        for conn in reversed(node.outputConnections()):
+            disconnect_connection(conn)

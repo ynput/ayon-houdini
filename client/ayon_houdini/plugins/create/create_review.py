@@ -8,11 +8,13 @@ import hou
 
 
 class CreateReview(plugin.HoudiniCreator):
-    """Review with OpenGL ROP"""
+    """Review with OpenGL or Flipbook ROP"""
 
     identifier = "io.openpype.creators.houdini.review"
     label = "Review"
     product_type = "review"
+    product_base_type = "review"
+    description = __doc__
     icon = "video-camera"
     review_color_space = ""
     node_type = "opengl"
@@ -24,7 +26,7 @@ class CreateReview(plugin.HoudiniCreator):
     # such as `rop.flipbook` for flipbook nodes
     # and `rop.opengl` for OpenGL nodes.
     def get_publish_families(self):
-        return ["review", "rop.opengl"]
+        return ["review", "rop.opengl", "publish.hou"]
 
     def apply_settings(self, project_settings):
         super(CreateReview, self).apply_settings(project_settings)
@@ -54,16 +56,7 @@ class CreateReview(plugin.HoudiniCreator):
 
         frame_range = hou.playbar.frameRange()
 
-        filepath = "{root}/{product_name}/{product_name}.$F4.{ext}".format(
-            root=hou.text.expandString("$HIP/pyblish"),
-            # keep dynamic link to product name
-            product_name="`chs(\"AYON_productName\")`",
-            ext=pre_create_data.get("imageFormat") or "png"
-        )
-
         parms = {
-            "picture": filepath,
-
             "trange": 1,
 
             # Unlike many other ROP nodes the opengl node does not default
@@ -123,9 +116,15 @@ class CreateReview(plugin.HoudiniCreator):
                                        self.review_color_space,
                                        self.log)
 
-        to_lock = ["id", "productType"]
+        to_lock = ["id", "productBaseType", "productType"]
 
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("picture").set(
+            f"{staging_dir}/$OS.$F4.{pre_create_data['imageFormat']}"
+        )
 
     def get_instance_attr_defs(self):
         render_target_items = {

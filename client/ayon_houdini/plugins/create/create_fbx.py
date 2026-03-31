@@ -10,16 +10,18 @@ class CreateFBX(plugin.HoudiniCreator):
     """Model as FBX."""
 
     identifier = "io.ayon.creators.houdini.model.fbx"
-    label = "model (FBX)"
+    label = "Model (FBX)"
     product_type = "model"
+    product_base_type = "model"
     icon = "cube"
     default_variants = ["Main"]
+    description = "Create a static model as FBX file"
 
     # Default render target
     render_target = "local"
 
     def get_publish_families(self):
-        return ["fbx", "model"]
+        return ["fbx", "model", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
 
@@ -37,13 +39,8 @@ class CreateFBX(plugin.HoudiniCreator):
         instance_node = hou.node(instance.get("instance_node"))
 
         # prepare parms
-        output_path = hou.text.expandString(
-            "$HIP/pyblish/{}.fbx".format(product_name)
-        )
-
         parms = {
             "startnode": self.get_selection(),
-            "sopoutput": output_path,
             # vertex cache format
             "vcformat": pre_create_data.get("vcformat"),
             "convertunits": pre_create_data.get("convertunits"),
@@ -57,8 +54,12 @@ class CreateFBX(plugin.HoudiniCreator):
         instance_node.setParms(parms)
 
         # Lock any parameters in this list
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("sopoutput").set(f"{staging_dir}/$OS.fbx")
 
     def get_network_categories(self):
         return [
@@ -121,30 +122,6 @@ class CreateFBX(plugin.HoudiniCreator):
             format_ascii,
         ] + self.get_instance_attr_defs()
 
-    def get_dynamic_data(
-        self,
-        project_name,
-        folder_entity,
-        task_entity,
-        variant,
-        host_name,
-        instance
-    ):
-        """
-        The default product name templates for Unreal include {asset} and thus
-        we should pass that along as dynamic data.
-        """
-        dynamic_data = super().get_dynamic_data(
-            project_name,
-            folder_entity,
-            task_entity,
-            variant,
-            host_name,
-            instance
-        )
-        dynamic_data["asset"] = folder_entity["name"]
-        return dynamic_data
-
     def get_selection(self):
         """Selection Logic.
 
@@ -190,13 +167,15 @@ class CreateFBX(plugin.HoudiniCreator):
 
 
 class CreateStaticMesh(CreateFBX):
-    """Static Meshes as FBX."""
+    """Create static meshes as FBX, usually used for Unreal Engine"""
 
     identifier = "io.openpype.creators.houdini.staticmesh.fbx"
     label = "Static Mesh (FBX)"
     product_type = "staticMesh"
+    product_base_type = "staticMesh"
     icon = "cube"
+    description = __doc__
 
     def get_publish_families(self):
-        return ["fbx", "staticMesh"]
+        return ["fbx", "staticMesh", "publish.hou"]
 

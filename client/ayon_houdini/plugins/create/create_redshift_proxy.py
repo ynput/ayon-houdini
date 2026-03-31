@@ -10,10 +10,15 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.redshiftproxy"
     label = "Redshift Proxy"
     product_type = "redshiftproxy"
+    product_base_type = "redshiftproxy"
     icon = "magic"
+    description = "Export Redshift Proxy (.rs)"
 
     # Default render target
     render_target = "local"
+
+    def get_publish_families(self):
+        return ["redshiftproxy", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
 
@@ -36,9 +41,7 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        parms = {
-            "RS_archive_file": '$HIP/pyblish/{}.$F4.rs'.format(product_name),
-        }
+        parms = {}
 
         if self.selected_nodes:
             parms["RS_archive_sopPath"] = self.selected_nodes[0].path()
@@ -46,8 +49,17 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
         instance_node.setParms(parms)
 
         # Lock some AYON attributes
-        to_lock = ["productType", "id", "prim_to_detail_pattern"]
+        to_lock = [
+            "productType",
+            "productBaseType",
+            "id",
+            "prim_to_detail_pattern"
+        ]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("RS_archive_file").set(f"{staging_dir}/$OS.$F4.rs")
 
     def get_network_categories(self):
         return [

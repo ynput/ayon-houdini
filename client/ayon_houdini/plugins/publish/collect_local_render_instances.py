@@ -1,10 +1,10 @@
 import os
-import warnings
 import pyblish.api
+
+from ayon_core.lib import is_func_signature_supported
 from ayon_core.pipeline.farm.patterning import match_aov_pattern
 from ayon_core.pipeline.farm.pyblish_functions import (
     get_product_name_and_group_from_template,
-    _get_legacy_product_name_and_group
 )
 from ayon_core.pipeline.publish import (
     get_plugin_settings,
@@ -12,7 +12,12 @@ from ayon_core.pipeline.publish import (
     ColormanagedPyblishPluginMixin
 )
 from ayon_houdini.api import plugin
-from ayon_houdini.api.colorspace import get_scene_linear_colorspace
+try:
+    from ayon_core.pipeline.farm.pyblish_functions import (
+        _get_legacy_product_name_and_group,
+    )
+except ImportError:
+    _get_legacy_product_name_and_group = None
 
 
 class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
@@ -22,8 +27,8 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
     Agnostic Local Render Collector.
     """
 
-    # this plugin runs after Collect Render Products
-    order = pyblish.api.CollectorOrder + 0.12
+    # this plugin runs after Collect Render Colorspace
+    order = pyblish.api.CollectorOrder + 0.151
     families = ["mantra_rop",
                 "karma_rop",
                 "redshift_rop",
@@ -84,7 +89,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         context = instance.context
         expected_files = next(iter(instance.data["expectedFiles"]), {})
 
-        product_type = "render"  # is always render
+        product_base_type = "render"  # is always render
 
         # NOTE: The assumption that the output image's colorspace is the
         #   scene linear role may be incorrect. Certain renderers, like
@@ -93,7 +98,6 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         #   would need to be detected in a renderer-specific way and the
         #   majority of production scenarios these would not be overridden.
         # TODO: Support renderer-specific explicit colorspace overrides
-        colorspace = get_scene_linear_colorspace()
 
         for aov_name, aov_filepaths in expected_files.items():
             dynamic_data = {}
@@ -105,7 +109,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
 
             product_name, product_group = self._get_product_name_and_group(
                 instance,
-                product_type,
+                product_base_type,
                 dynamic_data
             )
 
@@ -146,10 +150,26 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 "frameEnd": instance.data["frameEndHandle"]
             }
 
+            # Transfer the instance colorspace information too, because these
+            # may represent scene display/view, etc.
+            for key in (
+                "colorspaceConfig",
+                "colorspace",
+                "colorspaceDisplay",
+                "colorspaceView",
+            ):
+                if key in instance.data:
+                    value: str = instance.data[key]
+                    self.log.debug(f"Transfering '{key}': {value}")
+                    aov_instance.data[key] = value
+
             # Set the colorspace for the representation
-            self.set_representation_colorspace(representation,
-                                               context,
-                                               colorspace=colorspace)
+            if "colorspace" in instance.data:
+                self.set_representation_colorspace(
+                    representation,
+                    context,
+                    colorspace=instance.data["colorspace"],
+                )
 
             aov_instance.data.update({
                 # 'label': label,
@@ -157,8 +177,9 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
                 "folderPath": instance.data["folderPath"],
                 "frameStartHandle": instance.data["frameStartHandle"],
                 "frameEndHandle": instance.data["frameEndHandle"],
-                "productType": product_type,
-                "family": product_type,
+                "productType": product_base_type,
+                "productBaseType": product_base_type,
+                "family": product_base_type,
                 "productName": product_name,
                 "productGroup": product_group,
                 "families": ["render.local.hou", "review"],
@@ -176,53 +197,54 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         instance.data["integrate"] = False
 
     def _get_product_name_and_group(
-        self, instance, product_type, dynamic_data
+        self, instance, product_base_type, dynamic_data
     ):
         """Get product name and group
 
-        This method matches the logic in farm that gets
-         `product_name` and `group_name` respecting
-         `use_legacy_product_names_for_renders` logic in core settings.
-
         Args:
             instance (pyblish.api.Instance): The instance to publish.
-            product_type (str): Product type.
+            product_base_type (str): Product base type.
             dynamic_data (dict): Dynamic data (camera, aov, ...)
 
         Returns:
             tuple (str, str): product name and group name
 
         """
-        project_settings = instance.context.data.get("project_settings")
-
-        use_legacy_product_name = True
-        try:
-            use_legacy_product_name = (
-                project_settings
-                ["core"]
-                ["tools"]
-                ["creator"]
-                ["use_legacy_product_names_for_renders"]
-            )
-        except KeyError:
-            warnings.warn(
-                ("use_legacy_for_renders not found in project settings. "
-                 "Using legacy product name for renders. Please update "
-                 "your ayon-core version."), DeprecationWarning)
+        use_legacy_product_name = False
+        if _get_legacy_product_name_and_group is not None:
+            project_settings = instance.context.data["project_settings"]
+            try:
+                use_legacy_product_name = (
+                    project_settings
+                    ["core"]
+                    ["tools"]
+                    ["creator"]
+                    ["use_legacy_product_names_for_renders"]
+                )
+            except KeyError:
+                pass
 
         if use_legacy_product_name:
             return _get_legacy_product_name_and_group(
-                product_type=product_type,
-                source_product_name=instance.data["productName"],
-                task_name=instance.data["task"],
-                dynamic_data=dynamic_data
+                product_base_type,
+                instance.data["productName"],
+                instance.context.data["taskEntity"]["name"],
+                dynamic_data
             )
 
-        return get_product_name_and_group_from_template(
+        kwargs = dict(
             project_name=instance.context.data["projectName"],
+            folder_entity=instance.context.data["folderEntity"],
             task_entity=instance.context.data["taskEntity"],
             host_name=instance.context.data["hostName"],
-            product_type=product_type,
+            product_base_type=product_base_type,
+            product_type=product_base_type,
             variant=instance.data["variant"],
-            dynamic_data=dynamic_data
+            dynamic_data=dynamic_data,
         )
+        if not is_func_signature_supported(
+            get_product_name_and_group_from_template, **kwargs
+        ):
+            kwargs["product_type"] = kwargs.pop("product_base_type")
+            kwargs.pop("folder_entity")
+        return get_product_name_and_group_from_template(**kwargs)

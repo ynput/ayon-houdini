@@ -5,20 +5,28 @@ from ayon_core.lib import EnumDef
 
 
 class CreateArnoldAss(plugin.HoudiniCreator):
-    """Arnold .ass Archive"""
+    """Export Arnold .ass archive"""
 
     identifier = "io.openpype.creators.houdini.ass"
     label = "Arnold ASS"
     product_type = "ass"
+    product_base_type = "ass"
     icon = "magic"
+    description = __doc__
 
     # Default extension: `.ass` or `.ass.gz`
     # however calling HoudiniCreator.create()
     # will override it by the value in the project settings
     ext = ".ass"
 
+    # If true the rop will be shown in the RenderView rop dropdown
+    show_in_viewport_menu = False
+
     # Default render target
     render_target = "local"
+
+    def get_publish_families(self):
+        return ["ass", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
         import hou
@@ -41,23 +49,28 @@ class CreateArnoldAss(plugin.HoudiniCreator):
         parm_template_group.hideFolder("Properties", True)
         instance_node.setParmTemplateGroup(parm_template_group)
 
-        filepath = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4{}".format(product_name, self.ext)
-        )
         parms = {
             # Render frame range
             "trange": 1,
             # Arnold ROP settings
-            "ar_ass_file": filepath,
-            "ar_ass_export_enable": 1
+            "ar_ass_export_enable": 1,
+            "soho_viewport_menu": self.show_in_viewport_menu,
         }
 
         instance_node.setParms(parms)
 
         # Lock any parameters in this list
-        to_lock = ["ar_ass_export_enable", "productType", "id"]
+        to_lock = [
+            "ar_ass_export_enable",
+            "productBaseType",
+            "productType",
+            "id"
+        ]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("ar_ass_file").set(f"{staging_dir}/$OS.$F4{self.ext}")
 
     def get_instance_attr_defs(self):
         render_target_items = {

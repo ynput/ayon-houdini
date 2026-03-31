@@ -63,6 +63,4 @@ def get_default_display_view_colorspace() -> str:
         display=prefs["display"],
         view=prefs["view"]
     )
-    if colorspace == "<USE_DISPLAY_NAME>":
-        colorspace = prefs["display"]
     return colorspace

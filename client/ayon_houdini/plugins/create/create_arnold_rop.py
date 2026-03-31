@@ -8,7 +8,9 @@ class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
     identifier = "io.openpype.creators.houdini.arnold_rop"
     label = "Arnold ROP"
     legacy_product_type = "arnold_rop"
+    product_base_type = "render"
     icon = "magic"
+    description =  "Create Arnold ROP for rendering with Arnold"
 
     # Default extension
     ext = "exr"
@@ -35,33 +37,32 @@ class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        ext = pre_create_data.get("image_format")
-
-        renders_dir = hou.text.expandString("$HIP/pyblish/renders/")
-        filepath = f"{renders_dir}{product_name}/{product_name}.$F4.{ext}"
         parms = {
             # Render frame range
             "trange": 1,
-
             # Arnold ROP settings
-            "ar_picture": filepath,
             "ar_exr_half_precision": 1           # half precision
         }
 
-        if pre_create_data.get("render_target") == "farm_split":
-            ass_filepath = \
-                "{export_dir}{product_name}/{product_name}.$F4.ass".format(
-                    export_dir=hou.text.expandString("$HIP/pyblish/ass/"),
-                    product_name=product_name,
-                )
+        if pre_create_data.get("render_target") in {
+            "farm_split",
+            "local_export_farm_render",
+        }:
             parms["ar_ass_export_enable"] = 1
-            parms["ar_ass_file"] = ass_filepath
 
         instance_node.setParms(parms)
 
         # Lock any parameters in this list
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            "ar_picture": f"{staging_dir}"
+                          f"/$OS.$F4.{pre_create_data['image_format']}",
+            "ar_ass_file": f"{staging_dir}/ass/$OS.$F4.ass"
+        })
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.
@@ -74,7 +75,8 @@ class CreateArnoldRop(plugin.RenderLegacyProductTypeCreator):
             "local": "Local machine rendering",
             "local_no_render": "Use existing frames (local)",
             "farm": "Farm Rendering",
-            "farm_split": "Farm Rendering - Split export & render jobs",
+            "farm_split": "Farm Export & Farm Rendering",
+            "local_export_farm_render": "Local Export & Farm Rendering",
         }
 
         return [

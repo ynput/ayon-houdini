@@ -26,6 +26,7 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
     identifier = "io.openpype.creators.houdini.usdrender"
     label = "USD Render"
     legacy_product_type = "usdrender"
+    product_base_type = "render"
     icon = "magic"
     description = "Create USD Render"
 
@@ -73,7 +74,10 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
         if self.selected_nodes:
             parms["loppath"] = self.selected_nodes[0].path()
 
-        if pre_create_data.get("render_target") == "farm_split":
+        if pre_create_data.get("render_target") in {
+            "farm_split",
+            "local_export_farm_render",
+        }:
             # Do not trigger the husk render, only trigger the USD export
             parms["runcommand"] = False
             # By default, the render ROP writes out the render file to a
@@ -83,7 +87,7 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
             # folder to our choice. The
             # `__render__.usd` (default name, defined by `lopoutput` parm)
             # in that folder will then be the file to render.
-            parms["savetodirectory_directory"] = "$HIP/render/usd/$HIPNAME/$OS"
+
             parms["lopoutput"] = "__render__.usd"
             parms["allframesatonce"] = True
 
@@ -106,8 +110,12 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
         instance_node.setParms(parms)
 
         # Lock some AYON attributes
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("savetodirectory_directory").set(f"{staging_dir}/usd/$HIPNAME/$OS")
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.
@@ -119,7 +127,8 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
             "local": "Local machine rendering",
             "local_no_render": "Use existing frames (local)",
             "farm": "Farm Rendering",
-            "farm_split": "Farm Rendering - Split export & render jobs",
+            "farm_split": "Farm Export & Farm Rendering",
+            "local_export_farm_render": "Local Export & Farm Rendering",
         }
 
         return [

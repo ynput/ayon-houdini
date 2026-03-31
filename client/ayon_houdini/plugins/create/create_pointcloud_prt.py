@@ -1,15 +1,4 @@
-# -*- coding: utf-8 -*-
-"""Creator plugin for creating Model product type.
-
-Note:
-    Currently, This creator plugin is the same as 'create_pointcache.py'
-    But renaming the product type to 'model'.
-
-    It's purpose to support
-    Maya (load/publish model from maya to/from houdini).
-
-    It's considered to support multiple representations in the future.
-"""
+import inspect
 
 from ayon_houdini.api import plugin
 from ayon_core.lib import EnumDef
@@ -17,41 +6,46 @@ from ayon_core.lib import EnumDef
 import hou
 
 
-class CreateModel(plugin.HoudiniCreator):
-    """Create Model"""
-    identifier = "io.openpype.creators.houdini.model"
-    label = "Model (Abc)"
-    product_type = "model"
-    product_base_type = "model"
-    icon = "cube"
-    description = "Create a static model as Alembic file"
+class CreatePRTPointCloud(plugin.HoudiniCreator):
+    """PRT pointcloud Creator
+
+    Create point cloud instances for publishing with the PRT representation.
+    It requires the PRT_ROPDriver to be installed, which can be found at:
+        https://github.com/flipswitchingmonkey/houdini_PRTROP
+    """
+    identifier = "io.ayon.creators.houdini.pointcloud.prt"
+    label = "PointCloud (PRT)"
+    product_type = "pointcloud"
+    product_base_type = "pointcloud"
+    icon = "cubes"
+    description = "PRT pointcloud creator"
+
+    enabled = False  # configurable in settings
 
     # Default render target
     render_target = "local"
 
+    def get_detail_description(self) -> str:
+        return inspect.cleandoc(self.__doc__)
+
     def get_publish_families(self):
-        return ["model", "abc", "publish.hou"]
+        # The pointcache family is included because all of its validators
+        # also apply to the pointcache family
+        return ["pointcloud", "pointcache", "prt", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
-        instance_data.update({"node_type": "alembic"})
+        instance_data.update({"node_type": "PRT_ROPDriver"})
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
         creator_attributes["render_target"] = pre_create_data["render_target"]
 
-        instance = super(CreateModel, self).create(
+        instance = super().create(
             product_name,
             instance_data,
             pre_create_data)
 
         instance_node = hou.node(instance.get("instance_node"))
-        parms = {
-            "use_sop_path": True,
-            "build_from_path": True,
-            "path_attrib": "path",
-            "prim_to_detail_pattern": "cbId",
-            "format": 2,
-            "facesets": 0,
-        }
+        parms = {}
 
         if self.selected_nodes:
             selected_node = self.selected_nodes[0]
@@ -61,7 +55,7 @@ class CreateModel(plugin.HoudiniCreator):
 
             # Allow sop level paths (e.g. /obj/geo1/box1)
             if isinstance(selected_node, hou.SopNode):
-                parms["sop_path"] = selected_node.path()
+                parms["soppath"] = selected_node.path()
                 self.log.debug(
                    "Valid SopNode selection, 'SOP Path' in ROP"
                    " will be set to '%s'."
@@ -79,14 +73,14 @@ class CreateModel(plugin.HoudiniCreator):
                 sop_path = self.get_obj_output(selected_node)
 
                 if sop_path:
-                    parms["sop_path"] = sop_path.path()
+                    parms["soppath"] = sop_path.path()
                     self.log.debug(
                         "Valid ObjNode selection, 'SOP Path' in ROP"
                         " will be set to the child path '%s'."
                         % sop_path.path()
                     )
 
-            if not parms.get("sop_path", None):
+            if not parms.get("soppath", None):
                 self.log.debug(
                     "Selection isn't valid. 'SOP Path' in ROP will be empty."
                 )
@@ -98,19 +92,13 @@ class CreateModel(plugin.HoudiniCreator):
         instance_node.setParms(parms)
         instance_node.parm("trange").set(1)
 
-        # Explicitly set f1 and f2 to frame start.
-        # Which forces the rop node to export one frame.
-        instance_node.parmTuple('f').deleteAllKeyframes()
-        fstart = int(hou.hscriptExpression("$FSTART"))
-        instance_node.parmTuple('f').set((fstart, fstart, 1))
-
         # Lock any parameters in this list
         to_lock = ["prim_to_detail_pattern"]
         self.lock_parameters(instance_node, to_lock)
 
     def set_node_staging_dir(
             self, node, staging_dir, instance, pre_create_data):
-        node.parm("filename").set(f"{staging_dir}/$OS.abc")
+        node.parm("file").set(f"{staging_dir}/$OS.$F4.prt")
 
     def get_network_categories(self):
         return [

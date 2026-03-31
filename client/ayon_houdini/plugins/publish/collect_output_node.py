@@ -29,7 +29,7 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
 
         # Get sop path
         node_type = node.type().name()
-        if node_type == "geometry":
+        if node_type in {"geometry", "PRT_ROPDriver"}:
             out_node = node.parm("soppath").evalAsNode()
 
         elif node_type == "alembic":

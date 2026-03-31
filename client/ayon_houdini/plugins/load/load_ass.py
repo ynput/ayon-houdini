@@ -1,11 +1,9 @@
-import os
-import re
-
 import hou
 
 from ayon_houdini.api import (
     pipeline,
-    plugin
+    plugin,
+    lib,
 )
 
 
@@ -14,7 +12,8 @@ class AssLoader(plugin.HoudiniLoader):
 
     product_types = {"ass"}
     label = "Load Arnold Procedural"
-    representations = {"ass"}
+    representations = {"*"}
+    extensions = {"ass"}
     order = -10
     icon = "code-fork"
     color = "orange"
@@ -59,27 +58,19 @@ class AssLoader(plugin.HoudiniLoader):
         node = container["node"]
         node.destroy()
 
-    def format_path(self, context):
-        """Format file path correctly for single ass.* or ass.* sequence.
-
-        Args:
-            context (dict): representation context to be loaded.
-
-        Returns:
-             str: Formatted path to be used by the input node.
-
-        """
-        path = self.filepath_from_context(context)
-        # The path is either a single file or sequence in a folder.
-        is_sequence = bool(context["representation"]["context"].get("frame"))
-        if is_sequence:
-            folder, filename = os.path.split(path)
-            filename = re.sub(r"(.*)\.(\d+)\.(ass.*)", "\\1.$F4.\\3", filename)
-            path = os.path.join(folder, filename)
-
-        path = os.path.normpath(path)
-        path = path.replace("\\", "/")
-        return path
-
     def switch(self, container, context):
         self.update(container, context)
+
+    def create_load_placeholder_node(
+        self, node_name: str, placeholder_data: dict
+    ) -> hou.Node:
+        """Define how to create a placeholder node for this loader for the
+        Workfile Template Builder system."""
+        # Create node
+        network = lib.find_active_network(
+            category=hou.sopNodeTypeCategory(),
+            default="/obj"
+        )
+        node = network.createNode("null", node_name=node_name)
+        node.moveToGoodPosition()
+        return node

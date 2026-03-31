@@ -12,13 +12,15 @@ class CreatePointCache(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.pointcache"
     label = "PointCache (Abc)"
     product_type = "pointcache"
-    icon = "gears"
+    product_base_type = "pointcache"
+    icon = "cubes"
+    description = "Create Alembic ROP to export pointcache data"
 
     # Default render target
     render_target = "local"
 
     def get_publish_families(self):
-        return ["pointcache", "abc"]
+        return ["pointcache", "abc", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
         instance_data.update({"node_type": "alembic"})
@@ -38,9 +40,7 @@ class CreatePointCache(plugin.HoudiniCreator):
             "path_attrib": "path",
             "prim_to_detail_pattern": "cbId",
             "format": 2,
-            "facesets": 0,
-            "filename": hou.text.expandString(
-                "$HIP/pyblish/{}.abc".format(product_name))
+            "facesets": 0
         }
 
         if self.selected_nodes:
@@ -91,6 +91,10 @@ class CreatePointCache(plugin.HoudiniCreator):
         # Lock any parameters in this list
         to_lock = ["prim_to_detail_pattern"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("filename").set(f"{staging_dir}/$OS.abc")
 
     def get_network_categories(self):
         return [

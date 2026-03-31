@@ -2,6 +2,7 @@
 """Creator plugin for creating composite sequences."""
 from ayon_houdini.api import plugin
 from ayon_core.pipeline import CreatorError
+from ayon_core.lib import EnumDef
 
 import hou
 
@@ -10,11 +11,19 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
     """Composite ROP to Image Sequence"""
 
     identifier = "io.openpype.creators.houdini.imagesequence"
-    label = "Composite (Image Sequence)"
+    label = "Composite (COP2)"
+    description = "Render legacy COP2 ROP to image sequence"
     product_type = "imagesequence"
-    icon = "gears"
+    product_base_type = "imagesequence"
+    icon = "fa5.eye"
 
     ext = ".exr"
+
+    # Default render target
+    render_target = "local"
+
+    def get_publish_families(self):
+        return ["imagesequence", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
         import hou  # noqa
@@ -27,13 +36,8 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
             pre_create_data)
 
         instance_node = hou.node(instance.get("instance_node"))
-        filepath = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4{}".format(product_name, self.ext)
-        )
         parms = {
             "trange": 1,
-            "copoutput": filepath
         }
 
         if self.selected_nodes:
@@ -53,8 +57,31 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
         to_lock = ["prim_to_detail_pattern"]
         self.lock_parameters(instance_node, to_lock)
 
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("copoutput").set(f"{staging_dir}/$OS.$F4{self.ext}")
+
     def get_network_categories(self):
         return [
             hou.ropNodeTypeCategory(),
             hou.cop2NodeTypeCategory()
         ]
+
+    def get_instance_attr_defs(self):
+        render_target_items = {
+            "local": "Local machine rendering",
+            "local_no_render": "Use existing frames (local)",
+            "farm": "Farm Rendering",
+        }
+
+        return [
+            EnumDef("render_target",
+                    items=render_target_items,
+                    label="Render target",
+                    default=self.render_target)
+        ]
+
+    def get_pre_create_attr_defs(self):
+        attrs = super().get_pre_create_attr_defs()
+        # Use same attributes as for instance attributes
+        return attrs + self.get_instance_attr_defs()

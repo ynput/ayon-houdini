@@ -1,13 +1,14 @@
+from __future__ import annotations
 import copy
 import os
 import re
 
+import ayon_api
 import pyblish.api
 
 from ayon_core.pipeline import KnownPublishError
 from ayon_core.pipeline.create import get_product_name
 from ayon_houdini.api import plugin
-import ayon_houdini.api.usd as usdlib
 
 from pxr import Sdf
 import hou
@@ -72,11 +73,51 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
         rop_node = hou.node(instance.data["instance_node"])
 
         save_layers = []
-        for layer in usdlib.get_configured_save_layers(rop_node):
+        stack: list[Sdf.Layer] = list(instance.data.get("layers", []))
+        processed: set[str] = set(layer.identifier for layer in stack)
 
-            info = layer.rootPrims.get("HoudiniLayerInfo")
+        def _add_layer(layer_identifier: str, relative_to: Sdf.Layer):
+            """Add a child layer to track in the stack"""
+            layer_identifier = relative_to.ComputeAbsolutePath(
+                layer_identifier
+            )
+            if layer_identifier in processed:
+                return
+            processed.add(layer_identifier)
+            child_layer = Sdf.Layer.FindOrOpen(layer_identifier)
+            if child_layer is None:
+                # The layer may not exist yet, if e.g. it has not been computed
+                # or saved by Solaris yet.
+                # TODO: We'll need to pinpoint which layers this may happen for
+                self.log.warning(
+                    "Unable to find Sdf Layer for %s", layer_identifier
+                )
+                return
+            stack.append(child_layer)
+
+        for layer in stack:
+            # We need to proceed into sublayers and external references
+            # because these can also have configured save paths that we need
+            # to collect. This logic mimics Houdini's `scenegraphlayers` model
+            # used by the Scene Graph Layers panel in Solaris. Fix: #361
+            # Note: We use `list` over `set` here just to match the behavior of
+            #  Houdini's Scene Graph Layers panel to increase our chances the
+            #  sorting of the layers is somewhat similar to what artists see in
+            #  the panel. (It's purely for cosmetic reasons though)
+            child_sublayers = list(layer.subLayerPaths)
+            child_refs = list(ref for ref in layer.externalReferences
+                              if ref and ref not in layer.subLayerPaths)
+            for child_layer in child_sublayers + child_refs:
+                _add_layer(child_layer, relative_to=layer)
+
+            info = layer.GetPrimAtPath("/HoudiniLayerInfo")
+            if not info:
+                continue
             save_path = info.customData.get("HoudiniSavePath")
             creator = info.customData.get("HoudiniCreatorNode")
+            save_control = info.customData.get("HoudiniSaveControl")
+            if save_control != "Explicit":
+                continue
 
             self.log.debug("Found configured save path: "
                            "%s -> %s", layer, save_path)
@@ -88,14 +129,50 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                     "Created by: %s", creator_node.path()
                 )
 
+            # Skip any explicit save layer that is created by a geoclipsequence
+            # node, because this will be the topology layer - which will be
+            # included with a USD instance relatively by the
+            # CollectUSDValueClips plug-in
+            # Note: `geoclipsequence` nodes do not have explicit save control.
+            # If explicit save controls are present, they are most likely
+            # created by another node.
+            if (
+                creator_node
+                and creator_node.type().name() == "geoclipsequence"
+                and save_control != "Explicit"
+            ):
+                continue
+
             save_layers.append((layer, save_path, creator_node))
 
         # Store on the instance
         instance.data["usdConfiguredSavePaths"] = save_layers
 
+        context = instance.context
+        # In ideal case this plugin should run after plugin
+        #   "CollectAnatomyInstanceData" but because is running before
+        #   the entities has to be fetched here
+        project_name = context.data["projectName"]
+        folder_path = instance.data["folderPath"]
+        task_name = instance.data.get("task")
+        folder_entity = instance.data.get("folderEntity")
+        task_entity = instance.data.get("taskEntity")
+        if not folder_entity and folder_path:
+            folder_entity = ayon_api.get_folder_by_path(
+                project_name, folder_path
+            )
+            instance.data["folderEntity"] = folder_entity
+
+        if not task_entity and folder_entity and task_name:
+            task_entity = ayon_api.get_task_by_name(
+                project_name,
+                folder_entity["id"],
+                task_name
+            )
+            instance.data["taskEntity"] = task_entity
+
         # Create configured layer instances so User can disable updating
         # specific configured layers for publishing.
-        context = instance.context
         for layer, save_path, creator_node in save_layers:
             name = os.path.basename(save_path)
             layer_inst = context.create_instance(name)
@@ -120,25 +197,50 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
             layer_inst.data["usd_layer"] = layer
             layer_inst.data["usd_layer_save_path"] = save_path
 
-            project_name = context.data["projectName"]
+            product_base_type = "usd"
             variant_base = instance.data["variant"]
+
+            get_product_name_kwargs = {}
+            if getattr(get_product_name, "use_entities", False):
+                get_product_name_kwargs.update({
+                    "folder_entity": folder_entity,
+                    "task_entity": task_entity,
+                    "product_base_type": product_base_type,
+                })
+            else:
+                task_name = task_type = None
+                if task_entity:
+                    task_name = task_entity["name"]
+                    task_type = task_entity["taskType"]
+                get_product_name_kwargs.update({
+                    "task_name": task_name,
+                    "task_type": task_type,
+                })
+
             product_name = get_product_name(
-                project_name=project_name,
-                # TODO: This should use task from `instance`
-                task_name=context.data["anatomyData"]["task"]["name"],
-                task_type=context.data["anatomyData"]["task"]["type"],
-                host_name=context.data["hostName"],
-                product_type="usd",
+                project_name=instance.context.data["projectName"],
+                host_name=instance.context.data["hostName"],
+                product_type=instance.data["productType"],
                 variant=variant_base + "_" + variant,
-                project_settings=context.data["project_settings"]
+                project_settings=context.data["project_settings"],
+                project_entity=context.data["projectEntity"],
+                dynamic_data={
+                    "folder": {
+                        "label": folder_entity["label"],
+                        "name": folder_entity["name"],
+                        "type": folder_entity["folderType"]
+                    },
+                },
+                **get_product_name_kwargs,
             )
 
             label = "{0} -> {1}".format(instance.data["name"], product_name)
-            family = "usd"
-            layer_inst.data["family"] = family
-            layer_inst.data["families"] = [family]
+
+            layer_inst.data["family"] = product_base_type
+            layer_inst.data["families"] = [product_base_type]
+            layer_inst.data["productBaseType"] = product_base_type
+            layer_inst.data["productType"] = product_base_type
             layer_inst.data["productName"] = product_name
-            layer_inst.data["productType"] = instance.data["productType"]
             layer_inst.data["label"] = label
             layer_inst.data["folderPath"] = instance.data["folderPath"]
             layer_inst.data["task"] = instance.data.get("task")

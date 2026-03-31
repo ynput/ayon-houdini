@@ -13,6 +13,7 @@ from ayon_core.lib import (
 )
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import expand_houdini_string
 
 
 # region assettools
@@ -152,9 +153,10 @@ class CreateHDA(plugin.HoudiniCreator):
 
     identifier = "io.openpype.creators.houdini.hda"
     label = "Houdini Digital Asset (Hda)"
+    description = "Create a Houdini Digital Asset (HDA) product"
     product_type = "hda"
+    product_base_type = "hda"
     icon = "gears"
-    maintain_selection = False
 
     def _check_existing(self, folder_path, product_name):
         # type: (str, str) -> bool
@@ -179,7 +181,8 @@ class CreateHDA(plugin.HoudiniCreator):
         node_name,
         parent,
         node_type="geometry",
-        pre_create_data=None
+        pre_create_data=None,
+        instance_data=None
     ):
         if pre_create_data is None:
             pre_create_data = {}
@@ -247,10 +250,10 @@ class CreateHDA(plugin.HoudiniCreator):
             hda_node = to_hda.createDigitalAsset(
                 name=type_name,
                 description=node_name,
-                hda_file_name="$HIP/{}.hda".format(node_name),
                 ignore_external_references=True,
                 min_num_inputs=0,
                 max_num_inputs=len(to_hda.inputs()) or 1,
+                save_as_embedded=True,
             )
 
             if use_promote_spare_parameters:
@@ -284,6 +287,21 @@ class CreateHDA(plugin.HoudiniCreator):
             set_tool_submenu(hda_def, "AYON/{}".format(self.project_name))
 
         return hda_node
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+
+        with hou.ScriptEvalContext(node):
+            staging_dir = expand_houdini_string(staging_dir, r"`[^`]+`")
+
+        hda_file_name = f"{staging_dir}/{node.name()}.hda"
+
+        hda_def = node.type().definition()
+        hda_def.save(hda_file_name, node)
+        hou.hda.installFile(hda_file_name)
+
+        # Remove the embedded HDA.
+        hda_def.destroy()
 
     def get_network_categories(self):
         # Houdini allows creating sub-network nodes inside
@@ -329,28 +347,19 @@ class CreateHDA(plugin.HoudiniCreator):
         task_entity,
         variant,
         host_name,
-        instance
+        instance,
+        project_entity=None,
+        product_type=None,
     ):
         """
         Pass product name from product name templates as dynamic data.
         """
-        dynamic_data = super(CreateHDA, self).get_dynamic_data(
-            project_name,
-            folder_entity,
-            task_entity,
-            variant,
-            host_name,
-            instance
-        )
-
-        dynamic_data.update(
-            {
-                "asset": folder_entity["name"],
-                "folder": {
-                            "label": folder_entity["label"],
-                            "name": folder_entity["name"]
-                }
+        # TODO remove when ayon-core does support folder label to be used
+        #   in product name templates
+        return {
+            "folder": {
+                "label": folder_entity["label"],
+                "name": folder_entity["name"],
+                "type": folder_entity["folderType"],
             }
-        )
-
-        return dynamic_data
+        }

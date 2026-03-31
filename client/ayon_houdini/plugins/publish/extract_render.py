@@ -1,6 +1,4 @@
 import os
-import hou
-
 import pyblish.api
 
 from ayon_core.pipeline import PublishError
@@ -21,46 +19,19 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
 
     def process(self, instance):
         creator_attribute = instance.data["creator_attributes"]
-        rop_node = hou.node(instance.data.get("instance_node"))
-        node_type = rop_node.type().name()
 
-        # TODO: This section goes against pyblish concepts where
-        # pyblish plugins should change the state of the scene.
-        # However, in ayon publisher tool users can have options and
-        # these options should some how synced with the houdini nodes.
-        # More info: https://github.com/ynput/ayon-core/issues/417
+        do_local_render = (
+            creator_attribute.get("render_target")
+            in {"local", "local_export_farm_render"}
+        )
 
-        # Align split parameter value on rop node to the render target.
-        if instance.data["splitRender"]:
-            if node_type == "arnold":
-                rop_node.setParms({"ar_ass_export_enable": 1})
-            elif node_type == "ifd":
-                rop_node.setParms({"soho_outputmode": 1})
-            elif node_type == "Redshift_ROP":
-                rop_node.setParms({"RS_archive_enable": 1})
-            elif node_type == "vray_renderer":
-                rop_node.setParms({"render_export_mode": "2"})
-            elif node_type == "usdrender":
-                rop_node.setParms({"runcommand": 0})
-        else:
-            if node_type == "arnold":
-                rop_node.setParms({"ar_ass_export_enable": 0})
-            elif node_type == "ifd":
-                rop_node.setParms({"soho_outputmode": 0})
-            elif node_type == "Redshift_ROP":
-                rop_node.setParms({"RS_archive_enable": 0})
-            elif node_type == "vray_renderer":
-                rop_node.setParms({"render_export_mode": "1"})
-            elif node_type == "usdrender":
-                rop_node.setParms({"runcommand": 1})
-
-        if instance.data.get("farm"):
+        if instance.data.get("farm") and not do_local_render:
             self.log.debug(
                 "Render should be processed on farm, skipping local render."
             )
             return
 
-        if creator_attribute.get("render_target") == "local":
+        if do_local_render:
             # FIXME Render the entire frame range if any of the AOVs does
             #   not have a previously rendered version. This situation breaks
             #   the publishing.
@@ -68,6 +39,12 @@ class ExtractRender(plugin.HoudiniExtractorPlugin):
             #   cannot render different frame ranges for each AOV; they always
             #   use the same frame range for all AOVs.
             self.render_rop(instance)
+
+        if (
+            creator_attribute.get("render_target")
+            == "local_export_farm_render"
+        ):
+            return
 
         # `ExpectedFiles` is a list that includes one dict.
         expected_files = instance.data["expectedFiles"][0]

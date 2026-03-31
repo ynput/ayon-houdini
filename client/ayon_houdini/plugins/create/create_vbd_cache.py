@@ -11,11 +11,16 @@ class CreateVDBCache(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.vdbcache"
     name = "vbdcache"
     label = "VDB Cache"
+    description = __doc__
     product_type = "vdbcache"
+    product_base_type = "vdbcache"
     icon = "cloud"
 
     # Default render target
     render_target = "local"
+
+    def get_publish_families(self):
+        return ["vdbcache", "publish.hou"]
 
     def create(self, product_name, instance_data, pre_create_data):
         import hou
@@ -30,11 +35,8 @@ class CreateVDBCache(plugin.HoudiniCreator):
             pre_create_data)
 
         instance_node = hou.node(instance.get("instance_node"))
-        file_path = "{}{}".format(
-            hou.text.expandString("$HIP/pyblish/"),
-            "{}.$F4.vdb".format(product_name))
+
         parms = {
-            "sopoutput": file_path,
             "initsim": True,
             "trange": 1
         }
@@ -43,6 +45,10 @@ class CreateVDBCache(plugin.HoudiniCreator):
             parms["soppath"] = self.get_sop_node_path(self.selected_nodes[0])
 
         instance_node.setParms(parms)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.parm("sopoutput").set(f"{staging_dir}/$OS.$F4.vdb")
 
     def get_network_categories(self):
         return [

@@ -43,3 +43,11 @@ class CollectHoudiniRenderColorspace(plugin.HoudiniInstancePlugin):
 
         # Used in `create_skeleton_instance()`
         instance.data["colorspace"] = colorspace.get_scene_linear_colorspace()
+
+        self.log.debug(
+            "Collected OCIO color information:\n"
+            f"  - Config: {instance.data['colorspaceConfig']}\n"
+            f"  - Colorspace: {instance.data['colorspace']}\n"
+            f"  - Scene Display: {instance.data['colorspaceDisplay']}\n"
+            f"  - Scene View: {instance.data['colorspaceView']}\n"
+        )

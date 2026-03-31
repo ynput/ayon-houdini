@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Houdini specific AYON/Pyblish plugin definitions."""
 import os
-from typing import Dict
+import re
+from typing import Dict, Optional
 
 import hou
 
@@ -14,11 +15,16 @@ from ayon_core.pipeline import (
     AYON_INSTANCE_ID,
     AVALON_INSTANCE_ID,
     load,
-    publish
+    publish,
 )
 from ayon_core.lib import BoolDef
+from ayon_core.pipeline.staging_dir import StagingDir
 
-from .lib import imprint, read, lsattr, add_self_publish_button, render_rop
+from .lib import (
+    imprint, read, lsattr, render_rop,
+    add_self_publish_button,
+    expand_houdini_string,
+)
 from .usd import get_ayon_entity_uri_from_representation_context
 
 
@@ -97,8 +103,17 @@ class HoudiniCreatorBase(object):
 
             nodes = []
             for id_type in [AYON_INSTANCE_ID, AVALON_INSTANCE_ID]:
-                nodes.extend(lsattr("id", id_type))
+                nodes.extend(
+                    lsattr("id", id_type, recurse_in_locked_nodes=False)
+                )
             for node in nodes:
+
+                # Exclude nodes that are not editable because they are
+                # inside a locked HDA, because those currently would fail
+                # to apply instance attributes, etc. - Fix #332
+                # TODO: Implement #333: Support creator instances in HDAs
+                if not node.isEditableInsideLockedHDA():
+                    continue
 
                 creator_identifier_parm = node.parm("creator_identifier")
                 if creator_identifier_parm:
@@ -132,7 +147,8 @@ class HoudiniCreatorBase(object):
         node_name,
         parent,
         node_type="geometry",
-        pre_create_data=None
+        pre_create_data=None,
+        instance_data=None
     ):
         """Create node representing instance.
 
@@ -142,6 +158,7 @@ class HoudiniCreatorBase(object):
             parent (str): Name of the parent node.
             node_type (str, optional): Type of the node.
             pre_create_data (Optional[Dict]): Pre create data.
+            instance_data (Optional[Dict]): Instance data.
 
         Returns:
             hou.Node: Newly created instance node.
@@ -159,6 +176,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
     selected_nodes = []
     settings_name = None
     add_publish_button = False
+    default_staging_dir = "$HIP/ayon"
+    enable_staging_path_management = True
 
     settings_category = SETTINGS_CATEGORY
     node_type = "geometry"
@@ -182,7 +201,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
                 product_name,
                 "/out",
                 node_type,
-                pre_create_data
+                pre_create_data,
+                instance_data=instance_data
             )
 
             self.customize_node_look(instance_node)
@@ -195,6 +215,24 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
                 product_name,
                 instance_data,
                 self)
+
+            if self.enable_staging_path_management:
+                staging_dir_info = self.get_staging_dir(instance)
+                staging_dir = staging_dir_info.directory
+
+                if self.expand_staging_dir:
+                    with hou.ScriptEvalContext(instance_node):
+                        # Expand vars only without expanding expressions
+                        #   to keep dynamic link to ROP parameters.
+                        staging_dir = expand_houdini_string(staging_dir)
+
+                self.set_node_staging_dir(
+                    instance_node,
+                    staging_dir,
+                    instance,
+                    pre_create_data
+                )
+
             self._add_instance_to_context(instance)
             self.imprint(instance_node, instance.data_to_store())
 
@@ -215,8 +253,10 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
         """
         for name in parameters:
+            parm = node.parm(name)
+            if not parm:
+                continue
             try:
-                parm = node.parm(name)
                 parm.lock(True)
             except AttributeError:
                 self.log.debug("missing lock pattern {}".format(name))
@@ -350,12 +390,19 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             "add_self_publish_button", False)
 
         # Apply Creator Settings
+        create_settings = project_settings["houdini"]["create"]
+        set_rop_output = create_settings["set_rop_output"]
+        self.enable_staging_path_management = set_rop_output["enabled"]
+        self.expand_staging_dir = set_rop_output["expand_vars"]
+        self.default_staging_dir = \
+            set_rop_output["default_output_dir"] or self.default_staging_dir
+
         settings_name = self.settings_name
         if settings_name is None:
             settings_name = self.__class__.__name__
 
-        settings = project_settings["houdini"]["create"]
-        settings = settings.get(settings_name)
+
+        settings = create_settings.get(settings_name)
         if settings is None:
             self.log.debug(
                 "No settings found for {}".format(self.__class__.__name__)
@@ -364,6 +411,61 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
 
         for key, value in settings.items():
             setattr(self, key, value)
+
+    def get_staging_dir(self, instance) -> Optional[StagingDir]:
+        """Get Staging Dir
+
+        Return the staging dir and persistence from instance.
+
+        This method falls back to the default output path defined in settings
+        `ayon+settings://houdini/general/rop_output/default_output_dir`
+
+        Args:
+            instance (CreatedInstance): Instance for which should be staging
+                dir gathered.
+
+        Returns:
+            Optional[StagingDir]: Staging dir path
+        """
+
+        staging_dir_info = super().get_staging_dir(instance)
+
+        if staging_dir_info is None:
+            staging_dir_info = StagingDir(
+                self.default_staging_dir,
+                is_persistent=False,
+                is_custom=True,
+            )
+
+        staging_dir_info.directory = (
+            staging_dir_info.directory
+            .replace("\\", "/")
+            .rstrip("/")
+        )
+
+        return staging_dir_info
+
+    def set_node_staging_dir(
+            self, node: hou.Node,
+            staging_dir: str,
+            instance: CreatedInstance,
+            pre_create_data: dict
+    ):
+        """Set Node Staging Dir
+
+        Args:
+            node (hou.Node): Houdini node to set its output directory.
+            staging_dir (str): Staging output directory.
+            instance (CreatedInstance): Instance object associated
+                with the given node.
+            pre_create_data(dict): Data based on pre creation attributes.
+
+        """
+
+        raise NotImplementedError(
+            f"{self.__class__.__name__} "
+            "doesn't implement `set_node_staging_dir`"
+        )
 
 
 class RenderLegacyProductTypeCreator(HoudiniCreator):
@@ -374,6 +476,7 @@ class RenderLegacyProductTypeCreator(HoudiniCreator):
     # Overriding `product_type` avoids linters complaining that the attribute
     # is actually a property that can't be assigned to in `apply_settings`
     # because it inherits as property from `Creator`.
+    product_base_type = "render"
     product_type = "render"
     legacy_product_type = "render"
     use_legacy_product_type = False
@@ -447,6 +550,52 @@ class HoudiniLoader(load.LoaderPlugin):
 
         return path
 
+    @staticmethod
+    def replace_with_frame_token(filepath):
+        """Replace with frame token
+
+        Replace the frame number within a filepath with
+        $F token followed by the correct frame padding.
+
+        Args:
+            filepath (str): file path to convert.
+        """
+
+        folder, filename = os.path.split(filepath)
+
+        # Assume the frame number is always the last digit
+        pattern = re.compile(r"""
+            (.*)                 # All before last frame separator (greedy)
+            ([._])               # Literal dot / underscore before frame number
+            (\d+)                # the frame number
+            (\.[^.]+(?:\..+)*)$  # extension (one or more dot segments)
+        """, re.VERBOSE)
+        match = pattern.match(filename)
+        head, sep, frame, tail = match.groups()
+        padding = len(frame)
+
+        filename = f"{head}{sep}$F{padding}{tail}"
+        return os.path.join(folder, filename)
+
+    def format_path(self, context):
+        """Format file path correctly for single file or file sequence.
+
+        Args:
+            context (dict): representation context to be loaded.
+
+        Returns:
+             str: Formatted path to be used by the input node.
+
+        """
+        path = self.filepath_from_context(context)
+        # The path is either a single file or sequence in a folder.
+        is_sequence = bool(context["representation"]["context"].get("frame"))
+        if is_sequence:
+            path = self.replace_with_frame_token(path)
+
+        path = os.path.normpath(path)
+        path = path.replace("\\", "/")
+        return path
 
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
     """Base class for Houdini instance publish plugins."""

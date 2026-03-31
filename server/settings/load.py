@@ -1,6 +1,14 @@
 from ayon_server.settings import BaseSettingsModel, SettingsField
 
 
+class EnabledLoadPluginsModel(BaseSettingsModel):
+    enabled: bool = SettingsField(
+        default=True,
+        title="Enabled",
+        description="Whether the plug-in is enabled"
+    )
+
+
 
 def camera_aperture_expression_enum_options():
     return [
@@ -19,6 +27,20 @@ class CameraLoaderModel(BaseSettingsModel):
             "Alembic cameras by one that should better match the Maya Render "
             "Mask. The alternative Match Maya Render mask expression is based "
             "on Houdini's own expression it applies on FBX import of cameras."
+        )
+    )
+
+
+class LayoutLoaderModel(BaseSettingsModel):
+    remove_layout_container_members: bool = SettingsField(
+        False,
+        title="Remove Layout Container Members during removing container",
+        description=(
+            "Whether to remove the members of the layout container when the "
+            "container is removed. This can be useful to clean up any nodes "
+            "that were created as members of the layout container, but it can "
+            "also potentially remove nodes that were not created by the "
+            "loader if they were added as members of the container."
         )
     )
 
@@ -50,6 +72,18 @@ class LoadPluginsModel(BaseSettingsModel):
     CameraLoader: CameraLoaderModel = SettingsField(
         default_factory=CameraLoaderModel,
         title="Load Camera (abc)")
+    ImageLoader: EnabledLoadPluginsModel = SettingsField(
+        default_factory=EnabledLoadPluginsModel,
+        title="Load Image (COP2)"
+    )
+    ImageCopernicusLoader: EnabledLoadPluginsModel = SettingsField(
+        default_factory=EnabledLoadPluginsModel,
+        title="Load Image (Copernicus)"
+    )
+    LayoutLoader: LayoutLoaderModel = SettingsField(
+        default_factory=LayoutLoaderModel,
+        title="Load Layout"
+    )
     LOPLoadAssetLoader: LoadUseAYONEntityURIModel = SettingsField(
         default_factory=LoadUseAYONEntityURIModel,
         title="LOP Load Asset")

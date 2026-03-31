@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-import os
-import re
-
 import hou
 
 from ayon_houdini.api import (
     pipeline,
-    plugin
+    plugin,
+    lib
 )
 
 
@@ -15,7 +13,8 @@ class BgeoLoader(plugin.HoudiniLoader):
 
     label = "Load bgeo"
     product_types = {"model", "pointcache", "bgeo"}
-    representations = {
+    representations = {"*"}
+    extensions = {
         "bgeo", "bgeosc", "bgeogz",
         "bgeo.sc", "bgeo.gz", "bgeo.lzma", "bgeo.bz2"}
     order = -10
@@ -40,10 +39,9 @@ class BgeoLoader(plugin.HoudiniLoader):
             file_node.destroy()
 
         # Explicitly create a file node
-        path = self.filepath_from_context(context)
         file_node = container.createNode("file", node_name=node_name)
         file_node.setParms(
-            {"file": self.format_path(path, context["representation"])})
+            {"file": self.format_path(context)})
 
         # Set display on last node
         file_node.setDisplayFlag(True)
@@ -60,22 +58,6 @@ class BgeoLoader(plugin.HoudiniLoader):
             suffix="",
         )
 
-    @staticmethod
-    def format_path(path, representation):
-        """Format file path correctly for single bgeo or bgeo sequence."""
-        # The path is either a single file or sequence in a folder.
-        is_sequence = bool(representation["context"].get("frame"))
-        if is_sequence:
-            folder, filename = os.path.split(path)
-            filename = re.sub(
-                r"(.*)\.(\d+)\.(bgeo.*)", "\\1.$F4.\\3", filename
-            )
-            path = os.path.join(folder, filename)
-
-        path = os.path.normpath(path)
-        path = path.replace("\\", "/")
-        return path
-
     def update(self, container, context):
         repre_entity = context["representation"]
         node = container["node"]
@@ -88,10 +70,7 @@ class BgeoLoader(plugin.HoudiniLoader):
             return
 
         # Update the file path
-        file_path = self.filepath_from_context(context)
-        file_path = self.format_path(file_path, repre_entity)
-
-        file_node.setParms({"file": file_path})
+        file_node.setParms({"file": self.format_path(context)})
 
         # Update attribute
         node.setParms({"representation": repre_entity["id"]})
@@ -102,3 +81,19 @@ class BgeoLoader(plugin.HoudiniLoader):
 
     def switch(self, container, context):
         self.update(container, context)
+
+    def create_load_placeholder_node(
+        self, node_name: str, placeholder_data: dict
+    ) -> hou.Node:
+        """Define how to create a placeholder node for this loader for the
+        Workfile Template Builder system."""
+        # Create node
+        network = lib.find_active_network(
+            category=hou.sopNodeTypeCategory(),
+            default="/obj/geo1"
+        )
+        if not network:
+            network = hou.node("/obj").createNode("geo", "geo1")
+        node = network.createNode("null", node_name=node_name)
+        node.moveToGoodPosition()
+        return node

@@ -7,12 +7,15 @@ from ayon_core.pipeline import CreatedInstance, AutoCreator
 
 class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
     """Workfile auto-creator."""
+    settings_category = "houdini"
     identifier = "io.openpype.creators.houdini.workfile"
     label = "Workfile"
     product_type = "workfile"
+    product_base_type = "workfile"
     icon = "fa5.file"
 
     default_variant = "Main"
+    is_mandatory = False
 
     def create(self):
         variant = self.default_variant
@@ -23,20 +26,22 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
             ), None)
 
         project_entity = self.create_context.get_current_project_entity()
-        project_name = project_entity["name"]
         folder_entity = self.create_context.get_current_folder_entity()
-        folder_path = folder_entity["path"]
         task_entity = self.create_context.get_current_task_entity()
+
+        project_name = project_entity["name"]
+        folder_path = folder_entity["path"]
         task_name = task_entity["name"]
         host_name = self.create_context.host_name
 
         if current_instance is None:
             product_name = self.get_product_name(
-                project_name,
-                folder_entity,
-                task_entity,
-                variant,
-                host_name,
+                project_name=project_name,
+                project_entity=project_entity,
+                folder_entity=folder_entity,
+                task_entity=task_entity,
+                variant=variant,
+                host_name=host_name,
             )
             data = {
                 "folderPath": folder_path,
@@ -44,18 +49,12 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
                 "variant": variant,
             }
 
-            data.update(
-                self.get_dynamic_data(
-                    project_name,
-                    folder_entity,
-                    task_entity,
-                    variant,
-                    host_name,
-                    current_instance)
-            )
             self.log.info("Auto-creating workfile instance...")
             current_instance = CreatedInstance(
-                self.product_type, product_name, data, self
+                product_type=self.product_type,
+                product_name=product_name,
+                data=data,
+                creator=self,
             )
             self._add_instance_to_context(current_instance)
         elif (
@@ -64,11 +63,12 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
         ):
             # Update instance context if is not the same
             product_name = self.get_product_name(
-                project_name,
-                folder_entity,
-                task_entity,
-                variant,
-                host_name,
+                project_name=project_name,
+                project_entity=project_entity,
+                folder_entity=folder_entity,
+                task_entity=task_entity,
+                variant=variant,
+                host_name=host_name,
             )
             current_instance["folderPath"] = folder_path
             current_instance["task"] = task_name
@@ -78,6 +78,9 @@ class CreateWorkfile(plugin.HoudiniCreatorBase, AutoCreator):
         context_node = self.host.get_context_node()
         if not context_node:
             context_node = self.host.create_context_node()
+
+        if hasattr(current_instance, "set_mandatory"):
+            current_instance.set_mandatory(self.is_mandatory)
 
         workfile_data = {"workfile": current_instance.data_to_store()}
         imprint(context_node, workfile_data)

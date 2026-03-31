@@ -9,7 +9,9 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
     identifier = "io.openpype.creators.houdini.mantra_rop"
     label = "Mantra ROP"
     legacy_product_type = "mantra_rop"
+    product_base_type = "render"
     icon = "magic"
+    description = "Create Mantra ROP for rendering with Mantra"
 
     # Default render target
     render_target = "farm_split"
@@ -32,25 +34,16 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
 
         instance_node = hou.node(instance.get("instance_node"))
 
-        ext = pre_create_data.get("image_format")
-
-        renders_dir = hou.text.expandString("$HIP/pyblish/renders/")
-        filepath = f"{renders_dir}{product_name}/{product_name}.$F4.{ext}"
-
         parms = {
             # Render Frame Range
             "trange": 1,
-            # Mantra ROP Setting
-            "vm_picture": filepath,
         }
 
-        if pre_create_data.get("render_target") == "farm_split":
-            export_dir = hou.text.expandString("$HIP/pyblish/ifd/")
-            ifd_filepath = (
-                f"{export_dir}{product_name}/{product_name}.$F4.ifd"
-            )
+        if pre_create_data.get("render_target") in {
+            "farm_split",
+            "local_export_farm_render",
+        }:
             parms["soho_outputmode"] = 1
-            parms["soho_diskfile"] = ifd_filepath
 
         if self.selected_nodes:
             # If camera found in selection
@@ -71,8 +64,16 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
         instance_node.setParms(parms)
 
         # Lock some AYON attributes
-        to_lock = ["productType", "id"]
+        to_lock = ["productType", "productBaseType", "id"]
         self.lock_parameters(instance_node, to_lock)
+
+    def set_node_staging_dir(
+            self, node, staging_dir, instance, pre_create_data):
+        node.setParms({
+            "vm_picture": f"{staging_dir}"
+                          f"/$OS.$F4.{pre_create_data['image_format']}",
+            "soho_diskfile": f"{staging_dir}/ifd/$OS.$F4.ifd"
+        })
 
     def get_instance_attr_defs(self):
         """get instance attribute definitions.
@@ -85,7 +86,8 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
             "local": "Local machine rendering",
             "local_no_render": "Use existing frames (local)",
             "farm": "Farm Rendering",
-            "farm_split": "Farm Rendering - Split export & render jobs",
+            "farm_split": "Farm Export & Farm Rendering",
+            "local_export_farm_render": "Local Export & Farm Rendering",
         }
 
         return [

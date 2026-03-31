@@ -2,7 +2,8 @@ import hou
 
 from ayon_houdini.api import (
     pipeline,
-    plugin
+    plugin,
+    lib
 )
 
 
@@ -11,7 +12,8 @@ class SopUsdImportLoader(plugin.HoudiniLoader):
 
     label = "Load USD to SOPs"
     product_types = {"*"}
-    representations = {"usd"}
+    representations = {"*"}
+    extensions = {"usd", "usda", "usdc", "usdlc", "usdnc"}
     order = -6
     icon = "code-fork"
     color = "orange"
@@ -74,3 +76,19 @@ class SopUsdImportLoader(plugin.HoudiniLoader):
 
     def switch(self, container, representation):
         self.update(container, representation)
+
+    def create_load_placeholder_node(
+        self, node_name: str, placeholder_data: dict
+    ) -> hou.Node:
+        """Define how to create a placeholder node for this loader for the
+        Workfile Template Builder system."""
+        # Create node
+        network = lib.find_active_network(
+            category=hou.sopNodeTypeCategory(),
+            default="/obj/geo1"
+        )
+        if not network:
+            network = hou.node("/obj").createNode("geo", "geo1")
+        node = network.createNode("null", node_name=node_name)
+        node.moveToGoodPosition()
+        return node

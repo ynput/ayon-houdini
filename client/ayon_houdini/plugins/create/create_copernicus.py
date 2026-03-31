@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Creator plugin for creating alembic camera products."""
+"""Creator plugin for creating composite sequences."""
 from ayon_houdini.api import plugin
 from ayon_core.pipeline import CreatorError
 from ayon_core.lib import EnumDef
@@ -7,66 +7,65 @@ from ayon_core.lib import EnumDef
 import hou
 
 
-class CreateAlembicCamera(plugin.HoudiniCreator):
-    """Single baked camera from Alembic ROP"""
+class CreateCopernicusROP(plugin.HoudiniCreator):
+    """Copernicus ROP to Image Sequence"""
 
-    identifier = "io.openpype.creators.houdini.camera"
-    label = "Camera (Abc)"
-    product_type = "camera"
-    product_base_type = "camera"
-    icon = "camera"
-    description = __doc__
+    identifier = "io.ayon.creators.houdini.copernicus"
+    label = "Composite (Copernicus)"
+    description = "Render using the Copernicus Image ROP"
+    product_type = "render"
+    product_base_type = "render"
+    icon = "fa5.eye"
+
+    ext = ".exr"
+
+    # Copernicus was introduced in Houdini 20.5 so we only enable this
+    # creator if the Houdini version is 20.5 or higher.
+    enabled = hou.applicationVersion() >= (20, 5, 0)
 
     # Default render target
     render_target = "local"
 
-    def get_publish_families(self):
-        return ["camera", "publish.hou"]
-
     def create(self, product_name, instance_data, pre_create_data):
-        import hou
+        instance_data["node_type"] = "image"
 
-        instance_data.update({"node_type": "alembic"})
-        creator_attributes = instance_data.setdefault(
-            "creator_attributes", dict())
-        creator_attributes["render_target"] = pre_create_data["render_target"]
-
-        instance = super(CreateAlembicCamera, self).create(
+        instance = super().create(
             product_name,
             instance_data,
             pre_create_data)
 
         instance_node = hou.node(instance.get("instance_node"))
         parms = {
-            "use_sop_path": False,
+            "trange": 1,
         }
-
         if self.selected_nodes:
             if len(self.selected_nodes) > 1:
                 raise CreatorError("More than one item selected.")
             path = self.selected_nodes[0].path()
-            # Split the node path into the first root and the remainder
-            # So we can set the root and objects parameters correctly
-            _, root, remainder = path.split("/", 2)
-            parms.update({"root": "/" + root, "objects": remainder})
+            parms["coppath"] = path
 
         instance_node.setParms(parms)
 
-        # Lock the Use Sop Path setting so the
-        # user doesn't accidentally enable it.
-        to_lock = ["use_sop_path"]
-        self.lock_parameters(instance_node, to_lock)
-
-        instance_node.parm("trange").set(1)
+        # Manually set f1 & f2 to $FSTART and $FEND respectively
+        # to match other Houdini nodes default.
+        instance_node.parm("f1").setExpression("$FSTART")
+        instance_node.parm("f2").setExpression("$FEND")
 
     def set_node_staging_dir(
             self, node, staging_dir, instance, pre_create_data):
-        node.parm("filename").set(f"{staging_dir}/$OS.abc")
+        node.parm("copoutput").set(f"{staging_dir}/$OS.$F4{self.ext}")
 
     def get_network_categories(self):
         return [
             hou.ropNodeTypeCategory(),
-            hou.objNodeTypeCategory()
+            hou.cop2NodeTypeCategory()
+        ]
+
+    def get_publish_families(self):
+        return [
+            "render",
+            "image_rop",
+            "publish.hou"
         ]
 
     def get_instance_attr_defs(self):
@@ -85,4 +84,5 @@ class CreateAlembicCamera(plugin.HoudiniCreator):
 
     def get_pre_create_attr_defs(self):
         attrs = super().get_pre_create_attr_defs()
+        # Use same attributes as for instance attributes
         return attrs + self.get_instance_attr_defs()
