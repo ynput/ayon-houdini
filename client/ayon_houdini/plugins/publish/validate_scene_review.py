@@ -9,8 +9,8 @@ from ayon_houdini.api import plugin
 
 class ValidateSceneReview(plugin.HoudiniInstancePlugin):
     """Validator Some Scene Settings before publishing the review
-        1. Scene Path
-        2. Resolution
+    1. Scene Path
+    2. Resolution
     """
 
     order = pyblish.api.ValidatorOrder
@@ -35,9 +35,7 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
             report.extend(invalid)
 
         if report:
-            raise PublishValidationError(
-                "\n\n".join(report),
-                title=self.label)
+            raise PublishValidationError("\n\n".join(report), title=self.label)
 
     def get_invalid_scene_path(self, rop_node):
         scene_path_parm = rop_node.parm("scenepath")
@@ -74,7 +72,7 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
 
             if not camera_prim or not camera_prim.IsValid():
                 return f"Camera prim path does not exist: '{camera_path}'"
-            
+
             if not camera_prim.IsA(pxr.UsdGeom.Camera):
                 return f"Camera path '{camera_path}' is not a camera."
 
