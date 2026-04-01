@@ -8,7 +8,7 @@ from ayon_houdini.api import plugin
 class CollectHoudiniCurrentFile(plugin.HoudiniContextPlugin):
     """Inject the current working file into context"""
 
-    order = pyblish.api.CollectorOrder - 0.1
+    order = pyblish.api.CollectorOrder - 0.5
     label = "Houdini Current File"
 
     def process(self, context):
@@ -16,8 +16,8 @@ class CollectHoudiniCurrentFile(plugin.HoudiniContextPlugin):
 
         current_file = hou.hipFile.path()
         if (
-                hou.hipFile.isNewFile()
-                or not os.path.exists(current_file)
+            hou.hipFile.isNewFile()
+            or not os.path.exists(current_file)
         ):
             # By default, Houdini will even point a new scene to a path.
             # However if the file is not saved at all and does not exist,
