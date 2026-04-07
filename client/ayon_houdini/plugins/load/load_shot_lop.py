@@ -8,7 +8,8 @@ import hou
 class LOPLoadShotLoader(load.LoaderPlugin):
     """Load sublayer into Solaris using AYON Load Shot LOP"""
 
-    product_types = {"*"}
+    product_base_types = {"*"}
+    product_types = product_base_types
     label = "Load Shot (LOPs)"
     representations = {"*"}
     extensions = {"usd", "usda", "usdc", "usdlc", "usdnc", "abc"}
