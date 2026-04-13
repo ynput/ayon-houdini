@@ -37,8 +37,7 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
     def process(self, instance):
         """Inject the current working file"""
 
-        layer_path = instance.data["rig_layer"]
-        sdf_layer = Sdf.Layer.OpenAsAnonymous(layer_path)
+        sdf_layer = instance.data["rig_layer"]
 
         folder_path = instance.data["folderPath"]
         default_prim = get_standard_default_prim_name(folder_path)
@@ -65,6 +64,8 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
             instance)
 
         # Save the file
+        staging_dir = instance.data.get("stagingDir")
+        layer_path = os.path.join(staging_dir, f"{instance.name}.usd")
         self.log.debug(f"Set 'ayon:apex_rig' attr to '{layer_path}'")
         self.log.debug(f"Saving rig layer: {layer_path}")
         sdf_layer.Export(layer_path, args={"format": "usda"})
