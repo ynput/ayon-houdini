@@ -68,14 +68,18 @@ class CollectFramesFixDefHou(
             )
             return
 
-        product_type = product_entity["productType"]
-        instance_product_type = instance.data["productType"]
-        if product_type != instance_product_type:
+        product_base_type = (
+                product_entity["productBaseType"]
+                or product_entity["productType"]
+        )
+        instance_product_base_type = instance.data["productBaseType"]
+        if product_base_type != instance_product_base_type:
             self.log.error(
-                f"Existing product '{product_name}' product type "
-                f"'{product_type}' is not the same as instance product type "
-                f"'{instance_product_type}'. Re-render may have unintended "
-                f"side effects.")
+                f"Existing product '{product_name}' product base type "
+                f"'{product_base_type}' is not the same as instance "
+                "product base type "
+                f"'{instance_product_base_type}'. Re-render may have "
+                "unintended side effects.")
 
         version_entity = ayon_api.get_last_version_by_product_id(
             project_name,
