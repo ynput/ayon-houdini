@@ -9,8 +9,8 @@ from ayon_houdini.api import plugin
 
 class ValidateSceneReview(plugin.HoudiniInstancePlugin):
     """Validator Some Scene Settings before publishing the review
-        1. Scene Path
-        2. Resolution
+    1. Scene Path
+    2. Resolution
     """
 
     order = pyblish.api.ValidatorOrder
@@ -35,9 +35,7 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
             report.extend(invalid)
 
         if report:
-            raise PublishValidationError(
-                "\n\n".join(report),
-                title=self.label)
+            raise PublishValidationError("\n\n".join(report), title=self.label)
 
     def get_invalid_scene_path(self, rop_node):
         scene_path_parm = rop_node.parm("scenepath")
@@ -47,16 +45,39 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
             return "Scene path does not exist: '{}'".format(path)
 
     def get_invalid_camera_path(self, rop_node):
-        camera_path_parm = rop_node.parm("camera")
-        camera_node = camera_path_parm.evalAsNode()
-        path = camera_path_parm.evalAsString()
-        if not camera_node:
-            return "Camera path does not exist: '{}'".format(path)
-        type_name = camera_node.type().name()
-        if type_name not in {"cam", "lopimportcam"}:
-            return "Camera path is not a camera: '{}' (type: {})".format(
-                path, type_name
-            )
+
+        import pxr
+
+        opsource = rop_node.parm("opsource").eval()
+
+        if opsource == 0:
+            # Object-level
+            camera_path_parm = rop_node.parm("camera")
+            camera_node = camera_path_parm.evalAsNode()
+            path = camera_path_parm.evalAsString()
+            if not camera_node:
+                return "Camera path does not exist: '{}'".format(path)
+            type_name = camera_node.type().name()
+            if type_name not in {"cam", "lopimportcam"}:
+                return "Camera path is not a camera: '{}' (type: {})".format(
+                    path, type_name
+                )
+        elif opsource == 1:
+            # LOP-level
+            lop_path = rop_node.parm("loppath").evalAsString()
+            camera_path = rop_node.parm("cameraprim").evalAsString()
+
+            stage = hou.node(lop_path).stage()
+            camera_prim = stage.GetPrimAtPath(camera_path)
+
+            if not camera_prim or not camera_prim.IsValid():
+                return f"Camera prim path does not exist: '{camera_path}'"
+
+            if not camera_prim.IsA(pxr.UsdGeom.Camera):
+                return f"Camera path '{camera_path}' is not a camera."
+
+        else:
+            return "Unsupported camera source type: {}".format(opsource)
 
     def get_invalid_resolution(self, rop_node):
 

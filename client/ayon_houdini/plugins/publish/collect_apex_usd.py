@@ -1,4 +1,3 @@
-import os
 import pyblish.api
 
 try:
@@ -22,13 +21,5 @@ class CollectAPEXUSD(plugin.HoudiniInstancePlugin):
 
     def process(self, instance):
         sdf_layer = Sdf.Layer.CreateAnonymous()
-
-        # Save the file
-        staging_dir = instance.data.get("stagingDir")
-        filename = f"{instance.name}.usd"
-        filepath = os.path.join(staging_dir, filename)
-
-        self.log.debug(f"Saving rig layer: {filepath}")
-        sdf_layer.Export(filepath, args={"format": "usda"})
-
-        instance.data["rig_layer"] = filepath
+        self.log.debug(f"Creating USD rig layer: {sdf_layer}")
+        instance.data["rig_layer"] = sdf_layer
