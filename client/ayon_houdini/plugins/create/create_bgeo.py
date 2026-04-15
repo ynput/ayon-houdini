@@ -11,8 +11,9 @@ class CreateBGEO(plugin.HoudiniCreator):
     """BGEO pointcache creator."""
     identifier = "io.openpype.creators.houdini.bgeo"
     label = "PointCache (Bgeo)"
-    product_type = "pointcache"
     product_base_type = "pointcache"
+    product_type = product_base_type
+
     icon = "cubes"
     description = "Create Geometry ROP to export BGEO pointcache data"
 
@@ -130,8 +131,8 @@ class CreateRig(CreateBGEO):
     """APEX Rig (bgeo) creator."""
     identifier = "io.ayon.creators.houdini.bgeo.rig"
     label = "APEX Rig"
-    product_type = "rig"
     product_base_type = "rig"
+    product_type = product_base_type
     icon = "wheelchair"
 
     description = "APEX rig asset exported as BGEO file"
