@@ -158,8 +158,8 @@ class CreateAnim(CreateBGEO):
     """APEX Animation (bgeo) creator."""
     identifier = "io.ayon.creators.houdini.bgeo.anim"
     label = "APEX Animation"
-    product_type = "animation"
     product_base_type = "animation"
+    product_type = product_base_type
     icon = "male"
 
     description = "APEX Animation data exported as BGEO file"
