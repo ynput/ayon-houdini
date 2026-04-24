@@ -1,6 +1,5 @@
 import os
 import pyblish.api
-import platform
 
 try:
     from pxr import Sdf
