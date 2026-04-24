@@ -96,9 +96,7 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
             ext=ext,
             version=version_name if specific_version else None
         )
-        # Ensure `None` for now is also a string
-        path = str(path)
-        path = os.path.normpath(path)
-        if platform.system().lower() == "windows":
-            path = path.replace("\\", "/")
-        return path
+        if path:
+            return path
+
+        raise RuntimeError("Unable to resolve publish path.")
