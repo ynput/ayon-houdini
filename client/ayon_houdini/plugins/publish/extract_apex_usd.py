@@ -56,11 +56,14 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
         rig_attr = Sdf.AttributeSpec(
             asset_prim,
             "ayon:apex_rig",
-            Sdf.ValueTypeNames.String,
+            Sdf.ValueTypeNames.Asset,
             variability=Sdf.VariabilityUniform
         )
-        rig_attr.default = self.get_representation_path_in_publish_context(
-            instance)
+        rig_attr.default = Sdf.AssetPath(
+            self.get_representation_path_in_publish_context(
+                instance
+            )
+        )
 
         # Save the file
         staging_dir = instance.data.get("stagingDir")
