@@ -36,9 +36,11 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
     def process(self, instance):
         """Inject the current working file"""
 
-        sdf_layer = Sdf.Layer.CreateAnonymous()
+        staging_dir = instance.data.get("stagingDir")
+        layer_path = os.path.join(staging_dir, f"{instance.name}.usd")
+
+        sdf_layer = Sdf.Layer.CreateNew(layer_path)
         self.log.debug(f"Creating USD rig layer: {sdf_layer}")
-        instance.data["rig_layer"] = sdf_layer
 
         folder_path = instance.data["folderPath"]
         default_prim = get_standard_default_prim_name(folder_path)
@@ -52,26 +54,19 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
             "Xform"
         )
         asset_prim.specifier = Sdf.SpecifierOver
-        # "ayon:apex_rig" if apex rig exist:
-        #   if it is a path, use it in the file read and add it as asset.
-        #   if not load model layer and add it as prop.
         rig_attr = Sdf.AttributeSpec(
             asset_prim,
             "ayon:apex_rig",
             Sdf.ValueTypeNames.Asset,
             variability=Sdf.VariabilityUniform
         )
-        rig_attr.default = Sdf.AssetPath(
-            self.get_representation_path_in_publish_context(
-                instance
-            )
+        rig_path = self.get_representation_path_in_publish_context(
+            instance
         )
+        self.log.debug(f"Setting 'ayon:apex_rig' attr to '{rig_path}'")
+        rig_attr.default = Sdf.AssetPath(rig_path)
 
         # Save the file
-        staging_dir = instance.data.get("stagingDir")
-        layer_path = os.path.join(staging_dir, f"{instance.name}.usd")
-        self.log.debug(f"Set 'ayon:apex_rig' attr to '{layer_path}'")
-        self.log.debug(f"Saving rig layer: {layer_path}")
         sdf_layer.Export(layer_path, args={"format": "usda"})
 
         representations = instance.data.setdefault("representations", [])
