@@ -36,7 +36,9 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
     def process(self, instance):
         """Inject the current working file"""
 
-        sdf_layer = instance.data["rig_layer"]
+        sdf_layer = Sdf.Layer.CreateAnonymous()
+        self.log.debug(f"Creating USD rig layer: {sdf_layer}")
+        instance.data["rig_layer"] = sdf_layer
 
         folder_path = instance.data["folderPath"]
         default_prim = get_standard_default_prim_name(folder_path)
