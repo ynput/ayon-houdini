@@ -98,4 +98,6 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
         if path:
             return path
 
-        raise RuntimeError("Unable to resolve publish path.")
+        raise RuntimeError(
+            "Unable to resolve publish path for representation \"bgeo\"."
+        )
