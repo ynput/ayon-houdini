@@ -39,7 +39,7 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
         staging_dir = instance.data.get("stagingDir")
         layer_path = os.path.join(staging_dir, f"{instance.name}.usd")
 
-        sdf_layer = Sdf.Layer.CreateNew(layer_path)
+        sdf_layer = Sdf.Layer.CreateNew(layer_path, args={"format": "usda"})
         self.log.debug(f"Creating USD rig layer: {sdf_layer}")
 
         folder_path = instance.data["folderPath"]
@@ -67,7 +67,7 @@ class ExtractAPEXUSD(plugin.HoudiniInstancePlugin):
         rig_attr.default = Sdf.AssetPath(rig_path)
 
         # Save the file
-        sdf_layer.Export(layer_path, args={"format": "usda"})
+        sdf_layer.Save()
 
         representations = instance.data.setdefault("representations", [])
         representations.append({
