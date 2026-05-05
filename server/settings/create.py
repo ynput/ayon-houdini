@@ -125,6 +125,25 @@ class CreateUSDRenderModel(CreatorModel):
             "Specify either the Hydra renderer plug-in nice name, like "
             "'Karma CPU', or the plug-in name, e.g. 'BRAY_HdKarma'"
         ))
+    default_tile_rendering: bool = SettingsField(
+        False,
+        title="Tile Rendering (default)",
+        description=(
+            "Default state of the tile-rendering toggle on new "
+            "USD Render instances."
+        ))
+    default_tile_count_x: int = SettingsField(
+        2,
+        title="Tiles X (default)",
+        ge=1,
+        le=16,
+        description="Default number of husk tiles in X (--tile-count X Y).")
+    default_tile_count_y: int = SettingsField(
+        2,
+        title="Tiles Y (default)",
+        ge=1,
+        le=16,
+        description="Default number of husk tiles in Y (--tile-count X Y).")
 
 
 class WorkfileModel(BaseSettingsModel):
@@ -366,7 +385,10 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     "CreateUSDRender": {
         "enabled": True,
         "default_variants": ["Main"],
-        "default_renderer": "Karma CPU"
+        "default_renderer": "Karma CPU",
+        "default_tile_rendering": False,
+        "default_tile_count_x": 2,
+        "default_tile_count_y": 2
     },
     "CreateVDBCache": {
         "enabled": True,
