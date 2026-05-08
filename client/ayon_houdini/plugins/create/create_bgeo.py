@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Creator plugin for creating pointcache bgeo files."""
+import inspect
 from ayon_houdini.api import plugin
 from ayon_core.pipeline import CreatorError
 import hou
@@ -38,7 +39,7 @@ class CreateBGEO(plugin.HoudiniCreator):
 
         parms = {}
 
-        instance_node.parm("trange").set(1)
+        self.set_trange(instance_node)
         if self.selected_nodes:
             # if selection is on SOP level, use it
             if isinstance(self.selected_nodes[0], hou.SopNode):
@@ -63,6 +64,9 @@ class CreateBGEO(plugin.HoudiniCreator):
     def set_node_staging_dir(
             self, node, staging_dir, instance, pre_create_data):
         node.parm("sopoutput").set(f"{staging_dir}/$OS.$F4.{pre_create_data['bgeo_type']}")
+
+    def set_trange(self, node):
+        node.parm("trange").set(1)
 
     def get_instance_attr_defs(self):
         render_target_items = {
@@ -121,3 +125,30 @@ class CreateBGEO(plugin.HoudiniCreator):
             hou.ropNodeTypeCategory(),
             hou.sopNodeTypeCategory()
         ]
+
+
+class CreateRig(CreateBGEO):
+    """APEX Rig (bgeo) creator."""
+    identifier = "io.ayon.creators.houdini.bgeo.rig"
+    label = "APEX Rig"
+    product_base_type = "rig"
+    product_type = product_base_type
+    icon = "wheelchair"
+
+    description = "APEX rig asset exported as BGEO file"
+
+    # Default render target
+    render_target = "local"
+
+    def get_detail_description(self):
+        return inspect.cleandoc(
+            """Write a BGEO output file as `rig` product type. This can be
+            used to publish APEX rigs which are in essence just SOP-level
+            data representing a rig structure."""
+        )
+
+    def get_publish_families(self):
+        return ["rig", "apex", "bgeo", "publish.hou",  "usd"]
+
+    def set_trange(self, node):
+        pass
