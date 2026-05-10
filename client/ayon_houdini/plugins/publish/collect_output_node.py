@@ -16,7 +16,8 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
         "staticMesh",
         "model",
         "usdrender",
-        "usdrop"
+        "usdrop",
+        "apex"
     ]
 
     label = "Collect Output Node Path"
