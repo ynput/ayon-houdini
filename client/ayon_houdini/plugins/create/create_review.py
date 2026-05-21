@@ -12,8 +12,8 @@ class CreateReview(plugin.HoudiniCreator):
 
     identifier = "io.openpype.creators.houdini.review"
     label = "Review"
-    product_type = "review"
     product_base_type = "review"
+    product_type = product_base_type
     description = __doc__
     icon = "video-camera"
     review_color_space = ""

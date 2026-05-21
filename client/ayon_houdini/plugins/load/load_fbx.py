@@ -18,7 +18,8 @@ class FbxLoader(plugin.HoudiniLoader):
 
     order = -10
 
-    product_types = {"*"}
+    product_base_types = {"*"}
+    product_types = product_base_types
     representations = {"*"}
     extensions = {"fbx"}
 

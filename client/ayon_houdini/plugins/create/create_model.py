@@ -21,8 +21,8 @@ class CreateModel(plugin.HoudiniCreator):
     """Create Model"""
     identifier = "io.openpype.creators.houdini.model"
     label = "Model (Abc)"
-    product_type = "model"
     product_base_type = "model"
+    product_type = product_base_type
     icon = "cube"
     description = "Create a static model as Alembic file"
 
