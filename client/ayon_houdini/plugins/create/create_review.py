@@ -98,11 +98,13 @@ class CreateReview(plugin.HoudiniCreator):
                         if prim.GetTypeName() == "Camera":
                             camera = prim.GetPath().pathString
                             break
-                    parms.update({
-                        "opsource": 1,
-                        "loppath": path,
-                        "cameraprim": camera or "",
-                    })
+                    if camera:
+                        parms.update({
+                            "opsource": 1,
+                            "loppath": path,
+                            "cameraprim": camera or "",
+                        })
+                        break
 
             if not camera:
                 self.log.warning("No camera found in selection.")
