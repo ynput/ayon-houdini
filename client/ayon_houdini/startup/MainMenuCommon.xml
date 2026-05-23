@@ -115,6 +115,15 @@ ayon_houdini.api.lib.update_houdini_vars_context_dialog()
             </scriptItem>
 
             <separatorItem/>
+            <scriptItem id="clear_resplver_cache">
+                <label>Clear AYON USD Resolver Cache</label>
+                <scriptCode><![CDATA[
+from ayon_houdini.api.usd import clear_resolver_cache
+clear_resolver_cache()
+]]></scriptCode>
+            </scriptItem>
+
+            <separatorItem/>
             <scriptItem id="experimental_tools">
                 <label>Experimental tools...</label>
                 <scriptCode><![CDATA[

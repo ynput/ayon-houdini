@@ -425,3 +425,16 @@ def get_ayon_entity_uri_from_representation_context(context: dict) -> str:
             f"Received data: {response.data}"
         )
     return uris[0]["uri"]
+
+def clear_resolver_cache(reset_view=True):
+    try: 
+        from usdAssetResolver import AyonUsdResolver
+
+        ctx = AyonUsdResolver.ResolverContext()
+        # Clear the resolver cache.
+        ctx.ClearCache()
+        # TODO: Reset the viewport
+        if reset_view:
+            ...
+    except Exception as exc:
+        print(f"!!! Failed to Clear the usd resolver cache. Reason: {exc}")
