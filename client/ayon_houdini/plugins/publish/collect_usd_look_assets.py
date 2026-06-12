@@ -6,6 +6,8 @@ from typing import List, Optional
 import dataclasses
 
 import pyblish.api
+
+from ayon_houdini.api.usd import get_layer_save_path
 from pxr import Sdf
 
 from ayon_houdini.api import plugin
@@ -111,11 +113,14 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     file_label = f"- {filepath}"
                 all_files.append(file_label)
 
-        self.log.info(
-            "Collected assets:\n{}".format(
-                "\n".join(all_files)
+        if all_files:
+            self.log.info(
+                "Collected assets:\n{}".format(
+                    "\n".join(all_files)
+                )
             )
-        )
+        else:
+            self.log.debug("Collected no assets.")
 
     def get_layer_assets(self, layers: List[Sdf.Layer]) -> List[Resource]:
         # TODO: Correctly resolve paths using Asset Resolver.
@@ -154,6 +159,44 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     continue
 
                 filepath = asset.path.replace("\\", "/")
+
+                # Skip certain filenames, like `invokegraph.py`
+                if filepath == "invokegraph.py":
+                    self.log.debug(f"Skipping asset at '{path}': {filepath}")
+                    continue
+
+                # Skip AYON entity URIs because these represent already
+                # published files.
+                if filepath.startswith(("ayon://", "ayon+entity://")):
+                    self.log.debug(
+                        "Skipping AYON Entity URI at "
+                        f"'{path}': {filepath}"
+                    )
+                    continue
+
+                # Anchor relative paths to absolute paths
+                if filepath.startswith("./"):
+                    # USD can't anchor to anonymous layers because it doesn't
+                    # know where it exists - however, Houdini layers can have
+                    # dedicated save paths, and hence could resolve paths
+                    # relative to that.
+                    if layer.anonymous:
+                        layer_path = get_layer_save_path(layer)
+                        if layer_path:
+                            folder = os.path.dirname(layer_path)
+                            filepath = os.path.join(folder, filepath[2:])
+                        else:
+                            self.log.warning(
+                                "Skipping asset with relative path."
+                                " USD layer's path is unknown so"
+                                " we cannot resolve the full path for"
+                                f" attribute '{path}': {filepath}"
+                            )
+                            continue
+                    else:
+                        filepath = Sdf.ComputeAssetPathRelativeToLayer(
+                            layer, filepath
+                        )
 
                 # Expand <UDIM> to all files of the available files on disk
                 # TODO: Add support for `<TILE>`
