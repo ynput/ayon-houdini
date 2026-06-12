@@ -7,10 +7,10 @@ import dataclasses
 
 import pyblish.api
 
-from ayon_houdini.api.usd import get_layer_save_path
 from pxr import Sdf
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.usd import get_layer_save_path
 
 
 # Colorspace attributes differ per renderer implementation in the USD data
