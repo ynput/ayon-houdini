@@ -120,7 +120,7 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                 )
             )
         else:
-            self.log.debug("Collected no assets.")
+            self.log.debug("Collected no assets")
 
     def get_layer_assets(self, layers: List[Sdf.Layer]) -> List[Resource]:
         # TODO: Correctly resolve paths using Asset Resolver.
