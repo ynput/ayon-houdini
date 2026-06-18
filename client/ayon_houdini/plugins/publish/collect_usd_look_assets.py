@@ -140,6 +140,10 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                 if spec.typeName != "asset":
                     continue
 
+                # Skip Houdini procedurals
+                if self._is_houdini_procedural_path(path):
+                    continue
+
                 if spec.default is None:
                     # This may happen if no default value is authored. Likely
                     # the property is animated or only custom metadata is set
@@ -159,11 +163,6 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     continue
 
                 filepath = asset.path.replace("\\", "/")
-
-                # Skip certain filenames, like `invokegraph.py`
-                if filepath == "invokegraph.py":
-                    self.log.debug(f"Skipping asset at '{path}': {filepath}")
-                    continue
 
                 # Skip AYON entity URIs because these represent already
                 # published files.
@@ -229,6 +228,11 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
         resources.sort(key=lambda r: r.source)
 
         return resources
+
+    def _is_houdini_procedural_path(self, path: Sdf.Path) -> bool:
+        """Return whether path represents a Houdini procedural asset path."""
+        procedural_marker = "houdini:procedural:path"
+        return procedural_marker in path.pathString
 
     def get_colorspace(self, spec: Sdf.AttributeSpec) -> Optional[str]:
         """Return colorspace for a Asset attribute spec.
