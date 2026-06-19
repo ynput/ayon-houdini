@@ -31,9 +31,9 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position -2.36203 0.655861
+position 3.29329 3.76781
 connectornextid 0
-flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
@@ -225,6 +225,7 @@ parentlayer_group	[ 0	locks=0 ]	(	0	)
 loadpayloads	[ 0	locks=0 ]	(	"on"	)
 setstagemetadata	[ 0	locks=0 ]	(	auto	)
 editrootlayer	[ 0	locks=0 ]	(	"on"	)
+ineditblocklabel	[ 0	locks=0 ]	(	"First input is in an Edit Layer Block.  Can only Sublayer into first input's Active Layer."	)
 findsublayers	[ 0	locks=0 ]	(	""	)
 removefoundsublayers	[ 0	locks=0 ]	(	"on"	)
 composition_group	[ 0	locks=0 ]	(	0	)
@@ -419,6 +420,14 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../representation\") language = python }
     }
+    channel nodes_referencing_file {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      start = 40
+      segment { length = 0 expr = "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" language = python }
+    }
     channel project_name {
       lefttype = extend
       righttype = extend
@@ -495,13 +504,21 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../show_pipeline_parms\") }
     }
-    channel nodes_referencing_file {
+    channel enable_repre_filter {
       lefttype = extend
       righttype = extend
-      defaultString = \"\"
+      default = 1
       flags = 0
       start = 40
-      segment { length = 0 expr = "\" \".join(parm.node().path() for parm in hou.parm('./file').parmsReferencingThis())" language = python }
+      segment { length = 0 value = 1 1 expr = ch(\"../enable_repre_filter\") }
+    }
+    channel representation_filter {
+      lefttype = extend
+      righttype = extend
+      defaultString = "\"usd usda usdlc usdnc abc\""
+      flags = 0
+      start = 40
+      segment { length = 0 expr = chs(\"../representation_filter\") }
     }
   }
 
@@ -519,8 +536,8 @@ folder_name	[ 0	locks=0 ]	(	[ folder_name	"`strsplit(chs(\"folder_path\"), \"/\"
 product_name	[ 0	locks=0 ]	(	[ product_name	"" ] 	)
 version	[ 0	locks=0 ]	(	[ version	"" ] 	)
 representation_name	[ 0	locks=0 ]	(	[ representation_name	"" ] 	)
-enable_repre_filter	[ 0	locks=0 ]	(	"on"	)
-representation_filter	[ 0	locks=0 ]	(	"usd usda usdlc usdnc abc"	)
+enable_repre_filter	[ 0	locks=0 ]	(	[ enable_repre_filter	0 ] 	)
+representation_filter	[ 0	locks=0 ]	(	[ representation_filter	"" ] 	)
 clear_cache	[ 0	locks=0 ]	(	[ clear_cache	0 ] 	)
 sepparm	[ 0	locks=0 ]	(	)
 file	[ 0	locks=1 ]	(	[ file	"from ayon_houdini.api import hda_utils
