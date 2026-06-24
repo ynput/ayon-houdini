@@ -12,7 +12,7 @@ class BgeoLoader(plugin.HoudiniLoader):
     """Load bgeo files to Houdini."""
 
     label = "Load bgeo"
-    product_base_types = {"model", "pointcache", "bgeo", "rig"}
+    product_base_types = {"*"}
     product_types = product_base_types
     representations = {"*"}
     extensions = {
