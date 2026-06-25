@@ -5,7 +5,7 @@ class ProductTypeItemModel(BaseSettingsModel):
     _layout = "compact"
     product_type: str = SettingsField(
         title="Product Type",
-        decription="Product type name"
+        description="Product type name"
     )
     label: str = SettingsField(
         "",
