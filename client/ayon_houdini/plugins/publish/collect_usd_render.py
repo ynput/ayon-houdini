@@ -71,6 +71,7 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
         # We only enable it for farm modes — local renders never tile.
         creator_attrs = instance.data.get("creator_attributes", {})
         tile_enabled = bool(creator_attrs.get("tile_rendering", False))
+        instance.data["tileRendering"] = False
         if tile_enabled and instance.data.get("farm"):
             tiles_x = int(creator_attrs.get("tile_count_x", 1))
             tiles_y = int(creator_attrs.get("tile_count_y", 1))
@@ -80,10 +81,6 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
                 instance.data["tilesX"] = tiles_x
                 instance.data["tilesY"] = tiles_y
                 instance.data["tileCount"] = tile_count
-            else:
-                instance.data["tileRendering"] = False
-        else:
-            instance.data["tileRendering"] = False
 
         # stub required data for Submit Publish Job publish plug-in
         instance.data["attachTo"] = []
