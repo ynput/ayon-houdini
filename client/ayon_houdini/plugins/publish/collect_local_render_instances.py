@@ -146,6 +146,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         instance.data["integrate"] = False
 
     def post_process_skeleton_data(
+            self,
             instance: pyblish.api.Instance,
             instance_skeleton_data: dict
         ):
