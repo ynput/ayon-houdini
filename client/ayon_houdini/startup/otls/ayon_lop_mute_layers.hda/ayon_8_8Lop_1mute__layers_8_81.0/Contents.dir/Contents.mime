@@ -169,6 +169,7 @@ Content-Type: text/plain
 version 0.8
 python	[ 0	locks=0 ]	(	"import os
 from typing import List
+from pxr import Sdf
 
 
 def get_paths(
@@ -183,12 +184,12 @@ def get_paths(
     paths = []
     for layer_identifier in layers:
         identifier = layer_identifier
-        
-        # Ignore identifiers that are not a file
-        path = identifier.split(\":SDF_FORMAT_ARGS:\")[0]
-        
-        if not os.path.exists(path):
+
+        if Sdf.Layer.IsAnonymousLayerIdentifier(identifier):
             continue
+
+        # Ignore SDF format args in the filepath
+        path = identifier.split(\":SDF_FORMAT_ARGS:\")[0]
             
         if not hou.text.patternMatch(
             pattern, 
