@@ -21,7 +21,8 @@ class FilePathLoader(plugin.HoudiniLoader):
     order = 9
     icon = "link"
     color = "white"
-    product_types = {"*"}
+    product_base_type = {"*"}
+    product_types = product_base_type
     representations = {"*"}
 
     def load(self, context, name=None, namespace=None, data=None):

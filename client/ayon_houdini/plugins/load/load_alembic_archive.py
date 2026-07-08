@@ -12,7 +12,8 @@ from ayon_houdini.api import (
 class AbcArchiveLoader(plugin.HoudiniLoader):
     """Load Alembic as full geometry network hierarchy """
 
-    product_types = {"model", "animation", "pointcache", "gpuCache"}
+    product_base_types = {"model", "animation", "pointcache", "gpuCache"}
+    product_types = product_base_types
     label = "Load Alembic as Archive"
     representations = {"*"}
     extensions = {"abc"}

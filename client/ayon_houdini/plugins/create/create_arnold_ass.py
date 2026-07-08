@@ -9,8 +9,8 @@ class CreateArnoldAss(plugin.HoudiniCreator):
 
     identifier = "io.openpype.creators.houdini.ass"
     label = "Arnold ASS"
-    product_type = "ass"
     product_base_type = "ass"
+    product_type = product_base_type
     icon = "magic"
     description = __doc__
 

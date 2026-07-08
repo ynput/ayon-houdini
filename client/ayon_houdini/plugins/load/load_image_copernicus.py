@@ -36,7 +36,7 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
     "Object Merge" COP node, so we cannot merge nodes from another Cop network.
     """
 
-    product_types = {
+    product_base_types = {
         "imagesequence",
         "review",
         "render",
@@ -44,6 +44,7 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
         "image",
         "online",
     }
+    product_types = product_base_types
     label = "Load Image (Copernicus)"
     representations = {"*"}
     order = -10

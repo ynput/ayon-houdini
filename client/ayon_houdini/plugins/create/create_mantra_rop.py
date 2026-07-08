@@ -8,8 +8,8 @@ class CreateMantraROP(plugin.RenderLegacyProductTypeCreator):
     """Mantra ROP"""
     identifier = "io.openpype.creators.houdini.mantra_rop"
     label = "Mantra ROP"
-    legacy_product_type = "mantra_rop"
     product_base_type = "render"
+    product_type = product_base_type
     icon = "magic"
     description = "Create Mantra ROP for rendering with Mantra"
 

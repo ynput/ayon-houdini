@@ -16,7 +16,8 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
         "staticMesh",
         "model",
         "usdrender",
-        "usdrop"
+        "usdrop",
+        "apex"
     ]
 
     label = "Collect Output Node Path"
@@ -67,7 +68,7 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
         else:
             raise KnownPublishError(
                 f"ROP node type '{node_type}' is not supported"
-                f" for product type '{instance.data['product_type']}'"
+                f" for product base type '{instance.data['productBaseType']}'"
             )
 
         if not out_node:
