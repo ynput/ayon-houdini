@@ -76,16 +76,6 @@ host_tools.show_scene_inventory(parent)
 ]]></scriptCode>
             </scriptItem>
 
-            <scriptItem id="library_load">
-                <label>Library...</label>
-                <scriptCode><![CDATA[
-import hou
-from ayon_core.tools.utils import host_tools
-parent = hou.qt.mainWindow()
-host_tools.show_library_loader(parent=parent)
-]]></scriptCode>
-            </scriptItem>
-
             <separatorItem/>
 
             <scriptItem id="workfiles">
