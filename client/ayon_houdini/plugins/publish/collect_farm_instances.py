@@ -6,7 +6,6 @@ class CollectFarmInstances(plugin.HoudiniInstancePlugin):
     """Collect instances for farm render."""
 
     order = pyblish.api.CollectorOrder - 0.49
-    families = ["*"]
 
     targets = ["local", "remote"]
     label = "Collect farm instances"
