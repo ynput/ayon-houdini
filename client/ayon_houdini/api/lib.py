@@ -1770,7 +1770,3 @@ def disconnect_node(node: hou.Node, inputs: bool=True, outputs: bool=True):
     if outputs:
         for conn in reversed(node.outputConnections()):
             disconnect_connection(conn)
-
-
-def reset_view_port():
-    ...
