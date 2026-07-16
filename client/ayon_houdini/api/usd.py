@@ -426,7 +426,10 @@ def get_ayon_entity_uri_from_representation_context(context: dict) -> str:
         )
     return uris[0]["uri"]
 
-def clear_resolver_cache(reset_view=True):
+def clear_resolver_cache(
+        reload_all_files=True,
+        reload_viewports=True
+    ):
     try:
         from usdAssetResolver import AyonUsdResolver
     except ModuleNotFoundError:
@@ -435,6 +438,10 @@ def clear_resolver_cache(reset_view=True):
     ctx = AyonUsdResolver.ResolverContext()
     # Clear the resolver cache.
     ctx.ClearCache()
-    # TODO: Reset the viewport
-    if reset_view:
-        ...
+
+    # This can take time in heavy scenes.
+    # For future consideration, we may do
+    # this per layer via `hou.lop.reloadLayer("uri_path")`
+    if reload_all_files:
+        hou.lop.forceReloadAllFilesFromDisk(
+            reload_viewports=reload_viewports)
