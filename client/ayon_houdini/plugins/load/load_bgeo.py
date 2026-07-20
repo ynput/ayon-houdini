@@ -12,7 +12,7 @@ class BgeoLoader(plugin.HoudiniLoader):
     """Load bgeo files to Houdini."""
 
     label = "Load bgeo"
-    product_base_types = {"model", "pointcache", "bgeo"}
+    product_base_types = {"*"}
     product_types = product_base_types
     representations = {"*"}
     extensions = {
@@ -22,7 +22,7 @@ class BgeoLoader(plugin.HoudiniLoader):
     icon = "code-fork"
     color = "orange"
 
-    def load(self, context, name=None, namespace=None, data=None):
+    def load(self, context, name=None, namespace=None, options=None):
         # Get the root node
         obj = hou.node("/obj")
 
