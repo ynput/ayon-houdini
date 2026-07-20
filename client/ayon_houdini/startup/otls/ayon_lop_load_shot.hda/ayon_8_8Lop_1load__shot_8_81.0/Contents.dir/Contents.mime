@@ -31,9 +31,9 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position 3.29329 3.76781
+position -21.8406 10.2867
 connectornextid 0
-flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
@@ -504,21 +504,20 @@ Content-Type: text/plain
       start = 40
       segment { length = 0 expr = ch(\"../show_pipeline_parms\") }
     }
-    channel enable_repre_filter {
+    channel enable_ext_filter {
       lefttype = extend
       righttype = extend
-      default = 1
       flags = 0
       start = 40
-      segment { length = 0 value = 1 1 expr = ch(\"../enable_repre_filter\") }
+      segment { length = 0 expr = ch(\"../enable_ext_filter\") }
     }
-    channel representation_filter {
+    channel extension_filter {
       lefttype = extend
       righttype = extend
-      defaultString = "\"usd usda usdlc usdnc abc\""
+      defaultString = \"\"
       flags = 0
       start = 40
-      segment { length = 0 expr = chs(\"../representation_filter\") }
+      segment { length = 0 expr = chs(\"../extension_filter\") }
     }
   }
 
@@ -536,8 +535,10 @@ folder_name	[ 0	locks=0 ]	(	[ folder_name	"`strsplit(chs(\"folder_path\"), \"/\"
 product_name	[ 0	locks=0 ]	(	[ product_name	"" ] 	)
 version	[ 0	locks=0 ]	(	[ version	"" ] 	)
 representation_name	[ 0	locks=0 ]	(	[ representation_name	"" ] 	)
-enable_repre_filter	[ 0	locks=0 ]	(	[ enable_repre_filter	0 ] 	)
-representation_filter	[ 0	locks=0 ]	(	[ representation_filter	"" ] 	)
+enable_repre_filter	[ 0	locks=0 ]	(	"off"	)
+representation_filter	[ 0	locks=0 ]	(	"usd usda usdlc usdnc abc"	)
+enable_ext_filter	[ 0	locks=0 ]	(	[ enable_ext_filter	0 ] 	)
+extension_filter	[ 0	locks=0 ]	(	[ extension_filter	"" ] 	)
 clear_cache	[ 0	locks=0 ]	(	[ clear_cache	0 ] 	)
 sepparm	[ 0	locks=0 ]	(	)
 file	[ 0	locks=1 ]	(	[ file	"from ayon_houdini.api import hda_utils

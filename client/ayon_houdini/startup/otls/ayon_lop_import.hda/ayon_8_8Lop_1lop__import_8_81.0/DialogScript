@@ -85,21 +85,20 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
-            name    "enable_repre_filter"
-            label   "Enable Representation Filter"
+            name    "enable_ext_filter"
+            label   "Enable Extension Filter"
             type    toggle
-            default { "on" }
+            default { "off" }
             parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_callback_language" "python" }
         }
         parm {
-            name    "representation_filter"
-            label   "Representation Filter"
+            name    "extension_filter"
+            label   "Extension Filter"
             type    string
-            default { "usd usda usdlc usdnc abc" }
-            help    "space separated list of representation names to filter to"
-            disablewhen "{ enable_repre_filter == 0 }"
-            hidewhen "{ enable_repre_filter == 0 }"
+            default { "" }
+            disablewhen "{ enable_ext_filter == 0 }"
+            hidewhen "{ enable_ext_filter == 0 }"
             parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_callback_language" "python" }
         }

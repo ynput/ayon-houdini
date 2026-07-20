@@ -953,11 +953,26 @@ def get_available_representations(node):
 
     representations = get_representations(
         project_name,
-        fields={"name"},
+        fields={"name", "attrib.path"},
         representation_ids=representation_ids,
         representation_names=representation_filter,
     )
-    representations_names = [n["name"] for n in representations]
+    extension_filter = set()
+    filter_parm = node.parm("extension_filter")
+    if filter_parm and not filter_parm.isDisabled() and filter_parm.eval():
+        extension_filter = set(filter_parm.eval().split(" "))
+
+    representations_names = []
+    for n in representations:
+        if extension_filter:
+            _, ext = lib.splitext(
+                n["attrib"]["path"], allowed_multidot_extensions=[
+                    ".ass.gz", ".bgeo.sc", ".bgeo.gz",
+                    ".bgeo.lzma", ".bgeo.bz2"]
+            )
+            if ext not in extension_filter:
+                continue
+        representations_names.append(n["name"])
     return representations_names
 
 
