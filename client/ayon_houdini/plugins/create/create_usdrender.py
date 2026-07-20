@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Creator plugin for creating USD renders."""
 from ayon_houdini.api import plugin
-from ayon_core.lib import BoolDef, EnumDef
+from ayon_core.lib import BoolDef, EnumDef, NumberDef
 
 import hou
 
@@ -33,6 +33,12 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
     default_renderer = "Karma CPU"
     # Default render target
     render_target = "farm_split"
+    # Default tile rendering (overridable from server settings).
+    # Husk takes a 2D X/Y tile grid via `--tile-count X Y`, so we expose
+    # both axes separately rather than a single integer.
+    default_tile_rendering = False
+    default_tile_count_x = 2
+    default_tile_count_y = 2
 
     def create(self, product_name, instance_data, pre_create_data):
 
@@ -40,7 +46,13 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
 
-        for key in ["render_target", "review"]:
+        for key in [
+            "render_target",
+            "review",
+            "tile_rendering",
+            "tile_count_x",
+            "tile_count_y",
+        ]:
             if key in pre_create_data:
                 creator_attributes[key] = pre_create_data[key]
 
@@ -139,7 +151,35 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
             EnumDef("render_target",
                     items=render_target_items,
                     label="Render target",
-                    default=self.render_target)
+                    default=self.render_target),
+            BoolDef("tile_rendering",
+                    label="Tile Rendering",
+                    tooltip=(
+                        "Split each frame into a tilesX × tilesY grid of "
+                        "husk tile tasks rendered in parallel.\nRequires a "
+                        "farm render target."
+                    ),
+                    default=self.default_tile_rendering),
+            NumberDef("tile_count_x",
+                      label="Tiles X",
+                      tooltip=(
+                          "Number of tiles in X "
+                          "(husk-native --tile-count X Y)."
+                      ),
+                      default=self.default_tile_count_x,
+                      minimum=1,
+                      maximum=16,
+                      decimals=0),
+            NumberDef("tile_count_y",
+                      label="Tiles Y",
+                      tooltip=(
+                          "Number of tiles in Y "
+                          "(husk-native --tile-count X Y)."
+                      ),
+                      default=self.default_tile_count_y,
+                      minimum=1,
+                      maximum=16,
+                      decimals=0),
         ]
 
     def get_pre_create_attr_defs(self):
