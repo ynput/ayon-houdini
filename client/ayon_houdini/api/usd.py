@@ -425,3 +425,49 @@ def get_ayon_entity_uri_from_representation_context(context: dict) -> str:
             f"Received data: {response.data}"
         )
     return uris[0]["uri"]
+
+def clear_resolver_cache(
+        node=None,
+        reload_all_files=True,
+        reload_viewports=True
+    ):
+    """Clear Resolver Cache.
+
+    This function clears all resolver caches and reloads affected files.
+
+    This function is primarily called from two places:
+    - AYON Menu: Clears the cache and reloads all files in LOPs.
+    - AYON HDAs: Clears the cache and reloads files loaded by the current node.
+    """
+    try:
+        from usdAssetResolver import AyonUsdResolver
+    except ModuleNotFoundError:
+        return
+
+    ctx = AyonUsdResolver.ResolverContext()
+    # Clear the resolver cache.
+    ctx.ClearCache()
+
+    # Reload loaded files by pressing reload button
+    # either on the generic loader or the import asset or shot.
+    if node:
+        # if it's an import asset or shot, then it has a reload button.
+        reload_button_parm = node.parm("reload")
+        if reload_button_parm:
+            reload_button_parm.pressButton()
+        # if not, then it's a generic lop node, which always has a list
+        # of all nodes that reference the file parameter.
+        ref_nodes_parm = node.parm('nodes_referencing_file')
+        if ref_nodes_parm:
+            for node_path in ref_nodes_parm.eval().split(" "):
+                reload_button = None
+                reload_button = hou.node(node_path).parm("reload")
+                if reload_button:
+                    reload_button.pressButton()
+        # If this triggered from node, we don't want to reload everything.
+        return
+
+    # Reload all loaded USD layers in LOPs.
+    if reload_all_files:
+        hou.lop.forceReloadAllFilesFromDisk(
+            reload_viewports=reload_viewports)

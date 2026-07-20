@@ -104,8 +104,8 @@
             label   "Clear Cache"
             type    button
             default { "0" }
-            help    "The load logic uses expressions that cache into the current session to avoid continuously requeryin the database. This clear that cache to enforce a full refresh of the expressions."
-            parmtag { "script_callback" "hou.phm().expression_clear_cache()" }
+            help    "The load logic uses expressions that cache data into the current session to avoid continuously requerying the database. This function clears that cache to enforce a full refresh of the expressions. Additionally, it clears the AYON USD Resolver cache and reloads the files associated with this node."
+            parmtag { "script_callback" "hou.phm().expression_clear_cache();hou.phm().clear_resolver_cache(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
         }
         parm {

@@ -9,3 +9,4 @@ from ayon_houdini.api.hda_utils import (
     set_to_latest_version,
     expression_clear_cache
 )
+from ayon_houdini.api.usd import clear_resolver_cache
