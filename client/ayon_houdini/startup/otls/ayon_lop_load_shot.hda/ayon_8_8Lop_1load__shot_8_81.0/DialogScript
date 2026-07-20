@@ -85,6 +85,24 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
+            name    "enable_ext_filter"
+            label   "Enable Extension Filter"
+            type    toggle
+            default { "off" }
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "extension_filter"
+            label   "Extension Filter"
+            type    string
+            default { "" }
+            disablewhen "{ enable_ext_filter == 0 }"
+            hidewhen "{ enable_ext_filter == 0 }"
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
             name    "clear_cache"
             label   "Clear Cache"
             type    button
