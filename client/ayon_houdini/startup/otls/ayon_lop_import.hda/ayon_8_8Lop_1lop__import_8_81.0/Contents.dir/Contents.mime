@@ -31,9 +31,9 @@ Content-Disposition: attachment; filename="hdaroot.def"
 Content-Type: text/plain
 
 comment ""
-position 7.84794 10.1791
+position 0.844743 0.44291
 connectornextid 0
-flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on debug off
+flags =  lock off model off template off footprint off xray off bypass off display on render off highlight off unload off savedata off compress on colordefault on exposed on debug off
 outputsNamed3
 {
 }
@@ -47,7 +47,7 @@ stat
 {
   create -1
   modify -1
-  author Mustafa@DESKTOP-JHL3D9H
+  author Mustafa_Taher@Major-Kalawy
   access 0777
 }
 color UT_Color RGB 0.8 0.8 0.8 
@@ -611,7 +611,7 @@ product_name	[ 0	locks=0 ]	(	[ product_name	"" ] 	)
 version	[ 8	locks=0 ]	(	[ version	"" ] 	)
 representation_name	[ 0	locks=0 ]	(	[ representation_name	"" ] 	)
 enable_repre_filter	[ 0	locks=0 ]	(	"off"	)
-representation_filter	[ 0	locks=0 ]	(	"usd usda usdlc usdnc abc"	)
+representation_filter	[ 0	locks=0 ]	(	""	)
 enable_ext_filter	[ 0	locks=0 ]	(	[ enable_ext_filter	0 ] 	)
 extension_filter	[ 0	locks=0 ]	(	[ extension_filter	"" ] 	)
 clear_cache	[ 0	locks=0 ]	(	[ clear_cache	0 ] 	)
