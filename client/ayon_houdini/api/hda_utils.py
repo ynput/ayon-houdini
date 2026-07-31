@@ -946,6 +946,9 @@ def get_available_representations(node):
         entity["representationId"] for entity in entities
     }
 
+    # Refreshing Nodes Parm States
+    node.updateParmStates()
+
     representation_filter = None
     filter_parm = node.parm("representation_filter")
     if filter_parm and not filter_parm.isDisabled() and filter_parm.eval():
