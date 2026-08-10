@@ -455,8 +455,10 @@ def clear_resolver_cache(
         reload_button_parm = node.parm("reload")
         if reload_button_parm:
             reload_button_parm.pressButton()
+            return
         # if not, then it's a generic lop node, which always has a list
         # of all nodes that reference the file parameter.
+        refreshed = False
         ref_nodes_parm = node.parm('nodes_referencing_file')
         if ref_nodes_parm:
             for node_path in ref_nodes_parm.eval().split(" "):
@@ -464,8 +466,11 @@ def clear_resolver_cache(
                 reload_button = hou.node(node_path).parm("reload")
                 if reload_button:
                     reload_button.pressButton()
+                    refreshed  = True
+                    
         # If this triggered from node, we don't want to reload everything.
-        return
+        if refreshed:
+            return
 
     # Reload all loaded USD layers in LOPs.
     if reload_all_files:
