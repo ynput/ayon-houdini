@@ -426,6 +426,7 @@ def get_ayon_entity_uri_from_representation_context(context: dict) -> str:
         )
     return uris[0]["uri"]
 
+
 def clear_resolver_cache(
         node=None,
         reload_all_files=True,
