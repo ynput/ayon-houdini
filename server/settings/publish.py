@@ -150,16 +150,48 @@ class PublishPluginsModel(BaseSettingsModel):
         default_factory=CollectLocalRenderInstancesModel,
         title="Collect Local Render Instances"
     )
+    ValidateAbcPrimitiveToDetail: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate Abc Primitive To Detail",
+        description="Validate Alembic ROP Primitive to Detail "
+                    "attribute is consistent.",
+        section="Validators")
+    ValidateAlembicInputNode: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate Alembic Input Node",
+        description="Validate that the node connected "
+                    "to the output is correct."
+    )
+    ValidatePrimitiveHierarchyPaths: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate Primitive Hierarchy Paths",
+        description="Validate all primitives build hierarchy from"
+                    " attribute when enabled."
+    )
+    ValidateFBXOutputNode: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate FBX Output Node",
+        description="Validate the instance Output Node."
+    )
     ValidateInstanceInContextHoudini: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
-        title="Validate Instance is in same Context",
-        section="Validators")
+        title="Validate Instance is in same Context")
     ValidateMeshIsStatic: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Mesh is Static")
+    ValidateNoErrors: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate No Errors",
+        description="Validate the Instance has no current cooking errors."
+    )
     ValidateSingleFrame: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Single Frame")
+    ValidateSopOutputNode: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate Sop Output Node",
+        description="Validate the instance SOP Output Node."
+    )
     ValidateReviewColorspace: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Review Colorspace")
@@ -169,6 +201,12 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateUnrealStaticMeshName: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Unreal Static Mesh Name")
+    ValidateVDBOutputNode: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate VDB Output Node",
+        description="Validate that the node connected to "
+                    "the output node is of type VDB."
+    )
     ValidateWorkfilePaths: ValidateWorkfilePathsModel = SettingsField(
         default_factory=ValidateWorkfilePathsModel,
         title="Validate workfile paths settings")
@@ -228,6 +266,26 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
             ]
         }
     },
+    "ValidateAbcPrimitiveToDetail": {
+        "enabled": True,
+        "optional": False,
+        "active": True
+    },
+    "ValidateAlembicInputNode": {
+        "enabled": True,
+        "optional": False,
+        "active": True
+    },
+    "ValidatePrimitiveHierarchyPaths": {
+        "enabled": True,
+        "optional": False,
+        "active": True
+    },
+    "ValidateFBXOutputNode": {
+        "enabled": True,
+        "optional": False,
+        "active": True
+    },
     "ValidateInstanceInContextHoudini": {
         "enabled": True,
         "optional": True,
@@ -238,7 +296,17 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "optional": True,
         "active": True
     },
+    "ValidateNoErrors": {
+        "enabled": True,
+        "optional": False,
+        "active": True
+    },
     "ValidateSingleFrame": {
+        "enabled": True,
+        "optional": False,
+        "active": True
+    },
+    "ValidateSopOutputNode": {
         "enabled": True,
         "optional": False,
         "active": True
@@ -256,6 +324,11 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     "ValidateUnrealStaticMeshName": {
         "enabled": False,
         "optional": True,
+        "active": True
+    },
+    "ValidateVDBOutputNode": {
+        "enabled": True,
+        "optional": False,
         "active": True
     },
     "ValidateWorkfilePaths": {
