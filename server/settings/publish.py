@@ -268,22 +268,22 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     },
     "ValidateAbcPrimitiveToDetail": {
         "enabled": True,
-        "optional": True,
+        "optional": False,
         "active": True
     },
     "ValidateAlembicInputNode": {
         "enabled": True,
-        "optional": True,
+        "optional": False,
         "active": True
     },
     "ValidatePrimitiveHierarchyPaths": {
         "enabled": True,
-        "optional": True,
+        "optional": False,
         "active": True
     },
     "ValidateFBXOutputNode": {
         "enabled": True,
-        "optional": True,
+        "optional": False,
         "active": True
     },
     "ValidateInstanceInContextHoudini": {
@@ -298,7 +298,7 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     },
     "ValidateNoErrors": {
         "enabled": True,
-        "optional": True,
+        "optional": False,
         "active": True
     },
     "ValidateSingleFrame": {
@@ -308,7 +308,7 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     },
     "ValidateSopOutputNode": {
         "enabled": True,
-        "optional": True,
+        "optional": False,
         "active": True
     },
     "ValidateReviewColorspace": {
@@ -327,8 +327,8 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
         "active": True
     },
     "ValidateVDBOutputNode": {
-        "enabled": False,
-        "optional": True,
+        "enabled": True,
+        "optional": False,
         "active": True
     },
     "ValidateWorkfilePaths": {
