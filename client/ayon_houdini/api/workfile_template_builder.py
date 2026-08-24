@@ -199,8 +199,10 @@ def trigger_on_new_file() -> None:
 
 def build_workfile_template(*args, **kwargs):
     builder = HoudiniTemplateBuilder(registered_host())
-    builder.build_template()
-
+    preset = builder.get_template_preset()
+    if not preset.has_valid_path():
+        return
+    builder.build_template(preset=preset)
 
 def update_workfile_template(*args):
     builder = HoudiniTemplateBuilder(registered_host())
