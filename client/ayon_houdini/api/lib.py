@@ -1563,14 +1563,17 @@ def prompt_reset_context():
 
 def start_workfile_template_builder():
     from .workfile_template_builder import (
-        build_workfile_template
+        trigger_on_new_file,
+        trigger_on_app_launch,
     )
-
-    log.info("Starting workfile template builder...")
-    try:
-        build_workfile_template(workfile_creation_enabled=True)
-    except TemplateProfileNotFound:
-        log.warning("Template profile not found. Skipping...")
+    host = registered_host()
+    if host.hou_initialized:
+        log.info("Starting workfile template builder...")
+        trigger_on_new_file()
+    else:
+        host.hou_initialized = True
+        if not host.get_current_workfile():
+            trigger_on_app_launch()
 
 
 def show_node_parmeditor(node):

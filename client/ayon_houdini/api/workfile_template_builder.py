@@ -181,10 +181,25 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         return data
 
 
-def build_workfile_template(*args, **kwargs):
-    # NOTE Should we inform users that they'll lose unsaved changes ?
+def trigger_on_app_launch() -> None:
+    """Build the workfile template during application
+    launch if the setting is enabled.
+    """
     builder = HoudiniTemplateBuilder(registered_host())
-    builder.build_template(*args, **kwargs)
+    builder.trigger_on_app_launch()
+
+
+def trigger_on_new_file() -> None:
+    """Build the workfile template during new file creation
+    if the setting is enabled.
+    """
+    builder = HoudiniTemplateBuilder(registered_host())
+    builder.trigger_on_new_file()
+
+
+def build_workfile_template(*args, **kwargs):
+    builder = HoudiniTemplateBuilder(registered_host())
+    builder.build_template()
 
 
 def update_workfile_template(*args):
