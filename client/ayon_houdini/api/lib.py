@@ -24,9 +24,6 @@ from ayon_core.pipeline import (
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.template_data import get_template_data
 from ayon_core.pipeline.context_tools import get_current_task_entity
-from ayon_core.pipeline.workfile.workfile_template_builder import (
-    TemplateProfileNotFound
-)
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
 
@@ -1563,14 +1560,17 @@ def prompt_reset_context():
 
 def start_workfile_template_builder():
     from .workfile_template_builder import (
-        build_workfile_template
+        trigger_on_new_file,
+        trigger_on_app_launch,
     )
-
-    log.info("Starting workfile template builder...")
-    try:
-        build_workfile_template(workfile_creation_enabled=True)
-    except TemplateProfileNotFound:
-        log.warning("Template profile not found. Skipping...")
+    host = registered_host()
+    if host.hou_initialized:
+        log.info("Starting workfile template builder...")
+        trigger_on_new_file()
+    else:
+        host.hou_initialized = True
+        if not host.get_current_workfile():
+            trigger_on_app_launch()
 
 
 def show_node_parmeditor(node):
