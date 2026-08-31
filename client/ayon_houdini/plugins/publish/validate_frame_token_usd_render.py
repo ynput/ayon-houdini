@@ -78,5 +78,9 @@ class ValidateFrameTokenUSDRender(plugin.HoudiniInstancePlugin):
             # Already fixed
             return
 
+        import os 
+
         rop_node = hou.node(instance.data["instance_node"])
-        rop_node.parm("lopoutput").set("__render__.$F4.usd")
+        lopoutput = rop_node.parm("lopoutput").eval()
+        path, ext = os.path.splitext(lopoutput)
+        rop_node.parm("lopoutput").set(f"{path}.$F4{ext}")
