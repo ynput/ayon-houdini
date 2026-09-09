@@ -50,7 +50,10 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
         # clique.PATTERNS["frames"] supports only `.1001.exr` not `_1001.exr`.
         templates = instance.context.data["anatomy"]["templates"]
         frame_padding = int(templates["common"]["frame_padding"])
-        pattern = f"[_.](?P<index>(?P<padding>0*)\\d{{{frame_padding},}}+)\\.\\D+\\d?$"
+        pattern = (
+            f"[_.](?P<index>(?P<padding>0*)\\d{{{frame_padding},}}+)"
+            "\\.\\D+\\d?$"
+        )
         frame_collection, _ = clique.assemble(
             [file_name],
             patterns=[pattern],
