@@ -7,7 +7,6 @@ from ayon_core.pipeline import PublishValidationError
 
 from ayon_houdini.api.action import SelectROPAction
 from ayon_houdini.api import plugin
-from ayon_houdini.api.usd import get_usd_render_rop_rendersettings
 
 
 
@@ -55,24 +54,16 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
 
         if not instance.data.get("files", []):
             node = hou.node(node_path)
-            
-            rendersettings_path = (
-                node.evalParm("rendersettings") 
-                or instance.data["stage"].GetMetadata("renderSettingsPrimPath")
-                or "/Render/rendersettings"
-            )
-
-            if not instance.data["stage"].GetPrimAtPath(rendersettings_path):
-                self.log.warning(f"No render settings primitive found at: {rendersettings_path}")
             stage = instance.data["stage"]
             rendersettings_path: str = (
-                node.evalParm("rendersettings") 
+                node.evalParm("rendersettings")
                 or stage.GetMetadata("renderSettingsPrimPath")
                 or "/Render/rendersettings"
             )
 
             if not stage.GetPrimAtPath(rendersettings_path):
                 self.log.warning(f"No render settings primitive found at: {rendersettings_path}")
+
             raise PublishValidationError(
                 message=(
                     "No Render Products found in Render Settings "
