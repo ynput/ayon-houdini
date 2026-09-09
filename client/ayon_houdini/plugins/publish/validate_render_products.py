@@ -53,8 +53,10 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
 
         if not instance.data.get("files", []):
             node = hou.node(node_path)
+            lop_stage = node.parm("loppath").evalAsNode().stage()
+            
             rendersettings_path = (
-                node.evalParm("rendersettings") or "/Render/rendersettings"
+                node.evalParm("rendersettings") or lop_stage.GetMetadata("renderSettingsPrimPath")
             )
             raise PublishValidationError(
                 message=(

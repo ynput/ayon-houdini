@@ -341,7 +341,7 @@ def get_usd_render_rop_rendersettings(rop_node, stage=None, logger=None):
     path = rop_node.evalParm("rendersettings")
     if not path:
         # Default behavior
-        path = "/Render/rendersettings"
+        path = stage.GetMetadata("renderSettingsPrimPath")
 
     prim = stage.GetPrimAtPath(path)
     if not prim:
