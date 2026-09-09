@@ -9,7 +9,6 @@ from ayon_houdini.api.action import SelectROPAction
 from ayon_houdini.api import plugin
 
 
-
 class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
     """Validate at least one render product is present"""
 
