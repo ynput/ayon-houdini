@@ -53,9 +53,19 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
 
         if not instance.data.get("files", []):
             node = hou.node(node_path)
-            rendersettings_path = (
-                node.evalParm("rendersettings") or "/Render/rendersettings"
+            stage = instance.data["stage"]
+            rendersettings_path: str = (
+                node.evalParm("rendersettings")
+                or stage.GetMetadata("renderSettingsPrimPath")
+                or "/Render/rendersettings"
             )
+
+            if not stage.GetPrimAtPath(rendersettings_path):
+                self.log.warning(
+                    "No render settings primitive found at: "
+                    f"{rendersettings_path}"
+                )
+
             raise PublishValidationError(
                 message=(
                     "No Render Products found in Render Settings "
