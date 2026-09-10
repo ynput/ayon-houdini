@@ -803,6 +803,35 @@ def get_output_children(output_node, include_sops=True):
     return out_list
 
 
+def node_matches_filter(
+    node: hou.Node,
+    node_type_filter: hou.nodeTypeFilter,
+) -> bool:
+    """Check if the given node matches a hou.nodeTypeFilter.
+
+    Args:
+        node (hou.Node): The node to check.
+        node_type_filter (hou.nodeTypeFilter): The node type filter to check.
+
+    Returns:
+        bool: True if the node matches the node type filter, False otherwise.
+
+    """
+    if node_type_filter == hou.nodeTypeFilter.NoFilter:
+        return True
+
+    name = node.name()
+    parent = node.parent() or hou.root()
+
+    # houdini does not seem to have a simple "node matches filter" function
+    # so we repurpose the "recursiveGlob" function here
+    return node in parent.recursiveGlob(
+        pattern=name,
+        filter=node_type_filter,  # ty: ignore[invalid-argument-type]  hou-types has invalid type for filter
+        include_subnets=False,
+    )
+
+
 def get_resolution_from_entity(entity):
     """Get resolution from the given entity.
 
