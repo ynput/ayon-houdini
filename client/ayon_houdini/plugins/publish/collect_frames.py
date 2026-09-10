@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Collector plugin for frames data on ROP instances."""
 import os
+import re
 import hou  # noqa
-import clique
 import pyblish.api
 from ayon_houdini.api import lib, plugin
 
@@ -28,41 +28,40 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
         # Evaluate the file name at the first frame.
         ropnode = hou.node(instance.data["instance_node"])
         output_parm = lib.get_output_parameter(ropnode)
-        output = output_parm.evalAtFrame(start_frame)
+        output = lib.evalParmNoFrame(ropnode, output_parm.name())
         file_name = os.path.basename(output)
 
-        # todo: `frames` currently conflicts with "explicit frames" for a
-        #       for a custom frame list. So this should be refactored.
+        frames = self.compute_frames(file_name, start_frame, end_frame)
+        self.log.debug(f"Collected Frames: {frames}")
 
         instance.data.update({
-            "frames": file_name,  # Set frames to the file name by default.
+            "frames": frames,
             "stagingDir": os.path.dirname(output)
         })
 
-        # Skip unnecessary logic if start and end frames are equal.
-        if start_frame == end_frame:
-            return
+    def compute_frames(self, file_name, start, end):
+            """Compute output frames.
 
-        # Create collection using frame pattern.
-        # e.g. 'pointcacheBgeoCache_AB010.1001.bgeo'
-        # will be <Collection "pointcacheBgeoCache_AB010.%d.bgeo [1001]">
-        # we use a customized pattern as
-        # clique.PATTERNS["frames"] supports only `.1001.exr` not `_1001.exr`.
-        pattern = "[_.](?P<index>(?P<padding>0*)\\d+)\\.\\D+\\d?$"
-        frame_collection, _ = clique.assemble(
-            [file_name],
-            patterns=[pattern],
-            minimum_items=1
-        )
+            Args:
+                file_name (str): Input file path containing hash tokens.
+                start (int): Start frame.
+                end (int): End frame.
 
-        # Return as no frame pattern detected.
-        if not frame_collection:
-            return
+            Returns:
+                str | list[str]: A single frame path or a list of frame paths.
+            """
 
-        # It's always expected to be one collection.
-        frame_collection = frame_collection[0]
-        frame_collection.indexes.clear()
-        frame_collection.indexes.update(
-            list(range(start_frame, end_frame + 1))
-        )
-        instance.data["frames"] = list(frame_collection)
+            if "#" in file_name:
+                def replace(match):
+                    return "%0{}d".format(len(match.group()))
+
+                file_name = re.sub("#+", replace, file_name)
+
+            if "%" not in file_name:
+                return file_name
+
+            files = []
+            for i in range(int(start), (int(end) + 1)):
+                files.append(file_name % i)
+
+            return files
