@@ -31,9 +31,6 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
         output = lib.evalParmNoFrame(ropnode, output_parm.name())
         file_name = os.path.basename(output)
 
-        # todo: `frames` currently conflicts with "explicit frames" for a
-        #       for a custom frame list. So this should be refactored.
-
         frames = self.compute_frames(file_name, start_frame, end_frame)
         self.log.debug(f"Collected Frames: {frames}")
 
