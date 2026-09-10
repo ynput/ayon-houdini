@@ -61,7 +61,10 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
             )
 
             if not stage.GetPrimAtPath(rendersettings_path):
-                self.log.warning(f"No render settings primitive found at: {rendersettings_path}")
+                self.log.warning(
+                    "No render settings primitive found at: "
+                    f"{rendersettings_path}"
+                )
 
             raise PublishValidationError(
                 message=(

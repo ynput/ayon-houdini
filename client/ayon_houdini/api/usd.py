@@ -340,7 +340,7 @@ def get_usd_render_rop_rendersettings(rop_node, stage=None, logger=None):
 
     path = (
         rop_node.evalParm("rendersettings")
-        or stage.GetMetadata("renderSettingsPrimPath") 
+        or stage.GetMetadata("renderSettingsPrimPath")
         or "/Render/rendersettings"
     )
 
