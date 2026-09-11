@@ -1,0 +1,2847 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY"
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename=".OPfallbacks"
+Content-Type: application/external-reference
+
+.OPfallbacks
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename=".OPdummydefs"
+Content-Type: application/external-reference
+
+.OPdummydefs
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="node_type"
+Content-Type: text/plain
+
+Sop
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.init"
+Content-Type: text/plain
+
+type = ayon::load_apex_rig::1.0
+matchesdef = 0
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 5.77437 1.80302
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+0 "output1"
+}
+inputsNamed3
+{
+1 	turret1 0 1 "input1"
+}
+inputs
+{
+0 	turret1 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.inp"
+Content-Type: text/plain
+
+1
+0 0 6 2 0 __NO_OWNER_NETWORK_BOX__ "FROMOUTPUT"
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/__stickynote1.postitinit"
+Content-Type: text/plain
+
+type = postitnote
+matchesdef = 0
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/__stickynote1.postitdef"
+Content-Type: text/plain
+
+text "Map prim paths in rig to match their new path value in the USD scene."
+position 9.49617 1.80254
+size 2.5 1.14098
+flags = minimize off
+stat
+{
+  create 1773898602
+  modify 1773920178
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 1 0.969 0.522 
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/__stickynote2.postitinit"
+Content-Type: text/plain
+
+type = postitnote
+matchesdef = 0
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/__stickynote2.postitdef"
+Content-Type: text/plain
+
+text "Transfere path to geo"
+position -2.83717 1.13364
+size 2.5 0.606636
+flags = minimize off
+stat
+{
+  create 1773898602
+  modify 1773920189
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 1 0.969 0.522 
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/__stickynote3.postitinit"
+Content-Type: text/plain
+
+type = postitnote
+matchesdef = 0
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/__stickynote3.postitdef"
+Content-Type: text/plain
+
+text "If the primitive doesn't have \"ayon:apex_rig\", it'll be considered a prop."
+position -3.51201 4.42681
+size 3.04351 1.28159
+flags = minimize off
+stat
+{
+  create 1776249959
+  modify 1776249990
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 1 0.969 0.522 
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/output0.init"
+Content-Type: text/plain
+
+type = output
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/output0.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 0.2136 -7.50378
+connectornextid 1
+flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+}
+inputsNamed3
+{
+0 	switch_asset_prop 2 1 "input1"
+}
+inputs
+{
+0 	switch_asset_prop 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/output0.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+outputidx	[ 0	locks=0 ]	(	0	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/output0.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/IN.init"
+Content-Type: text/plain
+
+type = null
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/IN.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position -1.34664e-08 3.80515
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+0 	get_rig_path 1 1 "input1"
+}
+inputs
+{
+0 	get_rig_path 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.6 0.7 0.77 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/IN.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+copyinput	[ 0	locks=0 ]	(	"on"	)
+cacheinput	[ 0	locks=0 ]	(	"off"	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/IN.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/load_rig.init"
+Content-Type: text/plain
+
+type = file
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/load_rig.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 3.31462 4.11369
+connectornextid 0
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+}
+inputs
+{
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.9 0.8 0.55 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/load_rig.spareparmdef"
+Content-Type: text/plain
+
+    parm {
+        name    "filemode"
+        baseparm
+        label   "File Mode"
+        export  none
+    }
+    parm {
+        name    "file"
+        baseparm
+        label   "Geometry File"
+        export  all
+    }
+    parm {
+        name    "reload"
+        baseparm
+        label   "Reload Geometry"
+        export  none
+    }
+    parm {
+        name    "objpattern"
+        baseparm
+        label   "Object Mask"
+        export  none
+    }
+    parm {
+        name    "geodatapath"
+        baseparm
+        label   "Geometry Data Path"
+        export  none
+    }
+    parm {
+        name    "missingframe"
+        baseparm
+        label   "Missing Frame"
+        export  none
+    }
+    parm {
+        name    "loadtype"
+        baseparm
+        label   "Load"
+        export  none
+    }
+    parm {
+        name    "packedviewedit"
+        baseparm
+        label   "Display Packed As"
+        export  none
+    }
+    parm {
+        name    "viewportlod"
+        baseparm
+        label   "Display As"
+        export  none
+    }
+    parm {
+        name    "packexpanded"
+        baseparm
+        label   "Pack Using Expanded/Absolute File Path"
+        export  none
+    }
+    parm {
+        name    "delayload"
+        baseparm
+        label   "Delay Load Geometry"
+        export  none
+    }
+    parm {
+        name    "mkpath"
+        baseparm
+        label   "Create Intermediate Directories"
+        export  none
+    }
+    parm {
+        name    "cachesize"
+        baseparm
+        label   "Cache Frames"
+        export  none
+    }
+    parm {
+        name    "prefetch"
+        baseparm
+        label   "Pre-fetch Geometry"
+        export  none
+    }
+    parm {
+        name    "f"
+        baseparm
+        label   "Frame Range"
+        export  none
+    }
+    parm {
+        name    "index"
+        baseparm
+        label   "Sequence Index"
+        export  none
+    }
+    parm {
+        name    "wrap"
+        baseparm
+        label   "Wrap Mode"
+        export  none
+    }
+    parm {
+        name    "retry"
+        baseparm
+        label   "Save/Load Retries"
+        export  none
+    }
+    parm {
+        name    "spare_input0"
+        label   "Spare Input 0"
+        type    oppath
+        default { "" }
+        help    "Refer to this in expressions as -1, such as: npoints(-1)"
+        parmtag { "cook_dependent" "1" }
+        parmtag { "opfilter" "!!SOP!!" }
+        parmtag { "oprelative" "." }
+    }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/load_rig.chn"
+Content-Type: text/plain
+
+{
+    channel index {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      segment { length = 0 expr = $FF-ch(\"f1\") }
+    }
+  }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/load_rig.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+filemode	[ 0	locks=0 ]	(	"read"	)
+file	[ 0	locks=0 ]	(	"`prims(-1, 0, \"rig_path\")`"	)
+reload	[ 0	locks=0 ]	(	0	)
+objpattern	[ 0	locks=0 ]	(	*	)
+geodatapath	[ 0	locks=0 ]	(	""	)
+missingframe	[ 0	locks=0 ]	(	"error"	)
+loadtype	[ 0	locks=0 ]	(	"full"	)
+packedviewedit	[ 0	locks=0 ]	(	"unchanged"	)
+viewportlod	[ 0	locks=0 ]	(	"box"	)
+packexpanded	[ 0	locks=0 ]	(	"on"	)
+delayload	[ 0	locks=0 ]	(	"off"	)
+mkpath	[ 0	locks=0 ]	(	"on"	)
+cachesize	[ 0	locks=0 ]	(	0	)
+prefetch	[ 0	locks=0 ]	(	"off"	)
+f	[ 0	locks=0 ]	(	1	24	)
+index	[ 0	locks=0 ]	(	[ index	0 ] 	)
+wrap	[ 0	locks=0 ]	(	"cycle"	)
+retry	[ 0	locks=0 ]	(	0	)
+spare_input0	[ 0	locks=0 ]	(	../IN	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/load_rig.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_additivelayer":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_endframe":{
+		"type":"string",
+		"value":"240"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_frequency":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_keep":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_newlayer":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_resample":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_startframe":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_useframerange":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_settings_widget_constraint_baketoLayer":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_settings_widget_constraint_key_mode":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_settings_widget_constraint_updatebookmarks":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_settings_widget_constraint_updateconstraintvisualizer":{
+		"type":"string",
+		"value":"0"
+	},
+	"clickdrag":{
+		"type":"string",
+		"value":"0"
+	},
+	"controlxray":{
+		"type":"string",
+		"value":"1"
+	},
+	"hidecontrolgroups":{
+		"type":"string",
+		"value":"0"
+	},
+	"hidecontrolsduringdrag":{
+		"type":"string",
+		"value":"0"
+	},
+	"hidecontrolsduringplayback":{
+		"type":"string",
+		"value":"1"
+	},
+	"hidecontrolsduringscrub":{
+		"type":"string",
+		"value":"0"
+	},
+	"hidefbikdefaultmappingprompt":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_autopos":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_channel_panel_autoresize":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_channel_panel_height":{
+		"type":"string",
+		"value":"100"
+	},
+	"hud_channel_panel_locked":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_minimize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_pin":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_posx":{
+		"type":"string",
+		"value":"1139"
+	},
+	"hud_channel_panel_posy":{
+		"type":"string",
+		"value":"457"
+	},
+	"hud_channel_panel_titlevis":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_channel_panel_visible":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_width":{
+		"type":"string",
+		"value":"200"
+	},
+	"hud_mouse_sel_panel_autopos":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_mouse_sel_panel_autoresize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_height":{
+		"type":"string",
+		"value":"200"
+	},
+	"hud_mouse_sel_panel_locked":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_minimize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_pin":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_posx":{
+		"type":"string",
+		"value":"1139"
+	},
+	"hud_mouse_sel_panel_posy":{
+		"type":"string",
+		"value":"416"
+	},
+	"hud_mouse_sel_panel_titlevis":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_mouse_sel_panel_visible":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_width":{
+		"type":"string",
+		"value":"200"
+	},
+	"hud_parameter_panel_Use Control Auto Snap":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_autohandlexform":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_autopos":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_autoresize":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_additivelayer":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_endframe":{
+		"type":"string",
+		"value":"240"
+	},
+	"hud_parameter_panel_bake_frequency":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_keep":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_bake_newlayer":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_resample":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_bake_startframe":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_useframerange":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_enforcelimits":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_framingzoom":{
+		"type":"string",
+		"value":"1.0"
+	},
+	"hud_parameter_panel_height":{
+		"type":"string",
+		"value":"360"
+	},
+	"hud_parameter_panel_locked":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_minimize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_motionpathframesafter":{
+		"type":"string",
+		"value":"10"
+	},
+	"hud_parameter_panel_motionpathframesbefore":{
+		"type":"string",
+		"value":"10"
+	},
+	"hud_parameter_panel_motionpathkeysize":{
+		"type":"string",
+		"value":"1.0"
+	},
+	"hud_parameter_panel_motionpathlimitframes":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_motionpathpathwidth":{
+		"type":"string",
+		"value":"1.0"
+	},
+	"hud_parameter_panel_pin":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_posx":{
+		"type":"string",
+		"value":"960"
+	},
+	"hud_parameter_panel_posy":{
+		"type":"string",
+		"value":"715"
+	},
+	"hud_parameter_panel_showlimits":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_titlevis":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_visible":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_width":{
+		"type":"string",
+		"value":"360"
+	},
+	"hud_sel_panel_autopos":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_sel_panel_autoresize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_sel_panel_height":{
+		"type":"string",
+		"value":"400"
+	},
+	"hud_sel_panel_locked":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_sel_panel_minimize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_sel_panel_pin":{
+		"type":"string",
+		"value":"2"
+	},
+	"hud_sel_panel_posx":{
+		"type":"string",
+		"value":"2166"
+	},
+	"hud_sel_panel_posy":{
+		"type":"string",
+		"value":"675"
+	},
+	"hud_sel_panel_titlevis":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_sel_panel_visible":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_sel_panel_width":{
+		"type":"string",
+		"value":"200"
+	},
+	"skincontrol":{
+		"type":"string",
+		"value":"1"
+	},
+	"xform_handle_gimbal_mode":{
+		"type":"string",
+		"value":"0"
+	},
+	"xform_handle_pivot_mode":{
+		"type":"string",
+		"value":"0"
+	},
+	"xform_handle_r_alignment":{
+		"type":"string",
+		"value":"local"
+	},
+	"xform_handle_s_alignment":{
+		"type":"string",
+		"value":"local"
+	},
+	"xform_handle_separate_align":{
+		"type":"string",
+		"value":"0"
+	},
+	"xform_handle_t_alignment":{
+		"type":"string",
+		"value":"local"
+	},
+	"xform_handle_xform_mode":{
+		"type":"string",
+		"value":"t"
+	},
+	"xray_strength":{
+		"type":"string",
+		"value":"1.0"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/unpackcharacter.init"
+Content-Type: text/plain
+
+type = apex::unpackcharacter
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/unpackcharacter.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 5.37383 3.33421
+connectornextid 5
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+1 "output1"
+2 "output2"
+3 "output3"
+4 "output4"
+}
+inputsNamed3
+{
+0 	load_rig 1 1 "input1"
+}
+inputs
+{
+0 	load_rig 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author alexandru.preoteasa@WORK69.staticvfx.local
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/unpackcharacter.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+charname	[ 0	locks=0 ]	(	""	)
+shapepath	[ 0	locks=0 ]	(	/Base.shp	)
+skelpath	[ 0	locks=0 ]	(	/Base.skel	)
+rigpath	[ 0	locks=0 ]	(	/Base.rig	)
+clip	[ 0	locks=0 ]	(	""	)
+visoutput	[ 0	locks=0 ]	(	"character"	)
+doname	[ 0	locks=0 ]	(	"off"	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/unpackcharacter.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/packcharacter.init"
+Content-Type: text/plain
+
+type = apex::packcharacter
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/packcharacter.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 5.37383 0.218829
+connectornextid 5
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+4 "output1"
+}
+inputsNamed3
+{
+0 	unpackcharacter 1 1 "input1"
+1 	map_path 1 1 "input2"
+2 	unpackcharacter 3 1 "input3"
+3 	unpackcharacter 4 1 "input4"
+}
+inputs
+{
+0 	unpackcharacter 0 1
+1 	map_path 0 1
+2 	unpackcharacter 2 1
+3 	unpackcharacter 3 1
+}
+stat
+{
+  create -1
+  modify -1
+  author alexandru.preoteasa@WORK69.staticvfx.local
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/packcharacter.chn"
+Content-Type: text/plain
+
+{
+    channel framerange1 {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      start = 40
+      segment { length = 0 expr = $FSTART }
+    }
+    channel framerange2 {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      start = 40
+      segment { length = 0 expr = $FEND }
+    }
+  }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/packcharacter.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+isscene	[ 0	locks=0 ]	(	"off"	)
+charname	[ 0	locks=0 ]	(	""	)
+shapepath	[ 0	locks=0 ]	(	/Base.shp	)
+skelpath	[ 0	locks=0 ]	(	/Base.skel	)
+rigpath	[ 0	locks=0 ]	(	/Base.rig	)
+addbaserig	[ 0	locks=0 ]	(	"off"	)
+folder0	[ 0	locks=0 ]	(	0	)
+tpromotegroup	[ 0	locks=0 ]	(	root	)
+rpromotegroup	[ 0	locks=0 ]	(	*	)
+spromotegroup	[ 0	locks=0 ]	(	""	)
+anim	[ 0	locks=0 ]	(	1	)
+addanim	[ 0	locks=0 ]	(	"off"	)
+animparms	[ 0	locks=0 ]	(	0	)
+mapusing	[ 0	locks=0 ]	(	"mappingproperty"	)
+mappingpropertyname	[ 0	locks=0 ]	(	mapping	)
+framerange	[ 0	locks=0 ]	(	[ framerange1	0 ] 	[ framerange2	0 ] 	)
+framepattern	[ 0	locks=0 ]	(	*	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/packcharacter.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/map_path.init"
+Content-Type: text/plain
+
+type = attribwrangle
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/map_path.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 6.56826 1.84044
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+0 	unpackcharacter 2 1 "input1"
+}
+inputs
+{
+0 	unpackcharacter 1 1
+}
+stat
+{
+  create -1
+  modify -1
+  author alexandru.preoteasa@WORK69.staticvfx.local
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/map_path.spareparmdef"
+Content-Type: text/plain
+
+    group {
+        name    "folder1"
+        label   "Code"
+        grouptag { "sidefx::switcher" "folder0" }
+
+        parm {
+            name    "group"
+            baseparm
+            label   "Group"
+            export  none
+            bindselector uvselect "Modify Attribs"
+                "Select the geometry to affect and press Enter to complete."
+                0 1 0xffffffff 0 grouptype 0
+        }
+        parm {
+            name    "grouptype"
+            baseparm
+            label   "Group Type"
+            export  none
+        }
+        parm {
+            name    "class"
+            baseparm
+            label   "Run Over"
+            export  none
+        }
+        parm {
+            name    "vex_numcount"
+            baseparm
+            label   "Number Count"
+            export  none
+        }
+        parm {
+            name    "vex_threadjobsize"
+            baseparm
+            label   "Thread Job Size"
+            export  none
+        }
+        parm {
+            name    "snippet"
+            baseparm
+            label   "VEXpression"
+            export  all
+        }
+        parm {
+            name    "exportlist"
+            baseparm
+            label   "Attributes to Create"
+            export  none
+        }
+        parm {
+            name    "vex_strict"
+            baseparm
+            label   "Enforce Prototypes"
+            export  none
+        }
+        parm {
+            name    "vex_strictvariables"
+            baseparm
+            label   "Standard Variable Names Only"
+            export  none
+        }
+    }
+
+    group {
+        name    "folder1_1"
+        label   "Bindings"
+
+        parm {
+            name    "autobind"
+            baseparm
+            label   "Autobind by Name"
+            export  none
+        }
+        multiparm {
+            name    "bindings"
+            label    "Number of Bindings"
+            baseparm
+            default 0
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "multistartoffset" "1" }
+
+            parm {
+                name    "bindname#"
+                baseparm
+                label   "Attribute Name"
+                export  none
+            }
+            parm {
+                name    "bindparm#"
+                baseparm
+                label   "VEX Parameter"
+                export  none
+            }
+        }
+
+        parm {
+            name    "groupautobind"
+            baseparm
+            label   "Autobind Groups by Name"
+            export  none
+        }
+        multiparm {
+            name    "groupbindings"
+            label    "Group Bindings"
+            baseparm
+            default 0
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "multistartoffset" "1" }
+
+            parm {
+                name    "bindgroupname#"
+                baseparm
+                label   "Group Name"
+                export  none
+            }
+            parm {
+                name    "bindgroupparm#"
+                baseparm
+                label   "VEX Parameter"
+                export  none
+            }
+        }
+
+        parm {
+            name    "vex_cwdpath"
+            baseparm
+            label   "Evaluation Node Path"
+            export  none
+        }
+        parm {
+            name    "vex_outputmask"
+            baseparm
+            label   "Export Parameters"
+            export  none
+        }
+        parm {
+            name    "vex_updatenmls"
+            baseparm
+            label   "Update Normals If Displaced"
+            export  none
+        }
+        parm {
+            name    "vex_matchattrib"
+            baseparm
+            label   "Attribute to Match"
+            export  none
+        }
+        parm {
+            name    "vex_inplace"
+            baseparm
+            label   "Compute Results In Place"
+            export  none
+        }
+        parm {
+            name    "vex_selectiongroup"
+            baseparm
+            label   "Output Selection Group"
+            export  none
+        }
+        parm {
+            name    "vex_precision"
+            baseparm
+            label   "VEX Precision"
+            export  none
+        }
+    }
+
+    parm {
+        name    "spare_input0"
+        label   "Spare Input 0"
+        type    oppath
+        default { "" }
+        help    "Refer to this in expressions as -1, such as: npoints(-1)"
+        parmtag { "cook_dependent" "1" }
+        parmtag { "opfilter" "!!SOP!!" }
+        parmtag { "oprelative" "." }
+    }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/map_path.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+folder0	[ 0	locks=0 ]	(	0	0	)
+group	[ 0	locks=0 ]	(	""	)
+grouptype	[ 0	locks=0 ]	(	"guess"	)
+class	[ 0	locks=0 ]	(	"primitive"	)
+vex_numcount	[ 0	locks=0 ]	(	10	)
+vex_threadjobsize	[ 0	locks=0 ]	(	1024	)
+snippet	[ 0	locks=0 ]	(	"// Map path
+s@path = prim(-1,\"path\",0) +\"/\"+ prim(0,\"name\",@primnum);
+// Set asset name
+s@asset_name= prim(-1,\"name\",0);"	)
+exportlist	[ 8	locks=0 ]	(	*	)
+vex_strict	[ 0	locks=0 ]	(	"off"	)
+vex_strictvariables	[ 0	locks=0 ]	(	"on"	)
+autobind	[ 0	locks=0 ]	(	"on"	)
+bindings	[ 0	locks=0 ]	(	0	)
+groupautobind	[ 0	locks=0 ]	(	"on"	)
+groupbindings	[ 0	locks=0 ]	(	0	)
+vex_cwdpath	[ 0	locks=0 ]	(	.	)
+vex_outputmask	[ 0	locks=0 ]	(	*	)
+vex_updatenmls	[ 0	locks=0 ]	(	"off"	)
+vex_matchattrib	[ 0	locks=0 ]	(	id	)
+vex_inplace	[ 0	locks=0 ]	(	"off"	)
+vex_selectiongroup	[ 0	locks=0 ]	(	""	)
+vex_precision	[ 0	locks=0 ]	(	auto	)
+folder1	[ 0	locks=0 ]	(	0	0	)
+spare_input0	[ 0	locks=0 ]	(	../IN	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/map_path.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/switch_asset_prop.init"
+Content-Type: text/plain
+
+type = switchif
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/switch_asset_prop.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 0.2136 -4.4797
+connectornextid 3
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+2 "output1"
+}
+inputsNamed3
+{
+0 	sceneaddprop 2 1 "input1"
+1 	sceneaddcharacter 2 1 "input2"
+}
+inputs
+{
+0 	sceneaddprop 0 1
+1 	sceneaddcharacter 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 1 0.7 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/switch_asset_prop.spareparmdef"
+Content-Type: text/plain
+
+    parm {
+        name    "mergecondition"
+        baseparm
+        label   "Use Second Input If"
+        export  none
+    }
+    parm {
+        name    "testinput"
+        baseparm
+        label   "Test Input"
+        export  none
+    }
+    multiparm {
+        name    "tests"
+        label    "Number of Tests"
+        baseparm
+        default 1
+
+        parm {
+            name    "enable#"
+            baseparm
+            label   "enable#"
+            nolabel
+            joinnext
+            export  none
+        }
+        parm {
+            name    "type#"
+            baseparm
+            label   "Test Type"
+            export  none
+        }
+        parm {
+            name    "expr#"
+            baseparm
+            label   "Enable"
+            export  none
+        }
+        parm {
+            name    "attribtype#"
+            baseparm
+            label   "Enable When"
+            export  none
+        }
+        parm {
+            name    "attribowner#"
+            baseparm
+            label   "Class"
+            export  none
+        }
+        parm {
+            name    "attributes#"
+            baseparm
+            label   "Attributes"
+            export  none
+        }
+        parm {
+            name    "attribvaltype#"
+            baseparm
+            label   "Of Type"
+            export  none
+        }
+        parm {
+            name    "attribfloatcomp#"
+            baseparm
+            label   "Is"
+            export  none
+        }
+        parm {
+            name    "attribstringcomp#"
+            baseparm
+            label   "Is"
+            export  none
+        }
+        parm {
+            name    "attribval#"
+            baseparm
+            label   "Value"
+            export  none
+        }
+        parm {
+            name    "attribsval#"
+            baseparm
+            label   "Value"
+            export  none
+        }
+        parm {
+            name    "counttype#"
+            baseparm
+            label   "Enable When"
+            export  none
+        }
+        parm {
+            name    "countgroup#"
+            baseparm
+            label   "In Group"
+            export  none
+        }
+        parm {
+            name    "countcomp#"
+            baseparm
+            label   "Is"
+            export  none
+        }
+        parm {
+            name    "countval#"
+            baseparm
+            label   "Value"
+            export  none
+        }
+        parm {
+            name    "hasinputtype#"
+            baseparm
+            label   "Enable When"
+            export  none
+        }
+    }
+
+    parm {
+        name    "spare_input0"
+        label   "Spare Input 0"
+        type    oppath
+        default { "" }
+        help    "Refer to this in expressions as -1, such as: npoints(-1)"
+        parmtag { "opfilter" "!!SOP!!" }
+        parmtag { "oprelative" "." }
+    }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/switch_asset_prop.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+mergecondition	[ 0	locks=0 ]	(	"all"	)
+testinput	[ 0	locks=0 ]	(	"spare"	)
+tests	[ 0	locks=0 ]	(	1	)
+enable1	[ 0	locks=0 ]	(	"on"	)
+type1	[ 0	locks=0 ]	(	"attribval"	)
+expr1	[ 0	locks=0 ]	(	1	)
+attribtype1	[ 0	locks=0 ]	(	"all"	)
+attribowner1	[ 0	locks=0 ]	(	"prim"	)
+attributes1	[ 0	locks=0 ]	(	rig_path	)
+attribvaltype1	[ 0	locks=0 ]	(	"str"	)
+attribfloatcomp1	[ 0	locks=0 ]	(	"equal"	)
+attribstringcomp1	[ 0	locks=0 ]	(	"nequal"	)
+attribval1	[ 0	locks=0 ]	(	0	)
+attribsval1	[ 0	locks=0 ]	(	""	)
+counttype1	[ 0	locks=0 ]	(	"points"	)
+countgroup1	[ 0	locks=0 ]	(	""	)
+countcomp1	[ 0	locks=0 ]	(	"equal"	)
+countval1	[ 0	locks=0 ]	(	0	)
+hasinputtype1	[ 0	locks=0 ]	(	"wired"	)
+spare_input0	[ 0	locks=0 ]	(	../IN	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/switch_asset_prop.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddcharacter.init"
+Content-Type: text/plain
+
+type = apex::sceneaddcharacter
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddcharacter.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 5.37383 -1.01699
+connectornextid 3
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+2 "output1"
+}
+inputsNamed3
+{
+0 	"" "" 1 "input1"
+1 	packcharacter 4 1 "input2"
+}
+inputs
+{
+0 	"" 0 1
+1 	packcharacter 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddcharacter.spareparmdef"
+Content-Type: text/plain
+
+    parm {
+        name    "charactername"
+        baseparm
+        label   "Character Name"
+        export  none
+    }
+    parm {
+        name    "enablepackedcharacters"
+        baseparm
+        label   "Enable Packed Characters"
+        nolabel
+        joinnext
+        export  none
+    }
+    parm {
+        name    "pattern"
+        baseparm
+        label   "Packed Characters"
+        export  none
+    }
+    parm {
+        name    "enableragdollrename"
+        baseparm
+        label   "Enable Ragdoll Rename"
+        nolabel
+        joinnext
+        export  none
+    }
+    parm {
+        name    "ragdollrename"
+        baseparm
+        label   "Rename Ragdoll"
+        export  none
+    }
+    parm {
+        name    "ragdollrigpath"
+        baseparm
+        label   "Rig Path"
+        export  none
+    }
+    parm {
+        name    "spare_input0"
+        label   "Spare Input 0"
+        type    oppath
+        default { "" }
+        help    "Refer to this in expressions as -1, such as: npoints(-1)"
+        parmtag { "cook_dependent" "1" }
+        parmtag { "opfilter" "!!SOP!!" }
+        parmtag { "oprelative" "." }
+    }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddcharacter.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+charactername	[ 0	locks=0 ]	(	`prims(-1,0,\"name\")`	)
+enablepackedcharacters	[ 0	locks=0 ]	(	"off"	)
+pattern	[ 0	locks=0 ]	(	*.char	)
+enableragdollrename	[ 0	locks=0 ]	(	"off"	)
+ragdollrename	[ 0	locks=0 ]	(	`$OS`_Ragdoll	)
+ragdollrigpath	[ 0	locks=0 ]	(	/Base.rig	)
+spare_input0	[ 0	locks=0 ]	(	../IN	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddcharacter.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	},
+	"nodeshape":{
+		"type":"string",
+		"value":"rect"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddprop.init"
+Content-Type: text/plain
+
+type = apex::sceneaddprop
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddprop.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 1.07288 -1.96095
+connectornextid 3
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+2 "output1"
+}
+inputsNamed3
+{
+0 	"" "" 1 "input1"
+1 	pack 1 1 "input2"
+}
+inputs
+{
+0 	"" 0 1
+1 	pack 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddprop.spareparmdef"
+Content-Type: text/plain
+
+    parm {
+        name    "propname"
+        baseparm
+        label   "Prop Name"
+        export  none
+    }
+    parm {
+        name    "animate"
+        baseparm
+        label   "Animation"
+        export  none
+    }
+    parm {
+        name    "multiprop"
+        baseparm
+        label   "Import Prop Collection"
+        export  none
+    }
+    groupsimple {
+        name    "folder3"
+        label   "Control"
+        grouptag { "sidefx::switcher" "folder0" }
+
+        parm {
+            name    "use_skin"
+            baseparm
+            label   "Add Skin Control"
+            export  none
+        }
+        parm {
+            name    "visible"
+            baseparm
+            label   "Visible"
+            export  none
+        }
+        parm {
+            name    "color"
+            baseparm
+            label   "Color"
+            export  none
+        }
+        parm {
+            name    "shapeoverride"
+            baseparm
+            label   "Shape"
+            export  none
+        }
+        groupcollapsible {
+            name    "folder4"
+            label   "Rest Position"
+            grouptag { "sidefx::switcher" "folder1" }
+
+            parm {
+                name    "t"
+                baseparm
+                label   "Center"
+                export  none
+            }
+            parm {
+                name    "r"
+                baseparm
+                label   "Rotate"
+                export  none
+            }
+        }
+
+        groupcollapsible {
+            name    "folder5"
+            label   "Shape Offset"
+            grouptag { "sidefx::switcher" "folder2" }
+
+            parm {
+                name    "shape_t"
+                baseparm
+                label   "Shape Center"
+                export  none
+            }
+            parm {
+                name    "shape_r"
+                baseparm
+                label   "Shape Rotate"
+                export  none
+            }
+            parm {
+                name    "shape_scale"
+                baseparm
+                label   "Shape Uniform Scale"
+                export  none
+            }
+        }
+
+    }
+
+    groupcollapsible {
+        name    "ragdoll2"
+        label   "Ragdoll"
+        disablewhen "{ animate > 1 }"
+        parmtag { "group_default" "0" }
+        parmtag { "sidefx::header_toggle" "enableragdoll" }
+        grouptag { "sidefx::switcher" "ragdoll" }
+
+        parm {
+            name    "enableragdoll"
+            baseparm
+            label   "enableragdoll"
+            nolabel
+            export  none
+        }
+        parm {
+            name    "active"
+            baseparm
+            label   "Active"
+            export  none
+        }
+        parm {
+            name    "convexhull"
+            baseparm
+            label   "Collision Shape"
+            export  none
+        }
+        parm {
+            name    "maxconcavity"
+            baseparm
+            label   "Max Concavity"
+            export  none
+        }
+        parm {
+            name    "treatassolid"
+            baseparm
+            label   "Treat as Solid"
+            export  none
+        }
+        parm {
+            name    "dopolyreduce"
+            baseparm
+            label   "Reduce Polygons"
+            export  none
+        }
+        parm {
+            name    "npts"
+            baseparm
+            label   "Number of Pieces"
+            export  none
+        }
+        parm {
+            name    "displayhull"
+            baseparm
+            label   "Display Collision Shape"
+            joinnext
+            export  none
+        }
+        parm {
+            name    "explodedview"
+            baseparm
+            label   "Exploded View"
+            export  none
+        }
+        parm {
+            name    "shapecolor"
+            baseparm
+            label   "Color"
+            export  none
+        }
+    }
+
+    parm {
+        name    "spare_input0"
+        label   "Spare Input 0"
+        type    oppath
+        default { "" }
+        help    "Refer to this in expressions as -1, such as: npoints(-1)"
+        parmtag { "cook_dependent" "1" }
+        parmtag { "opfilter" "!!SOP!!" }
+        parmtag { "oprelative" "." }
+    }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddprop.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+propname	[ 0	locks=0 ]	(	`prims(-1,0,\"name\")`	)
+animate	[ 0	locks=0 ]	(	"0"	)
+multiprop	[ 0	locks=0 ]	(	"off"	)
+folder0	[ 0	locks=0 ]	(	0	)
+use_skin	[ 0	locks=0 ]	(	"off"	)
+visible	[ 0	locks=0 ]	(	"on"	)
+color	[ 0	locks=0 ]	(	1	1	1	)
+shapeoverride	[ 0	locks=0 ]	(	torus	)
+folder1	[ 0	locks=0 ]	(	0	)
+t	[ 0	locks=0 ]	(	0	0	0	)
+r	[ 0	locks=0 ]	(	0	0	0	)
+folder2	[ 0	locks=0 ]	(	0	)
+shape_t	[ 0	locks=0 ]	(	0	0	0	)
+shape_r	[ 0	locks=0 ]	(	0	0	0	)
+shape_scale	[ 0	locks=0 ]	(	3	)
+ragdoll	[ 0	locks=0 ]	(	0	)
+enableragdoll	[ 0	locks=0 ]	(	"on"	)
+active	[ 0	locks=0 ]	(	"on"	)
+convexhull	[ 0	locks=0 ]	(	"1"	)
+maxconcavity	[ 0	locks=0 ]	(	0.05	)
+treatassolid	[ 0	locks=0 ]	(	"on"	)
+dopolyreduce	[ 0	locks=0 ]	(	"on"	)
+npts	[ 0	locks=0 ]	(	35	)
+displayhull	[ 0	locks=0 ]	(	"off"	)
+explodedview	[ 0	locks=0 ]	(	"off"	)
+shapecolor	[ 0	locks=0 ]	(	1	1	1	)
+folder3	[ 0	locks=0 ]	(	0	)
+folder4	[ 0	locks=0 ]	(	0	)
+folder5	[ 0	locks=0 ]	(	0	)
+ragdoll2	[ 0	locks=0 ]	(	0	)
+spare_input0	[ 0	locks=0 ]	(	../IN	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddprop.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_additivelayer":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_endframe":{
+		"type":"string",
+		"value":"240"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_frequency":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_keep":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_newlayer":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_resample":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_startframe":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_hud_widget_apex.constrainttool_3_bake_bake_useframerange":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_settings_widget_constraint_baketoLayer":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_settings_widget_constraint_key_mode":{
+		"type":"string",
+		"value":"0"
+	},
+	"apex.constrainttool_3_settings_widget_constraint_updatebookmarks":{
+		"type":"string",
+		"value":"1"
+	},
+	"apex.constrainttool_3_settings_widget_constraint_updateconstraintvisualizer":{
+		"type":"string",
+		"value":"0"
+	},
+	"clickdrag":{
+		"type":"string",
+		"value":"0"
+	},
+	"controlxray":{
+		"type":"string",
+		"value":"1"
+	},
+	"hidecontrolgroups":{
+		"type":"string",
+		"value":"0"
+	},
+	"hidecontrolsduringdrag":{
+		"type":"string",
+		"value":"0"
+	},
+	"hidecontrolsduringplayback":{
+		"type":"string",
+		"value":"1"
+	},
+	"hidecontrolsduringscrub":{
+		"type":"string",
+		"value":"0"
+	},
+	"hidefbikdefaultmappingprompt":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_autopos":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_channel_panel_autoresize":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_channel_panel_height":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_locked":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_minimize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_pin":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_posx":{
+		"type":"string",
+		"value":"1139"
+	},
+	"hud_channel_panel_posy":{
+		"type":"string",
+		"value":"469"
+	},
+	"hud_channel_panel_titlevis":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_channel_panel_visible":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_channel_panel_width":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_autopos":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_mouse_sel_panel_autoresize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_height":{
+		"type":"string",
+		"value":"200"
+	},
+	"hud_mouse_sel_panel_locked":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_minimize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_pin":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_posx":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_posy":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_titlevis":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_mouse_sel_panel_visible":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_mouse_sel_panel_width":{
+		"type":"string",
+		"value":"200"
+	},
+	"hud_parameter_panel_Use Control Auto Snap":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_autohandlexform":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_autopos":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_autoresize":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_additivelayer":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_endframe":{
+		"type":"string",
+		"value":"240"
+	},
+	"hud_parameter_panel_bake_frequency":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_keep":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_bake_newlayer":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_resample":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_bake_startframe":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_bake_useframerange":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_enforcelimits":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_framingzoom":{
+		"type":"string",
+		"value":"1.0"
+	},
+	"hud_parameter_panel_height":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_locked":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_minimize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_motionpathframesafter":{
+		"type":"string",
+		"value":"10"
+	},
+	"hud_parameter_panel_motionpathframesbefore":{
+		"type":"string",
+		"value":"10"
+	},
+	"hud_parameter_panel_motionpathkeysize":{
+		"type":"string",
+		"value":"1.0"
+	},
+	"hud_parameter_panel_motionpathlimitframes":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_motionpathpathwidth":{
+		"type":"string",
+		"value":"1.0"
+	},
+	"hud_parameter_panel_pin":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_posx":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_posy":{
+		"type":"string",
+		"value":"282"
+	},
+	"hud_parameter_panel_showlimits":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_titlevis":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_parameter_panel_visible":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_parameter_panel_width":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_sel_panel_autopos":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_sel_panel_autoresize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_sel_panel_height":{
+		"type":"string",
+		"value":"400"
+	},
+	"hud_sel_panel_locked":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_sel_panel_minimize":{
+		"type":"string",
+		"value":"0"
+	},
+	"hud_sel_panel_pin":{
+		"type":"string",
+		"value":"2"
+	},
+	"hud_sel_panel_posx":{
+		"type":"string",
+		"value":"1206"
+	},
+	"hud_sel_panel_posy":{
+		"type":"string",
+		"value":"242"
+	},
+	"hud_sel_panel_titlevis":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_sel_panel_visible":{
+		"type":"string",
+		"value":"1"
+	},
+	"hud_sel_panel_width":{
+		"type":"string",
+		"value":"200"
+	},
+	"skincontrol":{
+		"type":"string",
+		"value":"1"
+	},
+	"xform_handle_gimbal_mode":{
+		"type":"string",
+		"value":"0"
+	},
+	"xform_handle_pivot_mode":{
+		"type":"string",
+		"value":"0"
+	},
+	"xform_handle_r_alignment":{
+		"type":"string",
+		"value":"local"
+	},
+	"xform_handle_s_alignment":{
+		"type":"string",
+		"value":"local"
+	},
+	"xform_handle_separate_align":{
+		"type":"string",
+		"value":"0"
+	},
+	"xform_handle_t_alignment":{
+		"type":"string",
+		"value":"local"
+	},
+	"xform_handle_xform_mode":{
+		"type":"string",
+		"value":"t"
+	},
+	"xray_strength":{
+		"type":"string",
+		"value":"1.0"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddprop/switch1.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 17.2639 10.7136
+connectornextid 3
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+2 "output1"
+}
+inputsNamed3
+{
+0 	null1 0 1 "input1"
+1 	null2 0 1 "input2"
+}
+inputs
+{
+0 	null1 0 1
+1 	null2 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author nobody@nowhere
+  access 0777
+}
+color UT_Color RGB 0.8 1 0.7 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddprop/switch1.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+input	[ 0	locks=0 ]	(	1	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddprop/switch1.netbox"
+Content-Type: text/plain
+
+__netbox1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/sceneaddprop/switch1.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/unpackusd.init"
+Content-Type: text/plain
+
+type = unpackusd::2.0
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/unpackusd.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 1.07288 1.18305
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+0 	IN 1 1 "input1"
+}
+inputs
+{
+0 	IN 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/unpackusd.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+group	[ 0	locks=0 ]	(	""	)
+deleteorig	[ 0	locks=0 ]	(	"on"	)
+unpacktraversal	[ 0	locks=0 ]	(	std:boundables	)
+group_unpack	[ 0	locks=0 ]	(	0	)
+output	[ 0	locks=0 ]	(	"polygons"	)
+limititerations	[ 0	locks=0 ]	(	"on"	)
+iterations	[ 0	locks=0 ]	(	1	)
+pivot	[ 0	locks=0 ]	(	"centroid"	)
+addpathattrib	[ 0	locks=0 ]	(	"on"	)
+pathattrib	[ 0	locks=0 ]	(	path	)
+addnameattrib	[ 0	locks=0 ]	(	"on"	)
+nameattrib	[ 0	locks=0 ]	(	name	)
+addfilepathattrib	[ 0	locks=0 ]	(	"off"	)
+filepathattrib	[ 0	locks=0 ]	(	usdpath	)
+addinstancelevelattrib	[ 0	locks=0 ]	(	"off"	)
+instancelevelattrib	[ 0	locks=0 ]	(	instancelevel	)
+transferattributes	[ 0	locks=0 ]	(	rig_path	)
+transfergroups	[ 0	locks=0 ]	(	""	)
+group_import	[ 0	locks=0 ]	(	0	)
+importprimvars	[ 0	locks=0 ]	(	*	)
+importinheritedprimvars	[ 0	locks=0 ]	(	"off"	)
+importcomputedvisibility	[ 0	locks=0 ]	(	"off"	)
+importattributes	[ 0	locks=0 ]	(	""	)
+nontransformingprimvars	[ 0	locks=0 ]	(	rest	)
+translatesttouv	[ 0	locks=0 ]	(	"on"	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/unpackusd.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/pack.init"
+Content-Type: text/plain
+
+type = pack
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/pack.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 1.07498 -0.929448
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+0 	set_asset_name 1 1 "input1"
+}
+inputs
+{
+0 	set_asset_name 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/pack.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+viewportlod	[ 0	locks=0 ]	(	"full"	)
+createpath	[ 0	locks=0 ]	(	"off"	)
+path	[ 0	locks=0 ]	(	op:`opfullpath('.')`	)
+packbyname	[ 0	locks=0 ]	(	"off"	)
+nameattribute	[ 0	locks=0 ]	(	name	)
+packedfragments	[ 0	locks=0 ]	(	"on"	)
+pivot	[ 0	locks=0 ]	(	"centroid"	)
+transfer_attributes	[ 0	locks=0 ]	(	"rig_path asset_name"	)
+transfer_groups	[ 0	locks=0 ]	(	""	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/pack.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":"___EXTERNAL___"
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/set_asset_name.init"
+Content-Type: text/plain
+
+type = attribwrangle
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/set_asset_name.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position 1.06988 0.14315
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+0 	unpackusd 1 1 "input1"
+}
+inputs
+{
+0 	unpackusd 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/set_asset_name.spareparmdef"
+Content-Type: text/plain
+
+    group {
+        name    "folder1"
+        label   "Code"
+        grouptag { "sidefx::switcher" "folder0" }
+
+        parm {
+            name    "group"
+            baseparm
+            label   "Group"
+            export  none
+            bindselector uvselect "Modify Attribs"
+                "Select the geometry to affect and press Enter to complete."
+                0 1 0xffffffff 0 grouptype 0
+        }
+        parm {
+            name    "grouptype"
+            baseparm
+            label   "Group Type"
+            export  none
+        }
+        parm {
+            name    "class"
+            baseparm
+            label   "Run Over"
+            export  none
+        }
+        parm {
+            name    "vex_numcount"
+            baseparm
+            label   "Number Count"
+            export  none
+        }
+        parm {
+            name    "vex_threadjobsize"
+            baseparm
+            label   "Thread Job Size"
+            export  none
+        }
+        parm {
+            name    "snippet"
+            baseparm
+            label   "VEXpression"
+            export  all
+        }
+        parm {
+            name    "exportlist"
+            baseparm
+            label   "Attributes to Create"
+            export  none
+        }
+        parm {
+            name    "vex_strict"
+            baseparm
+            label   "Enforce Prototypes"
+            export  none
+        }
+        parm {
+            name    "vex_strictvariables"
+            baseparm
+            label   "Standard Variable Names Only"
+            export  none
+        }
+    }
+
+    group {
+        name    "folder1_1"
+        label   "Bindings"
+
+        parm {
+            name    "autobind"
+            baseparm
+            label   "Autobind by Name"
+            export  none
+        }
+        multiparm {
+            name    "bindings"
+            label    "Number of Bindings"
+            baseparm
+            default 0
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "multistartoffset" "1" }
+
+            parm {
+                name    "bindname#"
+                baseparm
+                label   "Attribute Name"
+                export  none
+            }
+            parm {
+                name    "bindparm#"
+                baseparm
+                label   "VEX Parameter"
+                export  none
+            }
+        }
+
+        parm {
+            name    "groupautobind"
+            baseparm
+            label   "Autobind Groups by Name"
+            export  none
+        }
+        multiparm {
+            name    "groupbindings"
+            label    "Group Bindings"
+            baseparm
+            default 0
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "multistartoffset" "1" }
+
+            parm {
+                name    "bindgroupname#"
+                baseparm
+                label   "Group Name"
+                export  none
+            }
+            parm {
+                name    "bindgroupparm#"
+                baseparm
+                label   "VEX Parameter"
+                export  none
+            }
+        }
+
+        parm {
+            name    "vex_cwdpath"
+            baseparm
+            label   "Evaluation Node Path"
+            export  none
+        }
+        parm {
+            name    "vex_outputmask"
+            baseparm
+            label   "Export Parameters"
+            export  none
+        }
+        parm {
+            name    "vex_updatenmls"
+            baseparm
+            label   "Update Normals If Displaced"
+            export  none
+        }
+        parm {
+            name    "vex_matchattrib"
+            baseparm
+            label   "Attribute to Match"
+            export  none
+        }
+        parm {
+            name    "vex_inplace"
+            baseparm
+            label   "Compute Results In Place"
+            export  none
+        }
+        parm {
+            name    "vex_selectiongroup"
+            baseparm
+            label   "Output Selection Group"
+            export  none
+        }
+        parm {
+            name    "vex_precision"
+            baseparm
+            label   "VEX Precision"
+            export  none
+        }
+    }
+
+    parm {
+        name    "spare_input0"
+        label   "Spare Input 0"
+        type    oppath
+        default { "" }
+        help    "Refer to this in expressions as -1, such as: npoints(-1)"
+        parmtag { "cook_dependent" "1" }
+        parmtag { "opfilter" "!!SOP!!" }
+        parmtag { "oprelative" "." }
+    }
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/set_asset_name.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+folder0	[ 0	locks=0 ]	(	0	0	)
+group	[ 0	locks=0 ]	(	""	)
+grouptype	[ 0	locks=0 ]	(	"guess"	)
+class	[ 0	locks=0 ]	(	"primitive"	)
+vex_numcount	[ 0	locks=0 ]	(	10	)
+vex_threadjobsize	[ 0	locks=0 ]	(	1024	)
+snippet	[ 0	locks=0 ]	(	"s@asset_name= prim(-1,\"name\",0);
+removeprimattrib(0, \"rig_path\");"	)
+exportlist	[ 0	locks=0 ]	(	*	)
+vex_strict	[ 0	locks=0 ]	(	"off"	)
+vex_strictvariables	[ 0	locks=0 ]	(	"on"	)
+autobind	[ 0	locks=0 ]	(	"on"	)
+bindings	[ 0	locks=0 ]	(	0	)
+groupautobind	[ 0	locks=0 ]	(	"on"	)
+groupbindings	[ 0	locks=0 ]	(	0	)
+vex_cwdpath	[ 0	locks=0 ]	(	.	)
+vex_outputmask	[ 0	locks=0 ]	(	*	)
+vex_updatenmls	[ 0	locks=0 ]	(	"off"	)
+vex_matchattrib	[ 0	locks=0 ]	(	id	)
+vex_inplace	[ 0	locks=0 ]	(	"off"	)
+vex_selectiongroup	[ 0	locks=0 ]	(	""	)
+vex_precision	[ 0	locks=0 ]	(	auto	)
+folder1	[ 0	locks=0 ]	(	0	0	)
+spare_input0	[ 0	locks=0 ]	(	../IN	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/set_asset_name.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_rig_path.init"
+Content-Type: text/plain
+
+type = attribwrangle
+matchesdef = 1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_rig_path.def"
+Content-Type: text/plain
+
+sopflags sopflags = 
+comment ""
+position -0.00300001 4.8935
+connectornextid 2
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+outputsNamed3
+{
+1 "output1"
+}
+inputsNamed3
+{
+0 	(0) "" 1 "input1"
+}
+inputs
+{
+0 	(0) 0 1
+}
+stat
+{
+  create -1
+  modify -1
+  author Mustafa_Taher@Major-Kalawy
+  access 0777
+}
+color UT_Color RGB 0.8 0.8 0.8 
+delscript ""
+exprlanguage hscript
+end
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_rig_path.parm"
+Content-Type: text/plain
+
+{
+version 0.8
+folder0	[ 0	locks=0 ]	(	0	0	)
+group	[ 0	locks=0 ]	(	""	)
+grouptype	[ 0	locks=0 ]	(	"guess"	)
+class	[ 0	locks=0 ]	(	"primitive"	)
+vex_numcount	[ 0	locks=0 ]	(	10	)
+vex_threadjobsize	[ 0	locks=0 ]	(	1024	)
+snippet	[ 0	locks=0 ]	(	"s@rig_path = usd_attrib(\"op:\"+chs(\"../loppath\"), s@path, \"ayon:apex_rig\");
+
+if (s@rig_path != \"\") {
+    i@group_asset = 1;
+}"	)
+exportlist	[ 0	locks=0 ]	(	*	)
+vex_strict	[ 0	locks=0 ]	(	"off"	)
+vex_strictvariables	[ 0	locks=0 ]	(	"on"	)
+autobind	[ 0	locks=0 ]	(	"on"	)
+bindings	[ 0	locks=0 ]	(	0	)
+groupautobind	[ 0	locks=0 ]	(	"on"	)
+groupbindings	[ 0	locks=0 ]	(	0	)
+vex_cwdpath	[ 0	locks=0 ]	(	.	)
+vex_outputmask	[ 0	locks=0 ]	(	*	)
+vex_updatenmls	[ 0	locks=0 ]	(	"off"	)
+vex_matchattrib	[ 0	locks=0 ]	(	id	)
+vex_inplace	[ 0	locks=0 ]	(	"off"	)
+vex_selectiongroup	[ 0	locks=0 ]	(	""	)
+vex_precision	[ 0	locks=0 ]	(	auto	)
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot/get_rig_path.userdata"
+Content-Type: text/plain
+
+{
+	"___Version___":{
+		"type":"string",
+		"value":""
+	}
+}
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.order"
+Content-Type: text/plain
+
+13
+output0
+IN
+load_rig
+unpackcharacter
+packcharacter
+map_path
+switch_asset_prop
+sceneaddcharacter
+sceneaddprop
+unpackusd
+pack
+set_asset_name
+get_rig_path
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
+Content-Disposition: attachment; filename="hdaroot.net"
+Content-Type: text/plain
+
+1
+
+--HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY--
