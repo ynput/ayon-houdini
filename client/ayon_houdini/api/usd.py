@@ -343,11 +343,11 @@ def get_usd_render_rop_renderpass(rop_node,stage=None,logger=None):
     if not pass_path:
         return
 
-    sp = pass_path.split(" ")
-    if len(sp)>1:
-        logger.warning("Found mutliple render passes for %s, using the first", rop_node)
-        pass_path = sp[0]
-        
+    passes = pass_path.split(" ")
+    if len(passes) > 1:
+        pass_path = passes[0]
+        logger.warning("Found mutliple render passes for %s, using the first: %s", rop_node, pass_path)
+
     pass_prim = stage.GetPrimAtPath(pass_path)
     if not pass_prim:
         logger.warning("No render pass primitive found at: %s", pass_path)
@@ -386,6 +386,7 @@ def get_usd_render_rop_rendersettings(rop_node, stage=None, logger=None):
     settings_path = rop_node.evalParm("rendersettings")
     render_pass = get_usd_render_rop_renderpass(rop_node,stage,logger)
 
+    # If render settings is not set, we get the settings from the pass
     if not settings_path and render_pass:
         render_source = render_pass.GetRenderSourceRel().GetTargets()
         if len(render_source) > 1:
