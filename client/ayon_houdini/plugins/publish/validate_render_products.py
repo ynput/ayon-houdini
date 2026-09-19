@@ -38,7 +38,6 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
 
         node_path = instance.data["instance_node"]
         if not instance.data.get("output_node"):
-
             # Report LOP path parm for better logs
             lop_path_parm = hou.node(node_path).parm("loppath")
             if lop_path_parm:
@@ -51,20 +50,16 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
                 f"'{node_path}'.",
                 title="Invalid LOP path")
 
+        if not instance.data.get("rendersettings"):
+            raise PublishValidationError(
+                "Invalid render settings for '{}'".format(node_path),
+                title="Invalid Render Settings"
+            )
+        
         if not instance.data.get("files", []):
             node = hou.node(node_path)
             stage = instance.data["stage"]
-            rendersettings_path: str = (
-                node.evalParm("rendersettings")
-                or stage.GetMetadata("renderSettingsPrimPath")
-                or "/Render/rendersettings"
-            )
-
-            if not stage.GetPrimAtPath(rendersettings_path):
-                self.log.warning(
-                    "No render settings primitive found at: "
-                    f"{rendersettings_path}"
-                )
+            rendersettings_path = instance.data["rendersettings"].GetPath().pathString()
 
             raise PublishValidationError(
                 message=(
