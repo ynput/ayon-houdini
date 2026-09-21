@@ -206,9 +206,11 @@ return aperture
 
         # Detect whether the camera was loaded with the "Match Maya render
         # mask" before. If so, we want to maintain that expression on update.
+        aperture_expression = get_expression(temp_camera.parm("aperture"))
         if (
-                self._match_maya_render_mask_expression
-                in get_expression(temp_camera.parm("aperture"))
+                aperture_expression is not None
+                and self._match_maya_render_mask_expression
+                in aperture_expression
         ):
             self._match_maya_render_mask(new_camera)
 
