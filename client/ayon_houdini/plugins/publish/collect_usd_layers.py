@@ -129,19 +129,10 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                     "Created by: %s", creator_node.path()
                 )
 
-            # Skip any explicit save layer that is created by a geoclipsequence
-            # node, because this will be the topology layer - which will be
-            # included with a USD instance relatively by the
-            # CollectUSDValueClips plug-in
-            # Note: `geoclipsequence` nodes do not have explicit save control.
-            # If explicit save controls are present, they are most likely
-            # created by another node.
-            if (
-                creator_node
-                and creator_node.type().name() == "geoclipsequence"
-                and save_control != "Explicit"
-            ):
-                continue
+            # Note: The topology layer of a `geoclipsequence` node does not
+            # have explicit save control, so it is already skipped above. It
+            # is included with the USD instance relatively by the
+            # CollectUSDValueClips plug-in instead.
 
             save_layers.append((layer, save_path, creator_node))
 
