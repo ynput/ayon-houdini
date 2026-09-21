@@ -1426,7 +1426,7 @@ def get_node_thumbnail(node, first_only=True):
     if first_only:
         return next(attached_images, None)
     else:
-        return attached_images
+        return list(attached_images)
 
 
 def find_active_network(category, default):
