@@ -346,7 +346,7 @@ def get_usd_render_rop_renderpass(rop_node,stage=None,logger=None):
     passes = pass_path.split(" ")
     if len(passes) > 1:
         pass_path = passes[0]
-        logger.warning("Found mutliple render passes for %s, using the first: %s", rop_node, pass_path)
+        logger.warning("Found multiple render passes for %s, using the first: %s", rop_node, pass_path)
 
     pass_prim = stage.GetPrimAtPath(pass_path)
     if not pass_prim:
@@ -389,12 +389,13 @@ def get_usd_render_rop_rendersettings(rop_node, stage=None, logger=None):
     # If render settings is not set, we get the settings from the pass
     if not settings_path and render_pass:
         render_source = render_pass.GetRenderSourceRel().GetTargets()
-        if len(render_source) > 1:
-            logger.warning("Found multiple render settings for %s, using the first", render_pass.GetPath().pathString)
+        if render_source:
+            if len(render_source) > 1:
+                logger.warning("Found multiple render settings for %s, using the first", render_pass.GetPath().pathString)
 
-        settings_path = render_source[0]
-
-    # fallback
+            settings_path = render_source[0]
+        
+    # Fall back to the stage default or Houdini's conventional path.
     if not settings_path:
         settings_path = (
             stage.GetMetadata("renderSettingsPrimPath")
