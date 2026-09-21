@@ -68,7 +68,7 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
     hosts = ["houdini"]
     families = ["look"]
 
-    exclude_suffixes = [".usd", ".usda", ".usdc", ".usdz", ".abc", ".vbd"]
+    exclude_suffixes = [".usd", ".usda", ".usdc", ".usdz", ".abc", ".vdb"]
 
     def process(self, instance):
 
