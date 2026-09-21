@@ -66,7 +66,8 @@ class FbxLoader(plugin.HoudiniLoader):
         file_node.setParms({"file": file_path})
 
         # Update attribute
-        node.setParms({"representation": context["representation"]["id"]})
+        node.setParms({"representation": context["representation"]["id"],
+                       "project_name": context["project"]["name"]})
 
     def remove(self, container):
         node = container["node"]

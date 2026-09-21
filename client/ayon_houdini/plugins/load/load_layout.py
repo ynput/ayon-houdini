@@ -331,7 +331,8 @@ class LayoutLoader(plugin.HoudiniLoader):
         container_node = container["node"]
         self._set_members(container_node, updated_containers)
         container_node.setParms({
-            "representation": str(repre_entity["id"])
+            "representation": str(repre_entity["id"]),
+            "project_name": context["project"]["name"],
         })
 
     def switch(self, container, context):

@@ -53,6 +53,7 @@ class USDReferenceLoader(plugin.HoudiniLoader):
             "namespace": namespace,
             "loader": str(self.__class__.__name__),
             "representation": context["representation"]["id"],
+            "project_name": context["project"]["name"],
         }
 
         # todo: add folder="AYON"
@@ -72,6 +73,7 @@ class USDReferenceLoader(plugin.HoudiniLoader):
             {
                 "filepath1": file_path,
                 "representation": context["representation"]["id"],
+                "project_name": context["project"]["name"],
             }
         )
 

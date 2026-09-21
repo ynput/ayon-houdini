@@ -65,7 +65,8 @@ class FilePathLoader(plugin.HoudiniLoader):
 
         node.setParms({
             "filepath": filepath,
-            "representation": str(representation_entity["id"])
+            "representation": str(representation_entity["id"]),
+            "project_name": context["project"]["name"]
         })
 
         # Update the parameter default value (cosmetics)

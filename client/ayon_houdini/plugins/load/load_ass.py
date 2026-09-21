@@ -52,7 +52,8 @@ class AssLoader(plugin.HoudiniLoader):
         procedural = container["node"]
         procedural.setParms({
             "ar_filename": self.format_path(context),
-            "representation": context["representation"]["id"]
+            "representation": context["representation"]["id"],
+            "project_name": context["project"]["name"]
         })
 
     def remove(self, container):

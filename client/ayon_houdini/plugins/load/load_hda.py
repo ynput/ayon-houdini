@@ -56,6 +56,7 @@ class HdaLoader(plugin.HoudiniLoader):
             "namespace": namespace,
             "loader": self.__class__.__name__,
             "representation": context["representation"]["id"],
+            "project_name": context["project"]["name"],
         }
 
         lib.imprint(hda_node, data)
@@ -74,7 +75,8 @@ class HdaLoader(plugin.HoudiniLoader):
         new = def_paths.index(file_path)
         defs[new].setIsPreferred(True)
         hda_node.setParms({
-            "representation": repre_entity["id"]
+            "representation": repre_entity["id"],
+            "project_name": context["project"]["name"]
         })
 
         # Move the Extra parameter folder to the back.

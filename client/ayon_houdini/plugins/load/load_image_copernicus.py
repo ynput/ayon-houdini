@@ -92,6 +92,7 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
             "namespace": namespace,
             "loader": str(self.__class__.__name__),
             "representation": context["representation"]["id"],
+            "project_name": context["project"]["name"],
         }
 
         lib.imprint(node, data, folder="AYON")
@@ -106,6 +107,7 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
         parms = {
             "filename": self.format_path(context),
             "representation": repre_entity["id"],
+            "project_name": context["project"]["name"],
         }
 
         # Update attributes

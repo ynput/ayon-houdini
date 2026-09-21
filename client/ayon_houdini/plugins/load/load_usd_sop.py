@@ -70,7 +70,8 @@ class SopUsdImportLoader(plugin.HoudiniLoader):
         usdimport_node.setParms({"filepath1": file_path})
 
         # Update attribute
-        node.setParms({"representation": context["representation"]["id"]})
+        node.setParms({"representation": context["representation"]["id"],
+                       "project_name": context["project"]["name"]})
 
     def remove(self, container):
         node = container["node"]

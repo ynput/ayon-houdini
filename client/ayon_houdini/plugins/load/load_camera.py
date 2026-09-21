@@ -184,7 +184,8 @@ return aperture
 
         # Update attributes
         node.setParms({"fileName": file_path,
-                       "representation": context["representation"]["id"]})
+                       "representation": context["representation"]["id"],
+                       "project_name": context["project"]["name"]})
 
         # Store the cam temporarily next to the Alembic Archive
         # so that we can preserve parm values the user set on it

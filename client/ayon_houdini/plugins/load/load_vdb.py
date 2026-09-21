@@ -71,7 +71,8 @@ class VdbLoader(plugin.HoudiniLoader):
         file_node.setParms({"file": self.format_path(context)})
 
         # Update attribute
-        node.setParms({"representation": repre_entity["id"]})
+        node.setParms({"representation": repre_entity["id"],
+                       "project_name": context["project"]["name"]})
 
     def remove(self, container):
         node = container["node"]
