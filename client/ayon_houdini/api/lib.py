@@ -435,13 +435,11 @@ def lsattrs(attrs, root="/"):
     # the rest
     nodes = hou.node(root).allSubChildren()
     for node in nodes:
-        for attr in attrs:
-            if not node.parm(attr):
-                continue
-            elif node.evalParm(attr) != attrs[attr]:
-                continue
-            else:
-                matches.add(node)
+        if all(
+            node.parm(attr) and node.evalParm(attr) == value
+            for attr, value in attrs.items()
+        ):
+            matches.add(node)
 
     return list(matches)
 
