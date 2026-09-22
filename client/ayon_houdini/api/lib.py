@@ -1097,16 +1097,19 @@ def find_rop_input_dependencies(input_tuple):
 
     Returns:
         list of the RopNode.path() that can be found inside
-        the input tuple.
+        the input tuple, flattened into a single list.
     """
 
     out_list = []
+    if not input_tuple:
+        return out_list
+
     if isinstance(input_tuple[0], hou.RopNode):
-        return input_tuple[0].path()
+        return [input_tuple[0].path()]
 
     if isinstance(input_tuple[0], tuple):
         for item in input_tuple:
-            out_list.append(find_rop_input_dependencies(item))
+            out_list.extend(find_rop_input_dependencies(item))
 
     return out_list
 
