@@ -28,6 +28,9 @@ def get_instance_expected_files(instance: pyblish.api.Instance) -> List[str]:
         # This can be Render products or submitted cache to farm.
         for expected in expected_files:
             for sequence_files in expected.values():
+                if isinstance(sequence_files, str):
+                    # Single file instead of a list of files
+                    sequence_files = [sequence_files]
                 filepaths.extend(sequence_files)
     else:
         # Products with frames or single file.
