@@ -76,7 +76,7 @@ class USDReferenceLoader(plugin.HoudiniLoader):
             }
         )
         lib.imprint(
-node,
+            node,
             {"project_name": context["project"]["name"]},
             update=True
         )
