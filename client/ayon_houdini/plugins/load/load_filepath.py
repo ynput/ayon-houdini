@@ -1,6 +1,7 @@
 from ayon_houdini.api import (
     hda_utils,
-    plugin
+    plugin,
+    lib
 )
 from ayon_houdini.api.pipeline import get_or_create_ayon_container
 
@@ -67,7 +68,11 @@ class FilePathLoader(plugin.HoudiniLoader):
             "filepath": filepath,
             "representation": str(representation_entity["id"])
         })
-
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         # Update the parameter default value (cosmetics)
         parm_template_group = node.parmTemplateGroup()
         parm = parm_template_group.find("filepath")

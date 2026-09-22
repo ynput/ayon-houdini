@@ -72,6 +72,11 @@ class VdbLoader(plugin.HoudiniLoader):
 
         # Update attribute
         node.setParms({"representation": repre_entity["id"]})
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def remove(self, container):
         node = container["node"]
