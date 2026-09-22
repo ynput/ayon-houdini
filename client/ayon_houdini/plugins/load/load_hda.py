@@ -75,10 +75,13 @@ class HdaLoader(plugin.HoudiniLoader):
         new = def_paths.index(file_path)
         defs[new].setIsPreferred(True)
         hda_node.setParms({
-            "representation": repre_entity["id"],
-            "project_name": context["project"]["name"]
+            "representation": repre_entity["id"]
         })
-
+        lib.imprint(
+            hda_node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         # Move the Extra parameter folder to the back.
         parm_group = hda_node.parmTemplateGroup()
         # The name 'Extra' is a hard coded name in AYON.
