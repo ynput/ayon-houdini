@@ -54,6 +54,11 @@ class AssLoader(plugin.HoudiniLoader):
             "ar_filename": self.format_path(context),
             "representation": context["representation"]["id"]
         })
+        lib.imprint(
+            procedural,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def remove(self, container):
         node = container["node"]
