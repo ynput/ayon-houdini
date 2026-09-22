@@ -435,13 +435,11 @@ def lsattrs(attrs, root="/"):
     # the rest
     nodes = hou.node(root).allSubChildren()
     for node in nodes:
-        for attr in attrs:
-            if not node.parm(attr):
-                continue
-            elif node.evalParm(attr) != attrs[attr]:
-                continue
-            else:
-                matches.add(node)
+        if all(
+            node.parm(attr) and node.evalParm(attr) == value
+            for attr, value in attrs.items()
+        ):
+            matches.add(node)
 
     return list(matches)
 
@@ -1426,7 +1424,7 @@ def get_node_thumbnail(node, first_only=True):
     if first_only:
         return next(attached_images, None)
     else:
-        return attached_images
+        return list(attached_images)
 
 
 def find_active_network(category, default):
