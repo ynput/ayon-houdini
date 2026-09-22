@@ -435,13 +435,11 @@ def lsattrs(attrs, root="/"):
     # the rest
     nodes = hou.node(root).allSubChildren()
     for node in nodes:
-        for attr in attrs:
-            if not node.parm(attr):
-                continue
-            elif node.evalParm(attr) != attrs[attr]:
-                continue
-            else:
-                matches.add(node)
+        if all(
+            node.parm(attr) and node.evalParm(attr) == value
+            for attr, value in attrs.items()
+        ):
+            matches.add(node)
 
     return list(matches)
 
@@ -1099,16 +1097,19 @@ def find_rop_input_dependencies(input_tuple):
 
     Returns:
         list of the RopNode.path() that can be found inside
-        the input tuple.
+        the input tuple, flattened into a single list.
     """
 
     out_list = []
+    if not input_tuple:
+        return out_list
+
     if isinstance(input_tuple[0], hou.RopNode):
-        return input_tuple[0].path()
+        return [input_tuple[0].path()]
 
     if isinstance(input_tuple[0], tuple):
         for item in input_tuple:
-            out_list.append(find_rop_input_dependencies(item))
+            out_list.extend(find_rop_input_dependencies(item))
 
     return out_list
 
@@ -1426,7 +1427,7 @@ def get_node_thumbnail(node, first_only=True):
     if first_only:
         return next(attached_images, None)
     else:
-        return attached_images
+        return list(attached_images)
 
 
 def find_active_network(category, default):
