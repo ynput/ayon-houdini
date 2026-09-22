@@ -365,7 +365,7 @@ def get_filepath_from_context(context: dict):
     udim = representation["context"].get("udim")
     if frame is not None or udim is not None:
         template: str = representation["attrib"]["template"]
-        repre_context: dict = representation["context"]
+        repre_context: dict = dict(representation["context"])
         if udim is not None:
             repre_context["udim"] = "<UDIM>"
             template = _remove_format_spec(template, "udim")
@@ -418,6 +418,10 @@ def update_thumbnail(node):
 
     project_name = node.evalParm("project_name") or get_current_project_name()
     repre_entity = get_representation_by_id(project_name, representation_id)
+    if not repre_entity:
+        set_node_thumbnail(node, None)
+        return
+
     if node.evalParm("show_thumbnail"):
         # Update thumbnail
         # TODO: Cache thumbnail path as well
@@ -433,6 +437,7 @@ def set_node_thumbnail(node, thumbnail: str):
     """Update node thumbnail to thumbnail"""
     if thumbnail is None:
         lib.set_node_thumbnail(node, None)
+        return
 
     rect = compute_thumbnail_rect(node)
     lib.set_node_thumbnail(node, thumbnail, rect)
