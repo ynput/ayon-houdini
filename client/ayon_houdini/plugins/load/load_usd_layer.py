@@ -71,11 +71,14 @@ class USDSublayerLoader(plugin.HoudiniLoader):
         node.setParms(
             {
                 "filepath1": file_path,
-                "representation": context["representation"]["id"],
-                "project_name": context["project"]["name"],
+                "representation": context["representation"]["id"]
             }
         )
-
+        lib.imprint(
+            container,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         # Reload files
         node.parm("reload").pressButton()
 

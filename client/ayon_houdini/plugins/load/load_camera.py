@@ -11,6 +11,7 @@ from ayon_houdini.api.lib import (
     set_camera_resolution,
     get_camera_from_container,
     find_active_network,
+    imprint,
 )
 
 
@@ -184,9 +185,13 @@ return aperture
 
         # Update attributes
         node.setParms({"fileName": file_path,
-                       "representation": context["representation"]["id"],
-                       "project_name": context["project"]["name"]})
+                       "representation": context["representation"]["id"]})
 
+        imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         # Store the cam temporarily next to the Alembic Archive
         # so that we can preserve parm values the user set on it
         # after build hierarchy was triggered.

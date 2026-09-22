@@ -84,10 +84,13 @@ class ImageLoader(plugin.HoudiniLoader):
         # Update the file path
         parms = {
             "filename1": self.format_path(context),
-            "representation": repre_entity["id"],
-            "project_name": context["project"]["name"],
+            "representation": repre_entity["id"]
         }
-
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         parms.update(self.get_colorspace_parms(repre_entity))
 
         # Update attributes
