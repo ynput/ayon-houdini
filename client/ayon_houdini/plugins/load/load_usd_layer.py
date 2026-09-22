@@ -75,7 +75,7 @@ class USDSublayerLoader(plugin.HoudiniLoader):
             }
         )
         lib.imprint(
-            container,
+node,
             {"project_name": context["project"]["name"]},
             update=True
         )
