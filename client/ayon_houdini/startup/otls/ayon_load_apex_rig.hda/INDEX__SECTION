@@ -1,0 +1,14 @@
+Operator:     ayon::load_apex_rig::1.0
+Label:        AYON Load APEX Rig
+Path:         oplib:/ayon::Sop/load_apex_rig::1.0?ayon::Sop/load_apex_rig::1.0
+Icon:         opdef:/ayon::Sop/load_apex_rig::1.0?IconImage
+Table:        Sop
+License:      
+Extra:        inputcolors='1 "RGB 0.700195 0.700195 0.700195" ' outputcolors='1 "RGB 0.700195 0.700195 0.700195" ' 
+User:         
+Inputs:       1 to 1
+Subnet:       true
+Python:       false
+Empty:        false
+Modified:     Wed Apr 15 12:47:15 2026
+
