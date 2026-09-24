@@ -65,5 +65,5 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
         self.log.debug(f"Collected Frames: {files}")
         instance.data.update({
             "frames": files,
-            "stagingDir": staging_dir
+            "stagingDir": staging_dir,
         })
