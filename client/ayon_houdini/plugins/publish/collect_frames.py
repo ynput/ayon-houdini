@@ -1,10 +1,27 @@
 # -*- coding: utf-8 -*-
 """Collector plugin for frames data on ROP instances."""
+from __future__ import annotations
+
 import os
-import re
+import typing
+
 import hou  # noqa
 import pyblish.api
 from ayon_houdini.api import lib, plugin
+
+if typing.TYPE_CHECKING:
+    import logging
+
+
+def float_range(start: float, end: float, step: float):
+    """Simple float range generator."""
+    if step == 0:
+        raise ValueError("step must be non-zero")
+
+    num_steps = int((end - start) / step)
+    if num_steps < 0:
+        return []
+    return [start + i * step for i in range(num_steps + 1)]
 
 
 class CollectFrames(plugin.HoudiniInstancePlugin):
@@ -18,50 +35,35 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
                 "redshiftproxy", "review", "pointcache", "fbx",
                 "model", "bgeo", "image_rop"]
 
-    def process(self, instance):
+    log: logging.Logger
+
+    def process(self, instance: pyblish.api.Instance):
 
         # CollectRopFrameRange computes `start_frame` and `end_frame`
         #  depending on the trange value.
         start_frame = instance.data["frameStartHandle"]
         end_frame = instance.data["frameEndHandle"]
+        frame_step = instance.data.get("byFrameStep", 1.0)
 
         # Evaluate the file name at the first frame.
         ropnode = hou.node(instance.data["instance_node"])
-        output_parm = lib.get_output_parameter(ropnode)
-        output = lib.evalParmNoFrame(ropnode, output_parm.name())
-        file_name = os.path.basename(output)
+        parm: hou.Parm = lib.get_output_parameter(ropnode)
 
-        frames = self.compute_frames(file_name, start_frame, end_frame)
-        self.log.debug(f"Collected Frames: {frames}")
+        if start_frame != end_frame and parm.isTimeDependent():
 
+            if frame_step % 1.0 == 0:
+                frames = range(start_frame, end_frame+1)
+            else:
+                frames = float_range(start_frame, end_frame, frame_step)
+
+            files = [parm.evalAtFrame(frame) for frame in frames]
+            staging_dir = os.path.basename(files[0])
+        else:
+            files = parm.evalAtFrame(start_frame)
+            staging_dir = os.path.basename(files)
+
+        self.log.debug(f"Collected Frames: {files}")
         instance.data.update({
-            "frames": frames,
-            "stagingDir": os.path.dirname(output)
+            "frames": files,
+            "stagingDir": staging_dir
         })
-
-    def compute_frames(self, file_name, start, end):
-            """Compute output frames.
-
-            Args:
-                file_name (str): Input file path containing hash tokens.
-                start (int): Start frame.
-                end (int): End frame.
-
-            Returns:
-                str | list[str]: A single frame path or a list of frame paths.
-            """
-
-            if "#" in file_name:
-                def replace(match):
-                    return "%0{}d".format(len(match.group()))
-
-                file_name = re.sub("#+", replace, file_name)
-
-            if "%" not in file_name:
-                return file_name
-
-            files = []
-            for i in range(int(start), (int(end) + 1)):
-                files.append(file_name % i)
-
-            return files
