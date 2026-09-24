@@ -9,9 +9,6 @@ import pyblish.api
 
 from ayon_core.pipeline import PublishError
 from ayon_houdini.api import plugin
-from ayon_houdini.api.usd import (
-    get_usd_render_rop_rendersettings
-)
 
 
 class CollectRenderProducts(plugin.HoudiniInstancePlugin):
@@ -49,7 +46,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
         filenames = []
         files_by_product = {}
         stage = instance.data["stage"]
-        for prim_path in self.get_render_products(rop_node, stage):
+        for prim_path in self.get_render_products(instance):
             prim = stage.GetPrimAtPath(prim_path)
             if not prim or not prim.IsA(pxr.UsdRender.Product):
                 self.log.warning("Found invalid render product path "
@@ -199,22 +196,15 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
                 f"Render product has no rendervars set: {render_product}")
             return ""
 
-    def get_render_products(self, usdrender_rop, stage):
+    def get_render_products(self,instance):
         """"The render products in the defined render settings
-
-        Args:
-            usdrender_rop (hou.Node): The Houdini USD Render ROP node.
-            stage (pxr.Usd.Stage): The USD stage to find the render settings
-                 in. This is usually the stage from the LOP path the USD Render
-                 ROP node refers to.
 
         Returns:
             List[Sdf.Path]: Render Product paths enabled in the render settings
 
         """
-        render_settings = get_usd_render_rop_rendersettings(usdrender_rop,
-                                                            stage,
-                                                            logger=self.log)
+        render_settings = instance.data["rendersettings"]
+
         if not render_settings:
             return []
 

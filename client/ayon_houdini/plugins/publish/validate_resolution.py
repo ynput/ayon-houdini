@@ -14,7 +14,6 @@ from ayon_houdini.api import plugin
 from ayon_houdini.api.action import SelectROPAction
 from ayon_houdini.api.usd import (
     get_usd_rop_loppath,
-    get_usd_render_rop_rendersettings
 )
 
 
@@ -151,8 +150,7 @@ class ValidateRenderResolution(plugin.HoudiniInstancePlugin,
             return
 
         stage: Usd.Stage = lop_node.stage()
-        render_settings: UsdRender.Settings = (
-            get_usd_render_rop_rendersettings(rop_node, stage, logger=cls.log))
+        render_settings: UsdRender.Settings = instance.data["rendersettings"]
         if not render_settings:
             cls.log.debug(
                 f"No render settings found for LOP node: {lop_node.path()}")
