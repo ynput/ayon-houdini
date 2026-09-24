@@ -68,7 +68,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
             basename = os.path.basename(name)
 
             dollarf_regex = r"(\$F([0-9]?))"
-            if re.match(dollarf_regex, basename):
+            if re.search(dollarf_regex, basename):
                 # TODO: Confirm this actually is allowed USD stages and HUSK
                 # Substitute $F
                 def replace(match):

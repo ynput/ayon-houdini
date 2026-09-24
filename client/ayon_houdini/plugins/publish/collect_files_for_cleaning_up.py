@@ -63,6 +63,11 @@ class CollectFilesForCleaningUp(plugin.HoudiniInstancePlugin,
             for expected in expected_files:
                 # expected.values() is a list of lists
                 for output_files in expected.values():
+                    if isinstance(output_files, str):
+                        # Single file instead of a list of files
+                        output_files = [output_files]
+                    if not output_files:
+                        continue
                     staging_dir, _ = os.path.split(output_files[0])
                     if staging_dir not in staging_dirs:
                         staging_dirs.append(staging_dir)

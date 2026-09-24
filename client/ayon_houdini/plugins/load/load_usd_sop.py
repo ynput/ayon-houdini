@@ -71,6 +71,11 @@ class SopUsdImportLoader(plugin.HoudiniLoader):
 
         # Update attribute
         node.setParms({"representation": context["representation"]["id"]})
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def remove(self, container):
         node = container["node"]

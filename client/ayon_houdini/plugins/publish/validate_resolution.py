@@ -221,7 +221,7 @@ class ValidateRenderResolution(plugin.HoudiniInstancePlugin,
             if not prim.IsValid():
                 cls.log.debug(
                     f"Render product path is not a valid prim: {product_path}")
-                return
+                continue
 
             if prim.IsA(UsdRender.Product):
                 yield UsdRender.Product(prim)

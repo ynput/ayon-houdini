@@ -30,6 +30,9 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
         import hou  # noqa
 
         instance_data.update({"node_type": "comp"})
+        creator_attributes = instance_data.setdefault(
+            "creator_attributes", dict())
+        creator_attributes["render_target"] = pre_create_data["render_target"]
 
         instance = super(CreateCompositeSequence, self).create(
             product_name,
