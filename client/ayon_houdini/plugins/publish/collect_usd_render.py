@@ -69,7 +69,13 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
             if "$F" not in export_file:
                 instance.data["splitRenderFrameDependent"] = False
 
-        instance.data["renderpass"] = get_usd_render_rop_renderpass(rop,instance.data["stage"],self.log)
-        instance.data["rendersettings"] = get_usd_render_rop_rendersettings(rop,instance.data["stage"],self.log)
+        instance.data["renderpass"] = get_usd_render_rop_renderpass(
+            rop,instance.data["stage"],
+            self.log
+        )
+        instance.data["rendersettings"] = get_usd_render_rop_rendersettings(
+            rop,instance.data["stage"],
+            self.log
+        )
         # stub required data for Submit Publish Job publish plug-in
         instance.data["attachTo"] = []

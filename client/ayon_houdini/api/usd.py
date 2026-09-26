@@ -317,7 +317,7 @@ def remap_paths(rop_node, mapping):
 
 def get_usd_render_rop_renderpass(rop_node,stage=None,logger=None):
     """Return the chosen UsdRender.Pass from the stage (if any).
-    
+
         Args:
             rop_node (hou.Node): The Houdini USD Render ROP node.
             stage (pxr.Usd.Stage): The USD stage to find the render pass
@@ -325,20 +325,20 @@ def get_usd_render_rop_renderpass(rop_node,stage=None,logger=None):
                  ROP node refers to.
             logger (logging.Logger): Logger to log warnings to if no render
                 pass was found in stage.
-    
+
         Returns:
             Optional[UsdRender.Pass]: Render Pass.
     """
     if logger is None:
         logger = log
-    
+
     if stage is None:
         lop_node = get_usd_rop_loppath(rop_node)
         stage = lop_node.stage()
 
     # Keep <H21 compatible
     render_pass_parm = rop_node.parm("renderpass")
-    pass_path = render_pass_parm.eval() if render_pass_parm else ''
+    pass_path = render_pass_parm.eval() if render_pass_parm else ""
 
     if not pass_path:
         return
@@ -346,7 +346,10 @@ def get_usd_render_rop_renderpass(rop_node,stage=None,logger=None):
     passes = pass_path.split(" ")
     if len(passes) > 1:
         pass_path = passes[0]
-        logger.warning("Found multiple render passes for %s, using the first: %s", rop_node, pass_path)
+        logger.warning(
+            "Found multiple render passes for %s, using the first: %s",
+            rop_node, pass_path
+        )
 
     pass_prim = stage.GetPrimAtPath(pass_path)
     if not pass_prim:
@@ -391,10 +394,13 @@ def get_usd_render_rop_rendersettings(rop_node, stage=None, logger=None):
         render_source = render_pass.GetRenderSourceRel().GetTargets()
         if render_source:
             if len(render_source) > 1:
-                logger.warning("Found multiple render settings for %s, using the first", render_pass.GetPath().pathString)
+                logger.warning(
+                    "Found multiple render settings for %s, using the first",
+                    render_pass.GetPath().pathString
+                )
 
             settings_path = render_source[0]
-        
+
     # Fall back to the stage default or Houdini's conventional path.
     if not settings_path:
         settings_path = (
@@ -404,12 +410,16 @@ def get_usd_render_rop_rendersettings(rop_node, stage=None, logger=None):
 
     render_prim = stage.GetPrimAtPath(settings_path)
     if not render_prim:
-        logger.warning("No render settings primitive found at: %s", settings_path)
+        logger.warning(
+            "No render settings primitive found at: %s", settings_path
+        )
         return
 
     render_settings = UsdRender.Settings(render_prim)
     if not render_settings:
-        logger.warning("Prim at %s is not a valid RenderSettings prim.", settings_path)
+        logger.warning(
+            "Prim at %s is not a valid RenderSettings prim.", settings_path
+        )
         return
 
     return render_settings
