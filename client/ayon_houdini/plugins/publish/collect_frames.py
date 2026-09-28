@@ -46,10 +46,10 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
         frame_step = instance.data["byFrameStep"]
 
         # Evaluate the file name at the first frame.
-        ropnode = hou.node(instance.data["instance_node"])
-        parm: hou.Parm = lib.get_output_parameter(ropnode)
+        ropnode: hou.Node = hou.node(instance.data["instance_node"])  # ty: ignore[invalid-assignment]  # we know the path is valid
+        output_parm = lib.get_output_parameter(ropnode)
 
-        if start_frame != end_frame and parm.isTimeDependent():
+        if start_frame != end_frame and output_parm.isTimeDependent():
 
             if frame_step % 1.0 == 0:
                 frames = range(start_frame, end_frame+1)
