@@ -68,6 +68,11 @@ class AbcArchiveLoader(plugin.HoudiniLoader):
         node.setParms({"fileName": file_path,
                        "representation": context["representation"]["id"]})
 
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         # Rebuild
         node.parm("buildHierarchy").pressButton()
 

@@ -5,7 +5,7 @@ from typing import Any, Optional, List
 
 import ayon_api
 
-from ayon_houdini.api import plugin, pipeline
+from ayon_houdini.api import plugin, pipeline, lib
 
 from ayon_core.pipeline.load import (
     get_representation_contexts,
@@ -331,8 +331,13 @@ class LayoutLoader(plugin.HoudiniLoader):
         container_node = container["node"]
         self._set_members(container_node, updated_containers)
         container_node.setParms({
-            "representation": str(repre_entity["id"])
+            "representation": str(repre_entity["id"]),
         })
+        lib.imprint(
+            container_node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def switch(self, container, context):
         self.update(container, context)

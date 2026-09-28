@@ -8,7 +8,6 @@ import pyblish.api
 from ayon_core.pipeline.publish import PublishValidationError, RepairAction
 
 from ayon_houdini.api.action import SelectROPAction
-from ayon_houdini.api.usd import get_usd_render_rop_rendersettings
 from ayon_houdini.api import plugin
 
 
@@ -224,8 +223,7 @@ class ValidateUSDRenderCamera(plugin.HoudiniInstancePlugin):
             return
 
         stage = instance.data["stage"]
-        render_settings = get_usd_render_rop_rendersettings(rop_node, stage,
-                                                            logger=self.log)
+        render_settings = instance.data["rendersettings"]
         if not render_settings:
             # Without render settings we basically have no defined
             self.log.error("No render settings found for %s.", rop_node.path())

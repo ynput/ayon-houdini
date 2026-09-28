@@ -635,11 +635,12 @@ class HoudiniExtractorPlugin(publish.Extractor):
         rop_node = hou.node(instance.data["instance_node"])
         self.log.debug(f"Rendering {rop_node.path()}")
 
-        frames_to_fix = clique.parse(instance.data.get("frames_to_fix", ""),
-                                     "{ranges}")
-        if len(set(frames_to_fix)) < 2:
+        frames_to_fix_str = instance.data.get("frames_to_fix", "")
+        if not frames_to_fix_str:
             render_rop(rop_node)
             return
+
+        frames_to_fix = clique.parse(frames_to_fix_str, "{ranges}")
 
         # Render only frames to fix
         for frame_range in frames_to_fix.separate():
