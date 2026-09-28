@@ -6,12 +6,6 @@ from ayon_core.pipeline.publish import (
     ColormanagedPyblishPluginMixin
 )
 from ayon_houdini.api import plugin
-try:
-    from ayon_core.pipeline.farm.pyblish_functions import (
-        _get_legacy_product_name_and_group,
-    )
-except ImportError:
-    _get_legacy_product_name_and_group = None
 
 
 class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
