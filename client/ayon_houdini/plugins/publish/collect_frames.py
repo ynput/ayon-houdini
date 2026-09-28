@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
     import logging
 
 
-def float_range(start: float, end: float, step: float):
+def float_range(start: float, end: float, step: float) -> list[float]:
     """Simple float range generator."""
     if step == 0:
         raise ValueError("step must be non-zero")
