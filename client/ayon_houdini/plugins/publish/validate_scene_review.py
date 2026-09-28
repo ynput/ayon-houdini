@@ -5,6 +5,7 @@ import pyblish.api
 from ayon_core.pipeline import PublishValidationError
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import node_matches_filter
 
 
 class ValidateSceneReview(plugin.HoudiniInstancePlugin):
@@ -56,12 +57,15 @@ class ValidateSceneReview(plugin.HoudiniInstancePlugin):
             camera_node = camera_path_parm.evalAsNode()
             path = camera_path_parm.evalAsString()
             if not camera_node:
-                return "Camera path does not exist: '{}'".format(path)
-            type_name = camera_node.type().name()
-            if type_name not in {"cam", "lopimportcam"}:
-                return "Camera path is not a camera: '{}' (type: {})".format(
-                    path, type_name
-                )
+                return f"Camera path does not exist: '{path}'"
+
+            if not node_matches_filter(
+                camera_node,
+                hou.nodeTypeFilter.ObjCamera,  # ty: ignore[invalid-argument-type]  hou-types has invalid type for filter EnumValues
+            ):
+                type_ = camera_node.type().name()
+                return f"Camera path is not a camera: '{path}' (type: {type_})"
+
         elif opsource == 1:
             # LOP-level
             lop_path = rop_node.parm("loppath").evalAsString()
