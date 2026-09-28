@@ -315,6 +315,7 @@ def remap_paths(rop_node, mapping):
         ]):
             yield
 
+
 def get_usd_render_rop_renderpass(rop_node,stage=None,logger=None):
     """Return the chosen UsdRender.Pass from the stage (if any).
 
