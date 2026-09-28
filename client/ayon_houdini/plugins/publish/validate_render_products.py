@@ -55,11 +55,10 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
                 "Invalid render settings for '{}'".format(node_path),
                 title="Invalid Render Settings"
             )
-        
+
         if not instance.data.get("files", []):
-            node = hou.node(node_path)
-            stage = instance.data["stage"]
-            rendersettings_path = instance.data["rendersettings"].GetPath().pathString()
+            rendersettings_path = \
+                instance.data["rendersettings"].GetPath().pathString()
 
             raise PublishValidationError(
                 message=(
