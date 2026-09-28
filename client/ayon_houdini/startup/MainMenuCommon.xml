@@ -76,16 +76,6 @@ host_tools.show_scene_inventory(parent)
 ]]></scriptCode>
             </scriptItem>
 
-            <scriptItem id="library_load">
-                <label>Library...</label>
-                <scriptCode><![CDATA[
-import hou
-from ayon_core.tools.utils import host_tools
-parent = hou.qt.mainWindow()
-host_tools.show_library_loader(parent=parent)
-]]></scriptCode>
-            </scriptItem>
-
             <separatorItem/>
 
             <scriptItem id="workfiles">
@@ -111,6 +101,15 @@ ayon_houdini.api.lib.reset_framerange()
                 <scriptCode><![CDATA[
 import ayon_houdini.api.lib
 ayon_houdini.api.lib.update_houdini_vars_context_dialog()
+]]></scriptCode>
+            </scriptItem>
+
+            <separatorItem/>
+            <scriptItem id="clear_resolver_cache">
+                <label>Clear AYON USD Resolver Cache</label>
+                <scriptCode><![CDATA[
+from ayon_houdini.api.usd import clear_resolver_cache
+clear_resolver_cache()
 ]]></scriptCode>
             </scriptItem>
 

@@ -1,5 +1,6 @@
-"""Heper functions for load HDA"""
+"""Helper functions for load HDA"""
 
+from __future__ import annotations
 import os
 import re
 import uuid
@@ -364,7 +365,7 @@ def get_filepath_from_context(context: dict):
     udim = representation["context"].get("udim")
     if frame is not None or udim is not None:
         template: str = representation["attrib"]["template"]
-        repre_context: dict = representation["context"]
+        repre_context: dict = dict(representation["context"])
         if udim is not None:
             repre_context["udim"] = "<UDIM>"
             template = _remove_format_spec(template, "udim")
@@ -417,6 +418,10 @@ def update_thumbnail(node):
 
     project_name = node.evalParm("project_name") or get_current_project_name()
     repre_entity = get_representation_by_id(project_name, representation_id)
+    if not repre_entity:
+        set_node_thumbnail(node, None)
+        return
+
     if node.evalParm("show_thumbnail"):
         # Update thumbnail
         # TODO: Cache thumbnail path as well
@@ -432,6 +437,7 @@ def set_node_thumbnail(node, thumbnail: str):
     """Update node thumbnail to thumbnail"""
     if thumbnail is None:
         lib.set_node_thumbnail(node, None)
+        return
 
     rect = compute_thumbnail_rect(node)
     lib.set_node_thumbnail(node, thumbnail, rect)
@@ -785,41 +791,41 @@ class SelectProductDialog(QtWidgets.QDialog):
         self.folder_id = folder_id
 
         # Create widgets and layout
-        product_types_widget = QtWidgets.QComboBox()
+        product_base_types_widget = QtWidgets.QComboBox()
         products_widget = QtWidgets.QListWidget()
         accept_button = QtWidgets.QPushButton("Set product name")
 
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.addWidget(product_types_widget, 0)
+        main_layout.addWidget(product_base_types_widget, 0)
         main_layout.addWidget(products_widget, 1)
         main_layout.addWidget(accept_button, 0)
 
-        self.product_types_widget = product_types_widget
+        self.product_base_types_widget = product_base_types_widget
         self.products_widget = products_widget
 
         # Connect Signals
-        product_types_widget.currentTextChanged.connect(
-            self.on_product_type_changed
+        self.product_base_types_widget.currentTextChanged.connect(
+            self.on_product_base_type_changed
         )
         products_widget.itemDoubleClicked.connect(self.accept)
         accept_button.clicked.connect(self.accept)
 
         # Initialize widgets contents
-        product_types_widget.addItems(self.get_product_types())
-        product_type = self.get_selected_product_type()
-        self.set_product_type(product_type)
+        self.product_base_types_widget.addItems(self.get_product_base_types())
+        product_base_type = self.get_selected_product_base_type()
+        self.set_product_base_type(product_base_type)
 
     def get_selected_product(self) -> str:
         if self.products_widget.currentItem():
             return self.products_widget.currentItem().text()
         return ""
 
-    def get_selected_product_type(self) -> str:
-        return self.product_types_widget.currentText()
+    def get_selected_product_base_type(self) -> str:
+        return self.product_base_types_widget.currentText()
 
-    def get_product_types(self) -> List[str]:
-        """return default product types."""
+    def get_product_base_types(self) -> List[str]:
+        """return default product base types."""
 
         return [
             "*",
@@ -830,18 +836,18 @@ class SelectProductDialog(QtWidgets.QDialog):
             "usd",
         ]
 
-    def on_product_type_changed(self, product_type: str):
-        self.set_product_type(product_type)
+    def on_product_base_type_changed(self, product_base_type: str):
+        self.set_product_base_type(product_base_type)
 
-    def set_product_type(self, product_type: str):
-        self.product_types_widget.setCurrentText(product_type)
+    def set_product_base_type(self, product_base_type: str):
+        self.product_base_types_widget.setCurrentText(product_base_type)
 
-        if self.product_types_widget.currentText() != product_type:
+        if self.product_base_types_widget.currentText() != product_base_type:
             # Product type does not exist
             return
 
         # Populate products list
-        products = self.get_available_products(product_type)
+        products = self.get_available_products(product_base_type)
         self.products_widget.clear()
         if products:
             self.products_widget.addItems(products)
@@ -853,17 +859,24 @@ class SelectProductDialog(QtWidgets.QDialog):
         if matching_items:
             self.products_widget.setCurrentItem(matching_items[0])
 
-    def get_available_products(self, product_type):
-        if product_type == "*":
-            product_type = ""
+    def get_available_products(self, product_base_type):
+        if product_base_type == "*":
+            product_base_type = ""
 
-        product_types = [product_type] if product_type else None
+        product_base_types = [product_base_type] if product_base_type else None
 
-        products = ayon_api.get_products(
-            self.project_name,
-            folder_ids=[self.folder_id],
-            product_types=product_types,
-        )
+        kwargs = {
+            "project_name": self.project_name,
+            "folder_ids": [self.folder_id],
+        }
+
+        if ayon_api.get_server_version_tuple() >= (1, 14, 0):
+            kwargs["product_base_types"] = product_base_types
+        else:
+            kwargs["product_types"] = product_base_types
+
+        products = ayon_api.get_products(**kwargs)
+
 
         return list(sorted(product["name"] for product in products))
 
@@ -938,6 +951,9 @@ def get_available_representations(node):
         entity["representationId"] for entity in entities
     }
 
+    # Refreshing Nodes Parm States
+    node.updateParmStates()
+
     representation_filter = None
     filter_parm = node.parm("representation_filter")
     if filter_parm and not filter_parm.isDisabled() and filter_parm.eval():
@@ -945,11 +961,26 @@ def get_available_representations(node):
 
     representations = get_representations(
         project_name,
-        fields={"name"},
+        fields={"name", "attrib.path"},
         representation_ids=representation_ids,
         representation_names=representation_filter,
     )
-    representations_names = [n["name"] for n in representations]
+    extension_filter = set()
+    filter_parm = node.parm("extension_filter")
+    if filter_parm and not filter_parm.isDisabled() and filter_parm.eval():
+        extension_filter = set(filter_parm.eval().split(" "))
+
+    representations_names = []
+    for n in representations:
+        if extension_filter:
+            _, ext = lib.splitext(
+                n["attrib"]["path"], allowed_multidot_extensions=[
+                    ".ass.gz", ".bgeo.sc", ".bgeo.gz",
+                    ".bgeo.lzma", ".bgeo.bz2"]
+            )
+            if ext not in extension_filter:
+                continue
+        representations_names.append(n["name"])
     return representations_names
 
 

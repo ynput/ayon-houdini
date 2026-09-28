@@ -10,9 +10,11 @@ from ayon_houdini.api import (
 class VdbLoader(plugin.HoudiniLoader):
     """Load VDB"""
 
-    product_types = {"vdbcache"}
+    product_base_types = {"vdbcache"}
+    product_types = product_base_types
     label = "Load VDB"
-    representations = {"vdb"}
+    representations = {"*"}
+    extensions = {"vdb"}
     order = -10
     icon = "code-fork"
     color = "orange"
@@ -62,7 +64,7 @@ class VdbLoader(plugin.HoudiniLoader):
                 n for n in node.children() if n.type().name() == "file"
             )
         except StopIteration:
-            self.log.error("Could not find node of type `alembic`")
+            self.log.error("Could not find node of type `file`")
             return
 
         # Update the file path
@@ -70,6 +72,11 @@ class VdbLoader(plugin.HoudiniLoader):
 
         # Update attribute
         node.setParms({"representation": repre_entity["id"]})
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def remove(self, container):
         node = container["node"]

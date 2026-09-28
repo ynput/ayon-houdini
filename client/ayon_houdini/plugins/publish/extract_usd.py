@@ -49,7 +49,7 @@ class ExtractUSD(plugin.HoudiniExtractorPlugin):
             render_rop(ropnode)
 
         if not os.path.exists(output):
-            PublishError(f"Output does not exist: {output}")
+            raise PublishError(f"Output does not exist: {output}")
 
         if "representations" not in instance.data:
             instance.data["representations"] = []

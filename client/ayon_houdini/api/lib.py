@@ -24,9 +24,6 @@ from ayon_core.pipeline import (
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.template_data import get_template_data
 from ayon_core.pipeline.context_tools import get_current_task_entity
-from ayon_core.pipeline.workfile.workfile_template_builder import (
-    TemplateProfileNotFound
-)
 from ayon_core.tools.utils import PopupUpdateKeys, SimplePopup
 from ayon_core.tools.utils.host_tools import get_tool_by_name
 
@@ -438,13 +435,11 @@ def lsattrs(attrs, root="/"):
     # the rest
     nodes = hou.node(root).allSubChildren()
     for node in nodes:
-        for attr in attrs:
-            if not node.parm(attr):
-                continue
-            elif node.evalParm(attr) != attrs[attr]:
-                continue
-            else:
-                matches.add(node)
+        if all(
+            node.parm(attr) and node.evalParm(attr) == value
+            for attr, value in attrs.items()
+        ):
+            matches.add(node)
 
     return list(matches)
 
@@ -806,6 +801,35 @@ def get_output_children(output_node, include_sops=True):
     return out_list
 
 
+def node_matches_filter(
+    node: hou.Node,
+    node_type_filter: hou.nodeTypeFilter,
+) -> bool:
+    """Check if the given node matches a hou.nodeTypeFilter.
+
+    Args:
+        node (hou.Node): The node to check.
+        node_type_filter (hou.nodeTypeFilter): The node type filter to check.
+
+    Returns:
+        bool: True if the node matches the node type filter, False otherwise.
+
+    """
+    if node_type_filter == hou.nodeTypeFilter.NoFilter:
+        return True
+
+    name = node.name()
+    parent = node.parent() or hou.root()
+
+    # houdini does not seem to have a simple "node matches filter" function
+    # so we repurpose the "recursiveGlob" function here
+    return node in parent.recursiveGlob(
+        pattern=name,
+        filter=node_type_filter,  # ty: ignore[invalid-argument-type]  hou-types has invalid type for filter
+        include_subnets=False,
+    )
+
+
 def get_resolution_from_entity(entity):
     """Get resolution from the given entity.
 
@@ -1102,16 +1126,19 @@ def find_rop_input_dependencies(input_tuple):
 
     Returns:
         list of the RopNode.path() that can be found inside
-        the input tuple.
+        the input tuple, flattened into a single list.
     """
 
     out_list = []
+    if not input_tuple:
+        return out_list
+
     if isinstance(input_tuple[0], hou.RopNode):
-        return input_tuple[0].path()
+        return [input_tuple[0].path()]
 
     if isinstance(input_tuple[0], tuple):
         for item in input_tuple:
-            out_list.append(find_rop_input_dependencies(item))
+            out_list.extend(find_rop_input_dependencies(item))
 
     return out_list
 
@@ -1429,7 +1456,7 @@ def get_node_thumbnail(node, first_only=True):
     if first_only:
         return next(attached_images, None)
     else:
-        return attached_images
+        return list(attached_images)
 
 
 def find_active_network(category, default):
@@ -1563,14 +1590,17 @@ def prompt_reset_context():
 
 def start_workfile_template_builder():
     from .workfile_template_builder import (
-        build_workfile_template
+        trigger_on_new_file,
+        trigger_on_app_launch,
     )
-
-    log.info("Starting workfile template builder...")
-    try:
-        build_workfile_template(workfile_creation_enabled=True)
-    except TemplateProfileNotFound:
-        log.warning("Template profile not found. Skipping...")
+    host = registered_host()
+    if host.hou_initialized:
+        log.info("Starting workfile template builder...")
+        trigger_on_new_file()
+    else:
+        host.hou_initialized = True
+        if not host.get_current_workfile():
+            trigger_on_app_launch()
 
 
 def show_node_parmeditor(node):

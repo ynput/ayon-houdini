@@ -11,8 +11,11 @@ class SopUsdImportLoader(plugin.HoudiniLoader):
     """Load USD to SOPs via `usdimport`"""
 
     label = "Load USD to SOPs"
-    product_types = {"*"}
-    representations = {"usd"}
+    product_base_types = {"*"}
+    product_types = product_base_types
+    representations = {"*"}
+    extensions = {"usd", "usda", "usdc", "usdlc", "usdnc"}
+
     order = -6
     icon = "code-fork"
     color = "orange"
@@ -68,6 +71,11 @@ class SopUsdImportLoader(plugin.HoudiniLoader):
 
         # Update attribute
         node.setParms({"representation": context["representation"]["id"]})
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def remove(self, container):
         node = container["node"]

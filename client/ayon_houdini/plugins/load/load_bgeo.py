@@ -12,15 +12,17 @@ class BgeoLoader(plugin.HoudiniLoader):
     """Load bgeo files to Houdini."""
 
     label = "Load bgeo"
-    product_types = {"model", "pointcache", "bgeo"}
-    representations = {
+    product_base_types = {"*"}
+    product_types = product_base_types
+    representations = {"*"}
+    extensions = {
         "bgeo", "bgeosc", "bgeogz",
         "bgeo.sc", "bgeo.gz", "bgeo.lzma", "bgeo.bz2"}
     order = -10
     icon = "code-fork"
     color = "orange"
 
-    def load(self, context, name=None, namespace=None, data=None):
+    def load(self, context, name=None, namespace=None, options=None):
         # Get the root node
         obj = hou.node("/obj")
 
@@ -73,6 +75,11 @@ class BgeoLoader(plugin.HoudiniLoader):
 
         # Update attribute
         node.setParms({"representation": repre_entity["id"]})
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def remove(self, container):
         node = container["node"]

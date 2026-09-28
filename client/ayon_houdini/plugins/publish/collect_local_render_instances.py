@@ -227,7 +227,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         if use_legacy_product_name:
             return _get_legacy_product_name_and_group(
                 product_base_type,
-                dynamic_data.get("productName"),
+                instance.data["productName"],
                 instance.context.data["taskEntity"]["name"],
                 dynamic_data
             )

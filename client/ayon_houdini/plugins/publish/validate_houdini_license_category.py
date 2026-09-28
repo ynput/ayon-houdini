@@ -30,7 +30,7 @@ class ValidateHoudiniNotApprenticeLicense(plugin.HoudiniInstancePlugin):
 
         if hou.isApprentice():
             # Find which family or product type was matched with the plug-in
-            families = {instance.data["productType"]}
+            families = {instance.data["productBaseType"]}
             families.update(instance.data.get("families", []))
             disallowed_families = families.intersection(self.families)
             families = " ".join(sorted(disallowed_families)).title()

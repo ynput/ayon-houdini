@@ -11,6 +11,7 @@ from ayon_houdini.api.lib import (
     set_camera_resolution,
     get_camera_from_container,
     find_active_network,
+    imprint,
 )
 
 
@@ -91,9 +92,12 @@ def transfer_non_default_values(src, dest, ignore=None):
 class CameraLoader(plugin.HoudiniLoader):
     """Load camera from an Alembic file"""
 
-    product_types = {"camera"}
+    product_base_types = {"camera"}
+    product_types = product_base_types
+
     label = "Load Camera (abc)"
-    representations = {"abc"}
+    representations = {"*"}
+    extensions = {"abc"}
     order = -10
 
     icon = "code-fork"
@@ -183,6 +187,11 @@ return aperture
         node.setParms({"fileName": file_path,
                        "representation": context["representation"]["id"]})
 
+        imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         # Store the cam temporarily next to the Alembic Archive
         # so that we can preserve parm values the user set on it
         # after build hierarchy was triggered.
@@ -203,9 +212,11 @@ return aperture
 
         # Detect whether the camera was loaded with the "Match Maya render
         # mask" before. If so, we want to maintain that expression on update.
+        aperture_expression = get_expression(temp_camera.parm("aperture"))
         if (
-                self._match_maya_render_mask_expression
-                in get_expression(temp_camera.parm("aperture"))
+                aperture_expression is not None
+                and self._match_maya_render_mask_expression
+                in aperture_expression
         ):
             self._match_maya_render_mask(new_camera)
 

@@ -13,8 +13,9 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.imagesequence"
     label = "Composite (COP2)"
     description = "Render legacy COP2 ROP to image sequence"
-    product_type = "imagesequence"
     product_base_type = "imagesequence"
+    product_type = product_base_type
+
     icon = "fa5.eye"
 
     ext = ".exr"
@@ -29,6 +30,9 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
         import hou  # noqa
 
         instance_data.update({"node_type": "comp"})
+        creator_attributes = instance_data.setdefault(
+            "creator_attributes", dict())
+        creator_attributes["render_target"] = pre_create_data["render_target"]
 
         instance = super(CreateCompositeSequence, self).create(
             product_name,

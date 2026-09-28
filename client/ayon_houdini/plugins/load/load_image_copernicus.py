@@ -36,7 +36,7 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
     "Object Merge" COP node, so we cannot merge nodes from another Cop network.
     """
 
-    product_types = {
+    product_base_types = {
         "imagesequence",
         "review",
         "render",
@@ -44,6 +44,7 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
         "image",
         "online",
     }
+    product_types = product_base_types
     label = "Load Image (Copernicus)"
     representations = {"*"}
     order = -10
@@ -91,6 +92,7 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
             "namespace": namespace,
             "loader": str(self.__class__.__name__),
             "representation": context["representation"]["id"],
+            "project_name": context["project"]["name"],
         }
 
         lib.imprint(node, data, folder="AYON")
@@ -104,9 +106,13 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
         # Update the file path
         parms = {
             "filename": self.format_path(context),
-            "representation": repre_entity["id"],
+            "representation": repre_entity["id"]
         }
-
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         # Update attributes
         node.setParms(parms)
 

@@ -16,9 +16,11 @@ from ayon_houdini.api import (
 class HdaLoader(plugin.HoudiniLoader):
     """Load Houdini Digital Asset file."""
 
-    product_types = {"hda"}
+    product_base_types = {"hda"}
+    product_types = product_base_types
     label = "Load Hda"
-    representations = {"hda"}
+    representations = {"*"}
+    extensions = {"hda"}
     order = -10
     icon = "code-fork"
     color = "orange"
@@ -54,6 +56,7 @@ class HdaLoader(plugin.HoudiniLoader):
             "namespace": namespace,
             "loader": self.__class__.__name__,
             "representation": context["representation"]["id"],
+            "project_name": context["project"]["name"],
         }
 
         lib.imprint(hda_node, data)
@@ -74,7 +77,11 @@ class HdaLoader(plugin.HoudiniLoader):
         hda_node.setParms({
             "representation": repre_entity["id"]
         })
-
+        lib.imprint(
+            hda_node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         # Move the Extra parameter folder to the back.
         parm_group = hda_node.parmTemplateGroup()
         # The name 'Extra' is a hard coded name in AYON.

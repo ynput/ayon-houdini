@@ -12,9 +12,11 @@ from ayon_houdini.api import (
 class RedshiftProxyLoader(plugin.HoudiniLoader):
     """Load Redshift Proxy"""
 
-    product_types = {"redshiftproxy"}
+    product_base_types = {"redshiftproxy"}
+    product_types = product_base_types
     label = "Load Redshift Proxy"
-    representations = {"rs"}
+    representations = {"*"}
+    extensions = {"rs"}
     order = -10
     icon = "code-fork"
     color = "orange"
@@ -79,6 +81,11 @@ class RedshiftProxyLoader(plugin.HoudiniLoader):
 
         # Update attribute
         node.setParms({"representation": repre_entity["id"]})
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def remove(self, container):
         node = container["node"]

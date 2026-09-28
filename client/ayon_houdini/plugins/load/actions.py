@@ -8,14 +8,16 @@ from ayon_houdini.api import plugin
 class SetFrameRangeLoader(plugin.HoudiniLoader):
     """Set frame range excluding pre- and post-handles"""
 
-    product_types = {
+    product_base_types = {
         "animation",
         "camera",
         "pointcache",
         "vdbcache",
         "usd",
     }
-    representations = {"abc", "vdb", "usd"}
+    product_types = product_base_types
+    representations = {"*"}
+    extensions = {"abc", "vdb", "usd", "usda", "usdc", "usdlc", "usdnc"}
 
     label = "Set frame range"
     order = 11
@@ -45,14 +47,16 @@ class SetFrameRangeLoader(plugin.HoudiniLoader):
 class SetFrameRangeWithHandlesLoader(plugin.HoudiniLoader):
     """Set frame range including pre- and post-handles"""
 
-    product_types = {
+    product_base_types = {
         "animation",
         "camera",
         "pointcache",
         "vdbcache",
         "usd",
     }
-    representations = {"abc", "vdb", "usd"}
+    product_types = product_base_types
+    representations = {"*"}
+    extensions = {"abc", "vdb", "usd", "usda", "usdc", "usdlc", "usdnc"}
 
     label = "Set frame range (with handles)"
     order = 12

@@ -2,14 +2,17 @@
 import hou
 
 import pyblish.api
-from ayon_core.pipeline import PublishValidationError
+from ayon_core.pipeline import (
+    PublishValidationError,
+    OptionalPyblishPluginMixin
+)
 
 from ayon_houdini.api import plugin
 
 
 def cook_in_range(node, start, end):
     current = hou.intFrame()
-    if start >= current >= end:
+    if start <= current <= end:
         # Allow cooking current frame since we're in frame range
         node.cook(force=False)
     else:
@@ -29,13 +32,16 @@ def get_errors(node):
     return node.errors()
 
 
-class ValidateNoErrors(plugin.HoudiniInstancePlugin):
+class ValidateNoErrors(plugin.HoudiniInstancePlugin,
+                       OptionalPyblishPluginMixin):
     """Validate the Instance has no current cooking errors."""
 
     order = pyblish.api.ValidatorOrder
     label = "Validate no errors"
 
     def process(self, instance):
+        if not self.is_active(instance.data):
+            return
 
         if not instance.data.get("instance_node"):
             self.log.debug(
