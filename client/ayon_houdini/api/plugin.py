@@ -641,6 +641,10 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
             transfer_transient_data_keys (set[str]): These will transfer,
                 but won't be a unique copy so they are passed by reference.
 
+        Returns:
+                list of pyblish.api.Instance: Instances created from
+                    expected files.
+
         """
 
         from copy import deepcopy
@@ -678,6 +682,7 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
             )
 
         # Create instances for each AOV
+        aov_instances = []
         anatomy = instance.context.data["anatomy"]
         for aov_instance_data in instances_data:
 
@@ -697,6 +702,22 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
                 representation["stagingDir"] = anatomy.fill_root(
                     representation["stagingDir"]
                 )
+
+                # Set the colorspace for the representation
+                if "colorspace" in instance.data:
+                    self.set_representation_colorspace(
+                        representation,
+                        instance.context,
+                        colorspace=instance.data["colorspace"],
+                    )
+
+            aov_instance = instance.context.create_instance(
+                aov_instance_data["productName"]
+            )
+            aov_instance.data.update(aov_instance_data)
+            aov_instances.append(aov_instance)
+
+        return aov_instances
 
     def post_process_skeleton_data(
             self,
