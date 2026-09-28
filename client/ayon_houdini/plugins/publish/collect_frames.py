@@ -43,7 +43,7 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
         #  depending on the trange value.
         start_frame = instance.data["frameStartHandle"]
         end_frame = instance.data["frameEndHandle"]
-        frame_step = instance.data.get("byFrameStep", 1.0)
+        frame_step = instance.data["byFrameStep"]
 
         # Evaluate the file name at the first frame.
         ropnode = hou.node(instance.data["instance_node"])
