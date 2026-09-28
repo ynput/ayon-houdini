@@ -108,7 +108,7 @@ class CollectFramesFixDefHou(
         if rewrite_version:
             instance.data["version"] = version_entity["version"]
             # limits triggering version validator
-            instance.data.pop("latestVersion")
+            instance.data.pop("latestVersion", None)
 
     @classmethod
     def get_attribute_defs(cls):

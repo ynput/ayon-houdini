@@ -12,7 +12,7 @@ from ayon_houdini.api import plugin
 
 def cook_in_range(node, start, end):
     current = hou.intFrame()
-    if start >= current >= end:
+    if start <= current <= end:
         # Allow cooking current frame since we're in frame range
         node.cook(force=False)
     else:

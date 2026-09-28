@@ -29,7 +29,7 @@ class CollectHoudiniReviewData(plugin.HoudiniInstancePlugin):
 
         # Get camera based on the instance_node type.
         camera_path = self._get_camera_path(ropnode)
-        camera_node = hou.node(camera_path)
+        camera_node = hou.node(camera_path) if camera_path else None
         if not camera_node:
             self.log.warning("No valid camera node found on review node: "
                              "{}".format(camera_path))

@@ -170,5 +170,7 @@ class ValidateVDBOutputNode(plugin.HoudiniInstancePlugin,
 
     @classmethod
     def get_invalid(cls, instance):
-        nodes, _ = cls.get_invalid_with_message(instance)
-        return nodes
+        node, _ = cls.get_invalid_with_message(instance)
+        if node:
+            # Actions expect a list of nodes
+            return [node]
