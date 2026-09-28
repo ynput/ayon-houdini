@@ -52,6 +52,7 @@ class USDSublayerLoader(plugin.HoudiniLoader):
             "namespace": namespace,
             "loader": str(self.__class__.__name__),
             "representation": context["representation"]["id"],
+            "project_name": context["project"]["name"],
         }
 
         # todo: add folder="AYON"
@@ -70,10 +71,14 @@ class USDSublayerLoader(plugin.HoudiniLoader):
         node.setParms(
             {
                 "filepath1": file_path,
-                "representation": context["representation"]["id"],
+                "representation": context["representation"]["id"]
             }
         )
-
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
         # Reload files
         node.parm("reload").pressButton()
 

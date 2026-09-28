@@ -38,7 +38,6 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
 
         node_path = instance.data["instance_node"]
         if not instance.data.get("output_node"):
-
             # Report LOP path parm for better logs
             lop_path_parm = hou.node(node_path).parm("loppath")
             if lop_path_parm:
@@ -51,11 +50,16 @@ class ValidateUsdRenderProducts(plugin.HoudiniInstancePlugin):
                 f"'{node_path}'.",
                 title="Invalid LOP path")
 
-        if not instance.data.get("files", []):
-            node = hou.node(node_path)
-            rendersettings_path = (
-                node.evalParm("rendersettings") or "/Render/rendersettings"
+        if not instance.data.get("rendersettings"):
+            raise PublishValidationError(
+                "Invalid render settings for '{}'".format(node_path),
+                title="Invalid Render Settings"
             )
+
+        if not instance.data.get("files", []):
+            rendersettings_path = \
+                instance.data["rendersettings"].GetPath().pathString()
+
             raise PublishValidationError(
                 message=(
                     "No Render Products found in Render Settings "

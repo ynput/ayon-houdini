@@ -85,11 +85,29 @@
             parmtag { "script_callback_language" "python" }
         }
         parm {
+            name    "enable_ext_filter"
+            label   "Enable Extension Filter"
+            type    toggle
+            default { "off" }
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "extension_filter"
+            label   "Extension Filter"
+            type    string
+            default { ".usd .usda .usdlc .usdnc .abc" }
+            disablewhen "{ enable_ext_filter == 0 }"
+            hidewhen "{ enable_ext_filter == 0 }"
+            parmtag { "autoscope" "0000000000000000" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
             name    "clear_cache"
             label   "Clear Cache"
             type    button
             default { "0" }
-            help    "The load logic uses expressions that cache into the current session to avoid continuously requeryin the database. This clear that cache to enforce a full refresh of the expressions."
+            help    "The load logic uses expressions that cache data into the current session to avoid continuously requerying the database. This function clears that cache to enforce a full refresh of the expressions. Additionally, it clears the AYON USD Resolver cache and reloads the files associated with this node."
             parmtag { "autoscope" "0000000000000000" }
             parmtag { "script_callback_language" "python" }
         }

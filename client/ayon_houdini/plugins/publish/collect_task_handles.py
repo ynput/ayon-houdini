@@ -64,8 +64,10 @@ class CollectAssetHandles(plugin.HoudiniInstancePlugin,
         attr_values = self.get_attr_values_from_data(instance.data)
         if attr_values.get("use_handles", self.use_asset_handles):
             # Get from task (if task is set), otherwise from folder
-            entity = instance.data.get("taskEntity",
-                                       instance.data["folderEntity"])
+            entity = (
+                instance.data.get("taskEntity")
+                or instance.data["folderEntity"]
+            )
             handle_start = entity["attrib"].get("handleStart", 0)
             handle_end = entity["attrib"].get("handleEnd", 0)
         else:

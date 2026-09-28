@@ -2,7 +2,10 @@
 import hou
 
 from ayon_houdini.api import plugin
-from ayon_core.pipeline import PublishValidationError
+from ayon_core.pipeline import (
+    PublishValidationError,
+    OptionalPyblishPluginMixin
+)
 from ayon_core.pipeline.publish import (
     ValidateContentsOrder,
     RepairAction,
@@ -14,7 +17,8 @@ class AddDefaultPathAction(RepairAction):
     icon = "mdi.pencil-plus-outline"
 
 
-class ValidatePrimitiveHierarchyPaths(plugin.HoudiniInstancePlugin):
+class ValidatePrimitiveHierarchyPaths(plugin.HoudiniInstancePlugin,
+                                      OptionalPyblishPluginMixin):
     """Validate all primitives build hierarchy from attribute when enabled.
 
     The name of the attribute must exist on the prims and have the same name
@@ -29,6 +33,9 @@ class ValidatePrimitiveHierarchyPaths(plugin.HoudiniInstancePlugin):
     actions = [AddDefaultPathAction]
 
     def process(self, instance):
+        if not self.is_active(instance.data):
+            return
+
         invalid = self.get_invalid(instance)
         if invalid:
             nodes = [n.path() for n in invalid]

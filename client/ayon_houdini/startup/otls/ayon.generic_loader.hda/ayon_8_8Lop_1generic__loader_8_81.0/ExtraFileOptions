@@ -81,7 +81,7 @@
 	},
 	"PythonModule/Cursor":{
 		"type":"intarray",
-		"value":[7,35]
+		"value":[7,1]
 	},
 	"PythonModule/IsExpr":{
 		"type":"bool",
