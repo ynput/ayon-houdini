@@ -56,13 +56,16 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
             else:
                 frames = float_range(start_frame, end_frame, frame_step)
 
-            files = [parm.evalAtFrame(frame) for frame in frames]
-            staging_dir = os.path.basename(files[0])
-        else:
-            files = parm.evalAtFrame(start_frame)
-            staging_dir = os.path.basename(files)
+            files = [str(output_parm.evalAtFrame(frame)) for frame in frames]
+            staging_dir = os.path.dirname(files[0])
+            files = [os.path.basename(file) for file in files]
 
-        self.log.debug(f"Collected Frames: {files}")
+        else:
+            files = str(output_parm.evalAtFrame(start_frame))
+            staging_dir = os.path.dirname(files)
+            files = os.path.basename(files)
+
+        self.log.debug(f"Collected Frames: {files} in {staging_dir}")
         instance.data.update({
             "frames": files,
             "stagingDir": staging_dir,
