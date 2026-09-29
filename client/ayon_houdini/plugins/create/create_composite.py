@@ -13,8 +13,9 @@ class CreateCompositeSequence(plugin.HoudiniCreator):
     identifier = "io.openpype.creators.houdini.imagesequence"
     label = "Composite (COP2)"
     description = "Render legacy COP2 ROP to image sequence"
-    product_type = "imagesequence"
     product_base_type = "imagesequence"
+    product_type = product_base_type
+
     icon = "fa5.eye"
 
     ext = ".exr"

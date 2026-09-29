@@ -12,7 +12,8 @@ from ayon_houdini.api import (
 class AbcLoader(plugin.HoudiniLoader):
     """Load Alembic"""
 
-    product_types = {"model", "animation", "pointcache", "gpuCache"}
+    product_base_types = {"model", "animation", "pointcache", "gpuCache"}
+    product_types = product_base_types
     label = "Load Alembic"
     representations = {"*"}
     extensions = {"abc"}

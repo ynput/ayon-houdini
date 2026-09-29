@@ -12,8 +12,8 @@ class CreateVDBCache(plugin.HoudiniCreator):
     name = "vbdcache"
     label = "VDB Cache"
     description = __doc__
-    product_type = "vdbcache"
     product_base_type = "vdbcache"
+    product_type = product_base_type
     icon = "cloud"
 
     # Default render target

@@ -12,12 +12,14 @@ from ayon_houdini.api import (
 class USDReferenceLoader(plugin.HoudiniLoader):
     """Reference USD file in Solaris"""
 
-    product_types = {
+    product_base_types = {
         "usd",
         "usdCamera",
     }
+    product_types = product_base_types
     label = "Reference USD"
-    representations = {"usd", "usda", "usdlc", "usdnc", "abc"}
+    representations = {"*"}
+    extensions = {"usd", "usda", "usdlc", "usdnc", "abc"}
     order = -8
 
     icon = "code-fork"

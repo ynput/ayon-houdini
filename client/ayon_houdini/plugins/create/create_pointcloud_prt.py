@@ -15,8 +15,8 @@ class CreatePRTPointCloud(plugin.HoudiniCreator):
     """
     identifier = "io.ayon.creators.houdini.pointcloud.prt"
     label = "PointCloud (PRT)"
-    product_type = "pointcloud"
     product_base_type = "pointcloud"
+    product_type = product_base_type
     icon = "cubes"
     description = "PRT pointcloud creator"
 

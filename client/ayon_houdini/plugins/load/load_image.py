@@ -1,5 +1,3 @@
-import os
-import re
 import hou
 
 from ayon_core.pipeline import AYON_CONTAINER_ID
@@ -31,7 +29,7 @@ def get_image_ayon_container():
 class ImageLoader(plugin.HoudiniLoader):
     """Load images into COP2"""
 
-    product_types = {
+    product_base_types = {
         "imagesequence",
         "review",
         "render",
@@ -39,6 +37,7 @@ class ImageLoader(plugin.HoudiniLoader):
         "image",
         "online",
     }
+    product_types = product_base_types
     label = "Load Image (COP2)"
     representations = {"*"}
     order = -9
@@ -47,10 +46,6 @@ class ImageLoader(plugin.HoudiniLoader):
     color = "orange"
 
     def load(self, context, name=None, namespace=None, data=None):
-        # Format file name, Houdini only wants forward slashes
-        path = self.filepath_from_context(context)
-        path = self.format_path(path, representation=context["representation"])
-
         # Get the root node
         parent = get_image_ayon_container()
 
@@ -61,7 +56,7 @@ class ImageLoader(plugin.HoudiniLoader):
         node = parent.createNode("file", node_name=node_name)
         node.moveToGoodPosition()
 
-        parms = {"filename1": path}
+        parms = {"filename1": self.format_path(context)}
         parms.update(self.get_colorspace_parms(context["representation"]))
 
         node.setParms(parms)
@@ -86,11 +81,8 @@ class ImageLoader(plugin.HoudiniLoader):
         node = container["node"]
 
         # Update the file path
-        file_path = self.filepath_from_context(context)
-        file_path = self.format_path(file_path, repre_entity)
-
         parms = {
-            "filename1": file_path,
+            "filename1": self.format_path(context),
             "representation": repre_entity["id"],
         }
 
@@ -112,24 +104,6 @@ class ImageLoader(plugin.HoudiniLoader):
 
         if not parent.children():
             parent.destroy()
-
-    @staticmethod
-    def format_path(path, representation):
-        """Format file path correctly for single image or sequence."""
-        ext = os.path.splitext(path)[-1]
-
-        # The path is either a single file or sequence in a folder.
-        is_sequence = bool(representation["context"].get("frame"))
-        if is_sequence:
-            folder, filename = os.path.split(path)
-            filename = re.sub(r"(.*)\.(\d+){}$".format(re.escape(ext)),
-                              "\\1.$F4{}".format(ext),
-                              filename)
-            path = os.path.join(folder, filename)
-
-        path = os.path.normpath(path)
-        path = path.replace("\\", "/")
-        return path
 
     def get_colorspace_parms(self, representation: dict) -> dict:
         """Return the color space parameters.

@@ -166,8 +166,8 @@ class CreateUSDLook(CreateUSD):
 
     identifier = "io.openpype.creators.houdini.usd.look"
     label = "USD Asset Look"
-    product_type = "look"
     product_base_type = "look"
+    product_type = product_base_type
     icon = "paint-brush"
     enabled = True
     description = "Create USD Asset Look with localized textures"

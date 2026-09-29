@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Houdini specific AYON/Pyblish plugin definitions."""
 import os
+import re
 from typing import Dict, Optional
 
 import hou
@@ -177,6 +178,8 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
     add_publish_button = False
     default_staging_dir = "$HIP/ayon"
     enable_staging_path_management = True
+    skip_discovery = True
+
 
     settings_category = SETTINGS_CATEGORY
 
@@ -208,11 +211,16 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
             instance_data["instance_node"] = instance_node.path()
             instance_data["instance_id"] = instance_node.path()
             instance_data["families"] = self.get_publish_families()
+            product_type = (
+                instance_data.get("productType")
+                or self.product_base_type
+            )
             instance = CreatedInstance(
-                self.product_type,
-                product_name,
-                instance_data,
-                self)
+                product_type=product_type,
+                product_base_type=self.product_base_type,
+                product_name=product_name,
+                data=instance_data,
+                creator=self)
 
             if self.enable_staging_path_management:
                 staging_dir_info = self.get_staging_dir(instance)
@@ -407,6 +415,10 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for key, value in settings.items():
             setattr(self, key, value)
 
+        self.product_type_items = self._convert_product_type_items(
+            self.product_type_items
+        )
+
     def get_staging_dir(self, instance) -> Optional[StagingDir]:
         """Get Staging Dir
 
@@ -473,16 +485,6 @@ class RenderLegacyProductTypeCreator(HoudiniCreator):
     # because it inherits as property from `Creator`.
     product_base_type = "render"
     product_type = "render"
-    legacy_product_type = "render"
-    use_legacy_product_type = False
-
-    def apply_settings(self, project_settings):
-        super().apply_settings(project_settings)
-        use_legacy_product_type = project_settings["houdini"]["create"].get(
-            "render_rops_use_legacy_product_type", False
-        )
-        if use_legacy_product_type:
-            self.product_type = self.legacy_product_type
 
 
 class HoudiniLoader(load.LoaderPlugin):
@@ -545,6 +547,52 @@ class HoudiniLoader(load.LoaderPlugin):
 
         return path
 
+    @staticmethod
+    def replace_with_frame_token(filepath):
+        """Replace with frame token
+
+        Replace the frame number within a filepath with
+        $F token followed by the correct frame padding.
+
+        Args:
+            filepath (str): file path to convert.
+        """
+
+        folder, filename = os.path.split(filepath)
+
+        # Assume the frame number is always the last digit
+        pattern = re.compile(r"""
+            (.*)                 # All before last frame separator (greedy)
+            ([._])               # Literal dot / underscore before frame number
+            (\d+)                # the frame number
+            (\.[^.]+(?:\..+)*)$  # extension (one or more dot segments)
+        """, re.VERBOSE)
+        match = pattern.match(filename)
+        head, sep, frame, tail = match.groups()
+        padding = len(frame)
+
+        filename = f"{head}{sep}$F{padding}{tail}"
+        return os.path.join(folder, filename)
+
+    def format_path(self, context):
+        """Format file path correctly for single file or file sequence.
+
+        Args:
+            context (dict): representation context to be loaded.
+
+        Returns:
+             str: Formatted path to be used by the input node.
+
+        """
+        path = self.filepath_from_context(context)
+        # The path is either a single file or sequence in a folder.
+        is_sequence = bool(context["representation"]["context"].get("frame"))
+        if is_sequence:
+            path = self.replace_with_frame_token(path)
+
+        path = os.path.normpath(path)
+        path = path.replace("\\", "/")
+        return path
 
 class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
     """Base class for Houdini instance publish plugins."""

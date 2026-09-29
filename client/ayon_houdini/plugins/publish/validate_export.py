@@ -29,7 +29,6 @@ class ValidateExportParameterValue(plugin.HoudiniInstancePlugin):
 
     order = pyblish.api.ValidatorOrder
     families = ["mantra_rop",
-                "karma_rop",
                 "redshift_rop",
                 "arnold_rop",
                 "vray_rop",
