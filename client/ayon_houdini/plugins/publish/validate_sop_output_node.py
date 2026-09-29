@@ -2,7 +2,10 @@
 import hou
 
 import pyblish.api
-from ayon_core.pipeline import PublishValidationError
+from ayon_core.pipeline import (
+    PublishValidationError,
+    OptionalPyblishPluginMixin
+)
 
 from ayon_houdini.api import plugin
 from ayon_houdini.api.action import (
@@ -11,7 +14,8 @@ from ayon_houdini.api.action import (
 )
 
 
-class ValidateSopOutputNode(plugin.HoudiniInstancePlugin):
+class ValidateSopOutputNode(plugin.HoudiniInstancePlugin,
+                            OptionalPyblishPluginMixin):
     """Validate the instance SOP Output Node.
 
     This will ensure:
@@ -29,6 +33,8 @@ class ValidateSopOutputNode(plugin.HoudiniInstancePlugin):
     actions = [SelectROPAction, SelectInvalidAction]
 
     def process(self, instance):
+        if not self.is_active(instance.data):
+            return
 
         invalid = self.get_invalid(instance)
         if invalid:

@@ -95,7 +95,7 @@ class ValidateFrameRange(plugin.HoudiniInstancePlugin):
             return
 
         created_instance = create_context.get_instance_by_id(instance_id)
-        if not instance_id:
+        if not created_instance:
             cls.log.debug("Unable to find instance '{}' by id"
                           .format(instance))
             return

@@ -12,3 +12,4 @@ from ayon_houdini.api.hda_utils import (
     get_version_formatted_time,
     get_representation_info,
 )
+from ayon_houdini.api.usd import clear_resolver_cache
