@@ -7,6 +7,9 @@ from ayon_houdini.api.hda_utils import (
     get_available_representations_with_labels,
     select_product_name,
     set_to_latest_version,
-    expression_clear_cache
+    expression_clear_cache,
+    get_version_info,
+    get_version_formatted_time,
+    get_representation_info,
 )
 from ayon_houdini.api.usd import clear_resolver_cache
