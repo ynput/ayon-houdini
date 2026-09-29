@@ -1117,6 +1117,16 @@ def expression_clear_cache(subkey=None) -> bool:
     return False
 
 
+def expression_get_representation_id() -> str:
+    """Get the representation id for the node.
+
+    Left in for backwards compatibility, as older nodes will still use this
+    expression.
+
+    """
+    return get_representation_info().get("id") or ""
+
+
 def get_version_info(node: hou.OpNode | None = None) -> dict:
     """Get the version info for the node.
 
