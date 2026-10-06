@@ -16,6 +16,7 @@ import ayon_api
 
 from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.create import CreateContext
+from ayon_core.pipeline.create.creator_plugins import discover_create_plugins
 from ayon_core.resources import get_ayon_icon_filepath
 
 import hou
@@ -198,7 +199,8 @@ def install():
     # populate what we need to retrieve the list of creator plugins
     create_context = CreateContext(host, reset=False)
     create_context.reset_current_context()
-    create_context._reset_creator_plugins()
+    create_result, _ = discover_create_plugins()
+    create_context._reset_creator_plugins(create_result)
 
     log.debug("Writing AYON Creator nodes to shelf: {}".format(filepath))
     tools = []
