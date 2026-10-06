@@ -40,7 +40,7 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
 
-        for key in ["render_target", "review"]:
+        for key in ["render_target", "review", "xpu_disable_cpu"]:
             if key in pre_create_data:
                 creator_attributes[key] = pre_create_data[key]
 
@@ -136,6 +136,14 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
                     label="Review",
                     tooltip="Mark as reviewable",
                     default=True),
+            BoolDef("xpu_disable_cpu",
+                    label="Disable CPU (XPU)",
+                    tooltip="Disable the Embree (CPU) device so Karma XPU "
+                            "renders on GPU devices only.\n"
+                            "Sets KARMA_XPU_DISABLE_EMBREE_DEVICE=1 in the "
+                            "farm job environment. Only affects renders with "
+                            "the Karma XPU renderer.",
+                    default=False),
             EnumDef("render_target",
                     items=render_target_items,
                     label="Render target",
