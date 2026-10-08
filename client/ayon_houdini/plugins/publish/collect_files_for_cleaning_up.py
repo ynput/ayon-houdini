@@ -39,7 +39,11 @@ class CollectFilesForCleaningUp(plugin.HoudiniInstancePlugin,
 
     # It should run after CollectFrames and Collect Render plugins,
     # and before CollectLocalRenderInstances.
-    order = pyblish.api.CollectorOrder + 0.115
+    # Running before CollectLocalRenderInstances matters because that plugin
+    # creates runtime instances per AOV for local renders which would
+    # otherwise be collected a second time here, duplicating the render files
+    # and staging directories in the cleanup lists.
+    order = pyblish.api.CollectorOrder - 0.391
 
     hosts = ["houdini"]
     families = ["*"]
