@@ -12,7 +12,9 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
 
     # This specific order value is used so that
     # this plugin runs after CollectRopFrameRange
-    order = pyblish.api.CollectorOrder + 0.1
+    # Runs before CollectLocalRenderInstances so it does not overwrite the
+    # frames/stagingDir of the per-AOV instances created by that plugin.
+    order = pyblish.api.CollectorOrder - 0.405
     label = "Collect Frames"
     families = ["camera", "vdbcache", "imagesequence", "ass",
                 "redshiftproxy", "review", "pointcache", "fbx",
