@@ -21,7 +21,7 @@ class CollectVrayROPRenderProducts(plugin.HoudiniInstancePlugin):
     label = "VRay ROP Render Products"
     # This specific order value is used so that
     # this plugin runs after CollectFrames
-    order = pyblish.api.CollectorOrder + 0.11
+    order = pyblish.api.CollectorOrder - 0.4
     families = ["vray_rop"]
 
     def process(self, instance):

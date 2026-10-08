@@ -9,7 +9,9 @@ class CollectReviewableInstances(plugin.HoudiniInstancePlugin):
       with creator_attribure["review"]
     """
 
-    order = pyblish.api.CollectorOrder
+    # Runs before CollectLocalRenderInstances so the per-AOV instances can
+    # inherit the review state.
+    order = pyblish.api.CollectorOrder - 0.392
     label = "Collect Reviewable Instances"
     families = ["mantra_rop",
                 "karma_rop",
