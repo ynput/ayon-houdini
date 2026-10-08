@@ -28,7 +28,7 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
     """
 
     # this plugin runs after Collect Render Colorspace
-    order = pyblish.api.CollectorOrder + 0.151
+    order = pyblish.api.CollectorOrder - 0.49
     families = ["mantra_rop",
                 "karma_rop",
                 "redshift_rop",
