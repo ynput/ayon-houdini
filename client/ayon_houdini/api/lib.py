@@ -42,13 +42,21 @@ def get_entity_fps(entity=None):
     return entity["attrib"]["fps"]
 
 
-def get_output_parameter(node):
-    """Return the render output parameter of the given node
+def get_output_parameter(node: hou.Node) -> hou.Parm:
+    """Return the render output parameter of the given node.
+
+    Built-in node-type mappings take precedence. For other types, check
+    Houdini's General settings output_parameter_mapping for an exact node type
+    match before using the ordered fallback list below. If the configured
+    parameter is missing, log a warning and continue to the fallback.
+
+    Return the parameter without evaluating its value. This does not discover
+    outputs stored only in USD data.
 
     Example:
         root = hou.node("/obj")
         my_alembic_node = root.createNode("alembic")
-        get_output_parameter(my_alembic_node)
+        get_output_parameter(my_alembic_node).name()
         >>> "filename"
 
     Notes:
@@ -67,8 +75,38 @@ def get_output_parameter(node):
 
     Returns:
         hou.Parm
-    """
 
+    Raises:
+        TypeError: If no built-in mapping applies and neither a configured
+            parameter nor a fallback parameter exists.
+    """
+    node_type: str = node.type().name()
+    explicit = get_explicit_output_parameter(node)
+    if explicit is not None:
+        return explicit
+
+    user_defined = get_output_parameter_from_setting(node)
+    if user_defined is not None:
+        return user_defined
+
+    fallback = get_fallback_output_parameter(node)
+    if fallback is not None:
+        return fallback
+
+    raise TypeError("Node type '%s' not supported" % node_type)
+
+
+def get_explicit_output_parameter(node: hou.Node) -> hou.Parm | None:
+    """Get the explicit output parameter for a Houdini node based on its type.
+
+    Args:
+        node (hou.Node): The Houdini node for which to find the explicit
+            output parameter.
+
+    Returns:
+        hou.Parm | None: The explicit output parameter if found,
+            otherwise None.
+    """
     node_type: str = node.type().name()
 
     # Figure out which type of node is being rendered
@@ -109,7 +147,57 @@ def get_output_parameter(node):
     elif node_type == "PRT_ROPDriver":
         return node.parm("file")
 
-    raise TypeError("Node type '%s' not supported" % node_type)
+    return None
+
+
+def get_output_parameter_from_setting(node: hou.Node) -> hou.Parm | None:
+    """Get the output parameter for a Houdini node based on project settings.
+
+    Args:
+        node (hou.Node): The Houdini node for which to find the
+            output parameter.
+
+    Returns:
+        hou.Parm | None: The output parameter if found, otherwise None.
+    """
+    node_type = node.type().name()
+    project_settings = get_current_project_settings()
+
+    mappings = project_settings["houdini"]["general"].get(
+        "output_parameter_mapping", []
+    )
+    for mapping in mappings:
+        if mapping["node_type"] != node_type:
+            continue
+        parm_name = mapping["parm_name"]
+        parm = node.parm(parm_name)
+        if parm is not None:
+            return parm
+    return None
+
+
+def get_fallback_output_parameter(node: hou.Node) -> hou.Parm | None:
+    """Get a fallback output parameter for a Houdini node if no specific
+    output parameter is set.
+
+    Args:
+        node (hou.Node): The Houdini node for which to find a fallback
+            output parameter.
+
+    Returns:
+        hou.Parm | None: The fallback output parameter if found,
+            otherwise None.
+    """
+    names = (
+        "vm_picture", "sopoutput", "dopoutput", "lopoutput", "picture",
+        "copoutput", "filename", "usdfile", "file", "output",
+        "outputfilepath", "outputimage", "outfile",
+    )
+    for name in names:
+        parm = node.parm(name)
+        if parm is not None:
+            return parm
+    return None
 
 
 def get_lops_rop_context_options(
