@@ -161,26 +161,11 @@ def get_output_parameter_from_setting(node: hou.Node) -> hou.Parm | None:
         hou.Parm | None: The output parameter if found, otherwise None.
     """
     node_type = node.type().name()
-    project_settings = get_current_project_settings() or {}
-
-    houdini_settings = project_settings.get("houdini") or {}
-    general_settings = houdini_settings.get("general") or {}
+    project_settings = get_current_project_settings()
+    general_settings = project_settings["houdini"]["general"]
     mappings = general_settings.get("output_parameter_mapping") or []
 
-    if not isinstance(mappings, list):
-        log.warning(
-            "Ignoring invalid 'output_parameter_mapping' setting, expected a "
-            "list of mappings but got %s.",
-            type(mappings).__name__,
-        )
-        return None
-
     for mapping in mappings:
-        if not isinstance(mapping, dict):
-            log.warning(
-                "Ignoring invalid output parameter mapping entry: %r", mapping
-            )
-            continue
 
         if mapping.get("node_type") != node_type:
             continue
