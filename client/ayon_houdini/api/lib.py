@@ -173,6 +173,12 @@ def get_output_parameter_from_setting(node: hou.Node) -> hou.Parm | None:
         parm = node.parm(parm_name)
         if parm is not None:
             return parm
+        log.warning(
+            "Configured output parameter '%s' was not found on node type "
+            "'%s'; using automatic detection.",
+            parm_name,
+            node_type,
+        )
     return None
 
 
