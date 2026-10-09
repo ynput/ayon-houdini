@@ -96,7 +96,7 @@ def get_output_parameter(node: hou.Node) -> hou.Parm:
     raise TypeError("Node type '%s' not supported" % node_type)
 
 
-def get_explicit_output_parameter(node: hou.Node) -> hou.Parm | None:
+def get_explicit_output_parameter(node: hou.Node) -> "hou.Parm | None":
     """Get the explicit output parameter for a Houdini node based on its type.
 
     Args:
