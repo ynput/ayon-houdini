@@ -5,6 +5,7 @@ import os
 import re
 import uuid
 from typing import List, Union
+import logging
 
 import hou
 from qtpy import QtCore, QtWidgets, QtGui
@@ -16,7 +17,9 @@ from ayon_api import (
     get_folder_by_path,
     get_product_by_name,
     get_representations,
+    get_project,
 )
+from ayon_core.tools.common_models.projects import StatusStates, StatusItem
 from ayon_core.pipeline import Anatomy
 from ayon_core.lib import StringTemplate
 from ayon_core.pipeline.context_tools import (
@@ -31,7 +34,6 @@ from ayon_core.pipeline.load import (
 from ayon_core.style import load_stylesheet
 from ayon_core.tools.utils import SimpleFoldersWidget
 from ayon_houdini.api import lib
-
 
 def load_adapted_stylesheet(widget: QtWidgets.QWidget) -> str:
     """
@@ -92,6 +94,16 @@ def is_valid_uuid(value) -> bool:
         return False
     return True
 
+def get_status_items_by_name(project_name: str):
+    project_entity = get_project(project_name)
+    statuses = []
+    if project_entity:
+        statuses = [
+            StatusItem.from_project_item(status) for status in project_entity["statuses"]
+        ]
+
+    return {status_item.name: status_item for status_item in statuses}
+
 
 def get_available_versions_with_labels(
     node,
@@ -108,6 +120,9 @@ def get_available_versions_with_labels(
         if version == "latest":
             value = "latest"
             label = "latest"
+        elif version == "approved":
+            value = "approved"
+            label = "approved"
         elif isinstance(version, int):
             version_label = f"v{abs(version):03d}"
             if version < 0:
@@ -143,6 +158,77 @@ def get_available_representations_with_labels(node: hou.OpNode) -> list[str]:
 
         result.extend([name, label])
     return result
+
+
+def get_approved_version_number(
+    project_name: str,
+    folder_path: str,
+    product_name: str,
+) -> Union[int, None]:
+    """Return the highest version number with status 'Approved'.
+
+    Returns:
+        int | None: Approved version number, or None if none exists or
+            the context can't be resolved.
+    """
+    if not all([project_name, folder_path, product_name]):
+        return None
+
+    folder_entity = get_folder_by_path(project_name, folder_path, fields={"id"})
+    if not folder_entity:
+        return None
+    product_entity = get_product_by_name(
+        project_name,
+        product_name=product_name,
+        folder_id=folder_entity["id"],
+        fields={"id"},
+    )
+    if not product_entity:
+        return None
+    status_items_by_name = get_status_items_by_name(project_name)
+    versions = get_versions(
+        project_name,
+        product_ids={product_entity["id"]},
+        fields={"version", "status"},
+    )
+    approved = [
+        version["version"]
+        for version in versions
+        if status_items_by_name[version["status"]].state == StatusStates.done
+        and version["version"] > 0 
+    ]
+    if not approved:
+        return None
+    return max(approved)
+
+def _resolve_version_value(version, project_name, folder_path, product_name) -> Union[str, int]:
+    """Return the `version` parm value, translated to a concrete version
+    number when set to 'approved'."""
+
+    if version == "approved":
+        project_name = project_name or get_current_project_name()
+        resolved = get_approved_version_number(
+            project_name,
+            folder_path,
+            product_name,
+        )
+        if resolved is None:
+            raise ValueError(
+                "No approved version found for product "
+                f"'{product_name}'"
+            )
+        return str(resolved)
+    return version
+
+def _resolve_version_value_from_node(node) -> Union[str, int]:
+    """Return the `version` parm value, translated to a concrete version
+    number when set to 'approved'."""
+    version = node.evalParm("version")
+    project_name = node.evalParm("project_name")
+    folder_path = node.evalParm("folder_path")
+    product_name = node.evalParm('product_name')
+    return _resolve_version_value(version, project_name, folder_path, product_name)
+
 
 
 def get_available_versions(
@@ -189,13 +275,22 @@ def get_available_versions(
     )
     if not product_entity:
         return all_version_names
+		
+    status_items_by_name = get_status_items_by_name(project_name)
 
     versions = get_versions(
         project_name,
         product_ids={product_entity["id"]},
-        fields={"version"},
+        fields={"version", "status"},
         hero=include_hero,
     )
+    if any(
+        status_items_by_name[version["status"]].state == StatusStates.done and version["version"] > 0
+        and version["version"] > 0
+        for version in versions
+    ):
+        all_version_names.append("approved")
+
     def _sort_versions(version: dict) -> float:
         # Hero versions are negative and should be just below their non-hero
         # positive equivalents, like 1, 2, 3, -4, 4.
@@ -483,7 +578,7 @@ def get_node_expected_representation_id(node) -> str:
         project_name=project_name,
         folder_path=node.evalParm("folder_path"),
         product_name=node.evalParm("product_name"),
-        version=node.evalParm("version"),
+        version=_resolve_version_value_from_node(node),
         representation_name=node.evalParm("representation_name"),
     )
 
@@ -932,7 +1027,7 @@ def get_available_representations(node):
     project_name = node.evalParm("project_name") or get_current_project_name()
     folder_path = node.evalParm("folder_path")
     product_name = node.evalParm("product_name")
-    version = node.evalParm("version")
+    version=_resolve_version_value_from_node(node),
 
     if not all([project_name, folder_path, product_name, version]):
         return []
@@ -997,6 +1092,7 @@ def set_to_latest_version(node):
 
     # Get available versions, excluding the 'latest' key
     versions = get_available_versions(node, include_latest=False)
+    versions = [v for v in versions if v!= "approved"] # maintain current behaviour
     if versions:
         node.parm("version").set(str(versions[0]))
 
@@ -1062,7 +1158,9 @@ def expression_get_representation_path() -> str:
     project_name: str = hou.evalParm("project_name")
     folder_path: str = hou.evalParm("folder_path")
     product_name: str = hou.evalParm("product_name")
-    version: str = hou.evalParm("version")
+    version = _resolve_version_value(
+        hou.evalParm("version"), project_name, folder_path, product_name
+        )
     representation_name: str = hou.evalParm("representation_name")
     repre_id: str = hou.evalParm("representation")
     use_entity_uri: bool = bool(hou.evalParm("use_ayon_entity_uri"))
