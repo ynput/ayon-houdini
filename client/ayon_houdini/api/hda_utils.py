@@ -108,6 +108,9 @@ def get_available_versions_with_labels(
         if version == "latest":
             value = "latest"
             label = "latest"
+        elif version == "latestDone":
+            value = "latestDone"
+            label = "latestDone"
         elif isinstance(version, int):
             version_label = f"v{abs(version):03d}"
             if version < 0:
@@ -149,6 +152,7 @@ def get_available_versions(
         node,
         include_latest=True,
         include_hero=True,
+        include_latest_done=True,
     ):
     """Return the version as list for node.
 
@@ -172,6 +176,8 @@ def get_available_versions(
     all_version_names: list[Union[str, int]] = []
     if include_latest:
         all_version_names.append("latest")
+    if include_latest_done:
+        all_version_names.append("latestDone")
 
     if not all([project_name, folder_path, product_name]):
         return all_version_names
@@ -996,7 +1002,9 @@ def set_to_latest_version(node):
     """
 
     # Get available versions, excluding the 'latest' key
-    versions = get_available_versions(node, include_latest=False)
+    versions = get_available_versions(
+        node, include_latest=False, include_latest_done=False
+        )
     if versions:
         node.parm("version").set(str(versions[0]))
 
