@@ -8,7 +8,7 @@ from ayon_houdini.api import lib, plugin
 class CollectRopFrameRange(plugin.HoudiniInstancePlugin):
     """Collect all frames which would be saved from the ROP nodes"""
 
-    order = pyblish.api.CollectorOrder
+    order = pyblish.api.CollectorOrder - 0.41
     label = "Collect RopNode Frame Range"
 
     def process(self, instance):
