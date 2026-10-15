@@ -1002,7 +1002,9 @@ def set_to_latest_version(node):
     """
 
     # Get available versions, excluding the 'latest' key
-    versions = get_available_versions(node, include_latest=False)
+    versions = get_available_versions(
+        node, include_latest=False, include_latest_done=False
+        )
     if versions:
         node.parm("version").set(str(versions[0]))
 
