@@ -42,7 +42,7 @@ def get_entity_fps(entity=None):
     return entity["attrib"]["fps"]
 
 
-def get_output_parameter(node):
+def get_output_parameter(node: hou.Node) -> hou.Parm:
     """Return the render output parameter of the given node
 
     Example:
