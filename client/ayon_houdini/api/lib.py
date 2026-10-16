@@ -85,10 +85,6 @@ def get_output_parameter(node: hou.Node) -> hou.Parm:
     if explicit is not None:
         return explicit
 
-    user_defined = get_output_parameter_from_setting(node)
-    if user_defined is not None:
-        return user_defined
-
     fallback = get_fallback_output_parameter(node)
     if fallback is not None:
         return fallback
@@ -147,48 +143,6 @@ def get_explicit_output_parameter(node: hou.Node) -> "hou.Parm | None":
     elif node_type == "PRT_ROPDriver":
         return node.parm("file")
 
-    return None
-
-
-def get_output_parameter_from_setting(node: hou.Node) -> hou.Parm | None:
-    """Get the output parameter for a Houdini node based on project settings.
-
-    Args:
-        node (hou.Node): The Houdini node for which to find the
-            output parameter.
-
-    Returns:
-        hou.Parm | None: The output parameter if found, otherwise None.
-    """
-    node_type = node.type().name()
-    project_settings = get_current_project_settings()
-    general_settings = project_settings["houdini"]["general"]
-    mappings = general_settings.get("output_parameter_mapping") or []
-
-    for mapping in mappings:
-
-        if mapping.get("node_type") != node_type:
-            continue
-
-        parm_name = mapping.get("parm_name")
-        if not parm_name:
-            log.warning(
-                "Ignoring output parameter mapping without a 'parm_name' for "
-                "node type '%s': %r",
-                node_type,
-                mapping,
-            )
-            continue
-
-        parm = node.parm(parm_name)
-        if parm is not None:
-            return parm
-        log.warning(
-            "Configured output parameter '%s' was not found on node type "
-            "'%s'; using automatic detection.",
-            parm_name,
-            node_type,
-        )
     return None
 
 
