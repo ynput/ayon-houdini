@@ -46,18 +46,6 @@ class UpdateHoudiniVarcontextModel(BaseSettingsModel):
 
 
 class GeneralSettingsModel(BaseSettingsModel):
-    output_parameter_mapping: list[
-        OutputParameterMappingModel
-    ] = SettingsField(
-        default_factory=list,
-        title="Output Parameter Mapping",
-        description=(
-            "Additional mappings for node types without a built-in mapping. "
-            "These take precedence over automatic parameter-name detection. "
-            "If a configured parameter is missing, a warning is logged and "
-            "automatic detection is used."
-        )
-    )
     add_self_publish_button: bool = SettingsField(
         False,
         title="Add Self Publish Button"
@@ -67,21 +55,8 @@ class GeneralSettingsModel(BaseSettingsModel):
         title="Update Houdini Vars on context change"
     )
 
-    @validator("output_parameter_mapping")
-    def validate_unique_node_types(cls, value):
-        node_types = set()
-        for item in value:
-            if item.node_type in node_types:
-                raise ValueError(
-                    "Duplicate output mapping for node type "
-                    f"'{item.node_type}'"
-                )
-            node_types.add(item.node_type)
-        return value
-
 
 DEFAULT_GENERAL_SETTINGS = {
-    "output_parameter_mapping": [],
     "add_self_publish_button": False,
     "update_houdini_var_context": {
         "enabled": True,
