@@ -91,10 +91,11 @@ class HdaLoader(plugin.HoudiniLoader):
             "representation": repre_entity["id"],
             "project_name": context["project"]["name"],
         }
+        definition_parms = defs[new].parmTemplateGroup()
         fallback = {
             parm_name: value
             for parm_name, value in fallback.items()
-            if hda_node.parm(parm_name) is None
+            if definition_parms.find(parm_name) is None
         }
         if fallback:
             lib.imprint(hda_node, fallback, update=True)
