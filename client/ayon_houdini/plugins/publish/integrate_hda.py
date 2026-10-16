@@ -153,12 +153,13 @@ class IntegrateHDA(pyblish.api.InstancePlugin):
                 )
                 for parm_name in lib.AYON_DEFINITION_PARMS
             )
-            parm_folder = hou.FolderParmTemplate(
-                "folder", "Extra", parm_templates=parm_templates
-            )
-            if parm_group.findFolder("Extra") is None:
+            if parm_folder is None:
+                parm_folder = hou.FolderParmTemplate(
+                    "folder", "Extra", parm_templates=parm_templates
+                )
                 parm_group.append(parm_folder)
             else:
+                parm_folder.setParmTemplates(parm_templates)
                 parm_group.replace(parm_folder.name(), parm_folder)
 
             definition.setParmTemplateGroup(parm_group)
