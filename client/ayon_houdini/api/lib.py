@@ -34,16 +34,6 @@ log = logging.getLogger(__name__)
 JSON_PREFIX = "JSON:::"
 
 
-# AYON parameters that are stored on an HDA definition, so that they are part
-# of the node type and change along with the definition when it is switched,
-# e.g. to another published version.
-# The values are plain static strings, so no parameter expressions are needed.
-AYON_DEFINITION_PARMS = (
-    "project_name",
-    "representation",
-)
-
-
 def get_entity_fps(entity=None):
     """Return current task fps or fps from an entity."""
 
