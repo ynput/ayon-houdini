@@ -55,9 +55,18 @@ class HdaLoader(plugin.HoudiniLoader):
             "name": node_name,
             "namespace": namespace,
             "loader": self.__class__.__name__,
+        }
+        # HDA products published by AYON store `project_name` and
+        # `representation` on the HDA definition, so that they change along
+        # with the definition when it is switched. They only need to be
+        # imprinted for HDA products published without them.
+        fallback = {
             "representation": context["representation"]["id"],
             "project_name": context["project"]["name"],
         }
+        for parm_name in lib.AYON_DEFINITION_PARMS:
+            if hda_node.parm(parm_name) is None:
+                data[parm_name] = fallback[parm_name]
 
         lib.imprint(hda_node, data)
 
@@ -74,23 +83,32 @@ class HdaLoader(plugin.HoudiniLoader):
         def_paths = [d.libraryFilePath() for d in defs]
         new = def_paths.index(file_path)
         defs[new].setIsPreferred(True)
-        hda_node.setParms({
-            "representation": repre_entity["id"]
-        })
-        lib.imprint(
-            hda_node,
-            {"project_name": context["project"]["name"]},
-            update=True
-        )
+
+        # The switched HDA definition stores `project_name` and
+        # `representation` itself, so those values follow the definition.
+        # They are only set for HDA products published without them.
+        fallback = {
+            "representation": repre_entity["id"],
+            "project_name": context["project"]["name"],
+        }
+        fallback = {
+            parm_name: value
+            for parm_name, value in fallback.items()
+            if hda_node.parm(parm_name) is None
+        }
+        if fallback:
+            lib.imprint(hda_node, fallback, update=True)
+
         # Move the Extra parameter folder to the back.
         parm_group = hda_node.parmTemplateGroup()
         # The name 'Extra' is a hard coded name in AYON.
         parm_folder = parm_group.findFolder("Extra")
-        # Remove `Extra` AYON parameters
-        parm_group.remove(parm_folder.name())
-        # Add `Extra` AYON parameters back
-        parm_group.append(parm_folder)
-        hda_node.setParmTemplateGroup(parm_group)
+        if parm_folder is not None:
+            # Remove `Extra` AYON parameters
+            parm_group.remove(parm_folder.name())
+            # Add `Extra` AYON parameters back
+            parm_group.append(parm_folder)
+            hda_node.setParmTemplateGroup(parm_group)
 
     def remove(self, container):
         node = container["node"]
