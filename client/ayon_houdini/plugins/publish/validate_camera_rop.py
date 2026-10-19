@@ -85,7 +85,7 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
 
             if obj.startswith("/"):
                 object_paths.append(obj)
-                continue
+            else:
+                object_paths.append("/".join([root, obj]))
 
-            object_paths.append("/".join([root, obj]))
         return object_paths
