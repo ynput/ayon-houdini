@@ -45,10 +45,16 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
                 "Some checks failed, see validator log.",
                 title=self.label)
 
-        # Check if the object exists and is a camera
-        path = root + "/" + objects
-        camera = hou.node(path)
+        # check if there is only one object path
+        object_paths = self.get_object_paths(root, objects)
+        if len(object_paths) != 1:
+            raise PublishValidationError(
+                "Must have exactly one object path.",
+                title=self.label)
 
+        path = object_paths[0]
+        camera = hou.node(path)
+        # Check if the object exists and is a camera
         if not camera:
             raise PublishValidationError(
                 "Camera path does not exist: %s" % path,
@@ -59,3 +65,27 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
                 ("Object set in Alembic ROP is not a camera: "
                  "{} (type: {})").format(camera, camera.type().name()),
                 title=self.label)
+
+    def get_object_paths(self, root, objects) -> list[str]:
+        """Get full object paths based on root and objects parameters.
+
+        Args:
+            root (str): The root path of the Alembic ROP.
+            objects (str): The objects parameter of the Alembic ROP.
+
+        Returns:
+            list[str]: A list of full object paths.
+
+        """
+        root = root.rstrip("/")
+        object_paths = []
+        for obj in objects.split(" "):
+            if not obj:
+                continue
+
+            if obj.startswith("/"):
+                object_paths.append(obj)
+                continue
+
+            object_paths.append("/".join([root, obj]))
+        return object_paths
