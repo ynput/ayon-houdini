@@ -21,7 +21,7 @@ from ayon_core.lib import BoolDef
 from ayon_core.pipeline.staging_dir import StagingDir
 
 from .lib import (
-    imprint, read, read_parameters, lsattr, render_rop,
+    imprint, read_parameters, lsattr, render_rop,
     add_self_publish_button,
     expand_houdini_string,
 )
