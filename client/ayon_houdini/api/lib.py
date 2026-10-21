@@ -473,6 +473,43 @@ def read(node):
     return data
 
 
+def read_parameters(node, names):
+    """Read only the requested parameters from a Houdini node.
+
+    Unlike :func:`read`, this intentionally does not iterate over all spare
+    parameters. This is useful for nodes that contain both AYON metadata and
+    arbitrary Houdini/HDA parameters whose values may not be serializable.
+
+    Args:
+        node (hou.Node): Houdini node.
+        names (Iterable[str]): Parameter names to read.
+
+    Returns:
+        dict: Values of the parameters that exist on the node.
+    """
+    data = {}
+    if not node:
+        return data
+
+    for name in names:
+        parameter = node.parm(name)
+        if not parameter:
+            continue
+
+        value = parameter.eval()
+        # AYON stores dicts/lists/tuples in Houdini string parameters with
+        # this marker so they can be distinguished from ordinary strings.
+        if isinstance(value, str) and value.startswith(JSON_PREFIX):
+            try:
+                value = json.loads(value[len(JSON_PREFIX):])
+            except json.JSONDecodeError:
+                # Not JSON.
+                pass
+        data[name] = value
+
+    return data
+
+
 @contextmanager
 def maintained_selection():
     """Maintain selection during context
