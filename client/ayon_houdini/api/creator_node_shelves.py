@@ -198,7 +198,7 @@ def install():
     # populate what we need to retrieve the list of creator plugins
     create_context = CreateContext(host, reset=False)
     create_context.reset_current_context()
-    create_context._reset_creator_plugins()
+    create_context.reset_plugins(discover_publish_plugins=False)
 
     log.debug("Writing AYON Creator nodes to shelf: {}".format(filepath))
     tools = []
