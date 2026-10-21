@@ -43,15 +43,7 @@ def get_entity_fps(entity=None):
 
 
 def get_output_parameter(node: hou.Node) -> hou.Parm:
-    """Return the render output parameter of the given node.
-
-    Built-in node-type mappings take precedence. For other types, check
-    Houdini's General settings output_parameter_mapping for an exact node type
-    match before using the ordered fallback list below. If the configured
-    parameter is missing, log a warning and continue to the fallback.
-
-    Return the parameter without evaluating its value. This does not discover
-    outputs stored only in USD data.
+    """Return the render output parameter of the given node
 
     Example:
         root = hou.node("/obj")
