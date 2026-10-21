@@ -163,12 +163,25 @@ def get_fallback_output_parameter(node: hou.Node) -> hou.Parm | None:
         "copoutput", "filename", "usdfile", "file", "output",
         "outputfilepath", "outputimage", "outfile",
     )
-    for name in names:
-        parm = node.parm(name)
-        if parm is not None:
-            return parm
-    return None
+    parms = [
+        parm
+        for parm in (
+            node.parm(name) for name in names
+        )
+        if parm is not None
+    ]
+    if len(parms) > 1:
+        raise TypeError(
+            "Ambiguous output parameter for node type '{}' on '{}', "
+            "candidates: {}. Please add an explicit output parameter "
+            "mapping for this node type.".format(
+                node.type().name(),
+                node.path(),
+                ", ".join(parm.name() for parm in parms),
+            )
+        )
 
+    return parms[0] if parms else None
 
 def get_lops_rop_context_options(
         ropnode: hou.RopNode) -> "dict[str, str | float]":
