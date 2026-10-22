@@ -21,7 +21,7 @@ from ayon_core.lib import BoolDef
 from ayon_core.pipeline.staging_dir import StagingDir
 
 from .lib import (
-    imprint, read, lsattr, render_rop,
+    imprint, read_parameters, lsattr, render_rop,
     add_self_publish_button,
     expand_houdini_string,
 )
@@ -29,6 +29,28 @@ from .usd import get_ayon_entity_uri_from_representation_context
 
 
 SETTINGS_CATEGORY = "houdini"
+
+CREATOR_INSTANCE_DATA_KEYS = (
+    "folderPath",
+    "task",
+    "creator_identifier",
+    "id",
+    "AYON_productName",
+    "productName",
+    "productType",
+    "productBaseType",
+    "creator_attributes",
+    "publish_attributes",
+    "variant",
+    "active",
+    # Legacy OpenPype/AYON fields.
+    "asset",
+    "subset",
+    "family",
+    # Creator-specific fields stored at the top level.
+    "imageFormat",
+    "keepImages",
+)
 
 REMAP_CREATOR_IDENTIFIERS: Dict[str, str] = {
     "io.openpype.creators.houdini.ass":
@@ -273,7 +295,10 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         for instance in self.collection_shared_data[
                 "houdini_cached_instances"].get(self.identifier, []):
 
-            node_data = read(instance)
+            node_data = read_parameters(
+                instance,
+                CREATOR_INSTANCE_DATA_KEYS
+            )
 
             # Node paths are always the full node path since that is unique
             # Because it's the node's path it's not written into attributes
