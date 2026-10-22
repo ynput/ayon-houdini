@@ -42,13 +42,13 @@ def get_entity_fps(entity=None):
     return entity["attrib"]["fps"]
 
 
-def get_output_parameter(node):
+def get_output_parameter(node: hou.Node) -> hou.Parm:
     """Return the render output parameter of the given node
 
     Example:
         root = hou.node("/obj")
         my_alembic_node = root.createNode("alembic")
-        get_output_parameter(my_alembic_node)
+        get_output_parameter(my_alembic_node).name()
         >>> "filename"
 
     Notes:
@@ -67,8 +67,34 @@ def get_output_parameter(node):
 
     Returns:
         hou.Parm
-    """
 
+    Raises:
+        TypeError: If no built-in mapping applies and neither a configured
+            parameter nor a fallback parameter exists.
+    """
+    node_type: str = node.type().name()
+    explicit = get_explicit_output_parameter(node)
+    if explicit is not None:
+        return explicit
+
+    fallback = get_fallback_output_parameter(node)
+    if fallback is not None:
+        return fallback
+
+    raise TypeError("Node type '%s' not supported" % node_type)
+
+
+def get_explicit_output_parameter(node: hou.Node) -> "hou.Parm | None":
+    """Get the explicit output parameter for a Houdini node based on its type.
+
+    Args:
+        node (hou.Node): The Houdini node for which to find the explicit
+            output parameter.
+
+    Returns:
+        hou.Parm | None: The explicit output parameter if found,
+            otherwise None.
+    """
     node_type: str = node.type().name()
 
     # Figure out which type of node is being rendered
@@ -109,8 +135,45 @@ def get_output_parameter(node):
     elif node_type == "PRT_ROPDriver":
         return node.parm("file")
 
-    raise TypeError("Node type '%s' not supported" % node_type)
+    return None
 
+
+def get_fallback_output_parameter(node: hou.Node) -> hou.Parm | None:
+    """Get a fallback output parameter for a Houdini node if no specific
+    output parameter is set.
+
+    Args:
+        node (hou.Node): The Houdini node for which to find a fallback
+            output parameter.
+
+    Returns:
+        hou.Parm | None: The fallback output parameter if found,
+            otherwise None.
+    """
+    names = (
+        "vm_picture", "sopoutput", "dopoutput", "lopoutput", "picture",
+        "copoutput", "filename", "usdfile", "file", "output",
+        "outputfilepath", "outputimage", "outfile",
+    )
+    parms = [
+        parm
+        for parm in (
+            node.parm(name) for name in names
+        )
+        if parm is not None
+    ]
+    if len(parms) > 1:
+        raise TypeError(
+            "Ambiguous output parameter for node type '{}' on '{}', "
+            "candidates: {}. Please add an explicit output parameter "
+            "mapping for this node type.".format(
+                node.type().name(),
+                node.path(),
+                ", ".join(parm.name() for parm in parms),
+            )
+        )
+
+    return parms[0] if parms else None
 
 def get_lops_rop_context_options(
         ropnode: hou.RopNode) -> "dict[str, str | float]":
