@@ -485,15 +485,16 @@ def read_parameters(node, names):
         names (Iterable[str]): Parameter names to read.
 
     Returns:
-        dict: Values of the parameters that exist on the node.
+        dict: Values of the requested spare parameters that exist on the node.
     """
     data = {}
     if not node:
         return data
 
-    for name in names:
-        parameter = node.parm(name)
-        if not parameter:
+    names = set(names)
+    for parameter in node.spareParms():
+        name = parameter.name()
+        if name not in names:
             continue
 
         value = parameter.eval()
