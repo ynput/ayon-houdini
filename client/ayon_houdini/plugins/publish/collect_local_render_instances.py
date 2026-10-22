@@ -76,9 +76,8 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
         # Create Instance for each AOV.
         self.create_runtime_instance(
             instance,
-            aov_filter = self.aov_filter,
+            aov_filter=self.aov_filter,
             transfer_transient_data_keys={
-                "instance_node",
                 "colorspaceConfig",
                 "colorspace",
                 "colorspaceDisplay",

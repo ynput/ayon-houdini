@@ -16,6 +16,7 @@ from ayon_core.pipeline import (
     AVALON_INSTANCE_ID,
     load,
     publish,
+    KnownPublishError,
 )
 from ayon_core.lib import BoolDef
 from ayon_core.pipeline.staging_dir import StagingDir
@@ -600,18 +601,28 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
     hosts = ["houdini"]
     settings_category = SETTINGS_CATEGORY
 
+    # Always deep copied from the source instance to runtime instances.
+    runtime_instance_transfer_keys = {
+        "creator_attributes",
+        "publish_attributes",
+    }
+    # Always passed by reference from the source instance to runtime
+    # instances. The entities are safe to share because runtime instances
+    # always publish to the same context as their source instance.
+    runtime_instance_transfer_transient_data_keys = {
+        "instance_node",
+        "projectEntity",
+        "folderEntity",
+        "taskEntity",
+    }
+
     def create_runtime_instance(
             self,
             instance: pyblish.api.Instance,
-            families_to_append: list[str] = [],
-            aov_filter: str = "",
-            transfer_keys: set = {
-                "creator_attributes",
-                "publish_attributes"
-            },
-            transfer_transient_data_keys: set = {
-                "instance_node"
-            }
+            families_to_append: Optional[list[str]] = None,
+            aov_filter: Optional[dict] = None,
+            transfer_keys: Optional[set[str]] = None,
+            transfer_transient_data_keys: Optional[set[str]] = None,
         ):
         """Create Runtime Instances.
 
@@ -632,14 +643,37 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
             creating aov instances. Otherwise, it'll use the logic for
             creating cache instances which expects simpler instance data.
 
+        Note:
+            Runtime instances always publish to the same context
+            (folder and task) as their source instance. To publish them
+            elsewhere, change the context of the source instance before
+            this is called.
+
+        Note:
+            The colorspace of each representation is set with
+            `ColormanagedPyblishPluginMixin.set_representation_colorspace`.
+            So, when the source instance has "colorspace" in its data, the
+            calling plugin must inherit `ColormanagedPyblishPluginMixin`.
+            Otherwise, a `KnownPublishError` is raised before any runtime
+            instance is created.
+
         Args:
             instance (pyblish.api.Instance): Source publish instance.
-            families_to_append (list[str]): Families to add to new instances.
-            aov_filter (str): This is used for enabling generating review
-                if aov regex is applied to filename.
-            transfer_keys (set[str]): These will be safely deep copied
-            transfer_transient_data_keys (set[str]): These will transfer,
-                but won't be a unique copy so they are passed by reference.
+            families_to_append (Optional[list[str]]): Families to add to
+                new instances.
+            aov_filter (Optional[dict]): AOV filter as `match_aov_pattern`
+                expects it, `{host_name: [regex, ...]}`. It is used for
+                generating review if the aov regex matches the filename.
+            transfer_keys (Optional[set[str]]): Extra keys to deep copy
+                from the source instance. They are added to the keys that
+                are always deep copied, `runtime_instance_transfer_keys`:
+                "creator_attributes" and "publish_attributes".
+            transfer_transient_data_keys (Optional[set[str]]): Extra keys to
+                pass by reference from the source instance. They are added
+                to the keys that are always passed by reference,
+                `runtime_instance_transfer_transient_data_keys`:
+                "instance_node", "projectEntity", "folderEntity" and
+                "taskEntity".
 
         Returns:
                 list of pyblish.api.Instance: Instances created from
@@ -650,30 +684,69 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
         from copy import deepcopy
         from ayon_core.pipeline.farm.pyblish_functions import (
             create_skeleton_instance,
+            create_skeleton_instance_cache,
             create_instances_for_aov,
             create_instances_for_cache
         )
 
-        # Use same logic as how instances get created for farm submissions
-        instance_skeleton_data =  create_skeleton_instance(
-            instance,
-            # TODO: These should be fixed in core to just allow the default
-            #  None to work
-            families_transfer=[],
-            instance_transfer={},
+        if (
+            "colorspace" in instance.data
+            and not hasattr(self, "set_representation_colorspace")
+        ):
+            raise KnownPublishError(
+                f"Instance '{instance}' has colorspace data, but it can't be"
+                " set on the representations of its runtime instances"
+                f" because plugin '{self.__class__.__name__}' doesn't"
+                " inherit 'ColormanagedPyblishPluginMixin'."
+            )
+
+        transfer_keys = (
+            self.runtime_instance_transfer_keys | set(transfer_keys or ())
         )
+        transfer_transient_data_keys = (
+            self.runtime_instance_transfer_transient_data_keys
+            | set(transfer_transient_data_keys or ())
+        )
+
+        # Use same logic as how instances get created for farm submissions
+        is_render = instance.data.get("productBaseType") == "render"
+        if is_render:
+            # It forces the product base type to "render"
+            instance_skeleton_data = create_skeleton_instance(
+                instance,
+                # TODO: These should be fixed in core to just allow the
+                #  default None to work
+                families_transfer=[],
+                instance_transfer={},
+            )
+        else:
+            # It keeps the product base type and product type of the source
+            # instance, but it doesn't set the task.
+            instance_skeleton_data = create_skeleton_instance_cache(instance)
+            instance_skeleton_data["task"] = instance.data.get("task")
+
         self.post_process_skeleton_data(instance,
                                         instance_skeleton_data,
                                         families_to_append)
 
+        # Runtime instances must follow the context of the source instance
+        for key in ("folderPath", "task"):
+            if instance_skeleton_data.get(key) != instance.data.get(key):
+                raise KnownPublishError(
+                    f"Runtime instances must publish to the same '{key}'"
+                    f" as their source instance '{instance}'. Change it on"
+                    " the source instance instead."
+                )
+
         instances_data = []
-        if instance.data.get("productBaseType") == "render":
+        if is_render:
             instances_data = create_instances_for_aov(
                 instance=instance,
                 skeleton=instance_skeleton_data,
-                aov_filter=aov_filter,  # Use specified filter in settings.
+                aov_filter=aov_filter or {},  # Use filter from settings.
                 skip_integration_repre_list=[], # Extensions to skip.
-                do_not_add_review=False  # Don't explicitly skip review.
+                # Only add review if it's enabled on the source instance.
+                do_not_add_review=not instance.data.get("review", False),
             )
         else:
             instances_data = create_instances_for_cache(
@@ -723,13 +796,14 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
             self,
             instance: pyblish.api.Instance,
             instance_skeleton_data: dict,
-            families_to_append: list[str] = []
+            families_to_append: Optional[list[str]] = None
         ):
         """Post process skeleton data
         Applies Houdini specific logic to skeleton data.
         Args:
             instance (pyblish.api.Instance): The publish instance.
             instance_skeleton_data (dict): data to modify.
+            families_to_append (Optional[list[str]]): Families to add.
         """
         # Remove frame data like frameStart and handleStart
         # as they are added in later publisher plugins
@@ -739,8 +813,8 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
          ):
             instance_skeleton_data.pop(key, None)
 
-        # `create_skeleton_instance` only adds `render` and `review`
-        # Houdini local render also needs `render.local.hou`
+        # The skeleton families are only `render` plus `review` for renders,
+        #   or `render` plus the product base type for caches.
         if families_to_append:
             instance_skeleton_data["families"].extend(families_to_append)
         instance_skeleton_data.update({
