@@ -34,17 +34,17 @@ class ValidateUSDRenderSingleFile(plugin.HoudiniInstancePlugin):
             return
 
         # Get configured settings for this instance
-        submission_data = (
-            instance.data
-            .get("publish_attributes", {})
-            .get("HoudiniSubmitDeadlineUsdRender", {})
+        publish_attributes = instance.data.get("publish_attributes", {})
+        submission_data = publish_attributes.get(
+            "HoudiniSubmitDeadlineUsdRender", {}
         )
-        render_chunk_size = submission_data.get("chunk", 1)
+        # Render frames per task is set on the Deadline job info collector.
+        # A value of 0 means all frames are rendered in a single task.
+        job_info_data = publish_attributes.get("CollectJobInfo", {})
+        render_chunk_size = job_info_data.get("chunk_size", 1)
         export_chunk_size = submission_data.get("export_chunk", 1)
         usd_file_per_frame = "$F" in instance.data["ifdFile"]
-        frame_start_handle = instance.data["frameStartHandle"]
-        frame_end_handle = instance.data["frameEndHandle"]
-        num_frames = frame_end_handle - frame_start_handle + 1
+        num_frames = self.get_num_frames(instance)
         rop_node = hou.node(instance.data["instance_node"])
 
         # Whether ROP node is set to render all Frames within a single process
@@ -58,7 +58,7 @@ class ValidateUSDRenderSingleFile(plugin.HoudiniInstancePlugin):
             # If rendering multiple frames per task and USD file has $F then
             # log a warning that the optimization will be less efficient
             # since husk will still restart per frame.
-            if render_chunk_size > 1:
+            if render_chunk_size == 0 or render_chunk_size > 1:
                 self.log.debug(
                     "Render chunk size is bigger than one but export file is "
                     "a USD file per frame. Husk does not allow rendering "
@@ -95,19 +95,31 @@ class ValidateUSDRenderSingleFile(plugin.HoudiniInstancePlugin):
                 title="Render USD file overwritten",
                 description=self.get_description())
 
+    @staticmethod
+    def get_num_frames(instance):
+        """Return the number of frames to export, including handles."""
+        frame_start_handle = instance.data["frameStartHandle"]
+        frame_end_handle = instance.data["frameEndHandle"]
+        return int(frame_end_handle - frame_start_handle + 1)
+
     @classmethod
     def repair(cls, instance):
         # Enable all frames at once and make the frames per task
-        # very large
+        # large enough to export the whole frame range in one task
         rop_node = hou.node(instance.data["instance_node"])
         rop_node.parm("allframesatonce").set(True)
 
-        # Override instance setting for export chunk size
+        # Override instance setting for export chunk size. Keep at least
+        # 1000 so short shots behave as before.
+        export_chunk_size = max(1000, cls.get_num_frames(instance))
         create_context = instance.context.data["create_context"]
         created_instance = create_context.get_instance_by_id(
             instance.data["instance_id"]
         )
-        created_instance.publish_attributes["HoudiniSubmitDeadlineUsdRender"]["export_chunk"] = 1000  # noqa
+        submission_data = created_instance.publish_attributes[
+            "HoudiniSubmitDeadlineUsdRender"
+        ]
+        submission_data["export_chunk"] = export_chunk_size
         create_context.save_changes()
 
     def get_description(self):
