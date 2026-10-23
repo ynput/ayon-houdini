@@ -1,27 +1,218 @@
-import os
+from typing import Optional
+
 import pyblish.api
 
-from ayon_core.lib import is_func_signature_supported
-from ayon_core.pipeline.farm.patterning import match_aov_pattern
-from ayon_core.pipeline.farm.pyblish_functions import (
-    get_product_name_and_group_from_template,
-)
+from ayon_core.pipeline import PublishError
 from ayon_core.pipeline.publish import (
     get_plugin_settings,
     apply_plugin_settings_automatically,
     ColormanagedPyblishPluginMixin
 )
 from ayon_houdini.api import plugin
-try:
-    from ayon_core.pipeline.farm.pyblish_functions import (
-        _get_legacy_product_name_and_group,
-    )
-except ImportError:
-    _get_legacy_product_name_and_group = None
 
 
-class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
-                                  ColormanagedPyblishPluginMixin):
+# NOTE: This mixin lives next to `CollectLocalRenderInstances` because it is
+#   its only user. Move it to `ayon_houdini.api.plugin` (or core) when another
+#   plugin needs it.
+class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
+    """Create runtime instances from the expected files of an instance."""
+
+    # Always deep copied from the source instance to runtime instances.
+    runtime_instance_transfer_keys = {
+        "creator_attributes",
+        "publish_attributes",
+    }
+    # Always passed by reference from the source instance to runtime
+    # instances. The entities are safe to share because runtime instances
+    # always publish to the same context as their source instance.
+    runtime_instance_transfer_transient_data_keys = {
+        "instance_node",
+        "projectEntity",
+        "folderEntity",
+        "taskEntity",
+    }
+
+    def create_runtime_instance(
+            self,
+            instance: pyblish.api.Instance,
+            families_to_append: Optional[list[str]] = None,
+            aov_filter: Optional[dict] = None,
+            transfer_keys: Optional[set[str]] = None,
+            transfer_transient_data_keys: Optional[set[str]] = None,
+        ):
+        """Create Runtime Instances.
+
+        This heavily depends on farm logic where expected files.
+        Where it creates a runtime instances from "expectedFiles" dict
+        in instance data.
+            {
+                "item_1": ["file1", "file2", ...],
+                "item_2": "file",
+            }
+        Example:
+        >>> expected_files = instance.data.setdefault("expectedFiles", list())
+        >>> expected_files.append({"cache": files_sequence_list})
+        >>> self.create_runtime_instance(instance)
+
+        Notes:
+            - If the product base type is render, it creates aov instances.
+              Otherwise, it creates cache instances, which expect simpler
+              instance data.
+            - Runtime instances always publish to the same context (folder
+              and task) as their source instance. To publish them elsewhere,
+              change the context of the source instance before calling this.
+
+        Args:
+            instance (pyblish.api.Instance): Source publish instance.
+            families_to_append (Optional[list[str]]): Families to add to
+                new instances.
+            aov_filter (Optional[dict]): AOV filter as `match_aov_pattern`
+                expects it, `{host_name: [regex, ...]}`. It is used for
+                generating review if the aov regex matches the filename.
+            transfer_keys (Optional[set[str]]): Extra keys to deep copy
+                from the source instance. They are added to the keys that
+                are always deep copied, `runtime_instance_transfer_keys`:
+                "creator_attributes" and "publish_attributes".
+            transfer_transient_data_keys (Optional[set[str]]): Extra keys to
+                pass by reference from the source instance. They are added
+                to the keys that are always passed by reference,
+                `runtime_instance_transfer_transient_data_keys`:
+                "instance_node", "projectEntity", "folderEntity" and
+                "taskEntity".
+
+        Returns:
+                list of pyblish.api.Instance: Instances created from
+                    expected files.
+
+        """
+
+        from copy import deepcopy
+        from ayon_core.pipeline.farm.pyblish_functions import (
+            create_skeleton_instance,
+            create_skeleton_instance_cache,
+            create_instances_for_aov,
+            create_instances_for_cache
+        )
+
+        transfer_keys = (
+            self.runtime_instance_transfer_keys | set(transfer_keys or ())
+        )
+        transfer_transient_data_keys = (
+            self.runtime_instance_transfer_transient_data_keys
+            | set(transfer_transient_data_keys or ())
+        )
+
+        # Use same logic as how instances get created for farm submissions
+        is_render = instance.data.get("productBaseType") == "render"
+        if is_render:
+            # It forces the product base type to "render"
+            instance_skeleton_data = create_skeleton_instance(
+                instance,
+                # TODO: These should be fixed in core to just allow the
+                #  default None to work
+                families_transfer=[],
+                instance_transfer={},
+            )
+        else:
+            # It keeps the product base type and product type of the source
+            # instance, but it doesn't set the task.
+            instance_skeleton_data = create_skeleton_instance_cache(instance)
+            instance_skeleton_data["task"] = instance.data.get("task")
+
+        # The skeleton families are only `render` plus `review` for renders,
+        #   or `render` plus the product base type for caches.
+        if families_to_append:
+            instance_skeleton_data["families"].extend(families_to_append)
+
+        self.post_process_skeleton_data(instance, instance_skeleton_data)
+
+        # Runtime instances must follow the context of the source instance
+        for key in ("folderPath", "task"):
+            if instance_skeleton_data.get(key) != instance.data.get(key):
+                raise PublishError(
+                    f"Runtime instances must publish to the same '{key}'"
+                    f" as their source instance '{instance}'. Change it on"
+                    " the source instance instead."
+                )
+
+        instances_data = []
+        if is_render:
+            instances_data = create_instances_for_aov(
+                instance=instance,
+                skeleton=instance_skeleton_data,
+                aov_filter=aov_filter or {},  # Use filter from settings.
+                skip_integration_repre_list=[], # Extensions to skip.
+                # Only add review if it's enabled on the source instance.
+                do_not_add_review=not instance.data.get("review", False),
+            )
+        else:
+            instances_data = create_instances_for_cache(
+                instance,
+                instance_skeleton_data
+            )
+
+        # Create instances for each AOV
+        aov_instances = []
+        anatomy = instance.context.data["anatomy"]
+        for aov_instance_data in instances_data:
+
+            # Copy instance data to AOV instances after creation
+            for key in transfer_keys:
+                if key in instance.data:
+                    aov_instance_data[key] = deepcopy(instance.data[key])
+
+            for key in transfer_transient_data_keys:
+                if key in instance.data:
+                    aov_instance_data[key] = instance.data[key]
+
+            # The `create_instances_for_aov` makes some paths rootless paths,
+            # like the "stagingDir" for each representation which we will make
+            # absolute again.
+            for representation in aov_instance_data["representations"]:
+                representation["stagingDir"] = anatomy.fill_root(
+                    representation["stagingDir"]
+                )
+
+                # Set the colorspace for the representation
+                if "colorspace" in instance.data:
+                    self.set_representation_colorspace(
+                        representation,
+                        instance.context,
+                        colorspace=instance.data["colorspace"],
+                    )
+
+            aov_instance = instance.context.create_instance(
+                aov_instance_data["productName"]
+            )
+            aov_instance.data.update(aov_instance_data)
+            aov_instances.append(aov_instance)
+
+        return aov_instances
+
+    def post_process_skeleton_data(
+            self,
+            instance: pyblish.api.Instance,
+            instance_skeleton_data: dict,
+        ):
+        """Apply DCC specific changes to the skeleton data.
+
+        Called by `create_runtime_instance` after the skeleton data is
+        created and before the runtime instances are created from it.
+        Override it in the plugin to apply DCC specific logic.
+
+        It must not change "folderPath" or "task", runtime instances
+        always publish to the same context as their source instance.
+
+        Args:
+            instance (pyblish.api.Instance): Source publish instance.
+            instance_skeleton_data (dict): Skeleton data to modify.
+
+        """
+        pass
+
+
+class CollectLocalRenderInstances(RuntimeInstancesMixin,
+                                  plugin.HoudiniInstancePlugin):
     """Collect instances for local render.
 
     Agnostic Local Render Collector.
@@ -86,165 +277,39 @@ class CollectLocalRenderInstances(plugin.HoudiniInstancePlugin,
             return
 
         # Create Instance for each AOV.
-        context = instance.context
-        expected_files = next(iter(instance.data["expectedFiles"]), {})
-
-        product_base_type = "render"  # is always render
-
-        # NOTE: The assumption that the output image's colorspace is the
-        #   scene linear role may be incorrect. Certain renderers, like
-        #   Karma allow overriding explicitly the output colorspace of the
-        #   image. Such override are currently not considered since these
-        #   would need to be detected in a renderer-specific way and the
-        #   majority of production scenarios these would not be overridden.
-        # TODO: Support renderer-specific explicit colorspace overrides
-
-        for aov_name, aov_filepaths in expected_files.items():
-            dynamic_data = {}
-            if aov_name:
-                dynamic_data["aov"] = aov_name
-
-            if instance.data.get("renderlayer"):
-                dynamic_data["renderlayer"] = instance.data["renderlayer"]
-
-            product_name, product_group = self._get_product_name_and_group(
-                instance,
-                product_base_type,
-                dynamic_data
-            )
-
-            # Create instance for each AOV
-            aov_instance = context.create_instance(product_name)
-
-            # Prepare Representation for each AOV
-            aov_filenames = [os.path.basename(path) for path in aov_filepaths]
-            staging_dir = os.path.dirname(aov_filepaths[0])
-            ext = aov_filepaths[0].split(".")[-1]
-
-            # Decide if instance is reviewable
-            if instance.data.get("multipartExr", False):
-                # Add preview tag because its multipartExr.
-                preview = True
-            else:
-                # Add Preview tag if the AOV matches the filter.
-                preview = match_aov_pattern(
-                    "houdini", self.aov_filter, aov_filenames[0]
-                )
-
-            preview = preview and instance.data.get("review", False)
-
-            # Support Single frame.
-            # The integrator wants single files to be a single
-            #  filename instead of a list.
-            # More info: https://github.com/ynput/ayon-core/issues/238
-            if len(aov_filenames) == 1:
-                aov_filenames = aov_filenames[0]
-
-            representation = {
-                "stagingDir": staging_dir,
-                "ext": ext,
-                "name": ext,
-                "tags": ["review"] if preview else [],
-                "files": aov_filenames,
-                "frameStart": instance.data["frameStartHandle"],
-                "frameEnd": instance.data["frameEndHandle"]
-            }
-
-            # Transfer the instance colorspace information too, because these
-            # may represent scene display/view, etc.
-            for key in (
+        self.create_runtime_instance(
+            instance,
+            aov_filter=self.aov_filter,
+            transfer_transient_data_keys={
                 "colorspaceConfig",
                 "colorspace",
                 "colorspaceDisplay",
                 "colorspaceView",
-            ):
-                if key in instance.data:
-                    value: str = instance.data[key]
-                    self.log.debug(f"Transfering '{key}': {value}")
-                    aov_instance.data[key] = value
-
-            # Set the colorspace for the representation
-            if "colorspace" in instance.data:
-                self.set_representation_colorspace(
-                    representation,
-                    context,
-                    colorspace=instance.data["colorspace"],
-                )
-
-            aov_instance.data.update({
-                # 'label': label,
-                "task": instance.data["task"],
-                "folderPath": instance.data["folderPath"],
-                "frameStartHandle": instance.data["frameStartHandle"],
-                "frameEndHandle": instance.data["frameEndHandle"],
-                "productType": product_base_type,
-                "productBaseType": product_base_type,
-                "family": product_base_type,
-                "productName": product_name,
-                "productGroup": product_group,
-                "families": ["render.local.hou", "review"],
-                "instance_node": instance.data["instance_node"],
-                # The following three items are necessary for
-                # `ExtractLastPublished`
-                "publish_attributes": instance.data["publish_attributes"],
-                "stagingDir": staging_dir,
-                "frames": aov_filenames,
-                "representations": [representation]
-            })
+            }
+        )
 
         # Skip integrating original render instance.
         # We are not removing it because it's used to trigger the render.
         instance.data["integrate"] = False
 
-    def _get_product_name_and_group(
-        self, instance, product_base_type, dynamic_data
-    ):
-        """Get product name and group
-
-        Args:
-            instance (pyblish.api.Instance): The instance to publish.
-            product_base_type (str): Product base type.
-            dynamic_data (dict): Dynamic data (camera, aov, ...)
-
-        Returns:
-            tuple (str, str): product name and group name
-
-        """
-        use_legacy_product_name = False
-        if _get_legacy_product_name_and_group is not None:
-            project_settings = instance.context.data["project_settings"]
-            try:
-                use_legacy_product_name = (
-                    project_settings
-                    ["core"]
-                    ["tools"]
-                    ["creator"]
-                    ["use_legacy_product_names_for_renders"]
-                )
-            except KeyError:
-                pass
-
-        if use_legacy_product_name:
-            return _get_legacy_product_name_and_group(
-                product_base_type,
-                instance.data["productName"],
-                instance.context.data["taskEntity"]["name"],
-                dynamic_data
-            )
-
-        kwargs = dict(
-            project_name=instance.context.data["projectName"],
-            folder_entity=instance.context.data["folderEntity"],
-            task_entity=instance.context.data["taskEntity"],
-            host_name=instance.context.data["hostName"],
-            product_base_type=product_base_type,
-            product_type=product_base_type,
-            variant=instance.data["variant"],
-            dynamic_data=dynamic_data,
-        )
-        if not is_func_signature_supported(
-            get_product_name_and_group_from_template, **kwargs
+    def post_process_skeleton_data(
+            self,
+            instance: pyblish.api.Instance,
+            instance_skeleton_data: dict,
         ):
-            kwargs["product_type"] = kwargs.pop("product_base_type")
-            kwargs.pop("folder_entity")
-        return get_product_name_and_group_from_template(**kwargs)
+        # The skeleton gets its frame data from
+        #   `get_time_data_from_instance_or_context`, which falls back to
+        #   the context frame range because Houdini instances only have
+        #   `frameStartHandle` and `frameEndHandle` (the ROP frame range)
+        #   at this point. `frameStart`, `frameEnd` and the handles are
+        #   collected later by `CollectAssetHandles`.
+        for key in (
+            "frameStart", "frameEnd",
+            "handleStart", "handleEnd",
+        ):
+            instance_skeleton_data.pop(key, None)
+
+        instance_skeleton_data.update({
+            "frameStartHandle": instance.data["frameStartHandle"],
+            "frameEndHandle": instance.data["frameEndHandle"],
+        })
