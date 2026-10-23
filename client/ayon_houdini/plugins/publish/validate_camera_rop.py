@@ -7,7 +7,15 @@ from ayon_houdini.api import plugin
 
 
 class ValidateCameraROP(plugin.HoudiniInstancePlugin):
-    """Validate Camera ROP settings."""
+    """Validate the Alembic ROP exports exactly one camera.
+
+    The Alembic ROP of a camera instance must meet these criteria:
+
+    - 'Use SOP Path' is disabled.
+    - 'Root' is set to an absolute path, e.g. `/obj`.
+    - 'Objects' is set to a single object.
+    - That object exists and is a camera.
+    """
 
     order = pyblish.api.ValidatorOrder
     families = ["camera"]
