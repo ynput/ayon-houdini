@@ -119,9 +119,12 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
             instance_skeleton_data = create_skeleton_instance_cache(instance)
             instance_skeleton_data["task"] = instance.data.get("task")
 
-        self.post_process_skeleton_data(instance,
-                                        instance_skeleton_data,
-                                        families_to_append)
+        # The skeleton families are only `render` plus `review` for renders,
+        #   or `render` plus the product base type for caches.
+        if families_to_append:
+            instance_skeleton_data["families"].extend(families_to_append)
+
+        self.post_process_skeleton_data(instance, instance_skeleton_data)
 
         # Runtime instances must follow the context of the source instance
         for key in ("folderPath", "task"):
@@ -190,31 +193,22 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
             self,
             instance: pyblish.api.Instance,
             instance_skeleton_data: dict,
-            families_to_append: Optional[list[str]] = None
         ):
-        """Post process skeleton data
-        Applies Houdini specific logic to skeleton data.
-        Args:
-            instance (pyblish.api.Instance): The publish instance.
-            instance_skeleton_data (dict): data to modify.
-            families_to_append (Optional[list[str]]): Families to add.
-        """
-        # Remove frame data like frameStart and handleStart
-        # as they are added in later publisher plugins
-        for key in (
-            "frameStart", "frameEnd",
-            "handleStart", "handleEnd",
-         ):
-            instance_skeleton_data.pop(key, None)
+        """Apply DCC specific changes to the skeleton data.
 
-        # The skeleton families are only `render` plus `review` for renders,
-        #   or `render` plus the product base type for caches.
-        if families_to_append:
-            instance_skeleton_data["families"].extend(families_to_append)
-        instance_skeleton_data.update({
-            "frameStartHandle": instance.data["frameStartHandle"],
-            "frameEndHandle": instance.data["frameEndHandle"],
-        })
+        Called by `create_runtime_instance` after the skeleton data is
+        created and before the runtime instances are created from it.
+        Override it in the plugin to apply DCC specific logic.
+
+        It must not change "folderPath" or "task", runtime instances
+        always publish to the same context as their source instance.
+
+        Args:
+            instance (pyblish.api.Instance): Source publish instance.
+            instance_skeleton_data (dict): Skeleton data to modify.
+
+        """
+        pass
 
 
 class CollectLocalRenderInstances(RuntimeInstancesMixin,
@@ -297,3 +291,25 @@ class CollectLocalRenderInstances(RuntimeInstancesMixin,
         # Skip integrating original render instance.
         # We are not removing it because it's used to trigger the render.
         instance.data["integrate"] = False
+
+    def post_process_skeleton_data(
+            self,
+            instance: pyblish.api.Instance,
+            instance_skeleton_data: dict,
+        ):
+        # The skeleton gets its frame data from
+        #   `get_time_data_from_instance_or_context`, which falls back to
+        #   the context frame range because Houdini instances only have
+        #   `frameStartHandle` and `frameEndHandle` (the ROP frame range)
+        #   at this point. `frameStart`, `frameEnd` and the handles are
+        #   collected later by `CollectAssetHandles`.
+        for key in (
+            "frameStart", "frameEnd",
+            "handleStart", "handleEnd",
+        ):
+            instance_skeleton_data.pop(key, None)
+
+        instance_skeleton_data.update({
+            "frameStartHandle": instance.data["frameStartHandle"],
+            "frameEndHandle": instance.data["frameEndHandle"],
+        })
