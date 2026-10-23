@@ -112,9 +112,29 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             self.log.debug(
                 f"Collecting outputs for Geometry Clip Sequence: {node.path()}"
             )
+            # Store the nodes for `ValidateUSDGeoClipSequenceFlatten`
+            instance.data.setdefault("usdGeoClipSequenceNodes", []).append(
+                node.path()
+            )
 
-            # Collect all their output files
-            files = self._get_geoclipsequence_output_files(node, start, end)
+            # Collect all their output files: the manifest, topology and
+            # clip files
+            clip_files = self._get_geoclipsequence_clip_files(
+                node, start, end
+            )
+            files: list[str] = [
+                node.evalParm('manifestfile'),
+                node.evalParm('topologyfile'),
+                *clip_files
+            ]
+
+            # When loading clip files from disk, they must already exist or
+            # the USD ROP will fail. Store them for `ValidateUSDClipFilesExist`
+            if not node.evalParm('usesecondinput'):
+                loaded_clip_files = instance.data.setdefault(
+                    "usdLoadedClipFiles", {}
+                )
+                loaded_clip_files[node.path()] = clip_files
 
             # Check if the layer is an explicit save layer, because if it is
             # then likely it is collected as its own instance by the
@@ -148,20 +168,21 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
                     f"{src} -> {asset_remap[src]}"
                 )
 
-    def _get_geoclipsequence_output_files(
+    def _get_geoclipsequence_clip_files(
         self, clip_node: hou.Node, start: int, end: int
     ) -> list[str]:
-        """Return the output files for the given Geometry Clip Sequence node
-        that would be written out when executing the USD ROP for the given
-        frame range.
+        """Return the clip files for the given Geometry Clip Sequence node
+        that the published layer references when executing the USD ROP for
+        the given frame range.
 
-        A Geometry Clip Sequence only writes out files for the frames that
-        appear in the ROP render range. If it has a start and end frame, then
-        it won't write out frames beyond those frame ranges. If it loops, then
-        it loops solely beyond the end frame, not before the start frame.
+        A Geometry Clip Sequence only references (and writes out) clip files
+        for the frames that appear in the ROP render range. If it has a start
+        and end frame, then it won't write out frames beyond those frame
+        ranges. If it loops, then it loops solely beyond the end frame, not
+        before the start frame.
 
         As such, we find the intersection of the frame ranges to determine the
-        files to be written out.
+        clip files.
 
         Args:
             clip_node (hou.Node): The Geometry Clip Sequence node.
@@ -173,17 +194,21 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         """
         # TODO: We may want to process this node in the Context Options of the
         #  USD ROP to be correct in the case of e.g. multishot workflows
-        # Collect the manifest and topology file
-        files: list[str] = [
-            clip_node.evalParm('manifestfile'),
-            clip_node.evalParm('topologyfile')
-        ]
-
-        saveclipfilepath: str = \
-            clip_node.parm('saveclipfilepath').evalAtFrame(start)
+        # The published layer references the flattened clip files written to
+        # 'Save Clip File Path' when 'Flatten Clip Files' is enabled.
+        # Otherwise, when loading clips, it references the existing files
+        # from 'Load Clip File Path' which are not written by the USD ROP.
+        if (
+            clip_node.evalParm('usesecondinput')
+            or clip_node.evalParm('flattenclips')
+        ):
+            clipfilepath_parm = clip_node.parm('saveclipfilepath')
+        else:
+            clipfilepath_parm = clip_node.parm('loadclipfilepath')
+        clipfilepath: str = clipfilepath_parm.evalAtFrame(start)
 
         frame_collection, _ = clique.assemble(
-            [saveclipfilepath],
+            [clipfilepath],
             patterns=[clique.PATTERNS["frames"]],
             minimum_items=1
         )
@@ -191,11 +216,10 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         # Skip if no frame pattern detected.
         if not frame_collection:
             self.log.warning(
-                f"Unable detect frame sequence in filepath: {saveclipfilepath}"
+                f"Unable detect frame sequence in filepath: {clipfilepath}"
             )
             # Assume it's some form of static clip file in this scenario
-            files.append(saveclipfilepath)
-            return files
+            return [clipfilepath]
 
         # Collect the clip frames that fall within the render range
         # because those will be the clip frames to be written out.
@@ -212,8 +236,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         frame_collection = frame_collection[0]
         frame_collection.indexes.clear()
         frame_collection.indexes.update(frames)
-        files.extend(list(frame_collection))
-        return files
+        return list(frame_collection)
 
     def _find_instance_by_explict_save_layer(
         self,
