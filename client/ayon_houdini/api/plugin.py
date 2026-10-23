@@ -16,7 +16,7 @@ from ayon_core.pipeline import (
     AVALON_INSTANCE_ID,
     load,
     publish,
-    KnownPublishError,
+    PublishError,
 )
 from ayon_core.lib import BoolDef
 from ayon_core.pipeline.staging_dir import StagingDir
@@ -654,7 +654,7 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
             `ColormanagedPyblishPluginMixin.set_representation_colorspace`.
             So, when the source instance has "colorspace" in its data, the
             calling plugin must inherit `ColormanagedPyblishPluginMixin`.
-            Otherwise, a `KnownPublishError` is raised before any runtime
+            Otherwise, a `PublishError` is raised before any runtime
             instance is created.
 
         Args:
@@ -693,7 +693,7 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
             "colorspace" in instance.data
             and not hasattr(self, "set_representation_colorspace")
         ):
-            raise KnownPublishError(
+            raise PublishError(
                 f"Instance '{instance}' has colorspace data, but it can't be"
                 " set on the representations of its runtime instances"
                 f" because plugin '{self.__class__.__name__}' doesn't"
@@ -732,7 +732,7 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
         # Runtime instances must follow the context of the source instance
         for key in ("folderPath", "task"):
             if instance_skeleton_data.get(key) != instance.data.get(key):
-                raise KnownPublishError(
+                raise PublishError(
                     f"Runtime instances must publish to the same '{key}'"
                     f" as their source instance '{instance}'. Change it on"
                     " the source instance instead."
