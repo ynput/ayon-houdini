@@ -638,24 +638,19 @@ class HoudiniInstancePlugin(pyblish.api.InstancePlugin):
         >>> expected_files.append({"cache": files_sequence_list})
         >>> self.create_runtime_instance(instance)
 
-        Note:
-            If product base type is render, it'll trigger the logic for
-            creating aov instances. Otherwise, it'll use the logic for
-            creating cache instances which expects simpler instance data.
-
-        Note:
-            Runtime instances always publish to the same context
-            (folder and task) as their source instance. To publish them
-            elsewhere, change the context of the source instance before
-            this is called.
-
-        Note:
-            The colorspace of each representation is set with
-            `ColormanagedPyblishPluginMixin.set_representation_colorspace`.
-            So, when the source instance has "colorspace" in its data, the
-            calling plugin must inherit `ColormanagedPyblishPluginMixin`.
-            Otherwise, a `PublishError` is raised before any runtime
-            instance is created.
+        Notes:
+            - If the product base type is render, it creates aov instances.
+              Otherwise, it creates cache instances, which expect simpler
+              instance data.
+            - Runtime instances always publish to the same context (folder
+              and task) as their source instance. To publish them elsewhere,
+              change the context of the source instance before calling this.
+            - The colorspace of each representation is set with
+              `ColormanagedPyblishPluginMixin.set_representation_colorspace`.
+              So, when the source instance has "colorspace" in its data, the
+              calling plugin must inherit `ColormanagedPyblishPluginMixin`.
+              Otherwise, a `PublishError` is raised before any runtime
+              instance is created.
 
         Args:
             instance (pyblish.api.Instance): Source publish instance.
