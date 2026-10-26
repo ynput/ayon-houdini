@@ -113,7 +113,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
                 f"Collecting outputs for Geometry Clip Sequence: {node.path()}"
             )
             # Store the nodes for `ValidateUSDGeoClipSequenceFlatten`
-            instance.data.setdefault("usdGeoClipSequenceNodes", []).append(
+            instance.data.setdefault("usdGeoClipSequenceNodes", set()).add(
                 node.path()
             )
 

@@ -40,11 +40,7 @@ class ValidateUSDGeoClipSequenceFlatten(plugin.HoudiniInstancePlugin):
     @classmethod
     def get_invalid(cls, instance):
         invalid = []
-        # A node may be collected from multiple layers
-        node_paths = dict.fromkeys(
-            instance.data.get("usdGeoClipSequenceNodes", [])
-        )
-        for node_path in node_paths:
+        for node_path in instance.data.get("usdGeoClipSequenceNodes", set()):
             node = hou.node(node_path)
             if (
                 node.evalParm("usesecondinput")
