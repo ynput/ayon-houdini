@@ -84,14 +84,15 @@ class HdaLoader(plugin.HoudiniLoader):
         new = def_paths.index(file_path)
         defs[new].setIsPreferred(True)
 
-        # The switched HDA definition stores `project_name` and
-        # `representation` itself, so those values follow the definition.
-        # They are only set for HDA products published without them.
+        definition = defs[new]
+        definition_parms = definition.parmTemplateGroup()
+
+        # HDA definitions published before the AYON parameters were stored on
+        # the definition still need the spare parameters imprinted.
         fallback = {
             "representation": repre_entity["id"],
             "project_name": context["project"]["name"],
         }
-        definition_parms = defs[new].parmTemplateGroup()
         fallback = {
             parm_name: value
             for parm_name, value in fallback.items()
@@ -100,16 +101,16 @@ class HdaLoader(plugin.HoudiniLoader):
         if fallback:
             lib.imprint(hda_node, fallback, update=True)
 
-        # Move the Extra parameter folder to the back.
-        parm_group = hda_node.parmTemplateGroup()
-        # The name 'Extra' is a hard coded name in AYON.
-        parm_folder = parm_group.findFolder("Extra")
-        if parm_folder is not None:
-            # Remove `Extra` AYON parameters
-            parm_group.remove(parm_folder.name())
-            # Add `Extra` AYON parameters back
-            parm_group.append(parm_folder)
-            hda_node.setParmTemplateGroup(parm_group)
+        # Move the spare 'Extra' AYON parameter folder to the back. A folder
+        # that is part of the HDA definition must not be touched; the
+        # integrator already appends it at the end.
+        if definition_parms.findFolder("Extra") is None:
+            parm_group = hda_node.parmTemplateGroup()
+            parm_folder = parm_group.findFolder("Extra")
+            if parm_folder is not None:
+                parm_group.remove(parm_folder.name())
+                parm_group.append(parm_folder)
+                hda_node.setParmTemplateGroup(parm_group)
 
     def remove(self, container):
         node = container["node"]
