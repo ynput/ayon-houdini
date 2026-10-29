@@ -117,10 +117,20 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
                 node.path()
             )
 
+            # The published layer references the flattened clip files written
+            # to 'Save Clip File Path' when 'Flatten Clip Files' is enabled.
+            # Otherwise, when loading clips, it references the existing files
+            # from 'Load Clip File Path' which are not written by the USD ROP.
+            use_second_input = node.evalParm('usesecondinput')
+            if use_second_input or node.evalParm('flattenclips'):
+                clip_parm_name = 'saveclipfilepath'
+            else:
+                clip_parm_name = 'loadclipfilepath'
+
             # Collect all their output files: the manifest, topology and
             # clip files
             clip_files = self._get_geoclipsequence_clip_files(
-                node, start, end
+                node, clip_parm_name, start, end
             )
             files: list[str] = [
                 node.evalParm('manifestfile'),
@@ -129,8 +139,13 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             ]
 
             # When loading clip files from disk, they must already exist or
-            # the USD ROP will fail. Store them for `ValidateUSDClipFilesExist`
-            if not node.evalParm('usesecondinput'):
+            # the USD ROP will fail, also when they are flattened.
+            # Store them for `ValidateUSDClipFilesExist`
+            if not use_second_input:
+                if clip_parm_name != 'loadclipfilepath':
+                    clip_files = self._get_geoclipsequence_clip_files(
+                        node, 'loadclipfilepath', start, end
+                    )
                 loaded_clip_files = instance.data.setdefault(
                     "usdLoadedClipFiles", {}
                 )
@@ -169,11 +184,11 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
                 )
 
     def _get_geoclipsequence_clip_files(
-        self, clip_node: hou.Node, start: int, end: int
+        self, clip_node: hou.Node, parm_name: str, start: int, end: int
     ) -> list[str]:
-        """Return the clip files for the given Geometry Clip Sequence node
-        that the published layer references when executing the USD ROP for
-        the given frame range.
+        """Return the clip files from the given clip file path parameter of
+        the Geometry Clip Sequence node that are used when executing the USD
+        ROP for the given frame range.
 
         A Geometry Clip Sequence only references (and writes out) clip files
         for the frames that appear in the ROP render range. If it has a start
@@ -186,6 +201,8 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
 
         Args:
             clip_node (hou.Node): The Geometry Clip Sequence node.
+            parm_name (str): The clip file path parameter, e.g.
+                'saveclipfilepath' or 'loadclipfilepath'.
             start (int): The ROP render start frame.
             end (int): The ROP render end frame.
 
@@ -194,18 +211,7 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         """
         # TODO: We may want to process this node in the Context Options of the
         #  USD ROP to be correct in the case of e.g. multishot workflows
-        # The published layer references the flattened clip files written to
-        # 'Save Clip File Path' when 'Flatten Clip Files' is enabled.
-        # Otherwise, when loading clips, it references the existing files
-        # from 'Load Clip File Path' which are not written by the USD ROP.
-        if (
-            clip_node.evalParm('usesecondinput')
-            or clip_node.evalParm('flattenclips')
-        ):
-            clipfilepath_parm = clip_node.parm('saveclipfilepath')
-        else:
-            clipfilepath_parm = clip_node.parm('loadclipfilepath')
-        clipfilepath: str = clipfilepath_parm.evalAtFrame(start)
+        clipfilepath: str = clip_node.parm(parm_name).evalAtFrame(start)
 
         frame_collection, _ = clique.assemble(
             [clipfilepath],
