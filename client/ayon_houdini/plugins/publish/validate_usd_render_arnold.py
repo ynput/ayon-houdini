@@ -114,7 +114,6 @@ class ValidateUSDRenderSingleFile(plugin.HoudiniInstancePlugin):
         rop_node.parm("allframesatonce").set(True)
 
         # Override instance setting for export chunk size
-        export_chunk_size = MAX_CHUNK_SIZE
         create_context = instance.context.data["create_context"]
         created_instance = create_context.get_instance_by_id(
             instance.data["instance_id"]
@@ -122,7 +121,7 @@ class ValidateUSDRenderSingleFile(plugin.HoudiniInstancePlugin):
         submission_data = created_instance.publish_attributes[
             "HoudiniSubmitDeadlineUsdRender"
         ]
-        submission_data["export_chunk"] = export_chunk_size
+        submission_data["export_chunk"] = MAX_CHUNK_SIZE
         create_context.save_changes()
 
     def get_description(self):
