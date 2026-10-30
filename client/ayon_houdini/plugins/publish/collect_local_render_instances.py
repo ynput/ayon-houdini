@@ -27,7 +27,6 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
     # instances. The entities are safe to share because runtime instances
     # always publish to the same context as their source instance.
     runtime_instance_transfer_transient_data_keys = {
-        "instance_node",
         "projectEntity",
         "folderEntity",
         "taskEntity",
@@ -69,6 +68,7 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
             aov_filter (Optional[dict]): AOV filter as `match_aov_pattern`
                 expects it, `{host_name: [regex, ...]}`. It is used for
                 generating review if the aov regex matches the filename.
+                Empty by default, so only multipart EXRs get a review.
             transfer_keys (Optional[set[str]]): Extra keys to deep copy
                 from the source instance. They are added to the keys that
                 are always deep copied, `runtime_instance_transfer_keys`:
@@ -77,8 +77,7 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
                 pass by reference from the source instance. They are added
                 to the keys that are always passed by reference,
                 `runtime_instance_transfer_transient_data_keys`:
-                "instance_node", "projectEntity", "folderEntity" and
-                "taskEntity".
+                "projectEntity", "folderEntity" and "taskEntity".
 
         Returns:
                 list of pyblish.api.Instance: Instances created from
@@ -270,6 +269,7 @@ class CollectLocalRenderInstances(RuntimeInstancesMixin,
             instance,
             aov_filter=self.aov_filter,
             transfer_transient_data_keys={
+                "instance_node",
                 "colorspaceConfig",
                 "colorspace",
                 "colorspaceDisplay",
