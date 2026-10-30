@@ -10,6 +10,10 @@ from ayon_core.pipeline.publish import PublishValidationError, RepairAction
 from ayon_houdini.api.action import SelectROPAction
 from ayon_houdini.api import plugin
 
+# Mirrors `MAX_CHUNK_SIZE` from ayon-deadline, hardcoded to avoid
+# depending on that addon.
+MAX_CHUNK_SIZE = 2**31 - 1  # max signed 32-bit int
+
 
 class ValidateUSDRenderSingleFile(plugin.HoudiniInstancePlugin):
     """Validate the writing of a single USD Render Output file.
@@ -105,13 +109,12 @@ class ValidateUSDRenderSingleFile(plugin.HoudiniInstancePlugin):
     @classmethod
     def repair(cls, instance):
         # Enable all frames at once and make the frames per task
-        # large enough to export the whole frame range in one task
+        # very large so the whole frame range exports in one task
         rop_node = hou.node(instance.data["instance_node"])
         rop_node.parm("allframesatonce").set(True)
 
-        # Override instance setting for export chunk size. Keep at least
-        # 1000 so short shots behave as before.
-        export_chunk_size = max(1000, cls.get_num_frames(instance))
+        # Override instance setting for export chunk size
+        export_chunk_size = MAX_CHUNK_SIZE
         create_context = instance.context.data["create_context"]
         created_instance = create_context.get_instance_by_id(
             instance.data["instance_id"]
