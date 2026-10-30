@@ -129,7 +129,10 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
                     title=self.label)
             parent = parent.parent()
 
-        if camera.type().name() != "cam":
+        if camera.type().name().lower() not in {
+            "cam", "agentcam", "stereocam", "stereocamrig",
+            "vrcam", "lopimportcam"
+        }:
             raise PublishValidationError(
                 (f"Object set in Alembic ROP is not a camera: "
                  f"{camera} (type: {camera.type().name()})"),
