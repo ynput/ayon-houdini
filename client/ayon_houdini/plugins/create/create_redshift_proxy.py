@@ -9,8 +9,9 @@ class CreateRedshiftProxy(plugin.HoudiniCreator):
     """Redshift Proxy"""
     identifier = "io.openpype.creators.houdini.redshiftproxy"
     label = "Redshift Proxy"
-    product_type = "redshiftproxy"
     product_base_type = "redshiftproxy"
+    product_type = product_base_type
+
     icon = "magic"
     description = "Export Redshift Proxy (.rs)"
 

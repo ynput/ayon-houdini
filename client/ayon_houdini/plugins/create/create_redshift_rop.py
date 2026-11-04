@@ -13,8 +13,8 @@ class CreateRedshiftROP(plugin.RenderLegacyProductTypeCreator):
     identifier = "io.openpype.creators.houdini.redshift_rop"
     label = "Redshift ROP"
     description = "Create Redshift ROP for rendering with Redshift"
-    legacy_product_type = "redshift_rop"
     product_base_type = "render"
+    product_type = product_base_type
     icon = "magic"
     ext = "exr"
     multi_layered_mode = "1"  # No Multi-Layered EXR File

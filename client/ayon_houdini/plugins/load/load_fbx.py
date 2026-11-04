@@ -18,7 +18,8 @@ class FbxLoader(plugin.HoudiniLoader):
 
     order = -10
 
-    product_types = {"*"}
+    product_base_types = {"*"}
+    product_types = product_base_types
     representations = {"*"}
     extensions = {"fbx"}
 
@@ -66,6 +67,11 @@ class FbxLoader(plugin.HoudiniLoader):
 
         # Update attribute
         node.setParms({"representation": context["representation"]["id"]})
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def remove(self, container):
         node = container["node"]

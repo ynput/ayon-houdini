@@ -62,6 +62,7 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         super(HoudiniHost, self).__init__()
         self._op_events = {}
         self._has_been_setup = False
+        self.hou_initialized = False
 
     def get_app_information(self):
         from ayon_core.host import ApplicationInformation

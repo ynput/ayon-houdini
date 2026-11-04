@@ -12,7 +12,8 @@ class ShowInUsdview(plugin.HoudiniLoader):
 
     label = "Show in usdview"
     representations = {"*"}
-    product_types = {"*"}
+    product_base_types = {"*"}
+    product_types = product_base_types
     extensions = {"usd", "usda", "usdlc", "usdnc", "abc"}
     order = 15
 

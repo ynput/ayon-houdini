@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import pyblish.api
-from ayon_core.pipeline import PublishValidationError
+from ayon_core.pipeline import (
+    PublishValidationError,
+    OptionalPyblishPluginMixin
+)
 from ayon_houdini.api.action import (
     SelectInvalidAction,
     SelectROPAction,
@@ -10,7 +13,8 @@ from ayon_houdini.api.lib import get_obj_node_output
 import hou
 
 
-class ValidateFBXOutputNode(plugin.HoudiniInstancePlugin):
+class ValidateFBXOutputNode(plugin.HoudiniInstancePlugin,
+                            OptionalPyblishPluginMixin):
     """Validate the instance Output Node.
 
     This will ensure:
@@ -27,6 +31,8 @@ class ValidateFBXOutputNode(plugin.HoudiniInstancePlugin):
     actions = [SelectROPAction, SelectInvalidAction]
 
     def process(self, instance):
+        if not self.is_active(instance.data):
+            return
 
         invalid = self.get_invalid(instance)
         if invalid:

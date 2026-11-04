@@ -42,7 +42,7 @@ def copy_instance_data(instance_src, instance_dest, attr):
             break
 
         src_value = src_data[key]
-        if i != len(key):
+        if i != len(keys) - 1:
             dest_data = dest_data.setdefault(key, {})
             if not isinstance(dest_data, dict):
                 raise KnownPublishError("Destination must be a dict.")
@@ -128,20 +128,6 @@ class CollectUsdLayers(plugin.HoudiniInstancePlugin):
                 self.log.debug(
                     "Created by: %s", creator_node.path()
                 )
-
-            # Skip any explicit save layer that is created by a geoclipsequence
-            # node, because this will be the topology layer - which will be
-            # included with a USD instance relatively by the
-            # CollectUSDValueClips plug-in
-            # Note: `geoclipsequence` nodes do not have explicit save control.
-            # If explicit save controls are present, they are most likely
-            # created by another node.
-            if (
-                creator_node
-                and creator_node.type().name() == "geoclipsequence"
-                and save_control != "Explicit"
-            ):
-                continue
 
             save_layers.append((layer, save_path, creator_node))
 

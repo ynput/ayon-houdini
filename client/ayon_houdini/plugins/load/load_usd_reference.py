@@ -12,10 +12,11 @@ from ayon_houdini.api import (
 class USDReferenceLoader(plugin.HoudiniLoader):
     """Reference USD file in Solaris"""
 
-    product_types = {
+    product_base_types = {
         "usd",
         "usdCamera",
     }
+    product_types = product_base_types
     label = "Reference USD"
     representations = {"*"}
     extensions = {"usd", "usda", "usdlc", "usdnc", "abc"}
@@ -52,6 +53,7 @@ class USDReferenceLoader(plugin.HoudiniLoader):
             "namespace": namespace,
             "loader": str(self.__class__.__name__),
             "representation": context["representation"]["id"],
+            "project_name": context["project"]["name"],
         }
 
         # todo: add folder="AYON"
@@ -70,8 +72,13 @@ class USDReferenceLoader(plugin.HoudiniLoader):
         node.setParms(
             {
                 "filepath1": file_path,
-                "representation": context["representation"]["id"],
+                "representation": context["representation"]["id"]
             }
+        )
+        lib.imprint(
+            node,
+            {"project_name": context["project"]["name"]},
+            update=True
         )
 
         # Reload files

@@ -1,10 +1,12 @@
+from __future__ import annotations
 from typing import Any
 import hou
 
 from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.workfile.workfile_template_builder import (
     AbstractTemplateBuilder,
-    PlaceholderPlugin
+    PlaceholderPlugin,
+    PlaceholderItem,
 )
 from ayon_core.tools.workfile_template_build import (
     WorkfileBuildPlaceholderDialog,
@@ -68,7 +70,7 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
 
     attr_prefix: str = "AYON_placeholder_"
 
-    def get_placeholder_node_name(self, placeholder_data):
+    def get_placeholder_node_name(self, placeholder_data) -> str:
         return self.identifier.replace(".", "_")
 
     def create_placeholder_node(self, node_name=None):
@@ -98,7 +100,7 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         placeholder_data["plugin_identifier"] = self.identifier
         self._imprint(placeholder_node, placeholder_data)
 
-    def collect_scene_placeholders(self):
+    def collect_scene_placeholders(self) -> list[hou.Node]:
         # Read the cache by identifier
         placeholder_nodes = self.builder.get_shared_populate_data(
             self.identifier
@@ -119,6 +121,18 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
                 )
 
         return placeholder_nodes
+
+    def collect_placeholders(self) -> list[PlaceholderItem]:
+        output = []
+        placeholder_nodes = self.collect_scene_placeholders()
+
+        for node in placeholder_nodes:
+            placeholder_data = self._read(node)
+            output.append(
+                PlaceholderItem(node.path(), placeholder_data, self)
+            )
+
+        return output
 
     def update_placeholder(self, placeholder_item, placeholder_data):
         placeholder_node = hou.node(placeholder_item.scene_identifier)
@@ -167,11 +181,28 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
         return data
 
 
-def build_workfile_template(*args, **kwargs):
-    # NOTE Should we inform users that they'll lose unsaved changes ?
+def trigger_on_app_launch() -> None:
+    """Build the workfile template during application
+    launch if the setting is enabled.
+    """
     builder = HoudiniTemplateBuilder(registered_host())
-    builder.build_template(*args, **kwargs)
+    builder.trigger_on_app_launch()
 
+
+def trigger_on_new_file() -> None:
+    """Build the workfile template during new file creation
+    if the setting is enabled.
+    """
+    builder = HoudiniTemplateBuilder(registered_host())
+    builder.trigger_on_new_file()
+
+
+def build_workfile_template(*args, **kwargs):
+    builder = HoudiniTemplateBuilder(registered_host())
+    preset = builder.get_template_preset()
+    if not preset.has_valid_path():
+        return
+    builder.build_template(preset=preset)
 
 def update_workfile_template(*args):
     builder = HoudiniTemplateBuilder(registered_host())

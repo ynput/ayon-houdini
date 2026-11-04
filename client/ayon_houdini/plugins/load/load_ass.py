@@ -10,7 +10,8 @@ from ayon_houdini.api import (
 class AssLoader(plugin.HoudiniLoader):
     """Load .ass with Arnold Procedural"""
 
-    product_types = {"ass"}
+    product_base_types = {"ass"}
+    product_types = product_base_types
     label = "Load Arnold Procedural"
     representations = {"*"}
     extensions = {"ass"}
@@ -53,6 +54,11 @@ class AssLoader(plugin.HoudiniLoader):
             "ar_filename": self.format_path(context),
             "representation": context["representation"]["id"]
         })
+        lib.imprint(
+            procedural,
+            {"project_name": context["project"]["name"]},
+            update=True
+        )
 
     def remove(self, container):
         node = container["node"]
