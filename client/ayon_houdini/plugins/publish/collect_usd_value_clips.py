@@ -1,6 +1,5 @@
 import os
 import hou
-import clique
 from typing import Optional
 
 import pyblish.api
@@ -211,21 +210,11 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         """
         # TODO: We may want to process this node in the Context Options of the
         #  USD ROP to be correct in the case of e.g. multishot workflows
-        clipfilepath: str = clip_node.parm(parm_name).evalAtFrame(start)
+        clipfilepath_parm: hou.Parm = clip_node.parm(parm_name)
 
-        frame_collection, _ = clique.assemble(
-            [clipfilepath],
-            patterns=[clique.PATTERNS["frames"]],
-            minimum_items=1
-        )
-
-        # Skip if no frame pattern detected.
-        if not frame_collection:
-            self.log.warning(
-                f"Unable detect frame sequence in filepath: {clipfilepath}"
-            )
-            # Assume it's some form of static clip file in this scenario
-            return [clipfilepath]
+        # A path without a frame token is a static clip file
+        if not clipfilepath_parm.isTimeDependent():
+            return [clipfilepath_parm.evalAtFrame(start)]
 
         # Collect the clip frames that fall within the render range
         # because those will be the clip frames to be written out.
@@ -238,11 +227,11 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
             range_end=end
         )
 
-        # It's always expected to be one collection.
-        frame_collection = frame_collection[0]
-        frame_collection.indexes.clear()
-        frame_collection.indexes.update(frames)
-        return list(frame_collection)
+        # Evaluate the path per clip frame so that any frame token style
+        # is supported, e.g. `clip.$F4.usd` or `clip_$F4.usd`
+        return [
+            clipfilepath_parm.evalAtFrame(frame) for frame in sorted(frames)
+        ]
 
     def _find_instance_by_explict_save_layer(
         self,
