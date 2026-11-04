@@ -22,6 +22,7 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
     identifier = "io.ayon.creators.houdini.rop_publish"
     label = "AYON Publish"
     product_type = "rop_publish"  # TODO: Come up with better name
+    product_base_type = "rop_publish"  # TODO: Come up with better name
     icon = "cubes"
     description = "Create AYON publish ROP "
 
@@ -56,7 +57,7 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
             # Ordered by appearance in the UI
             "id",
             "productType",
-            "active"
+            "active",
             "creator_identifier",
             "variant",
             "folderPath",
@@ -75,6 +76,11 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
             if isinstance(value, str) and value.startswith(lib.JSON_PREFIX):
                 value = json.loads(value[len(lib.JSON_PREFIX):])
             result[attr] = value
+
+        # The HDA parm is still named 'productType' (renaming it would break
+        # already saved scenes). Expose the current 'productBaseType' key that
+        # the creator framework expects, falling back to the parm value.
+        result["productBaseType"] = result["productType"]
 
         # Creator attributes and publish attributes must be dict to avoid
         # bugs in publisher UI

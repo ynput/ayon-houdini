@@ -1,7 +1,7 @@
 # Automatically generated script
 \set noalias = 1
 #
-#  Creation script for ynput::dev::ayon_publish::1.7 operator
+#  Creation script for ayon::ayon_publish::1.0 operator
 #
 
 if ( "$arg1" == "" ) then
@@ -9,7 +9,7 @@ if ( "$arg1" == "" ) then
     exit
 endif
 
-# Node $arg1 (ynput::dev::Driver/ayon_publish::1.7)
+# Node $arg1 (ayon::Driver/ayon_publish::1.0)
 opspareds "" $arg1
 opexprlanguage -s hscript $arg1
 opuserdata -n '___Version___' -v '' $arg1

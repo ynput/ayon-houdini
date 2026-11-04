@@ -1,7 +1,7 @@
-# Dialog script for ynput::dev::ayon_publish::1.7 automatically generated
+# Dialog script for ayon::ayon_publish::1.0 automatically generated
 
 {
-    name	ynput::dev::ayon_publish::1.7
+    name	ayon::ayon_publish::1.0
     script	AyonPub
     label	"AYON Publish"
 

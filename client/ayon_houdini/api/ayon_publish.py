@@ -2,11 +2,43 @@ import logging
 import re
 
 import hou
-import pyblish
+import pyblish.api
+import pyblish.util
 
 from ayon_houdini.api import lib
 from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.create import CreateContext
+
+log = logging.getLogger(__name__)
+
+#: Node type name of the AYON Publish ROP. The lookup is done on the type name
+#: only, so it keeps working across HDA namespace and version changes.
+AYON_PUBLISH_NODE_NAME = "ayon_publish"
+
+
+class AyonPublishError(RuntimeError):
+    """Raised when a publish triggered from an AYON Publish node fails."""
+
+
+def is_ayon_publish_node(node) -> bool:
+    """Return whether the given node is an AYON Publish ROP node.
+
+    The check is done on the node type name only, so a new HDA namespace or
+    version (e.g. ``ynput::dev::ayon_publish::1.7`` -> ``ayon::ayon_publish
+    ::1.0``) does not silently stop matching.
+
+    Args:
+        node (hou.Node | None): Node to test.
+
+    Returns:
+        bool: Whether the node is an AYON Publish ROP node.
+    """
+    if node is None or node.type().category() != hou.ropNodeTypeCategory():
+        return False
+    components = node.type().nameComponents()
+    # (namespace, namespace, name, version), e.g.
+    # ('', 'ayon', 'ayon_publish', '1.0')
+    return len(components) == 4 and components[2] == AYON_PUBLISH_NODE_NAME
 
 
 def publish(node_path: str):
@@ -15,13 +47,19 @@ def publish(node_path: str):
     This does not save any changed instance data but only does the single
     publish run with the customized data on the instances for that publish run.
 
+    Raises:
+        AyonPublishError: When any publish plugin reported an error. The error
+            is also set on the node so the ROP shows up as failed.
+
     """
+    node = hou.node(node_path)
+    if node is not None:
+        # Clear an error left behind by a previous publish run, so a retry
+        # does not stay red for a problem that has been fixed.
+        node.clearErrors()
+
     host = registered_host()
     assert host, "No registered host."
-
-    logging.basicConfig()
-    log = logging.getLogger("publish-from-code")
-    log.setLevel(logging.ERROR)
 
     create_context = CreateContext(host)
 
@@ -49,15 +87,25 @@ def publish(node_path: str):
         if "IncrementCurrentFile" not in str(plugin)
     ]
 
+    errors = []
     for result in pyblish.util.publish_iter(pyblish_context, filtered_plugins):
         log.debug(result)
         for record in result["records"]:
-            log.debug("{}: {}".format(result["plugin"].label, record.msg))
+            log.debug("%s: %s", result["plugin"].label, record.msg)
 
-        # Exit as soon as any error occurs.
         if result["error"]:
             error_message = error_format.format(**result)
-            log.debug(error_message)
+            log.error(error_message)
+            errors.append(error_message)
+
+    if errors:
+        if node is not None:
+            node.addError(
+                "AYON publish failed: {} error(s), see the log for "
+                "details".format(len(errors)))
+        raise AyonPublishError(
+            "Publishing '{}' failed:\n{}".format(
+                node_path, "\n".join(errors)))
 
 
 def set_ayon_publish_nodes_pre_render_script(
@@ -67,9 +115,7 @@ def set_ayon_publish_nodes_pre_render_script(
     node_list.extend(rop_node.inputAncestors())
     for node in node_list:
 
-        if node.type() == hou.nodeType(
-            hou.ropNodeTypeCategory(), "ynput::dev::ayon_publish::1.7"
-        ):
+        if is_ayon_publish_node(node):
             node.parm("prerender").set(val)
 
 
