@@ -10,5 +10,5 @@ ayon_required_addons = {
     "core": ">=1.9.9",
 }
 ayon_compatible_addons = {
-    "deadline": ">=0.7.0",
+    "deadline": ">=0.7.6",
 }
