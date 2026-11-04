@@ -16,6 +16,13 @@ def get_clip_frames_in_frame_range(
         range_end: int):
     """Calculate which clip frames are visible in the given frame range.
 
+    Note:
+        Returns an empty set when the range doesn't overlap the clip, i.e.
+        it ends before the clip start, or starts after the clip end + 1
+        when the clip has an end and doesn't loop. Houdini then holds a
+        single clip frame, which `ValidateUSDGeoClipSequenceFrameRange`
+        reports.
+
     Args:
         clip_start: Start frame of clip (X)
         clip_end: End frame of clip (Y)
