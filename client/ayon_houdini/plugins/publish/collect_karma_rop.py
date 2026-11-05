@@ -21,7 +21,7 @@ class CollectKarmaROPRenderProducts(plugin.HoudiniInstancePlugin):
     label = "Karma ROP Render Products"
     # This specific order value is used so that
     # this plugin runs after CollectFrames
-    order = pyblish.api.CollectorOrder + 0.11
+    order = pyblish.api.CollectorOrder - 0.4
     families = ["karma_rop"]
 
     def process(self, instance):
