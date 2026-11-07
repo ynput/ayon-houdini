@@ -69,20 +69,29 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
             self.log.warning(f"Cannot be resolved: {unresolved}")
 
         self.log.debug(f"Collecting USD: {filepath}")
-        src_root_dir = os.path.dirname(filepath)
 
         # Used to compare resolved paths against
-        filepath = Path(filepath)
+        filepath = Path(filepath).resolve()
+        src_root_dir = filepath.parent
 
         # We keep the relative paths to the USD file
         transfers = instance.data.setdefault("transfers", [])
         publish_root = instance.data["publishDir"]
         for src in paths:
 
-            if filepath == Path(src):
+            src_path = Path(src).resolve()
+            if filepath == src_path:
                 continue
 
-            relative_path = os.path.relpath(src, start=src_root_dir)
+            try:
+                relative_path = src_path.relative_to(src_root_dir)
+            except ValueError:
+                self.log.debug(
+                    "Skipping external dependency outside component "
+                    f"directory: {src}"
+                )
+                continue
+
             self.log.debug(f"Collected dependency: {relative_path}")
             dest = os.path.normpath(os.path.join(publish_root, relative_path))
             transfers.append((src, dest))
