@@ -8,6 +8,7 @@ from ayon_houdini.api import (
 )
 
 COPNET_NAME = "COPNET"
+MANAGED_COPNET_KEY = "ayon:managed_image_copnet"
 
 
 def get_image_ayon_container():
@@ -23,6 +24,7 @@ def get_image_ayon_container():
         image_container = root_container.createNode(
             "copnet", node_name=COPNET_NAME
         )
+        image_container.setUserData(MANAGED_COPNET_KEY, "1")
         image_container.moveToGoodPosition()
 
     return image_container
@@ -127,7 +129,9 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
 
         node.destroy()
 
-        if parent.path() == f"{pipeline.AYON_CONTAINERS}/{COPNET_NAME}":
+        if (parent.path() == f"{pipeline.AYON_CONTAINERS}/{COPNET_NAME}"
+                and parent.userData(MANAGED_COPNET_KEY) == "1"
+                and not parent.children()):
             parent.destroy()
 
     def switch(self, container, representation):
