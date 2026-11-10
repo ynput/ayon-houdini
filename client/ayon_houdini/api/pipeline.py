@@ -37,6 +37,7 @@ log = logging.getLogger("ayon_houdini")
 
 AYON_CONTAINERS = "/obj/AYON_CONTAINERS"
 CONTEXT_CONTAINER = "/obj/AYONContext"
+WORKFILE_EXTENSIONS = (".hip", ".hiplc", ".hipnc")
 
 # legacy backwards compatibility
 LEGACY_AVALON_CONTAINERS = "/obj/AVALON_CONTAINERS"
@@ -134,7 +135,7 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         return hou.hipFile.hasUnsavedChanges()
 
     def get_workfile_extensions(self):
-        extensions = [".hip", ".hiplc", ".hipnc"]
+        extensions = list(WORKFILE_EXTENSIONS)
         # Workfiles uses the first extension for a new scene.
         category = hou.licenseCategory()
         if category == hou.licenseCategoryType.Indie:
@@ -178,7 +179,7 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         )
         if (
             filename == "untitled"
-            and extension in self.get_workfile_extensions()
+            and extension in WORKFILE_EXTENSIONS
             and not os.path.exists(current_filepath)
         ):
             # Houdini gives new scenes an untitled path before saving.
