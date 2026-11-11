@@ -37,6 +37,7 @@ log = logging.getLogger("ayon_houdini")
 
 AYON_CONTAINERS = "/obj/AYON_CONTAINERS"
 CONTEXT_CONTAINER = "/obj/AYONContext"
+WORKFILE_EXTENSIONS = (".hip", ".hiplc", ".hipnc")
 
 # legacy backwards compatibility
 LEGACY_AVALON_CONTAINERS = "/obj/AVALON_CONTAINERS"
@@ -134,7 +135,21 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         return hou.hipFile.hasUnsavedChanges()
 
     def get_workfile_extensions(self):
-        return [".hip", ".hiplc", ".hipnc"]
+        extensions = list(WORKFILE_EXTENSIONS)
+        # Workfiles uses the first extension for a new scene.
+        category = hou.licenseCategory()
+        if category == hou.licenseCategoryType.Indie:
+            preferred_extension = ".hiplc"
+        elif category in (
+            hou.licenseCategoryType.Apprentice,
+            hou.licenseCategoryType.ApprenticeHD,
+        ):
+            preferred_extension = ".hipnc"
+        else:
+            preferred_extension = ".hip"
+        extensions.remove(preferred_extension)
+        extensions.insert(0, preferred_extension)
+        return extensions
 
     def save_workfile(self, dst_path=None):
         # Force forwards slashes to avoid segfault
@@ -159,11 +174,16 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
 
     def get_current_workfile(self):
         current_filepath = hou.hipFile.path()
-        if (os.path.basename(current_filepath) == "untitled.hip" and
-                not os.path.exists(current_filepath)):
-            # By default a new scene in houdini is saved in the current
-            # working directory as "untitled.hip" so we need to capture
-            # that and consider it 'not saved' when it's in that state.
+        filename, extension = os.path.splitext(
+            os.path.basename(current_filepath)
+        )
+        if (
+            filename == "untitled"
+            and extension in WORKFILE_EXTENSIONS
+            and not os.path.exists(current_filepath)
+        ):
+            # Houdini gives new scenes an untitled path before saving.
+            # Preserve that path if it points to an existing workfile.
             return None
 
         return current_filepath
