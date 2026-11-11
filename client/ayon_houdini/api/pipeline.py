@@ -7,6 +7,7 @@ import warnings
 from typing import Optional
 
 import hou  # noqa
+import ayon_api
 
 from ayon_core.host import HostBase, IWorkfileHost, ILoadHost, IPublishHost
 from ayon_core.tools.utils import host_tools
@@ -17,6 +18,7 @@ from ayon_core.pipeline import (
     register_loader_plugin_path,
     register_inventory_action_path,
     register_workfile_build_plugin_path,
+    registered_host,
     AVALON_CONTAINER_ID,
     AYON_CONTAINER_ID,
 )
@@ -28,6 +30,7 @@ from ayon_core.lib import (
     register_event_callback,
     emit_event,
     env_value_to_bool,
+    get_version_from_path,
 )
 
 from .lib import JSON_PREFIX
@@ -56,6 +59,47 @@ WORKFILE_BUILD_PATH = os.path.join(PLUGINS_DIR, "workfile_build")
 _about_to_save = False
 
 
+def get_license_workfile_extension():
+    """Return the workfile extension Houdini saves with for its license.
+
+    Houdini forces this extension on save, e.g. saving 'file.hip' with an
+    Indie license writes 'file.hiplc'.
+
+    Returns:
+        str: '.hip', '.hiplc' or '.hipnc'.
+
+    """
+    category = hou.licenseCategory()
+    if category == hou.licenseCategoryType.Indie:
+        return ".hiplc"
+    if category in (
+        hou.licenseCategoryType.Apprentice,
+        hou.licenseCategoryType.ApprenticeHD,
+        hou.licenseCategoryType.Education,
+    ):
+        return ".hipnc"
+    return ".hip"
+
+
+def to_license_workfile_path(path):
+    """Change a workfile path's extension to the license's extension.
+
+    Paths that don't end with a Houdini workfile extension are returned
+    unchanged.
+
+    Args:
+        path (str): Workfile path, absolute or rootless.
+
+    Returns:
+        str: The path with the extension Houdini will save it with.
+
+    """
+    base, extension = os.path.splitext(path)
+    if extension.lower() not in WORKFILE_EXTENSIONS:
+        return path
+    return base + get_license_workfile_extension()
+
+
 class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
     name = "houdini"
 
@@ -64,6 +108,10 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         self._op_events = {}
         self._has_been_setup = False
         self.hou_initialized = False
+        # Core creates the workfile entity itself after a context save.
+        self._saving_with_context = False
+        # Workfiles known to have an entity, to skip server calls on resave.
+        self._registered_workfiles = set()
 
     def get_app_information(self):
         from ayon_core.host import ApplicationInformation
@@ -76,10 +124,11 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         elif hou_name == "houdinifx":
             app_name = "Houdini FX"
 
-        elif hou_name == "happrentice":
+        elif hou_name in ("happrentice", "hindie"):
+            # The license name added below tells these apart
             app_name = "Houdini"
         else:
-            print(f"Unknown houdini app name: {hou_name}")
+            log.debug(f"Unknown houdini app name: {hou_name}")
             app_name = "Houdini"
 
         full_app_name = f"{app_name} {license_name}"
@@ -137,24 +186,118 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
     def get_workfile_extensions(self):
         extensions = list(WORKFILE_EXTENSIONS)
         # Workfiles uses the first extension for a new scene.
-        category = hou.licenseCategory()
-        if category == hou.licenseCategoryType.Indie:
-            preferred_extension = ".hiplc"
-        elif category in (
-            hou.licenseCategoryType.Apprentice,
-            hou.licenseCategoryType.ApprenticeHD,
-        ):
-            preferred_extension = ".hipnc"
-        else:
-            preferred_extension = ".hip"
+        preferred_extension = get_license_workfile_extension()
         extensions.remove(preferred_extension)
         extensions.insert(0, preferred_extension)
         return extensions
 
+    def save_workfile_with_context(
+        self,
+        filepath,
+        folder_entity,
+        task_entity,
+        *,
+        version=None,
+        comment=None,
+        description=None,
+        prepared_data=None,
+    ):
+        # Houdini saves with the license's extension whatever path it gets,
+        # so fix the path before Core records it on the workfile entity.
+        filepath = to_license_workfile_path(filepath)
+        if prepared_data is not None and prepared_data.rootless_path:
+            prepared_data.rootless_path = to_license_workfile_path(
+                prepared_data.rootless_path
+            )
+        self._saving_with_context = True
+        try:
+            super().save_workfile_with_context(
+                filepath,
+                folder_entity,
+                task_entity,
+                version=version,
+                comment=comment,
+                description=description,
+                prepared_data=prepared_data,
+            )
+        finally:
+            self._saving_with_context = False
+        self._registered_workfiles.add(filepath.replace("\\", "/"))
+
+    def register_saved_workfile(self):
+        """Create a workfile entity for a scene saved outside AYON.
+
+        Saves through AYON create the entity themselves. Other saves (Ctrl+S,
+        the publish 'Save current file' step, Houdini changing the extension
+        to match its license) write a file in the work folder with no entity,
+        so the Workfiles tool doesn't know it.
+
+        Only files in the current task's work folder are registered.
+
+        """
+        if self._saving_with_context:
+            return
+
+        filepath = self.get_current_workfile()
+        if not filepath:
+            return
+        filepath = filepath.replace("\\", "/")
+        if filepath in self._registered_workfiles:
+            return
+
+        workdir = os.environ.get("AYON_WORKDIR")
+        if not workdir or (
+            os.path.normcase(os.path.normpath(os.path.dirname(filepath)))
+            != os.path.normcase(os.path.normpath(workdir))
+        ):
+            return
+
+        try:
+            from ayon_core.host.interfaces import get_save_workfile_context
+        except ImportError:
+            # Older ayon-core without workfile entities support
+            return
+
+        context = self.get_current_context()
+        project_name = context["project_name"]
+        folder_entity = ayon_api.get_folder_by_path(
+            project_name, context["folder_path"]
+        )
+        if not folder_entity:
+            return
+        task_entity = ayon_api.get_task_by_name(
+            project_name, folder_entity["id"], context["task_name"]
+        )
+        if not task_entity:
+            return
+
+        save_context = get_save_workfile_context(
+            project_name,
+            filepath,
+            folder_entity,
+            task_entity,
+            host_name=self.name,
+            prepared_data=None,
+        )
+        rootless_path = save_context.rootless_path
+        if not any(
+            workfile_entity["path"] == rootless_path
+            for workfile_entity in save_context.workfile_entities
+        ):
+            version_str = get_version_from_path(filepath)
+            self._save_workfile_entity(
+                save_context,
+                int(version_str) if version_str else None,
+                None,
+                None,
+            )
+            log.info(f"Registered workfile: {filepath}")
+        self._registered_workfiles.add(filepath)
+
     def save_workfile(self, dst_path=None):
-        # Force forwards slashes to avoid segfault
         if dst_path:
-            dst_path = dst_path.replace("\\", "/")
+            # Force forwards slashes to avoid segfault
+            dst_path = to_license_workfile_path(dst_path.replace("\\", "/"))
         hou.hipFile.save(file_name=dst_path,
                          save_to_recent_files=True)
         return dst_path
@@ -182,8 +325,8 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             and extension in WORKFILE_EXTENSIONS
             and not os.path.exists(current_filepath)
         ):
-            # Houdini gives new scenes an untitled path before saving.
-            # Preserve that path if it points to an existing workfile.
+            # Houdini gives new scenes an 'untitled' path before they are
+            # saved. A file that really exists under that name is a workfile.
             return None
 
         return current_filepath
@@ -385,6 +528,12 @@ def before_save():
 
 
 def on_save():
+    try:
+        registered_host().register_saved_workfile()
+    except Exception:
+        # Never break a save because the server can't be reached
+        log.warning("Failed to register the saved workfile.", exc_info=True)
+
     if not hou.isUIAvailable():
         log.debug("Batch mode detected, ignoring `on_save` callbacks..")
         return
