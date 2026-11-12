@@ -100,25 +100,25 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
         """Perform the render by node, it would raise Exception
         once there is error found.
 
+        The error is also displayed on the node itself, see
+        :func:`ayon_publish.set_node_error`.
+
         Args:
             node (hou.RopNode): rop node
         """
         try:
             node.render()
 
-        except hou.OperationFailed as e:
-            node.addError(f"Operation failed: {e}")
-            self.log.error(f"Operation error on {node.path()}: {e}")
-            raise
-        except hou.PermissionError as e:
-            node.addError(f"Permission error: {e}")
-            self.log.error(f"Permission error on {node.path()}: {e}")
-            raise
         except hou.Error as e:
-            node.addError(f"Houdini error: {e}")
-            self.log.error(f"Houdini error on {node.path()}: {e}")
+            ayon_publish.set_node_error(
+                node, "Houdini error: {}".format(e))
+            self.log.error(
+                "Houdini error on '%s': %s", node.path(), e, exc_info=True)
             raise
         except Exception as e:
-            node.addError(f"Unexpected error: {e}")
-            self.log.error(f"Unexpected error on {node.path()}: {e}")
+            ayon_publish.set_node_error(
+                node, "Unexpected error: {}".format(e))
+            self.log.error(
+                "Unexpected error on '%s': %s", node.path(), e,
+                exc_info=True)
             raise

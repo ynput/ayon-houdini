@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 
@@ -8,6 +9,7 @@ import pyblish.util
 from ayon_houdini.api import lib
 from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.create import CreateContext
+from ayon_core.pipeline.publish import PublishError
 
 log = logging.getLogger(__name__)
 
@@ -15,9 +17,91 @@ log = logging.getLogger(__name__)
 #: only, so it keeps working across HDA namespace and version changes.
 AYON_PUBLISH_NODE_NAME = "ayon_publish"
 
+#: Node user data key storing the appearance of the node before it was
+#: marked as failed by :func:`set_node_error`.
+NODE_ERROR_STATE_KEY = "ayon_publish_error_state"
 
-class AyonPublishError(RuntimeError):
-    """Raised when a publish triggered from an AYON Publish node fails."""
+#: Color used to mark an AYON Publish node that failed to publish.
+NODE_ERROR_COLOR = hou.Color((1.0, 0.2, 0.2))
+
+
+def set_node_error(node: "hou.Node | None", message: str) -> None:
+    """Display an error state on an AYON Publish node.
+
+    Houdini's :meth:`hou.OpNode.addError` may only be called on a node that
+    is currently cooking, so it cannot be relied upon from the publish or
+    pre-render context. Instead the node gets an error color and comment.
+    The original appearance is remembered in the node's user data so that
+    :func:`clear_node_error` can restore it.
+
+    Args:
+        node (hou.Node | None): Node to mark as failed.
+        message (str): Error message to display on the node.
+    """
+    if node is None:
+        return
+
+    # Remember the original color and comment only once, so repeated
+    # failures do not overwrite the state we need to restore later.
+    if not node.userDataDict().get(NODE_ERROR_STATE_KEY):
+        state = {
+            "color": list(node.color().rgb()),
+            "comment": node.comment() or "",
+        }
+        node.setUserData(NODE_ERROR_STATE_KEY, json.dumps(state))
+
+    node.setColor(NODE_ERROR_COLOR)
+    node.setComment("AYON publish FAILED: {}".format(message))
+
+    # `addError` is only allowed while the node is cooking, so treat the
+    # error badge as best effort; the color and comment above always show.
+    try:
+        node.addError(message)
+    except Exception:
+        log.debug(
+            "Could not add error badge to '%s'", node.path(),
+            exc_info=True,
+        )
+
+
+def clear_node_error(node: "hou.Node | None") -> None:
+    """Clear the error state of an AYON Publish node.
+
+    Restores the node color and comment that were present before
+    :func:`set_node_error` was called.
+
+    Args:
+        node (hou.Node | None): Node to clear the error state on.
+    """
+    if node is None:
+        return
+
+    # `clearErrors` is not available on all Houdini versions (and may be a
+    # no-op outside a cook), so guard the call.
+    clear_errors = getattr(node, "clearErrors", None)
+    if clear_errors is not None:
+        try:
+            clear_errors()
+        except Exception:
+            log.debug(
+                "Could not clear node errors on '%s'", node.path(),
+                exc_info=True,
+            )
+
+    stored = node.userDataDict().get(NODE_ERROR_STATE_KEY)
+    if not stored:
+        return
+
+    try:
+        state = json.loads(stored)
+    except (TypeError, ValueError):
+        state = {}
+
+    color = state.get("color")
+    if isinstance(color, (list, tuple)) and len(color) == 3:
+        node.setColor(hou.Color(tuple(color)))
+    node.setComment(state.get("comment", ""))
+    node.setUserData(NODE_ERROR_STATE_KEY, "")
 
 
 def is_ayon_publish_node(node) -> bool:
@@ -48,15 +132,15 @@ def publish(node_path: str):
     publish run with the customized data on the instances for that publish run.
 
     Raises:
-        AyonPublishError: When any publish plugin reported an error. The error
+        PublishError: When any publish plugin reported an error. The error
             is also set on the node so the ROP shows up as failed.
 
     """
     node = hou.node(node_path)
     if node is not None:
-        # Clear an error left behind by a previous publish run, so a retry
-        # does not stay red for a problem that has been fixed.
-        node.clearErrors()
+        # Clear an error state left behind by a previous publish run, so a
+        # retry does not stay marked as failed for a fixed problem.
+        clear_node_error(node)
 
     host = registered_host()
     assert host, "No registered host."
@@ -99,11 +183,11 @@ def publish(node_path: str):
             errors.append(error_message)
 
     if errors:
-        if node is not None:
-            node.addError(
-                "AYON publish failed: {} error(s), see the log for "
-                "details".format(len(errors)))
-        raise AyonPublishError(
+        set_node_error(
+            node,
+            "{} error(s), see the log for details".format(len(errors)),
+        )
+        raise PublishError(
             "Publishing '{}' failed:\n{}".format(
                 node_path, "\n".join(errors)))
 
