@@ -264,30 +264,57 @@ def containerise(name,
                  context,
                  loader=None,
                  suffix=""):
-    """Bundle `nodes` into a subnet and imprint it with metadata
+    """Imprint container node with metadata and move it into `AYON_CONTAINERS`.
 
-    Containerisation enables a tracking of version, author and origin
+    Containerisation enables tracking of version, author and origin
     for loaded products.
 
-    Arguments:
-        name (str): Name of resulting assembly
-        namespace (str): Namespace under which to host container
-        nodes (list): Long names of nodes to containerise
-        context (dict): Loaded product context information
+    Args:
+        name (str): Name of resulting assembly.
+        namespace (str): Namespace under which to host container.
+        nodes (list[hou.Node | str]): Created nodes or node paths, with the
+            container root first.
+        context (dict): Loaded product context information.
         loader (str, optional): Name of loader used to produce this container.
         suffix (str, optional): Suffix of container, defaults to `_CON`.
 
     Returns:
-        container (hou.Node): Name of container assembly
+        hou.Node: Container node.
+
+    Raises:
+        ValueError: If `nodes` is empty, `nodes[0]` cannot be resolved, or
+            `nodes[0]` cannot be parented under `AYON_CONTAINERS`.
 
     """
+    if not nodes:
+        raise ValueError(
+            "Expected at least one node to containerise '{}'.".format(name)
+        )
+
+    container = hou.node(nodes[0]) if isinstance(nodes[0], str) else nodes[0]
+    if container is None:
+        raise ValueError(
+            "Could not resolve container node {!r} for '{}'.".format(
+                nodes[0], name
+            )
+        )
 
     # Get AYON Containers subnet
     subnet = get_or_create_ayon_container()
+    if (
+        hasattr(subnet, "childTypeCategory")
+        and container.type().category() != subnet.childTypeCategory()
+    ):
+        raise ValueError(
+            "Container root '{}' must be a {} node, got {}.".format(
+                container.path(),
+                subnet.childTypeCategory().name(),
+                container.type().category().name(),
+            )
+        )
 
     # Create proper container name
     container_name = "{}_{}".format(name, suffix or "CON")
-    container = hou.node("/obj/{}".format(name))
     container.setName(container_name, unique_name=True)
 
     data = {
