@@ -82,22 +82,22 @@ def get_license_workfile_extension():
 
 
 def to_license_workfile_path(path):
-    """Change a workfile path's extension to the license's extension.
+    """Return the path with the extension Houdini saves it with.
 
-    Paths that don't end with a Houdini workfile extension are returned
-    unchanged.
+    Houdini saves with its license's extension, e.g. 'file.hip' with an
+    Indie license becomes 'file.hiplc'. A path that already has the
+    license's extension comes back unchanged, so it is safe to call on any
+    workfile path. The returned extension is always lower case.
 
     Args:
-        path (str): Workfile path, absolute or rootless.
+        path (str): Workfile path ending with '.hip', '.hiplc' or '.hipnc',
+            absolute or rootless.
 
     Returns:
-        str: The path with the extension Houdini will save it with.
+        str: The path with the license's extension.
 
     """
-    base, extension = os.path.splitext(path)
-    if extension.lower() not in WORKFILE_EXTENSIONS:
-        return path
-    return base + get_license_workfile_extension()
+    return os.path.splitext(path)[0] + get_license_workfile_extension()
 
 
 class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
