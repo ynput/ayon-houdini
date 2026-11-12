@@ -515,7 +515,7 @@
         label   "soho_program"
         type    string
         invisible
-        default { "ayon_pub.py" }
+        default { "ayon_publish.py" }
         parmtag { "script_callback_language" "python" }
     }
     parm {
