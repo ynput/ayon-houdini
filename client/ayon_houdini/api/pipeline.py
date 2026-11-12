@@ -108,7 +108,9 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         self._op_events = {}
         self._has_been_setup = False
         self.hou_initialized = False
-        # Core creates the workfile entity itself after a context save.
+        # True while 'save_workfile_with_context' runs, so
+        # 'register_saved_workfile' skips that save: Core creates the
+        # workfile entity itself.
         self._saving_with_context = False
         # Workfiles known to have an entity, to skip server calls on resave.
         self._registered_workfiles = set()
@@ -209,6 +211,9 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             prepared_data.rootless_path = to_license_workfile_path(
                 prepared_data.rootless_path
             )
+        # Core saves the file (through 'save_workfile') and then creates the
+        # workfile entity. Houdini's AfterSave callback calls
+        # 'register_saved_workfile' during that save; the flag makes it skip.
         self._saving_with_context = True
         try:
             super().save_workfile_with_context(
@@ -222,15 +227,20 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             )
         finally:
             self._saving_with_context = False
+        # Core registered it, so later Ctrl+S saves skip the server lookup.
         self._registered_workfiles.add(filepath.replace("\\", "/"))
 
     def register_saved_workfile(self):
         """Create a workfile entity for a scene saved outside AYON.
 
-        Saves through AYON create the entity themselves. Other saves (Ctrl+S,
-        the publish 'Save current file' step, Houdini changing the extension
-        to match its license) write a file in the work folder with no entity,
-        so the Workfiles tool doesn't know it.
+        This doesn't save the scene. It runs from Houdini's AfterSave
+        callback ('on_save') after every save, and skips saves done by
+        'save_workfile_with_context', where Core creates the entity itself.
+
+        Other saves (Ctrl+S, the publish 'Save current file' step, Houdini
+        changing the extension to match its license) write a file with no
+        workfile entity. The Workfiles tool still lists it from disk, but
+        the launcher and the server only show registered workfiles.
 
         Only files in the current task's work folder are registered.
 
@@ -298,6 +308,8 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         self._registered_workfiles.add(filepath)
 
     def save_workfile(self, dst_path=None):
+        # Only saves the scene. The workfile entity is created by Core in
+        # 'save_workfile_with_context' or by 'register_saved_workfile'.
         if dst_path:
             # Force forwards slashes to avoid segfault
             dst_path = to_license_workfile_path(dst_path.replace("\\", "/"))
