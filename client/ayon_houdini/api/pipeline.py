@@ -241,7 +241,10 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         filepath = self.get_current_workfile()
         if not filepath:
             return
-        filepath = filepath.replace("\\", "/")
+        # Force lowercase in case an upper case extension was entered by
+        # the user.
+        base, extension = os.path.splitext(filepath.replace("\\", "/"))
+        filepath = base + extension.lower()
         if filepath in self._registered_workfiles:
             return
 
