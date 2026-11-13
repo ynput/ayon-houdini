@@ -1,6 +1,8 @@
 import json
 import contextlib
 
+from ayon_core.pipeline.create import ProductTypeItem
+
 from ayon_houdini.api import plugin, lib, ayon_publish
 
 import hou
@@ -17,7 +19,13 @@ def monkeypatch_attribute(obj, name, value):
 
 
 class CreateAyonPublishROP(plugin.HoudiniCreator):
-    """Creator plugin for creating publishes."""
+    """Creator plugin for creating publishes.
+
+    Note:
+        The "pointcache" and "vdbcache" product types are planned to be moved
+        to a dedicated AYON ROP Cache node in a separate PR. Until that node
+        exists they remain selectable on the AYON Publish ROP.
+    """
 
     identifier = ayon_publish.AYON_PUBLISH_CREATOR_IDENTIFIER
     label = "AYON Publish"
@@ -27,6 +35,24 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
     description = "Create AYON publish ROP"
 
     node_type = "ayon_publish"
+
+    def get_product_type_items(self) -> list[ProductTypeItem]:
+        """Return the product types selectable in the Publisher UI.
+
+        Product type items configured in the addon settings take precedence.
+        Otherwise the common AYON product types are offered, with the generic
+        ``rop_publish`` product type first so it remains the default.
+
+        Returns:
+            list[ProductTypeItem]: Selectable product type items.
+        """
+        if self.product_type_items:
+            return self.product_type_items
+
+        return [
+            ProductTypeItem(product_type=name, label=label)
+            for name, label in ayon_publish.get_product_types()
+        ]
 
     def get_network_categories(self):
         return [hou.ropNodeTypeCategory()]
@@ -80,7 +106,8 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
         # The HDA parm is still named 'productType' (renaming it would break
         # already saved scenes). Expose the current 'productBaseType' key that
         # the creator framework expects, falling back to the parm value.
-        result["productBaseType"] = result["productType"]
+        if not result.get("productBaseType"):
+            result["productBaseType"] = result["productType"]
 
         # Creator attributes and publish attributes must be dict to avoid
         # bugs in publisher UI

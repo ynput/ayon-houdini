@@ -156,6 +156,53 @@ def is_ayon_publish_node(node) -> bool:
     return len(components) == 4 and components[2] == AYON_PUBLISH_NODE_NAME
 
 
+#: Product types offered by the AYON Publish ROP. The generic "rop_publish"
+#: type is always offered first so that it remains the default.
+#:
+#: TODO: "pointcache" and "vdbcache" are planned to move to a dedicated AYON
+#:   ROP Cache node in a separate PR. They stay selectable here until that
+#:   node exists.
+DEFAULT_PRODUCT_TYPES = (
+    "rop_publish",
+    "model",
+    "pointcache",
+    "fbx",
+    "render",
+    "review",
+    "usd",
+    "vdbcache",
+    "look",
+)
+
+
+def get_product_types() -> list[tuple[str, str]]:
+    """Return the product types selectable on the AYON Publish ROP.
+
+    The common AYON product types are offered, with the generic
+    ``rop_publish`` product type first so that it remains the default.
+    Product type items can be customized through the creator settings.
+
+    Returns:
+        list[tuple[str, str]]: Product type name and label pairs.
+    """
+    return [(name, name) for name in DEFAULT_PRODUCT_TYPES]
+
+
+def get_product_type_menu() -> list[str]:
+    """Return dynamic Houdini menu items for the ROP productType parameter.
+
+    The menu items alternate between value and label, as expected by a
+    Houdini dynamic menu (``menureplace``) callback.
+
+    Returns:
+        list[str]: Alternating product type value and label entries.
+    """
+    menu = []
+    for value, label in get_product_types():
+        menu.extend([value, label])
+    return menu
+
+
 def publish(node_path: str):
     """Publish the given AYON Publish node.
 

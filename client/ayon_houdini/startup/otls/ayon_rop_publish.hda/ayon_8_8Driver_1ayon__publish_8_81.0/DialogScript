@@ -712,15 +712,10 @@
             label   "Product Type"
             type    string
             default { "rop_publish" }
+            help    "Product type to publish as. The menu lists the common AYON product types; other values can be typed manually."
             menureplace {
-                "fbx"           "fbx"
-                "model"         "model"
-                "pointcache"    "pointcache"
-                "render"        "render"
-                "review"        "review"
-                "usd"           "usd"
-                "vdbcache"      "vdbcache"
-                "look"          "look"
+                [ "hou.phm().get_product_type_menu(kwargs['node'])" ]
+                language python
             }
         }
         parm {

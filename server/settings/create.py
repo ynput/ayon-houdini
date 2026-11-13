@@ -30,6 +30,17 @@ class CreatorModel(BaseSettingsModel):
     )
 
 
+class CreateAyonPublishROPModel(CreatorModel):
+    product_type_items: list[ProductTypeItemModel] = SettingsField(
+        default_factory=list,
+        title="Product Type Items",
+        description=(
+            "Product types selectable for the AYON Publish ROP. When empty, "
+            "the common AYON product types are used."
+        )
+    )
+
+
 def review_node_types_enum():
     return [
         {"label": "OpenGL", "value": "opengl"},
@@ -205,6 +216,9 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateArnoldRop: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Arnold ROP")
+    CreateAyonPublishROP: CreateAyonPublishROPModel = SettingsField(
+        default_factory=CreateAyonPublishROPModel,
+        title="Create AYON Publish ROP")
     CreateCompositeSequence: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Composite (Image Sequence)")
@@ -289,6 +303,10 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
         "ext": ".ass"
     },
     "CreateArnoldRop": {
+        "enabled": True,
+        "default_variants": ["Main"]
+    },
+    "CreateAyonPublishROP": {
         "enabled": True,
         "default_variants": ["Main"]
     },
