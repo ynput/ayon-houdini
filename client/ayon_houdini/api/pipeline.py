@@ -264,30 +264,33 @@ def containerise(name,
                  context,
                  loader=None,
                  suffix=""):
-    """Bundle `nodes` into a subnet and imprint it with metadata
+    """Move `nodes[0]` into `AYON_CONTAINERS` and imprint it with metadata.
 
-    Containerisation enables a tracking of version, author and origin
-    for loaded products.
+    Containerisation enables tracking of version, author and origin
+    for loaded products. The first node in `nodes` becomes the container
+    itself (it is moved under `AYON_CONTAINERS`, renamed, and imprinted).
 
-    Arguments:
-        name (str): Name of resulting assembly
-        namespace (str): Namespace under which to host container
-        nodes (list): Long names of nodes to containerise
-        context (dict): Loaded product context information
+    Args:
+        name (str): Name of resulting assembly.
+        namespace (str): Namespace under which to host container.
+        nodes (list[hou.Node]): Created nodes with the container root first;
+            `nodes[0]` itself becomes the container node.
+        context (dict): Loaded product context information.
         loader (str, optional): Name of loader used to produce this container.
         suffix (str, optional): Suffix of container, defaults to `_CON`.
 
     Returns:
-        container (hou.Node): Name of container assembly
+        hou.Node: Container node inside `AYON_CONTAINERS`.
 
     """
+    container = nodes[0]
 
-    # Get AYON Containers subnet
+    # Move before renaming so uniqueness and node type are validated against
+    # AYON_CONTAINERS rather than /obj.
     subnet = get_or_create_ayon_container()
+    container = hou.moveNodesTo([container], subnet)[0]
 
-    # Create proper container name
     container_name = "{}_{}".format(name, suffix or "CON")
-    container = hou.node("/obj/{}".format(name))
     container.setName(container_name, unique_name=True)
 
     data = {
@@ -301,9 +304,6 @@ def containerise(name,
     }
 
     lib.imprint(container, data)
-
-    # "Parent" the container under the container network
-    container = hou.moveNodesTo([container], subnet)[0]
     container.moveToGoodPosition()
 
     return container
