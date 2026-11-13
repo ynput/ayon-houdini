@@ -373,7 +373,9 @@ def set_ayon_publish_nodes_pre_render_script(
 def get_rop_output(rop: hou.RopNode, frame_range=None) -> list:
     """Returns a list of output files a RopNode will generate on render.
 
-    It will use the frame range and replacement variables.
+    It will use the frame range and replacement variables. ROPs without a
+    ``trange`` parameter (e.g. some custom studio or FileCache style ROPs)
+    are treated as single output ROPs.
 
     Args:
         rop: Rop Node to get output files for.
@@ -383,12 +385,16 @@ def get_rop_output(rop: hou.RopNode, frame_range=None) -> list:
     Returns:
          List[str]: List of output files from the ROP node.
     """
-    renders_range = rop.parm("trange").eval()
     out_parm = lib.get_output_parameter(rop)
 
-    # Render Current Frame
-    if frame_range is None and renders_range == 0:
-        return [out_parm.eval()]
+    trange_parm = rop.parm("trange")
+    if frame_range is None:
+        if trange_parm is None:
+            # Custom ROP without a frame range parameter
+            return [out_parm.eval()]
+        if trange_parm.eval() == 0:
+            # Render Current Frame
+            return [out_parm.eval()]
 
     # Render Frame Range or Render Frame Range Only
     # Get the file path with $F as format-able part as path template.
@@ -406,17 +412,25 @@ def get_rop_output(rop: hou.RopNode, frame_range=None) -> list:
 
     path_template = re.sub("#+", replace, path)
 
-    inc = rop.parm("f3").eval()
     if frame_range is not None:
         # Use user specified frame range tuple (2 or 3 elements)
         # See Houdini `RopNode.render` arguments
         start = frame_range[0]
         end = frame_range[1]
-        if len(frame_range) == 3:
-            inc = frame_range[2]
+        inc = frame_range[2] if len(frame_range) == 3 else 1
     else:
-        start = rop.parm("f1").eval()
-        end = rop.parm("f2").eval()
+        start_parm = rop.parm("f1")
+        end_parm = rop.parm("f2")
+        if start_parm is None or end_parm is None:
+            # Frame range parameters are missing; fall back to single output
+            return [out_parm.eval()]
+        start = start_parm.eval()
+        end = end_parm.eval()
+        inc_parm = rop.parm("f3")
+        inc = inc_parm.eval() if inc_parm is not None else 1
+
+    if not inc:
+        inc = 1
 
     files = []
     for frame in range(int(start), int(end) + 1, int(inc)):
