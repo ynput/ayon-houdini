@@ -17,6 +17,11 @@ log = logging.getLogger(__name__)
 #: only, so it keeps working across HDA namespace and version changes.
 AYON_PUBLISH_NODE_NAME = "ayon_publish"
 
+#: Creator identifier of the AYON Publish ROP creator. Unlike the publish
+#: family this does not change when another product type (and thereby another
+#: product base type) is selected on the ROP.
+AYON_PUBLISH_CREATOR_IDENTIFIER = "io.ayon.creators.houdini.rop_publish"
+
 #: Node user data key storing the appearance of the node before it was
 #: marked as failed by :func:`set_node_error`.
 NODE_ERROR_STATE_KEY = "ayon_publish_error_state"
@@ -102,6 +107,32 @@ def clear_node_error(node: "hou.Node | None") -> None:
         node.setColor(hou.Color(tuple(color)))
     node.setComment(state.get("comment", ""))
     node.setUserData(NODE_ERROR_STATE_KEY, "")
+
+
+def is_rop_publish_instance(instance) -> bool:
+    """Return whether the given instance is published by an AYON Publish ROP.
+
+    AYON Publish ROP instances can carry additional product type families
+    (e.g. "model" or "pointcache") because the product type is chosen on the
+    ROP. Those families are not backed by a native ROP node, so the native
+    Houdini ROP publish plugins must not process these instances: their
+    output is collected by ``CollectAYONPublishOutputs`` instead.
+
+    Instances are recognized by the AYON Publish creator identifier, which
+    stays the same when a different product type is selected, and which also
+    differs from the identifiers of the native ROP creators.
+
+    Args:
+        instance (pyblish.api.Instance): Instance to test.
+
+    Returns:
+        bool: Whether the instance is an AYON Publish ROP instance.
+    """
+    instance_data = instance.data
+    return (
+        instance_data.get("creator_identifier")
+        == AYON_PUBLISH_CREATOR_IDENTIFIER
+    )
 
 
 def is_ayon_publish_node(node) -> bool:

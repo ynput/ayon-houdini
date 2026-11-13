@@ -1,7 +1,7 @@
 import json
 import contextlib
 
-from ayon_houdini.api import plugin, lib
+from ayon_houdini.api import plugin, lib, ayon_publish
 
 import hou
 
@@ -19,12 +19,12 @@ def monkeypatch_attribute(obj, name, value):
 class CreateAyonPublishROP(plugin.HoudiniCreator):
     """Creator plugin for creating publishes."""
 
-    identifier = "io.ayon.creators.houdini.rop_publish"
+    identifier = ayon_publish.AYON_PUBLISH_CREATOR_IDENTIFIER
     label = "AYON Publish"
     product_type = "rop_publish"  # TODO: Come up with better name
     product_base_type = "rop_publish"  # TODO: Come up with better name
     icon = "cubes"
-    description = "Create AYON publish ROP "
+    description = "Create AYON publish ROP"
 
     node_type = "ayon_publish"
 

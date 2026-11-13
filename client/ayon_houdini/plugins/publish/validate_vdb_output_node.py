@@ -7,7 +7,7 @@ from ayon_core.pipeline import (
     OptionalPyblishPluginMixin
 )
 
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, ayon_publish
 from ayon_houdini.api.lib import update_mode_context
 from ayon_houdini.api.action import SelectInvalidAction
 
@@ -102,6 +102,12 @@ class ValidateVDBOutputNode(plugin.HoudiniInstancePlugin,
 
     @classmethod
     def get_invalid_with_message(cls, instance):
+
+        if ayon_publish.is_rop_publish_instance(instance):
+            cls.log.debug(
+                "Skipping VDB output node validation for AYON Publish ROP "
+                f"instance: {instance.data.get('instance_node')}")
+            return [None, None]
 
         node = instance.data.get("output_node")
         if node is None:

@@ -8,7 +8,7 @@ from ayon_houdini.api.action import (
     SelectInvalidAction,
     SelectROPAction,
 )
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, ayon_publish
 from ayon_houdini.api.lib import get_obj_node_output
 import hou
 
@@ -45,6 +45,12 @@ class ValidateFBXOutputNode(plugin.HoudiniInstancePlugin,
 
     @classmethod
     def get_invalid(cls, instance):
+        if ayon_publish.is_rop_publish_instance(instance):
+            cls.log.debug(
+                "Skipping FBX output node validation for AYON Publish ROP "
+                f"instance: {instance.data.get('instance_node')}")
+            return []
+
         output_node = instance.data.get("output_node")
 
         # Check if The Output Node Path is set and

@@ -7,7 +7,7 @@ import typing
 
 import hou  # noqa
 import pyblish.api
-from ayon_houdini.api import lib, plugin
+from ayon_houdini.api import lib, plugin, ayon_publish
 
 if typing.TYPE_CHECKING:
     import logging
@@ -38,6 +38,12 @@ class CollectFrames(plugin.HoudiniInstancePlugin):
     log: logging.Logger
 
     def process(self, instance: pyblish.api.Instance):
+
+        if ayon_publish.is_rop_publish_instance(instance):
+            self.log.debug(
+                "Skipping native ROP frame collection for AYON Publish ROP "
+                f"instance: {instance.data.get('instance_node')}")
+            return
 
         # CollectRopFrameRange computes `start_frame` and `end_frame`
         #  depending on the trange value.

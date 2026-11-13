@@ -767,7 +767,7 @@
             label   "creator_identifier"
             type    string
             invisible
-            default { "io.openpype.creators.houdini.rop_publish" }
+            default { "io.ayon.creators.houdini.rop_publish" }
         }
         parm {
             name    "id"
