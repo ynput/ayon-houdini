@@ -114,8 +114,11 @@ class ExtractLastPublished(plugin.HoudiniExtractorPlugin):
             # Products with expected files
             # This can be Render products or submitted cache to farm.
             for expected in expected_files:
-                # expected.values() is a list of lists
-                expected_filepaths.extend(sum(expected.values(), []))
+                # expected.values() is a list of lists or single filepaths
+                for output_files in expected.values():
+                    if isinstance(output_files, str):
+                        output_files = [output_files]
+                    expected_filepaths.extend(output_files)
         else:
             # Products with frames or single file.
             frames = instance.data.get("frames", "")
