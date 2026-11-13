@@ -1,15 +1,15 @@
 import json
 import logging
+import os
 import re
 
 import hou
 import pyblish.api
-import pyblish.util
 
 from ayon_houdini.api import lib
 from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.create import CreateContext
-from ayon_core.pipeline.publish import PublishError
+from ayon_core.pipeline.publish import PublishError, PublishLogic
 
 log = logging.getLogger(__name__)
 
@@ -203,11 +203,24 @@ def get_product_type_menu() -> list[str]:
     return menu
 
 
-def publish(node_path: str):
+def publish(node_path: str, report_path: "str | None" = None) -> dict:
     """Publish the given AYON Publish node.
 
     This does not save any changed instance data but only does the single
     publish run with the customized data on the instances for that publish run.
+
+    The JSON publish report (the same data the Publisher UI can store) is
+    returned and, when a report path is provided, stored to that file. The
+    report is stored even when publishing fails.
+
+    Args:
+        node_path (str): Path to the AYON Publish ROP node to publish.
+        report_path (str | None): Path where the JSON publish report is stored.
+            Can also be set with the ``AYON_PUBLISH_REPORT_PATH`` environment
+            variable, which is useful for farm renders.
+
+    Returns:
+        dict: JSON publish report data.
 
     Raises:
         PublishError: When any publish plugin reported an error. The error
@@ -236,38 +249,79 @@ def publish(node_path: str):
     pyblish_context = pyblish.api.Context()
     pyblish_context.data["create_context"] = create_context
     pyblish_context.data["comment"] = "publish from code"
-    pyblish_plugins = create_context.publish_plugins
-
-    error_format = "Failed {plugin.__name__}: {error} -- {error.traceback}"
 
     # filter out the increment plugin because it will cause our export to
     # get out of sync with nodes running later downstream
     # TODO: Implement more optimal way to filter out the workfile increment
     filtered_plugins = [
         plugin
-        for plugin in pyblish_plugins
+        for plugin in create_context.publish_plugins
         if "IncrementCurrentFile" not in str(plugin)
     ]
 
-    errors = []
-    for result in pyblish.util.publish_iter(pyblish_context, filtered_plugins):
-        log.debug(result)
-        for record in result["records"]:
-            log.debug("%s: %s", result["plugin"].label, record.msg)
+    project_name = (
+        create_context.get_current_project_name()
+        or os.environ.get("AYON_PROJECT_NAME")
+    )
+    logic = PublishLogic(reset=False)
+    logic.reset(
+        project_name,
+        context=pyblish_context,
+        plugins=filtered_plugins,
+        create_context=create_context,
+    )
+    logic.publish()
 
-        if result["error"]:
-            error_message = error_format.format(**result)
-            log.error(error_message)
-            errors.append(error_message)
+    report_data = logic.get_publish_report_data()
 
-    if errors:
+    if report_path is None:
+        report_path = os.environ.get("AYON_PUBLISH_REPORT_PATH")
+    if report_path:
+        report_path = os.path.abspath(os.path.expanduser(report_path))
+        report_dir = os.path.dirname(report_path)
+        if report_dir:
+            os.makedirs(report_dir, exist_ok=True)
+        logic.store_publish_report(report_path)
+        log.info(f"Publish report stored to '{report_path}'")
+
+    if logic.has_failed():
+        errors = []
+        for error_info in logic.iter_all_error_info():
+            message = _format_publish_error(error_info)
+            log.error(message)
+            errors.append(message)
+
+        if not errors:
+            errors.append(
+                f"Publishing failed: {logic.get_fail_reason()}"
+            )
+
         set_node_error(
             node,
-            "{} error(s), see the log for details".format(len(errors)),
+            f"{len(errors)} error(s), see the log for details",
         )
+        error_message = "\n".join(errors)
         raise PublishError(
-            "Publishing '{}' failed:\n{}".format(
-                node_path, "\n".join(errors)))
+            f"Publishing '{node_path}' failed:\n{error_message}")
+
+    return report_data
+
+
+def _format_publish_error(error_info) -> str:
+    """Format a publish error info item into a readable log message.
+
+    Args:
+        error_info: Publish error information item.
+
+    Returns:
+        str: Readable error message.
+    """
+    title = error_info.title or "Publish error"
+    description = error_info.description or str(error_info.exception)
+    detail = error_info.detail
+    if detail:
+        description = f"{description}\n{detail}"
+    return f"{title}: {description}"
 
 
 def set_ayon_publish_nodes_pre_render_script(
