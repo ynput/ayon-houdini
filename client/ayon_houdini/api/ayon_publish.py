@@ -156,6 +156,27 @@ def is_ayon_publish_node(node) -> bool:
     return len(components) == 4 and components[2] == AYON_PUBLISH_NODE_NAME
 
 
+def get_nested_ayon_publish_nodes(node) -> list:
+    """Return upstream AYON Publish ROP dependencies of the given node.
+
+    AYON Publish ROPs do not write output files themselves, so they cannot be
+    used as inputs or dependencies of another AYON Publish ROP: rendering them
+    would only run a no-op SOHO driver and trigger another publish.
+
+    Args:
+        node (hou.Node | None): Node whose upstream dependencies are checked.
+
+    Returns:
+        list[hou.Node]: Upstream nodes that are AYON Publish ROPs.
+    """
+    if node is None:
+        return []
+    return [
+        ancestor for ancestor in node.inputAncestors()
+        if is_ayon_publish_node(ancestor)
+    ]
+
+
 #: Product types offered by the AYON Publish ROP. The generic "rop_publish"
 #: type is always offered first so that it remains the default.
 #:
@@ -296,10 +317,7 @@ def publish(node_path: str, report_path: "str | None" = None) -> dict:
                 f"Publishing failed: {logic.get_fail_reason()}"
             )
 
-        set_node_error(
-            node,
-            f"{len(errors)} error(s), see the log for details",
-        )
+        set_node_error(node, _get_node_error_message(errors))
         error_message = "\n".join(errors)
         raise PublishError(
             f"Publishing '{node_path}' failed:\n{error_message}")
@@ -322,6 +340,23 @@ def _format_publish_error(error_info) -> str:
     if detail:
         description = f"{description}\n{detail}"
     return f"{title}: {description}"
+
+
+def _get_node_error_message(errors) -> str:
+    """Return a concise message to display on the AYON Publish ROP node.
+
+    Args:
+        errors (list[str]): Formatted publish error messages.
+
+    Returns:
+        str: Concise message for the node comment.
+    """
+    message = errors[0].replace("\n", " ")
+    if len(errors) > 1:
+        message = f"{message} (+{len(errors) - 1} more error(s))"
+    if len(message) > 200:
+        message = f"{message[:197]}..."
+    return message
 
 
 def set_ayon_publish_nodes_pre_render_script(
