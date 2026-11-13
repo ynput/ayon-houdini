@@ -1,0 +1,25 @@
+# Dialog script for ayon::load_apex_rig::1.0 automatically generated
+
+{
+    name	ayon::load_apex_rig::1.0
+    script	ayon::load_apex_rig::1.0
+    label	"AYON Load APEX Rig"
+
+    help {
+	""
+    }
+
+    inputlabel	1	"Sub-Network Input #1"
+    inputlabel	2	"Sub-Network Input #2"
+    inputlabel	3	"Sub-Network Input #3"
+    inputlabel	4	"Sub-Network Input #4"
+
+    parm {
+        name    "loppath"
+        label   "LOP Path"
+        type    oppath
+        default { "" }
+        parmtag { "oprelative" "." }
+        parmtag { "script_callback_language" "python" }
+    }
+}

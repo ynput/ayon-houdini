@@ -1,0 +1,17 @@
+{
+	"hdaroot/get_rig_path.def":1773892117,
+	"hdaroot/pack.def":1773919344,
+	"hdaroot/sceneaddcharacter.def":1773897484,
+	"hdaroot/sceneaddprop/switch1.def":1699388650,
+	"hdaroot/switch_asset_prop.def":1773913767,
+	"hdaroot/sceneaddprop.def":1773918342,
+	"hdaroot/unpackcharacter.def":1767544546,
+	"hdaroot/IN.def":1773913593,
+	"hdaroot/output0.def":1773913549,
+	"hdaroot/map_path.def":1767544001,
+	"hdaroot/load_rig.def":1773897319,
+	"hdaroot.def":1776206811,
+	"hdaroot/set_asset_name.def":1773914042,
+	"hdaroot/packcharacter.def":1767544584,
+	"hdaroot/unpackusd.def":1773919298
+}
