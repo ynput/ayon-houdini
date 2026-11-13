@@ -264,56 +264,32 @@ def containerise(name,
                  context,
                  loader=None,
                  suffix=""):
-    """Imprint container node with metadata and move it into `AYON_CONTAINERS`.
+    """Move `nodes[0]` into `AYON_CONTAINERS` and imprint it with metadata.
 
     Containerisation enables tracking of version, author and origin
-    for loaded products.
+    for loaded products. The first node in `nodes` becomes the container
+    itself (it is moved under `AYON_CONTAINERS`, renamed, and imprinted).
 
     Args:
         name (str): Name of resulting assembly.
         namespace (str): Namespace under which to host container.
-        nodes (list[hou.Node | str]): Created nodes or node paths, with the
-            container root first.
+        nodes (list[hou.Node]): Created nodes with the container root first;
+            `nodes[0]` itself becomes the container node.
         context (dict): Loaded product context information.
         loader (str, optional): Name of loader used to produce this container.
         suffix (str, optional): Suffix of container, defaults to `_CON`.
 
     Returns:
-        hou.Node: Container node.
-
-    Raises:
-        ValueError: If `nodes` is empty, `nodes[0]` cannot be resolved, or
-            `nodes[0]` cannot be parented under `AYON_CONTAINERS`.
+        hou.Node: Container node inside `AYON_CONTAINERS`.
 
     """
-    if not nodes:
-        raise ValueError(
-            "Expected at least one node to containerise '{}'.".format(name)
-        )
+    container = nodes[0]
 
-    container = hou.node(nodes[0]) if isinstance(nodes[0], str) else nodes[0]
-    if container is None:
-        raise ValueError(
-            "Could not resolve container node {!r} for '{}'.".format(
-                nodes[0], name
-            )
-        )
-
-    # Get AYON Containers subnet
+    # Move before renaming so uniqueness and node type are validated against
+    # AYON_CONTAINERS rather than /obj.
     subnet = get_or_create_ayon_container()
-    if (
-        hasattr(subnet, "childTypeCategory")
-        and container.type().category() != subnet.childTypeCategory()
-    ):
-        raise ValueError(
-            "Container root '{}' must be a {} node, got {}.".format(
-                container.path(),
-                subnet.childTypeCategory().name(),
-                container.type().category().name(),
-            )
-        )
+    container = hou.moveNodesTo([container], subnet)[0]
 
-    # Create proper container name
     container_name = "{}_{}".format(name, suffix or "CON")
     container.setName(container_name, unique_name=True)
 
@@ -328,9 +304,6 @@ def containerise(name,
     }
 
     lib.imprint(container, data)
-
-    # "Parent" the container under the container network
-    container = hou.moveNodesTo([container], subnet)[0]
     container.moveToGoodPosition()
 
     return container
