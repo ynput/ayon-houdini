@@ -1,0 +1,13 @@
+def run(*args, **kwargs):
+    import importlib
+    from ayon_houdini.api import ayon_publish
+
+    importlib.reload(ayon_publish)
+    ayon_publish.ayon_publish_command(*args, **kwargs)
+
+
+def get_product_type_menu(node):
+    """Return the product types for the node's productType menu."""
+    from ayon_houdini.api import ayon_publish
+
+    return ayon_publish.get_product_type_menu()

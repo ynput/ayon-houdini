@@ -3,6 +3,7 @@ repo_url: https://github.com/ynput/ayon-houdini
 
 nav:
   - Home: index.md
+  - AYON Publish ROP: publish-rop.md
   - License: license.md
 
 theme:

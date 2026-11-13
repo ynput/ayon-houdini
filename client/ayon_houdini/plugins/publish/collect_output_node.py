@@ -1,6 +1,6 @@
 import pyblish.api
 from ayon_core.pipeline.publish import KnownPublishError
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, ayon_publish
 
 
 class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
@@ -23,6 +23,12 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
     label = "Collect Output Node Path"
 
     def process(self, instance):
+
+        if ayon_publish.is_rop_publish_instance(instance):
+            self.log.debug(
+                "Skipping native ROP output node collection for AYON Publish "
+                f"ROP instance: {instance.data.get('instance_node')}")
+            return
 
         import hou
 
