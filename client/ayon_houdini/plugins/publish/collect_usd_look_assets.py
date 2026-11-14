@@ -1,8 +1,10 @@
 import re
 
+import itertools
 import os
 import glob
-from typing import List, Optional
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 import dataclasses
 
 import pyblish.api
@@ -33,6 +35,8 @@ class Resource:
     source: str               # unresolved source path
     files: List[str]          # resolve list of files, e.g. multiple for <UDIM>
     color_space: str = None   # colorspace of the resource
+    relative_dir: str = ""    # optional subfolder under resourcesDir
+    resolved_source: Optional[str] = None  # anchored path for relative sources
 
 
 def get_layer_property_paths(layer: Sdf.Layer) -> List[Sdf.Path]:
@@ -83,12 +87,39 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
 
         # Define a relative asset remapping for the USD Extractor so that
         # any textures are remapped to their 'relative' publish path.
-        # All textures will be in a relative `./resources/` folder
+        # All textures will be in a relative `./resources/` folder, placing
+        # colliding filenames in numbered subfolders to avoid overwrites.
         remap = {}
+        used_sources: Dict[Path, Tuple[Path, str]] = {}
+        used_targets: Dict[Path, Path] = {}
         for resource in instance_resources:
-            source = resource.source
-            name = os.path.basename(source)
-            remap[os.path.normpath(source)] = f"./resources/{name}"
+            source_name = Path(resource.source.replace("\\", "/")).name
+            canonical_source = Path(
+                os.path.normpath(resource.resolved_source or resource.source)
+            )
+            file_paths = [Path(os.path.normpath(f)) for f in resource.files]
+            rel_dir = self._find_unique_relative_dir(
+                source_name,
+                canonical_source,
+                file_paths,
+                used_sources,
+                used_targets,
+            )
+            resource.relative_dir = rel_dir
+
+            source_key = Path(rel_dir) / source_name
+            winning_name = used_sources.get(
+                source_key, (canonical_source, source_name)
+            )[1]
+            used_sources[source_key] = (canonical_source, winning_name)
+            for path in file_paths:
+                used_targets[Path(rel_dir) / path.name] = path
+
+            rel_path = Path(rel_dir) / winning_name
+            target_path = f"./resources/{rel_path.as_posix()}"
+            remap.setdefault(os.path.normpath(resource.source), target_path)
+            if resource.resolved_source:
+                remap[os.path.normpath(resource.resolved_source)] = target_path
         instance.data["assetRemap"] = remap
 
         # Store resources on instance
@@ -158,6 +189,9 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     continue
 
                 asset: Sdf.AssetPath = spec.default
+                if not asset.path:
+                    continue
+
                 base, ext = os.path.splitext(asset.path)
                 if ext in self.exclude_suffixes:
                     continue
@@ -174,7 +208,8 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     continue
 
                 # Anchor relative paths to absolute paths
-                if filepath.startswith("./"):
+                resolved_source = None
+                if filepath.startswith(("./", "../")):
                     # USD can't anchor to anonymous layers because it doesn't
                     # know where it exists - however, Houdini layers can have
                     # dedicated save paths, and hence could resolve paths
@@ -182,8 +217,8 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     if layer.anonymous:
                         layer_path = get_layer_save_path(layer)
                         if layer_path:
-                            folder = os.path.dirname(layer_path)
-                            filepath = os.path.join(folder, filepath[2:])
+                            folder = Path(layer_path).parent
+                            filepath = (folder / filepath).as_posix()
                         else:
                             self.log.warning(
                                 "Skipping asset with relative path."
@@ -196,17 +231,17 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                         filepath = Sdf.ComputeAssetPathRelativeToLayer(
                             layer, filepath
                         )
+                    resolved_source = filepath
 
                 # Expand <UDIM> to all files of the available files on disk
                 # TODO: Add support for `<TILE>`
                 # TODO: Add support for `<ATTR:name INDEX:name DEFAULT:value>`
                 if "<UDIM>" in filepath.upper():
-                    pattern = re.sub(
-                        r"<UDIM>",
-                        # UDIM is always four digits
-                        "[0-9]" * 4,
-                        filepath,
-                        flags=re.IGNORECASE
+                    parts = re.split(
+                        r"<UDIM>", filepath, flags=re.IGNORECASE
+                    )
+                    pattern = ("[0-9]" * 4).join(
+                        glob.escape(part) for part in parts
                     )
                     files = glob.glob(pattern)
                 else:
@@ -220,7 +255,8 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     attribute=path.pathString,
                     source=asset.path,
                     files=files,
-                    color_space=colorspace
+                    color_space=colorspace,
+                    resolved_source=resolved_source,
                 )
                 resources.append(resource)
 
@@ -228,6 +264,41 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
         resources.sort(key=lambda r: r.source)
 
         return resources
+
+    @staticmethod
+    def _find_unique_relative_dir(
+        source_name: str,
+        canonical_source: Path,
+        file_paths: List[Path],
+        used_sources: Dict[Path, Tuple[Path, str]],
+        used_targets: Dict[Path, Path],
+    ) -> str:
+        """Return a collision-free subfolder under ``resourcesDir``.
+
+        Args:
+            source_name (str): Basename of the unresolved resource path.
+            canonical_source (Path): Normalized canonical source path.
+            file_paths (List[Path]): Normalized resolved concrete file paths.
+            used_sources (dict): Relative source keys mapped to
+                ``(canonical_source, winning_basename)``.
+            used_targets (dict): Relative concrete file keys mapped to
+                normalized source file paths.
+
+        Returns:
+            str: Relative subfolder name (empty string if root is free).
+        """
+        for sub_idx in itertools.count():
+            rel_dir = str(sub_idx) if sub_idx else ""
+            existing_src = used_sources.get(Path(rel_dir) / source_name)
+            if existing_src and existing_src[0] != canonical_source:
+                continue
+            if any(
+                used_targets.get(Path(rel_dir) / path.name)
+                not in (None, path)
+                for path in file_paths
+            ):
+                continue
+            return rel_dir
 
     def _is_houdini_procedural_path(self, path: Sdf.Path) -> bool:
         """Return whether path represents a Houdini procedural asset path."""
@@ -283,10 +354,19 @@ class CollectUsdLookResourceTransfers(plugin.HoudiniInstancePlugin):
 
     def process(self, instance):
 
-        resources_dir = instance.data["resourcesDir"]
+        resources_dir = Path(instance.data["resourcesDir"])
         transfers = instance.data.setdefault("transfers", [])
+        seen = {
+            (Path(os.path.normpath(src)), Path(os.path.normpath(dest)))
+            for src, dest in transfers
+        }
         for resource in instance.data.get("resources", []):
+            dest_dir = resources_dir / resource["relative_dir"]
             for src in resource["files"]:
-                dest = os.path.join(resources_dir, os.path.basename(src))
-                transfers.append((src, dest))
+                dest = dest_dir / Path(src.replace("\\", "/")).name
+                key = (Path(os.path.normpath(src)), dest)
+                if key in seen:
+                    continue
+                seen.add(key)
+                transfers.append((src, str(dest)))
                 self.log.debug("Registering transfer: %s -> %s", src, dest)
