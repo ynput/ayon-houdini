@@ -127,7 +127,8 @@ class ImageCopernicusLoader(plugin.HoudiniLoader):
 
         node.destroy()
 
-        if parent.path() == f"{pipeline.AYON_CONTAINERS}/{COPNET_NAME}":
+        if (parent.path() == f"{pipeline.AYON_CONTAINERS}/{COPNET_NAME}"
+                and not parent.children()):
             parent.destroy()
 
     def switch(self, container, representation):

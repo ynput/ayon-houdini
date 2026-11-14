@@ -1,3 +1,5 @@
+import inspect
+
 from ayon_houdini.api.lib import find_active_network
 from ayon_houdini.api.workfile_template_builder import (
     HoudiniPlaceholderPlugin
@@ -6,6 +8,13 @@ from ayon_core.lib import NumberDef, TextDef
 from ayon_core.lib.events import weakref_partial
 
 import hou
+
+
+# Python syntax highlighting for script fields. The 'syntax' argument
+# requires ayon-core with https://github.com/ynput/ayon-core/pull/2310
+SCRIPT_TEXTDEF_KWARGS = {}
+if "syntax" in inspect.signature(TextDef.__init__).parameters:
+    SCRIPT_TEXTDEF_KWARGS["syntax"] = "python"
 
 
 EXAMPLE_SCRIPT = """
@@ -58,6 +67,7 @@ class HoudiniPlaceholderScriptPlugin(HoudiniPlaceholderPlugin):
                 label="Run at\nprepare",
                 tooltip="Run before populate at prepare order",
                 multiline=True,
+                **SCRIPT_TEXTDEF_KWARGS,
                 default=options.get("prepare_script", "")
             ),
             TextDef(
@@ -66,6 +76,7 @@ class HoudiniPlaceholderScriptPlugin(HoudiniPlaceholderPlugin):
                 tooltip="Run script at populate node order<br>"
                         "This is the <b>default</b> behavior",
                 multiline=True,
+                **SCRIPT_TEXTDEF_KWARGS,
                 default=options.get("populate_script", EXAMPLE_SCRIPT)
             ),
             TextDef(
@@ -73,6 +84,7 @@ class HoudiniPlaceholderScriptPlugin(HoudiniPlaceholderPlugin):
                 label="Run after\ndepth\niteration",
                 tooltip="Run script after every build depth iteration",
                 multiline=True,
+                **SCRIPT_TEXTDEF_KWARGS,
                 default=options.get("depth_processed_script", "")
             ),
             TextDef(
@@ -84,6 +96,7 @@ class HoudiniPlaceholderScriptPlugin(HoudiniPlaceholderPlugin):
                     "errors during the build"
                 ),
                 multiline=True,
+                **SCRIPT_TEXTDEF_KWARGS,
                 default=options.get("finished_script", "")
             ),
         ]
