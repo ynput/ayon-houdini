@@ -40,11 +40,19 @@ class ValidateUSDGeoClipSequenceFrameRange(plugin.HoudiniInstancePlugin):
 
     @classmethod
     def get_invalid(cls, instance):
+        # Only the source USD ROP instance collects the clip nodes. Runtime
+        # instances created during collection, like the save path layers and
+        # the department and asset/shot contribution layers, have no clip
+        # nodes and no frame range data.
+        clip_nodes = instance.data.get("usdGeoClipSequenceNodes")
+        if not clip_nodes:
+            return []
+
         start = int(instance.data["frameStartHandle"])
         end = int(instance.data["frameEndHandle"])
 
         invalid = []
-        for node_path in instance.data.get("usdGeoClipSequenceNodes", set()):
+        for node_path in clip_nodes:
             node = hou.node(node_path)
             clip_start = int(node.evalParm("startframe"))
             clip_end = int(node.evalParm("endframe"))
