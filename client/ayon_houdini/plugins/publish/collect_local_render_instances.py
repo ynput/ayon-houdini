@@ -14,25 +14,25 @@ from ayon_houdini.api import plugin
 # NOTE: This mixin lives next to `CollectLocalRenderInstances` because it is
 #   its only user. Move it to `ayon_houdini.api.plugin` (or core) when another
 #   plugin needs it.
-class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
-    """Create runtime instances from the expected files of a render instance.
+class RenderAOVInstancesMixin(ColormanagedPyblishPluginMixin):
+    """Create AOV instances from the expected files of a render instance.
     """
 
-    # Always deep copied from the source instance to runtime instances.
-    runtime_instance_transfer_keys = {
+    # Always deep copied from the source instance to AOV instances.
+    aov_instance_transfer_keys = {
         "creator_attributes",
         "publish_attributes",
     }
     # Always passed by reference from the source instance to runtime
-    # instances. The entities are safe to share because runtime instances
+    # instances. The entities are safe to share because AOV instances
     # always publish to the same context as their source instance.
-    runtime_instance_transfer_transient_data_keys = {
+    aov_instance_transfer_transient_data_keys = {
         "projectEntity",
         "folderEntity",
         "taskEntity",
     }
 
-    def create_runtime_instance(
+    def create_aov_instances(
             self,
             instance: pyblish.api.Instance,
             families_to_append: Optional[list[str]] = None,
@@ -40,9 +40,9 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
             transfer_keys: Optional[set[str]] = None,
             transfer_transient_data_keys: Optional[set[str]] = None,
         ):
-        """Create Runtime Instances.
+        """Create AOV Instances.
 
-        Creates one runtime instance per AOV from the "expectedFiles" of a
+        Creates one instance per AOV from the "expectedFiles" of a
         render instance, with the same core functions that are used for
         farm publishing.
             {
@@ -52,12 +52,12 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
         Example:
         >>> expected_files = instance.data.setdefault("expectedFiles", list())
         >>> expected_files.append({"beauty": files_sequence_list})
-        >>> self.create_runtime_instance(instance)
+        >>> self.create_aov_instances(instance)
 
         Notes:
             - Only instances with "render" product base type are supported,
               a `PublishError` is raised for others.
-            - Runtime instances always publish to the same context (folder
+            - AOV instances always publish to the same context (folder
               and task) as their source instance. To publish them elsewhere,
               change the context of the source instance before calling this.
 
@@ -71,12 +71,12 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
                 Empty by default, so only multipart EXRs get a review.
             transfer_keys (Optional[set[str]]): Extra keys to deep copy
                 from the source instance. They are added to the keys that
-                are always deep copied, `runtime_instance_transfer_keys`:
+                are always deep copied, `aov_instance_transfer_keys`:
                 "creator_attributes" and "publish_attributes".
             transfer_transient_data_keys (Optional[set[str]]): Extra keys to
                 pass by reference from the source instance. They are added
                 to the keys that are always passed by reference,
-                `runtime_instance_transfer_transient_data_keys`:
+                `aov_instance_transfer_transient_data_keys`:
                 "projectEntity", "folderEntity" and "taskEntity".
 
         Returns:
@@ -93,16 +93,16 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
 
         if instance.data.get("productBaseType") != "render":
             raise PublishError(
-                "Runtime instances can only be created from render"
+                "AOV instances can only be created from render"
                 f" instances. Instance '{instance}' has product base type"
                 f" '{instance.data.get('productBaseType')}'."
             )
 
         transfer_keys = (
-            self.runtime_instance_transfer_keys | set(transfer_keys or ())
+            self.aov_instance_transfer_keys | set(transfer_keys or ())
         )
         transfer_transient_data_keys = (
-            self.runtime_instance_transfer_transient_data_keys
+            self.aov_instance_transfer_transient_data_keys
             | set(transfer_transient_data_keys or ())
         )
 
@@ -121,11 +121,11 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
 
         self.post_process_skeleton_data(instance, instance_skeleton_data)
 
-        # Runtime instances must follow the context of the source instance
+        # AOV instances must follow the context of the source instance
         for key in ("folderPath", "task"):
             if instance_skeleton_data.get(key) != instance.data.get(key):
                 raise PublishError(
-                    f"Runtime instances must publish to the same '{key}'"
+                    f"AOV instances must publish to the same '{key}'"
                     f" as their source instance '{instance}'. Change it on"
                     " the source instance instead."
                 )
@@ -184,11 +184,11 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
         ):
         """Apply DCC specific changes to the skeleton data.
 
-        Called by `create_runtime_instance` after the skeleton data is
-        created and before the runtime instances are created from it.
+        Called by `create_aov_instances` after the skeleton data is
+        created and before the AOV instances are created from it.
         Override it in the plugin to apply DCC specific logic.
 
-        It must not change "folderPath" or "task", runtime instances
+        It must not change "folderPath" or "task", AOV instances
         always publish to the same context as their source instance.
 
         Args:
@@ -199,7 +199,7 @@ class RuntimeInstancesMixin(ColormanagedPyblishPluginMixin):
         pass
 
 
-class CollectLocalRenderInstances(RuntimeInstancesMixin,
+class CollectLocalRenderInstances(RenderAOVInstancesMixin,
                                   plugin.HoudiniInstancePlugin):
     """Collect instances for local render.
 
@@ -265,7 +265,7 @@ class CollectLocalRenderInstances(RuntimeInstancesMixin,
             return
 
         # Create Instance for each AOV.
-        self.create_runtime_instance(
+        self.create_aov_instances(
             instance,
             aov_filter=self.aov_filter,
             transfer_transient_data_keys={
