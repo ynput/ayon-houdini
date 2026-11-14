@@ -103,6 +103,12 @@ class CollectUsdRenderLayerAndStage(plugin.HoudiniInstancePlugin):
         if not lop_node:
             return
 
+        if not isinstance(lop_node, hou.LopNode):
+            # Reported to the user by the output node validators.
+            self.log.debug(
+                f"Skipping, output node is not a LOP node: {lop_node.path()}")
+            return
+
         lop_node: hou.LopNode
         rop: hou.RopNode = hou.node(instance.data["instance_node"])
         options = get_lops_rop_context_options(rop)

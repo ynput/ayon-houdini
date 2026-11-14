@@ -26,6 +26,13 @@ class CreateUSD(plugin.HoudiniCreator):
 
     def create(self, product_name, instance_data, pre_create_data):
 
+        if (
+            pre_create_data.get("use_selection")
+            and not self._confirm_selection(hou.selectedNodes())
+        ):
+            self.log.info("USD creation cancelled by user.")
+            return
+
         instance_data.update({"node_type": "usd"})
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
@@ -43,7 +50,9 @@ class CreateUSD(plugin.HoudiniCreator):
         }
         parms.update(self.additional_parameters)
 
-        if self.selected_nodes:
+        if self.selected_nodes and isinstance(
+            self.selected_nodes[0], hou.LopNode
+        ):
             parms["loppath"] = self.selected_nodes[0].path()
 
         instance_node.setParms(parms)
@@ -56,6 +65,41 @@ class CreateUSD(plugin.HoudiniCreator):
             "id",
         ]
         self.lock_parameters(instance_node, to_lock)
+
+    def _confirm_selection(self, selected_nodes) -> bool:
+        """Ask the user whether to continue when selection is not a LOP node.
+
+        Only the first selected node is used as the LOP path, so only that
+        one is checked.
+
+        Returns:
+            bool: Whether to continue with the creation.
+
+        """
+        if not selected_nodes or isinstance(selected_nodes[0], hou.LopNode):
+            return True
+
+        node = selected_nodes[0]
+        message = (
+            f"Selected node '{node.path()}' is a "
+            f"{node.type().category().name()} node, not a LOP node, "
+            "so it can't be used as the LOP path."
+        )
+        if not hou.isUIAvailable():
+            self.log.warning(f"{message} The LOP path is left empty.")
+            return True
+
+        choice = hou.ui.displayMessage(
+            message,
+            buttons=("Continue", "Cancel"),
+            severity=hou.severityType.Warning,
+            default_choice=0,
+            close_choice=1,
+            help="Continue creates the USD instance with an empty LOP path, "
+                 "to be set on the node afterwards.",
+            title="Selected node is not a LOP node",
+        )
+        return choice == 0
 
     def set_node_staging_dir(
             self, node, staging_dir, instance, pre_create_data):
