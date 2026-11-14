@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+import re
 import hou
 import pyblish.api
 
@@ -53,7 +54,8 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
 
         ropnode = hou.node(node_path)
 
-        slapcomp_sources =  []
+        slapcomp_sources = []
+        used_bgeo_paths = set()
 
         comp_numbers = ropnode.evalParm("husk_slapcomp")
         for i in range(1, comp_numbers+1):
@@ -68,7 +70,16 @@ class CollectSlapComps(plugin.HoudiniInstancePlugin):
                 slapcomp_out = ropnode.parm(f'husk_sc_cop{i}').evalAsNode()
 
                 slapcomp_dir = os.path.dirname(instance.data["ifdFile"])
-                slapcomp_src = f"{slapcomp_dir}/{slapcomp_out.name()}.bgeo"
+                raw_path = slapcomp_out.path().strip("/")
+                safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", raw_path)
+                slapcomp_src = f"{slapcomp_dir}/{safe_name}.bgeo"
+                suffix_idx = i
+                while slapcomp_src in used_bgeo_paths:
+                    slapcomp_src = (
+                        f"{slapcomp_dir}/{safe_name}_{suffix_idx}.bgeo"
+                    )
+                    suffix_idx += 1
+                used_bgeo_paths.add(slapcomp_src)
 
                 lib.save_slapcomp_to_file(
                     slapcomp_out,
