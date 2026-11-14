@@ -40,11 +40,15 @@ class ValidateUSDGeoClipSequenceFrameRange(plugin.HoudiniInstancePlugin):
 
     @classmethod
     def get_invalid(cls, instance):
+        node_paths = instance.data.get("usdGeoClipSequenceNodes")
+        if not node_paths:
+            return []
+
         start = int(instance.data["frameStartHandle"])
         end = int(instance.data["frameEndHandle"])
 
         invalid = []
-        for node_path in instance.data.get("usdGeoClipSequenceNodes", set()):
+        for node_path in node_paths:
             node = hou.node(node_path)
             clip_start = int(node.evalParm("startframe"))
             clip_end = int(node.evalParm("endframe"))
