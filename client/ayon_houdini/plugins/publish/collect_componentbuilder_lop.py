@@ -69,20 +69,69 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
             self.log.warning(f"Cannot be resolved: {unresolved}")
 
         self.log.debug(f"Collecting USD: {filepath}")
-        src_root_dir = os.path.dirname(filepath)
 
         # Used to compare resolved paths against
-        filepath = Path(filepath)
+        raw_root_dir = Path(os.path.abspath(filepath)).parent
+        filepath = Path(filepath).resolve()
+        src_root_dir = filepath.parent
 
         # We keep the relative paths to the USD file
         transfers = instance.data.setdefault("transfers", [])
         publish_root = instance.data["publishDir"]
         for src in paths:
 
-            if filepath == Path(src):
+            src_path = Path(src).resolve()
+            if filepath == src_path:
                 continue
 
-            relative_path = os.path.relpath(src, start=src_root_dir)
+            relative_path = self._get_relative_dependency_path(
+                src, src_path, raw_root_dir, src_root_dir
+            )
+            if relative_path is None:
+                self.log.debug(
+                    "Skipping external dependency outside component "
+                    f"directory: {src}"
+                )
+                continue
+
             self.log.debug(f"Collected dependency: {relative_path}")
             dest = os.path.normpath(os.path.join(publish_root, relative_path))
             transfers.append((src, dest))
+
+    @staticmethod
+    def _get_relative_dependency_path(
+        src: str,
+        src_path: Path,
+        raw_root_dir: Path,
+        src_root_dir: Path,
+    ):
+        """Return path relative to component root, or None if external.
+
+        Args:
+            src: Dependency file path returned by USD.
+            src_path: Resolved dependency path for containment verification.
+            raw_root_dir: Normalized non-resolved component staging directory.
+            src_root_dir: Resolved component staging directory.
+
+        Returns:
+            Relative path inside ``publishDir``, or ``None`` if outside.
+        """
+        try:
+            src_path.relative_to(src_root_dir)
+        except ValueError:
+            return None
+
+        norm_src_path = Path(os.path.abspath(src))
+        try:
+            # Preserve the authored layout for internal symlinks inside root
+            return norm_src_path.relative_to(raw_root_dir)
+        except ValueError:
+            # Handle raw vs resolved component root mismatches (e.g. Windows
+            # 8.3 short/long paths or an external symlinked parent folder)
+            for parent in norm_src_path.parents:
+                if (
+                    not parent.is_symlink()
+                    and parent.resolve() == src_root_dir
+                ):
+                    return norm_src_path.relative_to(parent)
+            return None
