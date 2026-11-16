@@ -33,6 +33,27 @@ self._parent = None
 log = logging.getLogger(__name__)
 JSON_PREFIX = "JSON:::"
 
+# Counter used to suppress the "outdated task variables" pop-up for
+# programmatic workfile saves (e.g. during publishing or auto-increment).
+_suppress_context_var_popup = 0
+
+
+@contextmanager
+def suppress_context_var_popup():
+    """Suppress the outdated task-variables pop-up during a save.
+
+    AYON's save callback normally checks whether the Houdini context variables
+    still match the current folder/task and prompts the user to update them.
+    That prompt is not useful for saves performed as part of publishing or a
+    workfile auto-increment, so those saves run inside this context manager.
+    """
+    global _suppress_context_var_popup
+    _suppress_context_var_popup += 1
+    try:
+        yield
+    finally:
+        _suppress_context_var_popup -= 1
+
 
 def get_entity_fps(entity=None):
     """Return current task fps or fps from an entity."""
@@ -1142,6 +1163,13 @@ def update_houdini_vars_context():
 
 def update_houdini_vars_context_dialog():
     """Show pop-up to update task context variables"""
+    if _suppress_context_var_popup:
+        log.debug(
+            "Skipping outdated task variables pop-up during a programmatic "
+            "save."
+        )
+        return
+
     update_vars = get_context_var_changes()
     if not update_vars:
         # Nothing to change

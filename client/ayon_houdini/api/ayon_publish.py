@@ -514,7 +514,8 @@ def after_publish_render(node) -> bool:
     from ayon_core.lib import version_up
 
     new_file = version_up(current_file)
-    host.save_workfile(new_file)
+    with lib.suppress_context_var_popup():
+        host.save_workfile(new_file)
     log.info(
         "Incremented workfile '%s' to '%s' after AYON Publish ROP render",
         current_file, new_file)

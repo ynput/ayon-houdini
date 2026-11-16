@@ -399,7 +399,13 @@ class HoudiniCreator(Creator, HoudiniCreatorBase):
         # Apply Creator Settings
         create_settings = project_settings["houdini"]["create"]
         set_rop_output = create_settings["set_rop_output"]
-        self.enable_staging_path_management = set_rop_output["enabled"]
+        # Creators can opt out of staging path management with a class-level
+        # default (e.g. the AYON Publish ROP has no output parameter of its
+        # own; the connected ROPs own the output paths).
+        self.enable_staging_path_management = (
+            type(self).enable_staging_path_management
+            and set_rop_output["enabled"]
+        )
         self.expand_staging_dir = set_rop_output["expand_vars"]
         self.default_staging_dir = \
             set_rop_output["default_output_dir"] or self.default_staging_dir
