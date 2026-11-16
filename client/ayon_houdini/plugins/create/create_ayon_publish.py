@@ -2,7 +2,9 @@ import json
 import contextlib
 
 from ayon_core.lib import is_func_signature_supported
-from ayon_houdini.api import plugin, lib
+from ayon_core.pipeline.create import ProductTypeItem
+
+from ayon_houdini.api import plugin, lib, ayon_publish
 
 import hou
 
@@ -35,6 +37,25 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
 
     node_type = "ayon_publish"
     enable_staging_path_management = False
+
+    def get_product_type_items(self) -> list[ProductTypeItem]:
+        """Return the product types selectable in the Publisher UI.
+
+        Product type items configured in the addon settings take precedence.
+        Otherwise the common AYON product types are offered, with the generic
+        ``rop_publish`` product type first so it remains the default.
+        This is introduced for handling the product-type-items regression.
+
+        Returns:
+            list[ProductTypeItem]: Selectable product type items.
+        """
+        if self.product_type_items:
+            return self.product_type_items
+
+        return [
+            ProductTypeItem(product_type=name, label=label)
+            for name, label in ayon_publish.get_product_types()
+        ]
 
     def get_product_name(self, *args, **kwargs):
         """Get the product name for the selected product type.
