@@ -26,7 +26,7 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
         exists they remain selectable on the AYON Publish ROP.
     """
 
-    identifier = ayon_publish.AYON_PUBLISH_CREATOR_IDENTIFIER
+    identifier = "io.ayon.creators.houdini.rop_publish"
     label = "AYON Publish"
     product_type = "rop_publish"  # TODO: Come up with better name
     product_base_type = "rop_publish"  # TODO: Come up with better name
@@ -34,6 +34,7 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
     description = "Create AYON publish ROP"
 
     node_type = "ayon_publish"
+    enable_staging_path_management = False
 
     def get_product_name(self, *args, **kwargs):
         """Get the product name for the selected product type.
