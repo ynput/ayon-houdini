@@ -1,9 +1,11 @@
 """Helper functions for load HDA"""
 
 from __future__ import annotations
+import json
 import os
 import re
 import uuid
+from datetime import datetime
 from typing import List, Union
 
 import hou
@@ -1093,6 +1095,72 @@ def select_variant(node):
     selected = menu.exec_(QtGui.QCursor.pos())
     if selected is not None:
         variant_parm.set(selected.text())
+
+
+def _get_stored_publish_report(node):
+    """Return the last publish report stored on the node, if any."""
+    from ayon_houdini.api import ayon_publish
+
+    report = ayon_publish.get_stored_publish_report(node)
+    if report is None:
+        lib.log.warning(
+            "No publish report stored on '%s'. Publish the node first.",
+            node.path())
+    return report
+
+
+def get_publish_report_json(node) -> str:
+    """Return the stored publish report as formatted JSON."""
+    report = _get_stored_publish_report(node)
+    if report is None:
+        return ""
+    return json.dumps(report, indent=2)
+
+
+def write_publish_report(node, filepath) -> bool:
+    """Write the stored publish report of the node to a JSON file."""
+    report = _get_stored_publish_report(node)
+    if report is None:
+        return False
+    with open(filepath, "w", encoding="utf-8") as stream:
+        json.dump(report, stream, indent=2)
+    lib.log.info("Saved AYON publish report to '%s'", filepath)
+    return True
+
+
+def save_publish_report(node):
+    """Ask for a filepath and save the node's stored publish report."""
+    report = _get_stored_publish_report(node)
+    if report is None:
+        return
+
+    workfile = hou.hipFile.path()
+    directory = os.path.dirname(workfile) if workfile else os.getcwd()
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    default_path = os.path.join(
+        directory, f"ayon-publish-report-{timestamp}.json"
+    )
+    filepath, _filter = QtWidgets.QFileDialog.getSaveFileName(
+        lib.get_main_window(),
+        "Save AYON publish report",
+        default_path,
+        "JSON files (*.json)",
+    )
+    if not filepath:
+        return
+    if not filepath.lower().endswith(".json"):
+        filepath += ".json"
+    write_publish_report(node, filepath)
+
+
+def copy_publish_report(node):
+    """Copy the stored publish report of the node to the clipboard."""
+    report_json = get_publish_report_json(node)
+    if not report_json:
+        return
+    QtWidgets.QApplication.clipboard().setText(report_json)
+    lib.log.info("Copied AYON publish report of '%s' to clipboard",
+                 node.path())
 
 
 def get_available_representations(node):

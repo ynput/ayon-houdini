@@ -36,6 +36,10 @@ _WORKFILE_INCREMENT_SESSION_KEY = "ayon_publish_pending_workfile_increments"
 #: marked as failed by :func:`set_node_error`.
 NODE_ERROR_STATE_KEY = "ayon_publish_error_state"
 
+#: Cached user data key for the last JSON publish report of the node.
+#: Cached user data is not saved with the hip file.
+PUBLISH_REPORT_CACHE_KEY = "ayon_publish_report"
+
 #: Color used to mark an AYON Publish node that failed to publish.
 NODE_ERROR_COLOR = hou.Color((1.0, 0.2, 0.2))
 
@@ -124,6 +128,30 @@ def has_node_error(node: "hou.Node | None") -> bool:
     if node is None:
         return False
     return bool(node.userDataDict().get(NODE_ERROR_STATE_KEY))
+
+
+def store_publish_report(node, report_data) -> None:
+    """Store the JSON publish report on the node as cached user data.
+
+    Cached user data is not saved with the hip file, so the report does not
+    persist with the scene but stays available for the session.
+    """
+    if node is None or report_data is None:
+        return
+    node.setCachedUserData(PUBLISH_REPORT_CACHE_KEY, report_data)
+
+
+def get_stored_publish_report(node):
+    """Return the last publish report stored on the node, if any."""
+    if node is None:
+        return None
+    try:
+        return node.cachedUserData(PUBLISH_REPORT_CACHE_KEY)
+    except Exception:  # noqa: BLE001
+        log.debug(
+            "Could not read cached publish report from '%s'", node.path(),
+            exc_info=True)
+        return None
 
 
 def is_rop_publish_instance(instance) -> bool:
@@ -318,6 +346,7 @@ def publish(node_path: str, report_path: "str | None" = None) -> dict:
     logic.publish()
 
     report_data = logic.get_publish_report_data()
+    store_publish_report(node, report_data)
 
     if report_path is None:
         report_path = os.environ.get("AYON_PUBLISH_REPORT_PATH")

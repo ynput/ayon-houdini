@@ -23,3 +23,21 @@ def get_product_type_menu(node):
     from ayon_houdini.api import ayon_publish
 
     return ayon_publish.get_product_type_menu()
+
+
+def save_publish_report(node):
+    """Save the node's stored publish report to a JSON file."""
+    import importlib
+    from ayon_houdini.api import hda_utils
+
+    importlib.reload(hda_utils)
+    hda_utils.save_publish_report(node)
+
+
+def copy_publish_report(node):
+    """Copy the node's stored publish report to the clipboard."""
+    import importlib
+    from ayon_houdini.api import hda_utils
+
+    importlib.reload(hda_utils)
+    hda_utils.copy_publish_report(node)

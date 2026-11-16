@@ -76,6 +76,15 @@ AYON_PUBLISH_REPORT_PATH=/path/to/publish-report.json
 The report (the same data the Publisher UI can export) is written even when
 publishing fails, and `ayon_publish.publish()` returns the report data.
 
+## Publish report on the node
+
+The latest publish report is also stored on the AYON Publish ROP as **cached
+user data** (not saved with the hip file). After a publish, use the buttons at
+the bottom of the node parameters:
+
+- **Save Publish Report...** — write the report to a JSON file.
+- **Copy Publish Report** — copy the JSON report to the clipboard.
+
 ## Known issues / limitations
 
 - **Unique extensions only:** two inputs exporting the same extension would

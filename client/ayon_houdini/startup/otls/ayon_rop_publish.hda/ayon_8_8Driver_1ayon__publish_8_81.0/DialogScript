@@ -777,6 +777,25 @@
             invisible
             default { "pyblish.avalon.instance" }
         }
+        parm {
+            name    "save_publish_report"
+            label   "Save Publish Report..."
+            type    button
+            joinnext
+            default { "0" }
+            help    "Save the last publish report of this node to a JSON file."
+            parmtag { "script_callback" "hou.phm().save_publish_report(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "copy_publish_report"
+            label   "Copy Publish Report"
+            type    button
+            default { "0" }
+            help    "Copy the last publish report of this node to the clipboard."
+            parmtag { "script_callback" "hou.phm().copy_publish_report(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
     }
 
 }
