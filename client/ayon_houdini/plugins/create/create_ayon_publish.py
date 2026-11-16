@@ -2,7 +2,7 @@ import json
 import contextlib
 
 from ayon_core.lib import is_func_signature_supported
-from ayon_houdini.api import plugin, lib, ayon_publish
+from ayon_houdini.api import plugin, lib
 
 import hou
 
