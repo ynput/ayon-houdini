@@ -28,20 +28,8 @@ class ValidateUSDOutputNode(plugin.HoudiniInstancePlugin):
 
     def process(self, instance):
 
-        invalid = self.get_invalid(instance)
-        if invalid:
-            node = invalid[0]
-            # The instance node itself is returned when no output node exists
-            if node.path() == instance.data.get("instance_node"):
-                message = (
-                    f"USD node '{node.path()}' has no valid LOP path set."
-                )
-            else:
-                message = (
-                    f"LOP path '{node.path()}' is a "
-                    f"{node.type().category().name()} node, "
-                    "it must point to a LOP node."
-                )
+        invalid_node, message = self.get_invalid_with_message(instance)
+        if invalid_node:
             raise PublishValidationError(
                 message,
                 title=self.label,
@@ -49,19 +37,34 @@ class ValidateUSDOutputNode(plugin.HoudiniInstancePlugin):
             )
 
     @classmethod
-    def get_invalid(cls, instance):
+    def get_invalid_with_message(cls, instance):
 
         import hou
 
         output_node = instance.data.get("output_node")
-
-        # The error messages are raised in `process`.
         if output_node is None:
-            return [hou.node(instance.data.get("instance_node"))]
+            instance_node = hou.node(instance.data.get("instance_node"))
+            message = (
+                f"USD node '{instance_node.path()}' has no valid LOP path set."
+            )
+            return instance_node, message
 
-        # Output node must be a LOP node.
         if not isinstance(output_node, hou.LopNode):
-            return [output_node]
+            message = (
+                f"LOP path '{output_node.path()}' is a "
+                f"{output_node.type().category().name()} node, "
+                "it must point to a LOP node."
+            )
+            return output_node, message
+
+        return None, None
+
+    @classmethod
+    def get_invalid(cls, instance):
+        node, _ = cls.get_invalid_with_message(instance)
+        if node:
+            # Actions expect a list of nodes
+            return [node]
 
     def get_description(self):
         return inspect.cleandoc(
