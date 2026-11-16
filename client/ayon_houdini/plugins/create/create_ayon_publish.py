@@ -2,8 +2,6 @@ import json
 import contextlib
 
 from ayon_core.lib import is_func_signature_supported
-from ayon_core.pipeline.create import ProductTypeItem
-
 from ayon_houdini.api import plugin, lib, ayon_publish
 
 import hou
@@ -37,24 +35,6 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
 
     node_type = "ayon_publish"
 
-    def get_product_type_items(self) -> list[ProductTypeItem]:
-        """Return the product types selectable in the Publisher UI.
-
-        Product type items configured in the addon settings take precedence.
-        Otherwise the common AYON product types are offered, with the generic
-        ``rop_publish`` product type first so it remains the default.
-
-        Returns:
-            list[ProductTypeItem]: Selectable product type items.
-        """
-        if self.product_type_items:
-            return self.product_type_items
-
-        return [
-            ProductTypeItem(product_type=name, label=label)
-            for name, label in ayon_publish.get_product_types()
-        ]
-
     def get_product_name(self, *args, **kwargs):
         """Get the product name for the selected product type.
 
@@ -70,25 +50,9 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
         if not product_type:
             return super().get_product_name(*args, **kwargs)
 
-        def get_product_type_items():
-            # Older ayon-core versions do not accept 'product_type' in
-            # get_product_name. Making the selected product type the first
-            # product type item makes those versions resolve the product name
-            # template for the selected type too.
-            return [ProductTypeItem(
-                product_type=product_type,
-                label=product_type,
-            )]
-
         with contextlib.ExitStack() as stack:
             stack.enter_context(
                 monkeypatch_attribute(self, "product_type", product_type))
-            stack.enter_context(
-                monkeypatch_attribute(
-                    self, "product_base_type", product_type))
-            stack.enter_context(
-                monkeypatch_attribute(
-                    self, "get_product_type_items", get_product_type_items))
             if is_func_signature_supported(
                 super().get_product_name,
                 *args,
