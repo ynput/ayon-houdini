@@ -22,6 +22,16 @@ AYON_PUBLISH_NODE_NAME = "ayon_publish"
 #: product base type) is selected on the ROP.
 AYON_PUBLISH_CREATOR_IDENTIFIER = "io.ayon.creators.houdini.rop_publish"
 
+#: Pre-render script of the AYON Publish ROP.
+AYON_PUBLISH_PRE_RENDER_SCRIPT = "hou.phm().run()"
+
+#: Post-render script of the AYON Publish ROP.
+AYON_PUBLISH_POST_RENDER_SCRIPT = "hou.phm().run_after_render()"
+
+#: Session key used to remember workfile increments that should happen after
+#: Houdini finished rendering a ROP-triggered publish.
+_WORKFILE_INCREMENT_SESSION_KEY = "ayon_publish_pending_workfile_increments"
+
 #: Node user data key storing the appearance of the node before it was
 #: marked as failed by :func:`set_node_error`.
 NODE_ERROR_STATE_KEY = "ayon_publish_error_state"
@@ -107,6 +117,13 @@ def clear_node_error(node: "hou.Node | None") -> None:
         node.setColor(hou.Color(tuple(color)))
     node.setComment(state.get("comment", ""))
     node.setUserData(NODE_ERROR_STATE_KEY, "")
+
+
+def has_node_error(node: "hou.Node | None") -> bool:
+    """Return whether the node currently shows a publish error state."""
+    if node is None:
+        return False
+    return bool(node.userDataDict().get(NODE_ERROR_STATE_KEY))
 
 
 def is_rop_publish_instance(instance) -> bool:
@@ -257,6 +274,12 @@ def publish(node_path: str, report_path: "str | None" = None) -> dict:
     host = registered_host()
     assert host, "No registered host."
 
+    # The workfile increment is deferred until after the Houdini render
+    # finished, see :func:`after_publish_render`. Capture the workfile before
+    # publishing so a changed scene is not incremented by accident.
+    current_file = host.get_current_workfile()
+    _clear_workfile_increment_pending(node)
+
     create_context = CreateContext(host)
 
     # Deactivate all instances except the one from this node.
@@ -271,9 +294,10 @@ def publish(node_path: str, report_path: "str | None" = None) -> dict:
     pyblish_context.data["create_context"] = create_context
     pyblish_context.data["comment"] = "publish from code"
 
-    # filter out the increment plugin because it will cause our export to
-    # get out of sync with nodes running later downstream
-    # TODO: Implement more optimal way to filter out the workfile increment
+    # Filter out the increment plugin: the workfile increment is deferred to
+    # the AYON Publish ROP's post-render script (see
+    # :func:`after_publish_render`) so that $HIP stays stable while Houdini
+    # still renders ROPs after this publish.
     filtered_plugins = [
         plugin
         for plugin in create_context.publish_plugins
@@ -322,6 +346,8 @@ def publish(node_path: str, report_path: "str | None" = None) -> dict:
         raise PublishError(
             f"Publishing '{node_path}' failed:\n{error_message}")
 
+    _mark_workfile_increment_pending(node, current_file)
+
     return report_data
 
 
@@ -359,8 +385,145 @@ def _get_node_error_message(errors) -> str:
     return message
 
 
+def _get_pending_workfile_increments() -> dict:
+    """Return session data of pending workfile increments."""
+    pending = getattr(hou.session, _WORKFILE_INCREMENT_SESSION_KEY, None)
+    if not isinstance(pending, dict):
+        pending = {}
+        setattr(hou.session, _WORKFILE_INCREMENT_SESSION_KEY, pending)
+    return pending
+
+
+def _clear_workfile_increment_pending(node) -> None:
+    """Remove a pending workfile increment for the node."""
+    if node is None:
+        return
+    pending = getattr(hou.session, _WORKFILE_INCREMENT_SESSION_KEY, None)
+    if isinstance(pending, dict):
+        pending.pop(node.path(), None)
+
+
+def _mark_workfile_increment_pending(node, current_file: str) -> None:
+    """Mark the workfile to be incremented after the render finished."""
+    if node is None or not current_file:
+        return
+    pending = _get_pending_workfile_increments()
+    pending[node.path()] = current_file
+
+
+def _is_ui_session() -> bool:
+    """Return whether Houdini runs in an interactive UI session."""
+    return bool(hou.isUIAvailable())
+
+
+def _normalize_filepath(filepath: str) -> str:
+    """Return a normalized filepath for comparison."""
+    return os.path.normcase(os.path.normpath(os.path.expanduser(filepath)))
+
+
+def get_downstream_rop_dependencies(node) -> list:
+    """Return ROP nodes in the same network that depend on the node.
+
+    Args:
+        node (hou.Node | None): Node to inspect.
+
+    Returns:
+        list[hou.Node]: ROP nodes that have ``node`` as an input dependency.
+    """
+    if node is None:
+        return []
+    parent = node.parent()
+    if parent is None:
+        return []
+
+    downstream = []
+    for candidate in parent.children():
+        if candidate == node:
+            continue
+        try:
+            dependencies = candidate.inputDependencies()
+        except hou.Error:
+            continue
+        for dependency, _frame_range in dependencies:
+            if dependency == node:
+                downstream.append(candidate)
+                break
+    return downstream
+
+
+def after_publish_render(node) -> bool:
+    """Increment the workfile after a ROP-triggered publish render.
+
+    This is called by the AYON Publish ROP's HDA post-render script. The
+    increment cannot happen during the pre-render publish: changing ``$HIP``
+    before Houdini renders downstream ROPs would make them export to a
+    different workfile version than the published representations.
+
+    The increment is skipped for farm/batch renders and when the AYON Publish
+    ROP still has downstream ROP dependencies in the same network, because
+    those nodes render after this node's post-render script.
+
+    Args:
+        node (hou.Node | None): AYON Publish ROP that finished rendering.
+
+    Returns:
+        bool: Whether the workfile was incremented.
+    """
+    if node is None:
+        return False
+
+    pending = getattr(hou.session, _WORKFILE_INCREMENT_SESSION_KEY, None)
+    if not isinstance(pending, dict) or node.path() not in pending:
+        log.debug("No pending workfile increment for '%s'", node.path())
+        return False
+    published_file = pending.pop(node.path())
+
+    if not _is_ui_session():
+        log.info(
+            "Skipping workfile increment for '%s': not an interactive "
+            "session (farm/batch render)", node.path())
+        return False
+
+    downstream = get_downstream_rop_dependencies(node)
+    if downstream:
+        log.info(
+            "Skipping workfile increment for '%s': it has downstream ROP "
+            "dependencies (%s); $HIP must stay stable for their renders",
+            node.path(), ", ".join(dep.path() for dep in downstream))
+        return False
+
+    host = registered_host()
+    if host is None:
+        log.warning("Skipping workfile increment: no registered host")
+        return False
+
+    current_file = host.get_current_workfile()
+    if not current_file:
+        log.warning(
+            "Skipping workfile increment: current workfile is not saved")
+        return False
+    if published_file and (
+        _normalize_filepath(current_file)
+        != _normalize_filepath(published_file)
+    ):
+        log.warning(
+            "Skipping workfile increment: current workfile '%s' changed "
+            "since publishing '%s'", current_file, published_file)
+        return False
+
+    from ayon_core.lib import version_up
+
+    new_file = version_up(current_file)
+    host.save_workfile(new_file)
+    log.info(
+        "Incremented workfile '%s' to '%s' after AYON Publish ROP render",
+        current_file, new_file)
+    return True
+
+
 def set_ayon_publish_nodes_pre_render_script(
-    rop_node: hou.Node, log: logging.Logger, val: str
+    rop_node: hou.Node, log: logging.Logger, val: str,
+    postrender: "str | None" = None,
 ):
     node_list = [rop_node]
     node_list.extend(rop_node.inputAncestors())
@@ -368,6 +531,11 @@ def set_ayon_publish_nodes_pre_render_script(
 
         if is_ayon_publish_node(node):
             node.parm("prerender").set(val)
+            if postrender is not None:
+                # Old scenes may still have the post-render script language
+                # set to Hscript; the restored script is Python.
+                node.parm("lpostrender").set("python")
+                node.parm("postrender").set(postrender)
 
 
 def get_rop_output(rop: hou.RopNode, frame_range=None) -> list:

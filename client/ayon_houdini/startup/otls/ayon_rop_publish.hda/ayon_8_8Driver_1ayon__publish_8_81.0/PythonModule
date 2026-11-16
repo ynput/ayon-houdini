@@ -6,6 +6,18 @@ def run(*args, **kwargs):
     ayon_publish.ayon_publish_command(*args, **kwargs)
 
 
+def run_after_render(*args, **kwargs):
+    """Increment the workfile after a successful publish render."""
+    import importlib
+
+    import hou
+
+    from ayon_houdini.api import ayon_publish
+
+    importlib.reload(ayon_publish)
+    ayon_publish.after_publish_render(hou.pwd(), *args, **kwargs)
+
+
 def get_product_type_menu(node):
     """Return the product types for the node's productType menu."""
     from ayon_houdini.api import ayon_publish

@@ -5,7 +5,7 @@ import pyblish.api
 from ayon_core.pipeline import PublishValidationError
 
 from ayon_houdini.api.action import SelectROPAction
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, ayon_publish
 
 
 class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
@@ -21,6 +21,14 @@ class ValidateFrameRangeFramesToFix(plugin.HoudiniInstancePlugin):
     actions = [SelectROPAction]
 
     def process(self, instance):
+
+        # The AYON Publish ROP has no own frame range; the ranges of the ROPs
+        # connected to it are the source of truth.
+        if ayon_publish.is_rop_publish_instance(instance):
+            self.log.debug(
+                "Skipping frames to fix validation for AYON Publish ROP "
+                f"instance: {instance.data.get('instance_node')}")
+            return
 
         if not instance.data.get("instance_node"):
             return

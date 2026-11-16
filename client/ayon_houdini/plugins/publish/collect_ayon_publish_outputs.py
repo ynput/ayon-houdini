@@ -102,6 +102,7 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
                 rop_node,
                 self.log,
                 "",
+                postrender="",
             )
             try:
                 self._rop_render(rop_node)
@@ -110,7 +111,8 @@ class CollectAYONPublishOutputs(plugin.HoudiniInstancePlugin):
                 ayon_publish.set_ayon_publish_nodes_pre_render_script(
                     rop_node,
                     self.log,
-                    "hou.phm().run()",
+                    ayon_publish.AYON_PUBLISH_PRE_RENDER_SCRIPT,
+                    postrender=ayon_publish.AYON_PUBLISH_POST_RENDER_SCRIPT,
                 )
 
         input_rops = rop_node.inputs()

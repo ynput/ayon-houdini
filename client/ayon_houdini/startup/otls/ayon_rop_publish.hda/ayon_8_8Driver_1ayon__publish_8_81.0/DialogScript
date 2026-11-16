@@ -640,7 +640,7 @@
             type    file
             invisible
             joinnext
-            default { "" }
+            default { "hou.phm().run_after_render()" }
             parmtag { "filechooser_mode" "read" }
         }
         parm {
@@ -649,7 +649,7 @@
             type    string
             invisible
             nolabel
-            default { "hscript" }
+            default { "python" }
             menu {
                 "hscript"   "Hscript"
                 "python"    "Python"

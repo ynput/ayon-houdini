@@ -80,13 +80,19 @@ publishing fails, and `ayon_publish.publish()` returns the report data.
   real output image, otherwise publishing fails with a clear error.
 - **Saved workfile required:** AYON requires the workfile to be saved before
   publishing.
+- **Frame range validators:** the generic frame range validators are skipped
+  for AYON Publish ROPs because the publish ROP's own range does not describe
+  its input ROPs. Set/validate the range on the connected ROPs instead.
 - **Missing files:** expected files that are not on disk (e.g. when a farm
   render only covered a Deadline node range) are skipped with a warning; if no
   files exist, publishing fails. Stale files from older renders are not
   detected — the ROP's frame range remains the source of truth.
-- **No workfile increment:** publishing through AYON Publish ROPs does not
-  increment the workfile version, because upstream nodes would still export
-  with the old `$HIP` path.
+- **Workfile increment:** after a ROP-triggered publish finishes rendering in an
+  interactive Houdini session, the workfile is incremented automatically (after
+  the render, so downstream exports keep the old `$HIP` path during rendering).
+  The increment is skipped for farm/batch renders and when the AYON Publish ROP
+  still feeds downstream ROPs in the same network; use the Publisher UI publish
+  if the workfile must be incremented in those cases.
 - **Nested AYON Publish ROPs** are not supported (see above).
 
 ## Troubleshooting
@@ -98,3 +104,6 @@ publishing fails, and `ayon_publish.publish()` returns the report data.
 | `No output files were found for input ROP` | The ROP did not render (yet), or writes elsewhere. Render it first / check its output path. |
 | `Multiple input ROPs export the same file extension` | Give the inputs unique extensions or publish them separately. |
 | `File not saved` | Save the Houdini workfile before publishing. |
+| `Invalid Frame Range` on an AYON Publish ROP | This validator is skipped for AYON Publish ROPs; set the frame range on the input ROPs instead. |
+| Node stays red with `AYON publish FAILED` after fixing the problem | Right-click the node → **Reset AYON Publish Error** (or run another publish; the stale state is cleared at the start of the next publish). |
+| Workfile not incremented after a ROP render | Expected for farm/batch renders and when the AYON Publish ROP has downstream ROP dependencies; publish via the Publisher UI to increment the workfile. |
