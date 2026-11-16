@@ -31,7 +31,6 @@ from ayon_core.pipeline.load import (
 )
 from ayon_core.style import load_stylesheet
 from ayon_core.tools.utils import SimpleFoldersWidget
-from ayon_core.ui.components import AYMenu
 from ayon_houdini.api import lib
 
 
@@ -841,7 +840,12 @@ def get_available_tasks(node) -> List[str]:
 
 
 def select_task(node):
-    """Show an AYON-styled menu to select the task for the AYON Publish ROP."""
+    """Show a host-styled menu to select the task for the AYON Publish ROP.
+
+    The menu uses the host application's Qt style (like the native product
+    type dropdown) so the task picker stays visually consistent with the
+    other AYON Publish ROP controls.
+    """
     task_parm = node.parm("task")
     if task_parm is None:
         return
@@ -851,7 +855,7 @@ def select_task(node):
         return
 
     current_task = task_parm.eval()
-    menu = AYMenu(parent=lib.get_main_window())
+    menu = QtWidgets.QMenu(parent=lib.get_main_window())
     for task_name in task_names:
         action = menu.addAction(task_name)
         action.setCheckable(True)
@@ -1063,7 +1067,11 @@ def get_available_variants(node) -> List[str]:
 
 
 def select_variant(node):
-    """Show an AYON-styled menu to select a variant for the AYON Publish ROP.
+    """Show a menu to select a variant for the AYON Publish ROP.
+
+    The menu uses the host application's Qt style (like the native product
+    type dropdown) so the variant picker stays visually consistent with the
+    other AYON Publish ROP controls.
 
     Applies the chosen value to the node's ``variant`` parm.
     """
@@ -1076,7 +1084,7 @@ def select_variant(node):
         return
 
     current_variant = variant_parm.eval()
-    menu = AYMenu(parent=lib.get_main_window())
+    menu = QtWidgets.QMenu(parent=lib.get_main_window())
     for variant in variants:
         action = menu.addAction(variant)
         action.setCheckable(True)
