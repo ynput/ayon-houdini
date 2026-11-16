@@ -2,7 +2,7 @@ import re
 
 import os
 import glob
-from typing import List, Optional
+from typing import Dict, List, Optional
 import dataclasses
 
 import pyblish.api
@@ -33,6 +33,7 @@ class Resource:
     source: str               # unresolved source path
     files: List[str]          # resolve list of files, e.g. multiple for <UDIM>
     color_space: str = None   # colorspace of the resource
+    resolved_source: Optional[str] = None  # anchored path for relative sources
 
 
 def get_layer_property_paths(layer: Sdf.Layer) -> List[Sdf.Path]:
@@ -85,10 +86,17 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
         # any textures are remapped to their 'relative' publish path.
         # All textures will be in a relative `./resources/` folder
         remap = {}
+        winning_names: Dict[str, str] = {}
         for resource in instance_resources:
             source = resource.source
-            name = os.path.basename(source)
-            remap[os.path.normpath(source)] = f"./resources/{name}"
+            name = os.path.basename(source.replace("\\", "/"))
+            winning_name = winning_names.setdefault(
+                os.path.normcase(name), name
+            )
+            target_path = f"./resources/{winning_name}"
+            remap[os.path.normpath(source)] = target_path
+            if resource.resolved_source:
+                remap[os.path.normpath(resource.resolved_source)] = target_path
         instance.data["assetRemap"] = remap
 
         # Store resources on instance
@@ -158,11 +166,13 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     continue
 
                 asset: Sdf.AssetPath = spec.default
-                base, ext = os.path.splitext(asset.path)
-                if ext in self.exclude_suffixes:
+                if not asset.path:
                     continue
 
                 filepath = asset.path.replace("\\", "/")
+                base, ext = os.path.splitext(filepath)
+                if ext in self.exclude_suffixes:
+                    continue
 
                 # Skip AYON entity URIs because these represent already
                 # published files.
@@ -174,7 +184,8 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     continue
 
                 # Anchor relative paths to absolute paths
-                if filepath.startswith("./"):
+                resolved_source = None
+                if filepath.startswith(("./", "../")):
                     # USD can't anchor to anonymous layers because it doesn't
                     # know where it exists - however, Houdini layers can have
                     # dedicated save paths, and hence could resolve paths
@@ -183,7 +194,9 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                         layer_path = get_layer_save_path(layer)
                         if layer_path:
                             folder = os.path.dirname(layer_path)
-                            filepath = os.path.join(folder, filepath[2:])
+                            filepath = os.path.normpath(
+                                os.path.join(folder, filepath)
+                            ).replace("\\", "/")
                         else:
                             self.log.warning(
                                 "Skipping asset with relative path."
@@ -196,17 +209,17 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                         filepath = Sdf.ComputeAssetPathRelativeToLayer(
                             layer, filepath
                         )
+                    resolved_source = filepath
 
                 # Expand <UDIM> to all files of the available files on disk
                 # TODO: Add support for `<TILE>`
                 # TODO: Add support for `<ATTR:name INDEX:name DEFAULT:value>`
                 if "<UDIM>" in filepath.upper():
-                    pattern = re.sub(
-                        r"<UDIM>",
-                        # UDIM is always four digits
-                        "[0-9]" * 4,
-                        filepath,
-                        flags=re.IGNORECASE
+                    parts = re.split(
+                        r"<UDIM>", filepath, flags=re.IGNORECASE
+                    )
+                    pattern = ("[0-9]" * 4).join(
+                        glob.escape(part) for part in parts
                     )
                     files = glob.glob(pattern)
                 else:
@@ -220,7 +233,8 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                     attribute=path.pathString,
                     source=asset.path,
                     files=files,
-                    color_space=colorspace
+                    color_space=colorspace,
+                    resolved_source=resolved_source,
                 )
                 resources.append(resource)
 
@@ -285,8 +299,23 @@ class CollectUsdLookResourceTransfers(plugin.HoudiniInstancePlugin):
 
         resources_dir = instance.data["resourcesDir"]
         transfers = instance.data.setdefault("transfers", [])
+        seen = {
+            (
+                os.path.normcase(os.path.normpath(src)),
+                os.path.normcase(os.path.normpath(dest)),
+            )
+            for src, dest in transfers
+        }
         for resource in instance.data.get("resources", []):
             for src in resource["files"]:
-                dest = os.path.join(resources_dir, os.path.basename(src))
+                name = os.path.basename(src.replace("\\", "/"))
+                dest = os.path.join(resources_dir, name)
+                key = (
+                    os.path.normcase(os.path.normpath(src)),
+                    os.path.normcase(os.path.normpath(dest)),
+                )
+                if key in seen:
+                    continue
+                seen.add(key)
                 transfers.append((src, dest))
                 self.log.debug("Registering transfer: %s -> %s", src, dest)
