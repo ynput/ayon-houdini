@@ -30,6 +30,7 @@ from ayon_core.pipeline.load import (
 )
 from ayon_core.style import load_stylesheet
 from ayon_core.tools.utils import SimpleFoldersWidget
+from ayon_core.ui.components import AYMenu
 from ayon_houdini.api import lib
 
 
@@ -923,6 +924,91 @@ def select_product_name(node):
     if selected_product:
         product_parm.set(selected_product)
         product_parm.pressButton()  # allow any callbacks to trigger
+
+
+def get_available_variants(node) -> List[str]:
+    """Return the variants selectable on the node.
+
+    The list contains the creator's configured default variants (from the
+    ``CreateAyonPublishROP`` addon settings) and the variants already used by
+    AYON Publish ROP nodes in the current scene.
+    """
+    from ayon_core.settings import get_current_project_settings
+    from ayon_houdini.api import ayon_publish
+
+    variants = []
+
+    def _add(value):
+        if value and value not in variants:
+            variants.append(value)
+
+    try:
+        settings = get_current_project_settings()
+        defaults = (
+            settings.get("houdini", {})
+            .get("create", {})
+            .get("CreateAyonPublishROP", {})
+            .get("default_variants", [])
+        )
+    except Exception:  # noqa: BLE001
+        defaults = []
+    for value in defaults or []:
+        _add(value)
+
+    variant_parm = node.parm("variant")
+    if variant_parm:
+        _add(variant_parm.eval())
+
+    existing = []
+    out = hou.node("/out")
+    candidates = []
+    if out is not None:
+        candidates = list(out.allSubChildren())
+        if node not in candidates:
+            candidates.append(node)
+    else:
+        candidates = [node]
+    creator_id = ayon_publish.AYON_PUBLISH_CREATOR_IDENTIFIER
+    for candidate in candidates:
+        creator_parm = candidate.parm("creator_identifier")
+        candidate_variant_parm = candidate.parm("variant")
+        if creator_parm is None or candidate_variant_parm is None:
+            continue
+        if creator_parm.eval() != creator_id:
+            continue
+        value = candidate_variant_parm.eval()
+        if value and value not in existing:
+            existing.append(value)
+
+    for value in sorted(existing):
+        _add(value)
+
+    return variants
+
+
+def select_variant(node):
+    """Show an AYON-styled menu to select a variant for the AYON Publish ROP.
+
+    Applies the chosen value to the node's ``variant`` parm.
+    """
+    variant_parm = node.parm("variant")
+    if variant_parm is None:
+        return
+
+    variants = get_available_variants(node)
+    if not variants:
+        return
+
+    current_variant = variant_parm.eval()
+    menu = AYMenu(parent=lib.get_main_window())
+    for variant in variants:
+        action = menu.addAction(variant)
+        action.setCheckable(True)
+        action.setChecked(variant == current_variant)
+
+    selected = menu.exec_(QtGui.QCursor.pos())
+    if selected is not None:
+        variant_parm.set(selected.text())
 
 
 def get_available_representations(node):

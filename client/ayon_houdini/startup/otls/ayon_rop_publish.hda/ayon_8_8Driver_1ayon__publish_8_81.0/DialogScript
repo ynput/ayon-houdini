@@ -735,6 +735,8 @@
             label   "Variant"
             type    string
             default { "Main" }
+            parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_variant;select_variant(kwargs['node'])" }
+            parmtag { "script_action_icon" "BUTTONS_reselect" }
         }
         parm {
             name    "active"
