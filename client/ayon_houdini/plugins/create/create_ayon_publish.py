@@ -1,6 +1,7 @@
 import json
 import contextlib
 
+from ayon_core.lib import is_func_signature_supported
 from ayon_core.pipeline.create import ProductTypeItem
 
 from ayon_houdini.api import plugin, lib, ayon_publish
@@ -53,6 +54,49 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
             ProductTypeItem(product_type=name, label=label)
             for name, label in ayon_publish.get_product_types()
         ]
+
+    def get_product_name(self, *args, **kwargs):
+        """Get the product name for the selected product type.
+
+        The AYON Publish ROP can publish any product type while the creator's
+        own product base type is the generic ``rop_publish``. The name must
+        be computed as if the selected product type was the creator's type,
+        otherwise the 'rop_publish' product name template is used (which can
+        result in names like ``rop_pointcacheMain``).
+        """
+        product_type = kwargs.pop("product_type", None)
+        if not product_type:
+            product_type = self.product_type
+        if not product_type:
+            return super().get_product_name(*args, **kwargs)
+
+        def get_product_type_items():
+            # Older ayon-core versions do not accept 'product_type' in
+            # get_product_name. Making the selected product type the first
+            # product type item makes those versions resolve the product name
+            # template for the selected type too.
+            return [ProductTypeItem(
+                product_type=product_type,
+                label=product_type,
+            )]
+
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(
+                monkeypatch_attribute(self, "product_type", product_type))
+            stack.enter_context(
+                monkeypatch_attribute(
+                    self, "product_base_type", product_type))
+            stack.enter_context(
+                monkeypatch_attribute(
+                    self, "get_product_type_items", get_product_type_items))
+            if is_func_signature_supported(
+                super().get_product_name,
+                *args,
+                product_type=product_type,
+                **kwargs,
+            ):
+                kwargs["product_type"] = product_type
+            return super().get_product_name(*args, **kwargs)
 
     def get_network_categories(self):
         return [hou.ropNodeTypeCategory()]
@@ -115,19 +159,18 @@ class CreateAyonPublishROP(plugin.HoudiniCreator):
             if not result[key]:
                 result[key] = {}
 
-        # Compute product name
-        # TODO: Preferably we wouldn't need to monkeypatch this but have
-        #  ayon-core automatically be able to update and re-compute the
-        #  product name if a custom product type is set for the instance.
+        # Compute product name.
+        # The name must be computed for the selected product type, not for
+        # the creator's generic 'rop_publish' product base type.
         folder_path: str = result["folderPath"]
         task_name: str = result["task"]
         product_type: str = result["productType"]
-        with monkeypatch_attribute(self, "product_type", product_type):
-            result["productName"] = self.get_product_name(
-                self.create_context.get_current_project_name(),
-                self.create_context.get_folder_entity(folder_path),
-                self.create_context.get_task_entity(folder_path, task_name),
-                variant=result["variant"],
-            )
+        result["productName"] = self.get_product_name(
+            self.create_context.get_current_project_name(),
+            self.create_context.get_folder_entity(folder_path),
+            self.create_context.get_task_entity(folder_path, task_name),
+            variant=result["variant"],
+            product_type=product_type,
+        )
 
         return result
