@@ -723,12 +723,16 @@
             label   "Folder Path"
             type    string
             default { "$AYON_FOLDER_PATH" }
+            parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_folder_path;select_folder_path(kwargs['node'])" }
+            parmtag { "script_action_icon" "BUTTONS_reselect" }
         }
         parm {
             name    "task"
             label   "Task Name"
             type    string
             default { "$AYON_TASK_NAME" }
+            parmtag { "script_action" "from ayon_houdini.api.hda_utils import select_task;select_task(kwargs['node'])" }
+            parmtag { "script_action_icon" "BUTTONS_reselect" }
         }
         parm {
             name    "variant"

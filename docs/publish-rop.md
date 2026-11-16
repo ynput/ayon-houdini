@@ -10,7 +10,9 @@ including custom studio ROPs and cache nodes such as a `FileCache`.
 1. Create the node from the AYON Publisher UI (recommended), or from the
    `/out` tab menu › **AYON Publish**.
 2. Set the context (`Folder Path`, `Task Name`), `Variant` and `Product Type`.
-   Use the picker button next to `Variant` to choose from the creator's
+   Use the picker buttons next to `Folder Path` and `Task Name` to select from
+   the current AYON project's folders and the folder's tasks. Use the picker
+   button next to `Variant` to choose from the creator's
    configured default variants and the variants already used by AYON Publish
    ROPs in the scene.
    The product type defaults to `rop_publish`; the ROP menu and the Publisher

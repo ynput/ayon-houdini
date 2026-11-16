@@ -22,6 +22,7 @@ from ayon_core.lib import StringTemplate
 from ayon_core.pipeline.context_tools import (
     get_current_project_name,
     get_current_folder_path,
+    get_current_task_name,
 )
 from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 from ayon_core.pipeline.load import (
@@ -720,10 +721,10 @@ def select_folder_path(node):
     When triggered it opens a dialog that shows the available
     folder paths within a given project.
 
-    Note:
-        This function should be refactored.
-        It currently shows the available
-          folder paths within the current project only.
+    Supports both the generic loader parms (``project_name`` and
+    ``folder_path``) and the AYON Publish ROP parms (no ``project_name``;
+    ``folderPath``). When the node has no project parm the dialog is limited
+    to the current AYON project.
 
     Args:
         node (hou.OpNode): The HDA node.
@@ -732,11 +733,27 @@ def select_folder_path(node):
 
     main_window = lib.get_main_window()
 
-    project_name = node.evalParm("project_name")
-    folder_path = node.evalParm("folder_path")
+    project_parm = node.parm("project_name")
+    folder_parm = node.parm("folder_path") or node.parm("folderPath")
+    if folder_parm is None:
+        return
+
+    project_name = (
+        project_parm.eval() if project_parm is not None
+        else get_current_project_name()
+    )
+    if project_name == "$AYON_PROJECT_NAME":
+        project_name = get_current_project_name()
+    folder_path = folder_parm.eval()
+    if folder_path == "$AYON_FOLDER_PATH":
+        folder_path = get_current_folder_path()
 
     dialog = SelectFolderPathDialog(parent=main_window)
     dialog.set_project_name(project_name)
+    if project_parm is None:
+        # The AYON Publish ROP has no project parm; keep the picker in the
+        # current project so the selected folder path is always valid.
+        dialog.project_widget.setEnabled(False)
     if folder_path:
         # We add a small delay to the setting of the selected folder
         # because the folder widget's set project logic itself also runs
@@ -763,14 +780,14 @@ def select_folder_path(node):
     if result != QtWidgets.QDialog.Accepted:
         return
 
-    # Set project
-    selected_project_name = dialog.get_selected_project_name()
-    if selected_project_name == get_current_project_name():
-        selected_project_name = "$AYON_PROJECT_NAME"
+    if project_parm is not None:
+        # Set project
+        selected_project_name = dialog.get_selected_project_name()
+        if selected_project_name == get_current_project_name():
+            selected_project_name = "$AYON_PROJECT_NAME"
 
-    project_parm = node.parm("project_name")
-    project_parm.set(selected_project_name)
-    project_parm.pressButton()  # allow any callbacks to trigger
+        project_parm.set(selected_project_name)
+        project_parm.pressButton()  # allow any callbacks to trigger
 
     # Set folder path
     selected_folder_path = dialog.get_selected_folder_path()
@@ -781,9 +798,68 @@ def select_folder_path(node):
     if selected_folder_path == get_current_folder_path():
         selected_folder_path = "$AYON_FOLDER_PATH"
 
-    folder_parm = node.parm("folder_path")
     folder_parm.set(selected_folder_path)
     folder_parm.pressButton()  # allow any callbacks to trigger
+
+
+def _get_publish_folder_path(node) -> str:
+    """Return the resolved folder path of an AYON Publish ROP."""
+    folder_path = node.evalParm("folderPath")
+    if not folder_path or folder_path == "$AYON_FOLDER_PATH":
+        return get_current_folder_path()
+    return folder_path
+
+
+def _get_publish_task_name(node) -> str:
+    """Return the resolved task name of an AYON Publish ROP."""
+    task_name = node.evalParm("task")
+    if not task_name or task_name == "$AYON_TASK_NAME":
+        return get_current_task_name()
+    return task_name
+
+
+def get_available_tasks(node) -> List[str]:
+    """Return the task names available for the node's folder."""
+    project_name = get_current_project_name()
+    folder_path = _get_publish_folder_path(node)
+    folder_entity = ayon_api.get_folder_by_path(
+        project_name, folder_path, fields={"id"}
+    )
+    current_task = _get_publish_task_name(node)
+    if not folder_entity:
+        return [current_task] if current_task else []
+
+    tasks = ayon_api.get_tasks(
+        project_name,
+        folder_ids=[folder_entity["id"]],
+        fields=["name"],
+    )
+    task_names = sorted({task["name"] for task in tasks})
+    if current_task and current_task not in task_names:
+        task_names.insert(0, current_task)
+    return task_names
+
+
+def select_task(node):
+    """Show an AYON-styled menu to select the task for the AYON Publish ROP."""
+    task_parm = node.parm("task")
+    if task_parm is None:
+        return
+
+    task_names = get_available_tasks(node)
+    if not task_names:
+        return
+
+    current_task = task_parm.eval()
+    menu = AYMenu(parent=lib.get_main_window())
+    for task_name in task_names:
+        action = menu.addAction(task_name)
+        action.setCheckable(True)
+        action.setChecked(task_name == current_task)
+
+    selected = menu.exec_(QtGui.QCursor.pos())
+    if selected is not None:
+        task_parm.set(selected.text())
 
 
 class SelectProductDialog(QtWidgets.QDialog):
