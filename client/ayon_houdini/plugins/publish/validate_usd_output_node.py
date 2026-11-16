@@ -67,10 +67,11 @@ class ValidateUSDOutputNode(plugin.HoudiniInstancePlugin):
         return inspect.cleandoc(
             """### USD ROP has invalid LOP path
 
-            The USD ROP node has no or an invalid LOP path set to be exported.
-            The LOP path must point to an existing LOP (Solaris) node, not
-            e.g. a SOP node. To export SOP geometry, import it into Solaris
-            first (e.g. with a SOP Import LOP) and point the LOP path to that.
+            The USD ROP node has an invalid LOP path set to be exported.
+            The LOP path must point to an existing LOP (Solaris) node.
+            
+            To export SOP geometry, import it into Solaris first (e.g. 
+            with a SOP Import LOP) and point the LOP path to that.
 
             Make sure to correctly configure what you want to export for the
             publish.
