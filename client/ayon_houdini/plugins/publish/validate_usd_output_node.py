@@ -47,19 +47,16 @@ class ValidateUSDOutputNode(plugin.HoudiniInstancePlugin):
         if output_node is None:
             node = hou.node(instance.data.get("instance_node"))
             cls.log.error(
-                "USD node '%s' configured LOP path does not exist. "
-                "Ensure a valid LOP path is set." % node.path()
+                f"USD node '{node.path()}' has no valid LOP path set."
             )
-
             return [node]
 
-        # Output node must be a Sop node.
+        # Output node must be a LOP node.
         if not isinstance(output_node, hou.LopNode):
             cls.log.error(
-                "Output node %s is not a LOP node. "
-                "LOP Path must point to a LOP node, "
-                "instead found category type: %s"
-                % (output_node.path(), output_node.type().category().name())
+                f"LOP path '{output_node.path()}' is a "
+                f"{output_node.type().category().name()} node, "
+                "it must point to a LOP node."
             )
             return [output_node]
 
@@ -67,7 +64,12 @@ class ValidateUSDOutputNode(plugin.HoudiniInstancePlugin):
         return inspect.cleandoc(
             """### USD ROP has invalid LOP path
 
-            The USD ROP node has no or an invalid LOP path set to be exported.
+            The USD ROP node has an invalid LOP path set to be exported.
+            The LOP path must point to an existing LOP (Solaris) node.
+
+            To export SOP geometry, import it into Solaris first (e.g.
+            with a SOP Import LOP) and point the LOP path to that.
+
             Make sure to correctly configure what you want to export for the
             publish.
             """
