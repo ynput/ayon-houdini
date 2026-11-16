@@ -18,7 +18,10 @@ Publish ROP, or create a publish instance from the node in the Publisher UI.
 
 The latest publish report is kept on the node as cached data (not saved with
 the hip file); use **Save Publish Report...** or **Copy Publish Report** at the
-bottom of the parameters to inspect it.
+bottom of the parameters to inspect it. **Open Publisher UI** opens the AYON
+Publisher UI (report tab) to investigate a failed publish. With the creator
+setting **Auto-open Publisher UI on Errors** enabled, the Publisher UI opens
+automatically after a failed ROP-triggered publish.
 
 Full documentation:
 https://github.com/ynput/ayon-houdini/blob/develop/docs/publish-rop.md
@@ -44,6 +47,8 @@ Save Publish Report...:
     Save the last publish report of this node to a JSON file.
 Copy Publish Report:
     Copy the last publish report of this node to the clipboard.
+Open Publisher UI:
+    Open the AYON Publisher UI (report tab) to investigate a failed publish.
 
 @related
 

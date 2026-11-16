@@ -796,6 +796,15 @@
             parmtag { "script_callback" "hou.phm().copy_publish_report(kwargs['node'])" }
             parmtag { "script_callback_language" "python" }
         }
+        parm {
+            name    "open_publisher"
+            label   "Open Publisher UI"
+            type    button
+            default { "0" }
+            help    "Open the AYON Publisher UI to investigate or repair a failed publish."
+            parmtag { "script_callback" "hou.phm().open_publisher()" }
+            parmtag { "script_callback_language" "python" }
+        }
     }
 
 }

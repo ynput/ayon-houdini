@@ -39,6 +39,16 @@ class CreateAyonPublishROPModel(CreatorModel):
             "the common AYON product types are used."
         )
     )
+    auto_open_publisher_on_error: bool = SettingsField(
+        title="Auto-open Publisher UI on Errors",
+        description=(
+            "When a ROP-triggered publish fails, open the AYON Publisher UI "
+            "so the publish can be investigated. When disabled, the node is "
+            "still marked as failed and the Publisher UI can be opened from "
+            "the node."
+        ),
+        default=False,
+    )
 
 
 def review_node_types_enum():
@@ -308,7 +318,8 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     },
     "CreateAyonPublishROP": {
         "enabled": True,
-        "default_variants": ["Main"]
+        "default_variants": ["Main"],
+        "auto_open_publisher_on_error": False,
     },
     "CreateCompositeSequence": {
         "enabled": True,

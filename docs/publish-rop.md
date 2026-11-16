@@ -84,6 +84,13 @@ the bottom of the node parameters:
 
 - **Save Publish Report...** — write the report to a JSON file.
 - **Copy Publish Report** — copy the JSON report to the clipboard.
+- **Open Publisher UI** — open the AYON Publisher UI (report tab) to
+  investigate a failed publish.
+
+If the creator setting **Auto-open Publisher UI on Errors** is enabled, the
+Publisher UI opens automatically after a failed ROP-triggered publish. When it
+is disabled (default), the node is still marked as failed and you can open the
+Publisher UI from the node.
 
 ## Known issues / limitations
 

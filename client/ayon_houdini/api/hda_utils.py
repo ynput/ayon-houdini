@@ -1163,6 +1163,15 @@ def copy_publish_report(node):
                  node.path())
 
 
+def open_publisher(node=None):
+    """Open the AYON Publisher UI on the report tab."""
+    if not hou.isUIAvailable():
+        return None
+
+    from ayon_core.tools.utils.host_tools import show_publisher
+    return show_publisher(parent=lib.get_main_window(), tab="report")
+
+
 def get_available_representations(node):
     """Return the representation list for node.
 

@@ -41,3 +41,12 @@ def copy_publish_report(node):
 
     importlib.reload(hda_utils)
     hda_utils.copy_publish_report(node)
+
+
+def open_publisher():
+    """Open the AYON Publisher UI to investigate a failed publish."""
+    import importlib
+    from ayon_houdini.api import hda_utils
+
+    importlib.reload(hda_utils)
+    hda_utils.open_publisher()

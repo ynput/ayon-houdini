@@ -10,6 +10,8 @@ from ayon_houdini.api import lib
 from ayon_core.pipeline import registered_host
 from ayon_core.pipeline.create import CreateContext
 from ayon_core.pipeline.publish import PublishError, PublishLogic
+from ayon_core.settings import get_current_project_settings
+from ayon_core.tools.utils import host_tools
 
 log = logging.getLogger(__name__)
 
@@ -371,6 +373,7 @@ def publish(node_path: str, report_path: "str | None" = None) -> dict:
             )
 
         set_node_error(node, _get_node_error_message(errors))
+        _maybe_open_publisher_on_error()
         error_message = "\n".join(errors)
         raise PublishError(
             f"Publishing '{node_path}' failed:\n{error_message}")
@@ -443,6 +446,33 @@ def _mark_workfile_increment_pending(node, current_file: str) -> None:
 def _is_ui_session() -> bool:
     """Return whether Houdini runs in an interactive UI session."""
     return bool(hou.isUIAvailable())
+
+
+def _auto_open_publisher_on_error_enabled() -> bool:
+    """Return whether the project enables auto-opening the Publisher UI."""
+    settings = get_current_project_settings()
+    return (
+        settings.get("houdini", {})
+        .get("create", {})
+        .get("CreateAyonPublishROP", {})
+        .get("auto_open_publisher_on_error", False)
+    )
+
+
+def _maybe_open_publisher_on_error() -> None:
+    """Auto-open the Publisher UI after a failed ROP-triggered publish."""
+    if not _is_ui_session():
+        return
+    if not _auto_open_publisher_on_error_enabled():
+        return
+
+    import hdefereval
+
+    hdefereval.executeDeferred(
+        lambda: host_tools.show_publisher(
+            parent=lib.get_main_window(), tab="report"
+        )
+    )
 
 
 def _normalize_filepath(filepath: str) -> str:
