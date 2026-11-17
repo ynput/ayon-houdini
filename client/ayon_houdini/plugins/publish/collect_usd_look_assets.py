@@ -197,29 +197,32 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
                             filepath = os.path.normpath(
                                 os.path.join(folder, filepath)
                             ).replace("\\", "/")
+                            resolved_source = filepath
                         else:
                             self.log.warning(
-                                "Skipping asset with relative path."
-                                " USD layer's path is unknown so"
-                                " we cannot resolve the full path for"
-                                f" attribute '{path}': {filepath}"
+                                "Cannot resolve relative path because the "
+                                "USD layer has no save path for attribute "
+                                f"'{path}': {filepath}"
                             )
-                            continue
+                            filepath = None
                     else:
                         filepath = Sdf.ComputeAssetPathRelativeToLayer(
                             layer, filepath
                         )
-                    resolved_source = filepath
+                        resolved_source = filepath
 
                 # Expand <UDIM> to all files of the available files on disk
                 # TODO: Add support for `<TILE>`
                 # TODO: Add support for `<ATTR:name INDEX:name DEFAULT:value>`
-                if "<UDIM>" in filepath.upper():
-                    parts = re.split(
-                        r"<UDIM>", filepath, flags=re.IGNORECASE
-                    )
-                    pattern = ("[0-9]" * 4).join(
-                        glob.escape(part) for part in parts
+                if filepath is None:
+                    files = []
+                elif "<UDIM>" in filepath.upper():
+                    pattern = re.sub(
+                        r"<UDIM>",
+                        # UDIM is always four digits
+                        "[0-9]" * 4,
+                        glob.escape(filepath),
+                        flags=re.IGNORECASE,
                     )
                     files = glob.glob(pattern)
                 else:
