@@ -32,7 +32,7 @@ class Resource:
     attribute: str            # property path
     source: str               # unresolved source path
     files: List[str]          # resolve list of files, e.g. multiple for <UDIM>
-    color_space: str = None   # colorspace of the resource
+    color_space: Optional[str] = None  # colorspace of the resource
     resolved_source: Optional[str] = None  # anchored path for relative sources
 
 
@@ -86,14 +86,14 @@ class CollectUsdLookAssets(plugin.HoudiniInstancePlugin):
         # any textures are remapped to their 'relative' publish path.
         # All textures will be in a relative `./resources/` folder
         remap = {}
-        winning_names: Dict[str, str] = {}
+        destination_names: Dict[str, str] = {}
         for resource in instance_resources:
             source = resource.source
             name = os.path.basename(source.replace("\\", "/"))
-            winning_name = winning_names.setdefault(
+            destination_name = destination_names.setdefault(
                 os.path.normcase(name), name
             )
-            target_path = f"./resources/{winning_name}"
+            target_path = f"./resources/{destination_name}"
             remap[os.path.normpath(source)] = target_path
             if resource.resolved_source:
                 remap[os.path.normpath(resource.resolved_source)] = target_path
