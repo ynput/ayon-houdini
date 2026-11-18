@@ -919,7 +919,7 @@ def get_resolution_from_entity(entity):
 
 
 def set_camera_resolution(camera, entity=None):
-    """Apply resolution to camera from task or folder entity.
+    """Apply resolution and pixel aspect to camera from task or folder entity.
 
     Arguments:
         camera (hou.OpNode): Camera node.
@@ -938,6 +938,16 @@ def set_camera_resolution(camera, entity=None):
         ))
         camera.parm("resx").set(resolution[0])
         camera.parm("resy").set(resolution[1])
+
+    pixel_aspect = entity["attrib"].get("pixelAspect")
+    if pixel_aspect is not None:
+        print(
+            f"Setting camera pixel aspect: {camera.name()} -> {pixel_aspect}"
+        )
+        # Remove the Alembic archive channel expression, if any
+        aspect_parm = camera.parm("aspect")
+        aspect_parm.deleteAllKeyframes()
+        aspect_parm.set(pixel_aspect)
 
 
 def get_camera_from_container(container):
