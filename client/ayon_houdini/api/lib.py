@@ -940,12 +940,12 @@ def set_camera_resolution(camera, entity=None):
         camera.parm("resy").set(resolution[1])
 
     pixel_aspect = entity["attrib"].get("pixelAspect")
-    if pixel_aspect is not None:
+    aspect_parm = camera.parm("aspect")
+    if pixel_aspect is not None and aspect_parm.eval() != pixel_aspect:
         print(
             f"Setting camera pixel aspect: {camera.name()} -> {pixel_aspect}"
         )
         # Remove the Alembic archive channel expression, if any
-        aspect_parm = camera.parm("aspect")
         aspect_parm.deleteAllKeyframes()
         aspect_parm.set(pixel_aspect)
 
