@@ -8,7 +8,7 @@ from ayon_core.pipeline import (
 )
 from ayon_core.pipeline.publish import ValidateContentsOrder
 from ayon_houdini.api.action import SelectInvalidAction
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, ayon_publish
 
 
 class ValidateSingleFrame(plugin.HoudiniInstancePlugin,
@@ -37,6 +37,15 @@ class ValidateSingleFrame(plugin.HoudiniInstancePlugin,
 
     @classmethod
     def get_invalid(cls, instance):
+
+        if ayon_publish.is_rop_publish_instance(instance):
+            # The AYON Publish ROP's own frame range does not describe the
+            # ranges of the ROPs connected to it, so this check would be
+            # misleading. TODO: validate the input ROPs' frame ranges instead.
+            cls.log.debug(
+                "Skipping single frame validation for AYON Publish ROP "
+                f"instance: {instance.data.get('instance_node')}")
+            return []
 
         frame_start = instance.data.get("frameStartHandle")
         frame_end = instance.data.get("frameEndHandle")

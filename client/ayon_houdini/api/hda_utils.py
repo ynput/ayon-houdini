@@ -1,9 +1,11 @@
 """Helper functions for load HDA"""
 
 from __future__ import annotations
+import json
 import os
 import re
 import uuid
+from datetime import datetime
 from typing import List, Union
 
 import hou
@@ -22,6 +24,7 @@ from ayon_core.lib import StringTemplate
 from ayon_core.pipeline.context_tools import (
     get_current_project_name,
     get_current_folder_path,
+    get_current_task_name,
 )
 from ayon_core.pipeline.entity_uri import construct_ayon_entity_uri
 from ayon_core.pipeline.load import (
@@ -719,10 +722,10 @@ def select_folder_path(node):
     When triggered it opens a dialog that shows the available
     folder paths within a given project.
 
-    Note:
-        This function should be refactored.
-        It currently shows the available
-          folder paths within the current project only.
+    Supports both the generic loader parms (``project_name`` and
+    ``folder_path``) and the AYON Publish ROP parms (no ``project_name``;
+    ``folderPath``). When the node has no project parm the dialog is limited
+    to the current AYON project.
 
     Args:
         node (hou.OpNode): The HDA node.
@@ -731,11 +734,27 @@ def select_folder_path(node):
 
     main_window = lib.get_main_window()
 
-    project_name = node.evalParm("project_name")
-    folder_path = node.evalParm("folder_path")
+    project_parm = node.parm("project_name")
+    folder_parm = node.parm("folder_path") or node.parm("folderPath")
+    if folder_parm is None:
+        return
+
+    project_name = (
+        project_parm.eval() if project_parm is not None
+        else get_current_project_name()
+    )
+    if project_name == "$AYON_PROJECT_NAME":
+        project_name = get_current_project_name()
+    folder_path = folder_parm.eval()
+    if folder_path == "$AYON_FOLDER_PATH":
+        folder_path = get_current_folder_path()
 
     dialog = SelectFolderPathDialog(parent=main_window)
     dialog.set_project_name(project_name)
+    if project_parm is None:
+        # The AYON Publish ROP has no project parm; keep the picker in the
+        # current project so the selected folder path is always valid.
+        dialog.project_widget.setEnabled(False)
     if folder_path:
         # We add a small delay to the setting of the selected folder
         # because the folder widget's set project logic itself also runs
@@ -762,14 +781,14 @@ def select_folder_path(node):
     if result != QtWidgets.QDialog.Accepted:
         return
 
-    # Set project
-    selected_project_name = dialog.get_selected_project_name()
-    if selected_project_name == get_current_project_name():
-        selected_project_name = "$AYON_PROJECT_NAME"
+    if project_parm is not None:
+        # Set project
+        selected_project_name = dialog.get_selected_project_name()
+        if selected_project_name == get_current_project_name():
+            selected_project_name = "$AYON_PROJECT_NAME"
 
-    project_parm = node.parm("project_name")
-    project_parm.set(selected_project_name)
-    project_parm.pressButton()  # allow any callbacks to trigger
+        project_parm.set(selected_project_name)
+        project_parm.pressButton()  # allow any callbacks to trigger
 
     # Set folder path
     selected_folder_path = dialog.get_selected_folder_path()
@@ -780,9 +799,73 @@ def select_folder_path(node):
     if selected_folder_path == get_current_folder_path():
         selected_folder_path = "$AYON_FOLDER_PATH"
 
-    folder_parm = node.parm("folder_path")
     folder_parm.set(selected_folder_path)
     folder_parm.pressButton()  # allow any callbacks to trigger
+
+
+def _get_publish_folder_path(node) -> str:
+    """Return the resolved folder path of an AYON Publish ROP."""
+    folder_path = node.evalParm("folderPath")
+    if not folder_path or folder_path == "$AYON_FOLDER_PATH":
+        return get_current_folder_path()
+    return folder_path
+
+
+def _get_publish_task_name(node) -> str:
+    """Return the resolved task name of an AYON Publish ROP."""
+    task_name = node.evalParm("task")
+    if not task_name or task_name == "$AYON_TASK_NAME":
+        return get_current_task_name()
+    return task_name
+
+
+def get_available_tasks(node) -> List[str]:
+    """Return the task names available for the node's folder."""
+    project_name = get_current_project_name()
+    folder_path = _get_publish_folder_path(node)
+    folder_entity = ayon_api.get_folder_by_path(
+        project_name, folder_path, fields={"id"}
+    )
+    current_task = _get_publish_task_name(node)
+    if not folder_entity:
+        return [current_task] if current_task else []
+
+    tasks = ayon_api.get_tasks(
+        project_name,
+        folder_ids=[folder_entity["id"]],
+        fields=["name"],
+    )
+    task_names = sorted({task["name"] for task in tasks})
+    if current_task and current_task not in task_names:
+        task_names.insert(0, current_task)
+    return task_names
+
+
+def select_task(node):
+    """Show a host-styled menu to select the task for the AYON Publish ROP.
+
+    The menu uses the host application's Qt style (like the native product
+    type dropdown) so the task picker stays visually consistent with the
+    other AYON Publish ROP controls.
+    """
+    task_parm = node.parm("task")
+    if task_parm is None:
+        return
+
+    task_names = get_available_tasks(node)
+    if not task_names:
+        return
+
+    current_task = task_parm.eval()
+    menu = QtWidgets.QMenu(parent=lib.get_main_window())
+    for task_name in task_names:
+        action = menu.addAction(task_name)
+        action.setCheckable(True)
+        action.setChecked(task_name == current_task)
+
+    selected = menu.exec_(QtGui.QCursor.pos())
+    if selected is not None:
+        task_parm.set(selected.text())
 
 
 class SelectProductDialog(QtWidgets.QDialog):
@@ -923,6 +1006,170 @@ def select_product_name(node):
     if selected_product:
         product_parm.set(selected_product)
         product_parm.pressButton()  # allow any callbacks to trigger
+
+
+def get_available_variants(node) -> List[str]:
+    """Return the variants selectable on the node.
+
+    The list contains the creator's configured default variants (from the
+    ``CreateAyonPublishROP`` addon settings) and the variants already used by
+    AYON Publish ROP nodes in the current scene.
+    """
+    from ayon_core.settings import get_current_project_settings
+    from ayon_houdini.api import ayon_publish
+
+    variants = []
+
+    def _add(value):
+        if value and value not in variants:
+            variants.append(value)
+
+    try:
+        settings = get_current_project_settings()
+        defaults = (
+            settings.get("houdini", {})
+            .get("create", {})
+            .get("CreateAyonPublishROP", {})
+            .get("default_variants", [])
+        )
+    except Exception:  # noqa: BLE001
+        defaults = []
+    for value in defaults or []:
+        _add(value)
+
+    variant_parm = node.parm("variant")
+    if variant_parm:
+        _add(variant_parm.eval())
+
+    existing = []
+    out = hou.node("/out")
+    candidates = []
+    if out is not None:
+        candidates = list(out.allSubChildren())
+        if node not in candidates:
+            candidates.append(node)
+    else:
+        candidates = [node]
+    creator_id = ayon_publish.AYON_PUBLISH_CREATOR_IDENTIFIER
+    for candidate in candidates:
+        creator_parm = candidate.parm("creator_identifier")
+        candidate_variant_parm = candidate.parm("variant")
+        if creator_parm is None or candidate_variant_parm is None:
+            continue
+        if creator_parm.eval() != creator_id:
+            continue
+        value = candidate_variant_parm.eval()
+        if value and value not in existing:
+            existing.append(value)
+
+    for value in sorted(existing):
+        _add(value)
+
+    return variants
+
+
+def select_variant(node):
+    """Show a menu to select a variant for the AYON Publish ROP.
+
+    The menu uses the host application's Qt style (like the native product
+    type dropdown) so the variant picker stays visually consistent with the
+    other AYON Publish ROP controls.
+
+    Applies the chosen value to the node's ``variant`` parm.
+    """
+    variant_parm = node.parm("variant")
+    if variant_parm is None:
+        return
+
+    variants = get_available_variants(node)
+    if not variants:
+        return
+
+    current_variant = variant_parm.eval()
+    menu = QtWidgets.QMenu(parent=lib.get_main_window())
+    for variant in variants:
+        action = menu.addAction(variant)
+        action.setCheckable(True)
+        action.setChecked(variant == current_variant)
+
+    selected = menu.exec_(QtGui.QCursor.pos())
+    if selected is not None:
+        variant_parm.set(selected.text())
+
+
+def _get_stored_publish_report(node):
+    """Return the last publish report stored on the node, if any."""
+    from ayon_houdini.api import ayon_publish
+
+    report = ayon_publish.get_stored_publish_report(node)
+    if report is None:
+        lib.log.warning(
+            "No publish report stored on '%s'. Publish the node first.",
+            node.path())
+    return report
+
+
+def get_publish_report_json(node) -> str:
+    """Return the stored publish report as formatted JSON."""
+    report = _get_stored_publish_report(node)
+    if report is None:
+        return ""
+    return json.dumps(report, indent=2)
+
+
+def write_publish_report(node, filepath) -> bool:
+    """Write the stored publish report of the node to a JSON file."""
+    report = _get_stored_publish_report(node)
+    if report is None:
+        return False
+    with open(filepath, "w", encoding="utf-8") as stream:
+        json.dump(report, stream, indent=2)
+    lib.log.info("Saved AYON publish report to '%s'", filepath)
+    return True
+
+
+def save_publish_report(node):
+    """Ask for a filepath and save the node's stored publish report."""
+    report = _get_stored_publish_report(node)
+    if report is None:
+        return
+
+    workfile = hou.hipFile.path()
+    directory = os.path.dirname(workfile) if workfile else os.getcwd()
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    default_path = os.path.join(
+        directory, f"ayon-publish-report-{timestamp}.json"
+    )
+    filepath, _filter = QtWidgets.QFileDialog.getSaveFileName(
+        lib.get_main_window(),
+        "Save AYON publish report",
+        default_path,
+        "JSON files (*.json)",
+    )
+    if not filepath:
+        return
+    if not filepath.lower().endswith(".json"):
+        filepath += ".json"
+    write_publish_report(node, filepath)
+
+
+def copy_publish_report(node):
+    """Copy the stored publish report of the node to the clipboard."""
+    report_json = get_publish_report_json(node)
+    if not report_json:
+        return
+    QtWidgets.QApplication.clipboard().setText(report_json)
+    lib.log.info("Copied AYON publish report of '%s' to clipboard",
+                 node.path())
+
+
+def open_publisher(node=None):
+    """Open the AYON Publisher UI on the report tab."""
+    if not hou.isUIAvailable():
+        return None
+
+    from ayon_core.tools.utils.host_tools import show_publisher
+    return show_publisher(parent=lib.get_main_window(), tab="report")
 
 
 def get_available_representations(node):

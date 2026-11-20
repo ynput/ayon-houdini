@@ -2,7 +2,7 @@ import os
 import pyblish.api
 
 from ayon_core.pipeline import publish, PublishError
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, ayon_publish
 from ayon_houdini.api.lib import splitext, format_as_collections
 
 
@@ -17,6 +17,14 @@ class ExtractROP(plugin.HoudiniExtractorPlugin):
     targets = ["local", "remote"]
 
     def process(self, instance: pyblish.api.Instance):
+        if ayon_publish.is_rop_publish_instance(instance):
+            # The ROP publish instance is not backed by a native ROP node;
+            # its outputs are collected by `CollectAYONPublishOutputs`.
+            self.log.debug(
+                "Skipping native ROP extraction for AYON Publish ROP "
+                f"instance: {instance.data.get('instance_node')}")
+            return
+
         if instance.data.get("farm"):
             self.log.debug("Should be processed on farm, skipping.")
             return

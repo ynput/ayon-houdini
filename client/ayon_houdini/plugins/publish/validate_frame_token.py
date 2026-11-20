@@ -3,7 +3,7 @@ import hou
 import pyblish.api
 
 from ayon_core.pipeline import PublishValidationError
-from ayon_houdini.api import lib, plugin
+from ayon_houdini.api import lib, plugin, ayon_publish
 
 
 class ValidateFrameToken(plugin.HoudiniInstancePlugin):
@@ -38,6 +38,12 @@ class ValidateFrameToken(plugin.HoudiniInstancePlugin):
 
     @classmethod
     def get_invalid(cls, instance):
+
+        if ayon_publish.is_rop_publish_instance(instance):
+            cls.log.debug(
+                "Skipping frame token validation for AYON Publish ROP "
+                f"instance: {instance.data.get('instance_node')}")
+            return []
 
         node = hou.node(instance.data["instance_node"])
         # Check trange parm, 0 means Render Current Frame

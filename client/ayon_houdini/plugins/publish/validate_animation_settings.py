@@ -3,7 +3,7 @@ import hou
 import pyblish.api
 from ayon_core.pipeline.publish import PublishValidationError
 
-from ayon_houdini.api import lib, plugin
+from ayon_houdini.api import lib, plugin, ayon_publish
 
 
 class ValidateAnimationSettings(plugin.HoudiniInstancePlugin):
@@ -38,6 +38,13 @@ class ValidateAnimationSettings(plugin.HoudiniInstancePlugin):
 
     @classmethod
     def get_invalid(cls, instance):
+
+        if ayon_publish.is_rop_publish_instance(instance):
+            cls.log.debug(
+                "Skipping output animation settings validation for AYON "
+                f"Publish ROP instance: {instance.data.get('instance_node')}"
+            )
+            return []
 
         node = hou.node(instance.data["instance_node"])
         # Check trange parm, 0 means Render Current Frame
