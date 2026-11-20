@@ -1,0 +1,154 @@
+# Dialog script for ayon::ayon_filecache::1.0 automatically generated
+
+{
+    name	ayon::ayon_filecache::1.0
+    script	ayon::ayon_filecache::1.0
+    label	"AYON File Cache"
+
+    help {
+    }
+
+    inputlabel	1	"Sub-Network Input #1"
+    inputlabel	2	"Sub-Network Input #2"
+    inputlabel	3	"Sub-Network Input #3"
+    inputlabel	4	"Sub-Network Input #4"
+
+    parm {
+        name    "folderPath"
+        label   "Folder Path"
+        type    string
+        default { "$AYON_FOLDER_PATH" }
+        help    "AYON folder path for the cache context."
+    }
+    parm {
+        name    "task"
+        label   "Task Name"
+        type    string
+        default { "$AYON_TASK_NAME" }
+        help    "AYON task name for the cache context."
+    }
+    parm {
+        name    "cacheRoot"
+        label   "Cache Root"
+        type    string
+        default { "$HIP/ayon_cache" }
+        help    "Root folder for generated cache files."
+    }
+    parm {
+        name    "cacheName"
+        label   "Cache Name"
+        type    string
+        default { "$OS" }
+        help    "Name of the cache folder."
+    }
+    parm {
+        name    "enableVersion"
+        label   "Enable Version"
+        type    toggle
+        default { "1" }
+        help    "Write the cache into a version folder."
+    }
+    parm {
+        name    "version"
+        label   "Version"
+        type    integer
+        default { "1" }
+        help    "Cache version."
+        range   { 0 10 }
+    }
+    parm {
+        name    "trange"
+        label   "Evaluate As"
+        type    ordinal
+        default { "1" }
+        menu {
+            "off"       "Single Frame"
+            "normal"    "Frame Range"
+        }
+    }
+    parm {
+        name    "cachesim"
+        label   "Simulation"
+        type    toggle
+        default { "1" }
+    }
+    parm {
+        name    "f"
+        label   "Start/End/Inc"
+        type    float
+        size    3
+        default { "1001" "1001" "1" }
+        range   { 0 10 }
+    }
+    parm {
+        name    "substeps"
+        label   "Substeps"
+        type    integer
+        default { "1" }
+        range   { 0 10 }
+    }
+    parm {
+        name    "loadtype"
+        label   "Load"
+        type    ordinal
+        default { "0" }
+        menu {
+            "full"      "All Geometry"
+            "infobbox"  "Info Bounding Box"
+            "info"      "Info"
+            "points"    "Point Cloud"
+            "delayed"   "Packed Disk Primitive"
+            "packedseq" "Packed Disk Sequence"
+            "packedgeo" "Packed Geometry"
+        }
+    }
+    parm {
+        name    "loadfromdisk"
+        label   "Load from Disk"
+        type    toggle
+        default { "0" }
+    }
+    parm {
+        name    "resolvedPath"
+        label   "Resolved Cache Path"
+        type    string
+        default { "" }
+        help    "Resolved cache folder generated from the parameters."
+    }
+    parm {
+        name    "saveCache"
+        label   "Save to Disk"
+        type    button
+        default { "0" }
+        help    "Save the input geometry to disk."
+        parmtag { "script_callback" "hou.phm().save_cache(kwargs['node'])" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "saveBackground"
+        label   "Save to Disk in Background"
+        type    button
+        default { "0" }
+        help    "Save the input geometry to disk in the background."
+        parmtag { "script_callback" "hou.phm().save_background(kwargs['node'])" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "cancelCook"
+        label   "Cancel Cook"
+        type    button
+        default { "0" }
+        help    "Cancel the running cache cook."
+        parmtag { "script_callback" "hou.phm().cancel_cook(kwargs['node'])" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "nextVersion"
+        label   "Next Version"
+        type    button
+        default { "0" }
+        help    "Set the version to the next free cache version."
+        parmtag { "script_callback" "hou.phm().next_version(kwargs['node'])" }
+        parmtag { "script_callback_language" "python" }
+    }
+}

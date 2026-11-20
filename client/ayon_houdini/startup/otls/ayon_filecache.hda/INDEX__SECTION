@@ -1,6 +1,6 @@
 Operator:     ayon::Sop/ayon_filecache::1.0
 Label:        AYON File Cache
-Path:         oplib:/ayon::Sop/Sop/ayon_filecache::1.0?ayon::Sop/Sop/ayon_filecache::1.0
+Path:         oplib:/ayon::Sop/ayon_filecache::1.0?ayon::Sop/ayon_filecache::1.0
 Icon:         opdef:/ayon::Sop/Sop/ayon_filecache::1.0?IconImage
 Table:        Sop
 License:      
@@ -12,6 +12,7 @@ Subnet:       true
 Python:       false
 Empty:        false
 Modified:     Fri Nov 20 20:38:10 2026
+
 
 
 
