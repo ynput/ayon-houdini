@@ -7,7 +7,6 @@ import warnings
 from typing import Optional
 
 import hou  # noqa
-import ayon_api
 
 from ayon_core.host import HostBase, IWorkfileHost, ILoadHost, IPublishHost
 from ayon_core.tools.utils import host_tools
@@ -18,7 +17,6 @@ from ayon_core.pipeline import (
     register_loader_plugin_path,
     register_inventory_action_path,
     register_workfile_build_plugin_path,
-    registered_host,
     AVALON_CONTAINER_ID,
     AYON_CONTAINER_ID,
 )
@@ -30,7 +28,6 @@ from ayon_core.lib import (
     register_event_callback,
     emit_event,
     env_value_to_bool,
-    get_version_from_path,
 )
 
 from .lib import JSON_PREFIX
@@ -108,12 +105,6 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         self._op_events = {}
         self._has_been_setup = False
         self.hou_initialized = False
-        # True while 'save_workfile_with_context' runs, so
-        # 'ensure_workfile_entity' skips that save: Core creates the
-        # workfile entity itself.
-        self._saving_with_context = False
-        # Workfiles known to have an entity, to skip server calls on resave.
-        self._registered_workfiles = set()
 
     def get_app_information(self):
         from ayon_core.host import ApplicationInformation
@@ -211,107 +202,17 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             prepared_data.rootless_path = to_license_workfile_path(
                 prepared_data.rootless_path
             )
-        # Core saves the file (through 'save_workfile') and then creates the
-        # workfile entity. Houdini's AfterSave callback calls
-        # 'ensure_workfile_entity' during that save; the flag makes it skip.
-        self._saving_with_context = True
-        try:
-            super().save_workfile_with_context(
-                filepath,
-                folder_entity,
-                task_entity,
-                version=version,
-                comment=comment,
-                description=description,
-                prepared_data=prepared_data,
-            )
-        finally:
-            self._saving_with_context = False
-        # Core registered it, so later Ctrl+S saves skip the server lookup.
-        self._registered_workfiles.add(filepath.replace("\\", "/"))
-
-    def ensure_workfile_entity(self):
-        """Make sure the current workfile has a workfile entity.
-
-        Creates the entity only if the file has none yet. This doesn't save
-        the scene. It runs from Houdini's AfterSave callback ('on_save')
-        after every save, and skips saves done by
-        'save_workfile_with_context', where Core creates the entity itself.
-
-        Saves outside AYON (Ctrl+S, the publish 'Save current file' step,
-        Houdini changing the extension to match its license) write a file
-        with no workfile entity. The Workfiles tool still lists it from
-        disk, but the launcher and the server only show workfiles that have
-        an entity.
-
-        Only files in the current task's work folder are handled.
-
-        """
-        if self._saving_with_context:
-            return
-
-        filepath = self.get_current_workfile()
-        if not filepath:
-            return
-        # Force lowercase in case an upper case extension was entered by
-        # the user.
-        base, extension = os.path.splitext(filepath.replace("\\", "/"))
-        filepath = base + extension.lower()
-        if filepath in self._registered_workfiles:
-            return
-
-        workdir = os.environ.get("AYON_WORKDIR")
-        if not workdir or (
-            os.path.normcase(os.path.normpath(os.path.dirname(filepath)))
-            != os.path.normcase(os.path.normpath(workdir))
-        ):
-            return
-
-        try:
-            from ayon_core.host.interfaces import get_save_workfile_context
-        except ImportError:
-            # Older ayon-core without workfile entities support
-            return
-
-        context = self.get_current_context()
-        project_name = context["project_name"]
-        folder_entity = ayon_api.get_folder_by_path(
-            project_name, context["folder_path"]
-        )
-        if not folder_entity:
-            return
-        task_entity = ayon_api.get_task_by_name(
-            project_name, folder_entity["id"], context["task_name"]
-        )
-        if not task_entity:
-            return
-
-        save_context = get_save_workfile_context(
-            project_name,
+        super().save_workfile_with_context(
             filepath,
             folder_entity,
             task_entity,
-            host_name=self.name,
-            prepared_data=None,
+            version=version,
+            comment=comment,
+            description=description,
+            prepared_data=prepared_data,
         )
-        rootless_path = save_context.rootless_path
-        if not any(
-            workfile_entity["path"] == rootless_path
-            for workfile_entity in save_context.workfile_entities
-        ):
-            version_str = get_version_from_path(filepath)
-            self._save_workfile_entity(
-                save_context,
-                int(version_str) if version_str else None,
-                None,
-                None,
-            )
-            log.info(f"Registered workfile: {filepath}")
-        self._registered_workfiles.add(filepath)
 
     def save_workfile(self, dst_path=None):
-        # Only saves the scene. The workfile entity is created by Core in
-        # 'save_workfile_with_context' or by 'ensure_workfile_entity'.
         if dst_path:
             # Force forwards slashes to avoid segfault
             dst_path = to_license_workfile_path(dst_path.replace("\\", "/"))
@@ -545,12 +446,6 @@ def before_save():
 
 
 def on_save():
-    try:
-        registered_host().ensure_workfile_entity()
-    except Exception:
-        # Never break a save because the server can't be reached
-        log.warning("Failed to register the saved workfile.", exc_info=True)
-
     if not hou.isUIAvailable():
         log.debug("Batch mode detected, ignoring `on_save` callbacks..")
         return
