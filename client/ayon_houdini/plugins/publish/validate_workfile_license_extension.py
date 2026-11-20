@@ -4,12 +4,30 @@ import os
 import pyblish.api
 
 from ayon_core.pipeline import registered_host, PublishValidationError
-from ayon_core.plugins.publish.validate_file_saved import (
-    SaveByVersionUpAction,
-    ShowWorkfilesAction,
-)
+from ayon_core.pipeline.workfile import save_next_version
+from ayon_core.tools.utils.host_tools import show_workfiles
 
 from ayon_houdini.api import plugin
+
+
+class SaveByVersionUpAction(pyblish.api.Action):
+    """Save Workfile."""
+    label = "Save Workfile"
+    on = "failed"
+    icon = "save"
+
+    def process(self, context, plugin):
+        save_next_version()
+
+
+class ShowWorkfilesAction(pyblish.api.Action):
+    """Save Workfile."""
+    label = "Show Workfiles Tool..."
+    on = "failed"
+    icon = "files-o"
+
+    def process(self, context, plugin):
+        show_workfiles()
 
 
 class ValidateWorkfileLicenseExtension(plugin.HoudiniContextPlugin):
