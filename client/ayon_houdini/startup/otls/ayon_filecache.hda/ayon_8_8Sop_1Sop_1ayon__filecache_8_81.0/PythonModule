@@ -19,6 +19,13 @@ def cancel_cook(node):
         cache.parm("dirtyall").pressButton()
 
 
+def reload_geometry(node):
+    """Reload the cached geometry from disk."""
+    cache = node.node("filecache1")
+    if cache is not None:
+        cache.parm("reload").pressButton()
+
+
 def next_version(node):
     """Set the version to the next free version folder."""
     import os

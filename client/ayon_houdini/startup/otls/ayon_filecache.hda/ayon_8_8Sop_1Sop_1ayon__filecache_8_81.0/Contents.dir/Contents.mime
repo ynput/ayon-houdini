@@ -23,7 +23,7 @@ Sop
 Content-Disposition: attachment; filename="hdaroot.init"
 Content-Type: text/plain
 
-type = ayon::Sop/ayon_filecache::1.0
+type = ayon::ayon_filecache::1.0
 matchesdef = 0
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
@@ -327,6 +327,40 @@ Content-Type: text/plain
 
 	 length = 0 expr = ch(\"../cachesim\") }
     }
+    channel timedependent {
+      lefttype = extend
+      righttype = extend
+      default = 1
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../timedependent\") }
+    }
+    channel filemethod {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../filemethod\") }
+    }
+    channel filetype {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../filetype\") }
+    }
+    channel file {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"$HIP/geo/$HIPNAME.$OS.$F.bgeo.sc\"
+      flags = 0
+      segment { options = {	 autoslope  ai ao }
+
+	 length = 0 accel = 0.33333333333333331 0.33333333333333331 expr = chs(\"../geometryFile\") }
+    }
     channel f3 {
       lefttype = extend
       righttype = extend
@@ -371,11 +405,11 @@ Content-Type: text/plain
 version 0.8
 loadfromdisk	[ 0	locks=0 ]	(	[ loadfromdisk	0 ] 	)
 reload	[ 0	locks=0 ]	(	0	)
-filemethod	[ 0	locks=0 ]	(	"constructed"	)
-timedependent	[ 0	locks=0 ]	(	"on"	)
+filemethod	[ 0	locks=0 ]	(	[ filemethod	0 ] 	)
+timedependent	[ 0	locks=0 ]	(	[ timedependent	1 ] 	)
 basename	[ 0	locks=0 ]	(	[ basename	$HIPNAME.$OS ] 	)
-filetype	[ 0	locks=0 ]	(	".bgeo.sc"	)
-file	[ 0	locks=0 ]	(	$HIP/geo/$HIPNAME.$OS.$F.bgeo.sc	)
+filetype	[ 0	locks=0 ]	(	[ filetype	0 ] 	)
+file	[ 0	locks=0 ]	(	[ file	$HIP/geo/$HIPNAME.$OS.$F.bgeo.sc ] 	)
 openfiledir	[ 0	locks=0 ]	(	0	)
 basedir	[ 0	locks=0 ]	(	[ basedir	$HIP/geo ] 	)
 openbasedir	[ 0	locks=0 ]	(	0	)
