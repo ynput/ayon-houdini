@@ -1,6 +1,6 @@
 = AYON File Cache =
 
-#icon: opdef:/ayon::Sop/ayon_filecache::1.0?IconImage
+#icon: opdef:/ayon::Sop/Sop/ayon_filecache::1.0?IconImage
 
 """Caches input geometry into an AYON versioned cache folder."""
 
@@ -26,11 +26,23 @@ Enable Version:
 Version:
     Cache version.
 Evaluate As:
-    How the File Cache evaluates frames.
-Start Frame / End Frame / Frame Step:
+    Single Frame or Frame Range.
+Simulation:
+    Cache simulation frames through substeps.
+Start/End/Inc:
     Frame range written by the File Cache.
+Substeps:
+    Number of simulation substeps.
+Load:
+    How the cached geometry is loaded.
+Load from Disk:
+    Read the cache back from disk instead of the input.
 Save Cache:
     Save the current input geometry.
+Save to Disk in Background:
+    Save the cache in a background process.
+Cancel Cook:
+    Cancel a running cache cook.
 Next Version:
     Set Version to the next free version folder.
 

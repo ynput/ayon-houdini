@@ -318,6 +318,15 @@ Content-Type: text/plain
 
 	 length = 0 expr = ch(\"../trange\") }
     }
+    channel cachesim {
+      lefttype = extend
+      righttype = extend
+      default = 1
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../cachesim\") }
+    }
     channel f3 {
       lefttype = extend
       righttype = extend
@@ -327,6 +336,31 @@ Content-Type: text/plain
 
 	 length = 0 expr = ch(\"../f3\") }
     }
+    channel substeps {
+      lefttype = extend
+      righttype = extend
+      default = 1
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../substeps\") }
+    }
+    channel loadtype {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../loadtype\") }
+    }
+    channel loadfromdisk {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../loadfromdisk\") }
+    }
   }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
@@ -335,7 +369,7 @@ Content-Type: text/plain
 
 {
 version 0.8
-loadfromdisk	[ 0	locks=0 ]	(	"off"	)
+loadfromdisk	[ 0	locks=0 ]	(	[ loadfromdisk	0 ] 	)
 reload	[ 0	locks=0 ]	(	0	)
 filemethod	[ 0	locks=0 ]	(	"constructed"	)
 timedependent	[ 0	locks=0 ]	(	"on"	)
@@ -355,10 +389,10 @@ cookoutputnode	[ 0	locks=0 ]	(	0	)
 dirtyall	[ 0	locks=0 ]	(	0	)
 folder2	[ 0	locks=0 ]	(	1	)
 trange	[ 0	locks=0 ]	(	[ trange	1 ] 	)
-cachesim	[ 0	locks=0 ]	(	"on"	)
+cachesim	[ 0	locks=0 ]	(	[ cachesim	1 ] 	)
 f	[ 0	locks=0 ]	(	[ f1	0 ] 	[ f2	0 ] 	[ f3	1 ] 	)
 fmenu	[ 0	locks=0 ]	(	"fstartend"	)
-substeps	[ 0	locks=0 ]	(	1	)
+substeps	[ 0	locks=0 ]	(	[ substeps	1 ] 	)
 useframeoverride	[ 0	locks=0 ]	(	"off"	)
 frameoverride	[ 0	locks=0 ]	(	1	)
 folder1_2	[ 0	locks=0 ]	(	0	)
@@ -367,7 +401,7 @@ clampfirst	[ 0	locks=0 ]	(	[ clampfirst	0 ] 	)
 doclamplast	[ 0	locks=0 ]	(	"off"	)
 clamplast	[ 0	locks=0 ]	(	[ clamplast	0 ] 	)
 sepparm3	[ 0	locks=0 ]	(	)
-loadtype	[ 0	locks=0 ]	(	"full"	)
+loadtype	[ 0	locks=0 ]	(	[ loadtype	0 ] 	)
 packedviewedit	[ 0	locks=0 ]	(	"unchanged"	)
 viewportlod	[ 0	locks=0 ]	(	"box"	)
 packexpanded	[ 0	locks=0 ]	(	"on"	)

@@ -5,6 +5,20 @@ def save_cache(node):
         cache.parm("execute").pressButton()
 
 
+def save_background(node):
+    """Save the input geometry through the background cache button."""
+    cache = node.node("filecache1")
+    if cache is not None:
+        cache.parm("cookoutputnode").pressButton()
+
+
+def cancel_cook(node):
+    """Cancel the running File Cache cook."""
+    cache = node.node("filecache1")
+    if cache is not None:
+        cache.parm("dirtyall").pressButton()
+
+
 def next_version(node):
     """Set the version to the next free version folder."""
     import os
