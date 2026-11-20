@@ -190,13 +190,9 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
     def save_workfile_with_context(
         self,
         filepath,
-        folder_entity,
-        task_entity,
-        *,
-        version=None,
-        comment=None,
-        description=None,
+        *args,
         prepared_data=None,
+        **kwargs,
     ):
         # 'save_workfile' saves with the license's extension, so Core must
         # record that path on the workfile entity.
@@ -207,12 +203,9 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             )
         super().save_workfile_with_context(
             filepath,
-            folder_entity,
-            task_entity,
-            version=version,
-            comment=comment,
-            description=description,
+            *args,
             prepared_data=prepared_data,
+            **kwargs,
         )
 
     def save_workfile(self, dst_path=None):
