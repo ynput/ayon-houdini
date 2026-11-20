@@ -9,7 +9,7 @@ on:
 jobs:
   build-mk-docs:
     # FIXME: Update @develop to @main after `ops-repo-automation` release.
-    uses: ynput/ops-repo-automation/.github/workflows/deploy_mkdocs.yml@develop
+    uses: ynput/ops-repo-automation/.github/workflows/deploy_mkdocs.yml@feature/mkdocs-requirements-in-pyproject
     with:
       repo: ${{ github.repository }}
     secrets:

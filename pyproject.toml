@@ -1,0 +1,25 @@
+# WARNING: This file is used only for development done on this addon.
+# Be aware that dependencies used here might not match the ones used by
+# the specific addon bundle set up on the AYON server. This file should
+# be used only for local development and CI/CD purposes.
+
+[project]
+name = "ayon-houdini"
+version = "0.10.10"
+description = "Houdini addon for AYON."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+docs = [
+    "mkdocs-material >= 9.6.7",
+    "mkdocs-autoapi >= 0.4.0",
+    "mkdocstrings-python >= 1.16.2",
+    "mkdocs-minify-plugin >= 0.8.0",
+    "markdown-checklist >= 0.4.4",
+    "mdx-gh-links >= 0.4",
+    "pymdown-extensions >= 10.14.3",
+    "mike >= 2.1.3",
+    "mkdocstrings-shell >= 1.0.2",
+]
