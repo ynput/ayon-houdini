@@ -1,0 +1,26 @@
+def save_cache(node):
+    """Save the input geometry through the inner File Cache."""
+    cache = node.node("filecache1")
+    if cache is not None:
+        cache.parm("execute").pressButton()
+
+
+def next_version(node):
+    """Set the version to the next free version folder."""
+    import os
+    import re
+
+    def expand(parm_name):
+        return hou.expandString(node.evalParm(parm_name)).rstrip("/\\")
+
+    folder = expand("folderPath").lstrip("/\\")
+    base = os.path.join(
+        expand("cacheRoot"), folder, expand("task"), expand("cacheName")
+    )
+    next_version = 1
+    if os.path.isdir(base):
+        for name in os.listdir(base):
+            match = re.match(r"^v(\d+)$", name)
+            if match:
+                next_version = max(next_version, int(match.group(1)) + 1)
+    node.parm("version").set(next_version)
