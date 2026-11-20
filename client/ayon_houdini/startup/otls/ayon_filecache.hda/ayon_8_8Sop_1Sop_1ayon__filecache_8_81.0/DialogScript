@@ -59,10 +59,13 @@
     parm {
         name    "trange"
         label   "Evaluate As"
-        type    integer
+        type    ordinal
         default { "1" }
-        help    "0: current frame, 1: frame range, 2: frame range only."
-        range   { 0 10 }
+        help    "Single Frame or Frame Range."
+        menu {
+            "off"       "Single Frame"
+            "normal"    "Frame Range"
+        }
     }
     parm {
         name    "f1"
@@ -111,3 +114,4 @@
         parmtag { "script_callback_language" "python" }
     }
 }
+
