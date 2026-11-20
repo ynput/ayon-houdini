@@ -7,7 +7,6 @@
 
   <tool name="$HDA_DEFAULT_TOOL" label="$HDA_LABEL" icon="$HDA_ICON">
     <toolMenuContext name="network">
-      <contextOpType>ayon::Sop/ayon_filecache::1.0</contextOpType>
       <contextNetType>SOP</contextNetType>
     </toolMenuContext>
     <toolMenuContext name="network">
