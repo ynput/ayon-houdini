@@ -80,10 +80,12 @@ class CreateUSD(plugin.HoudiniCreator):
             return True
 
         node = selected_nodes[0]
+        node_type = node.type()
+        category = node_type.category().name()
+        label = node_type.description() if category == "Lop" else category
         message = (
-            f"Selected node '{node.path()}' is a "
-            f"{node.type().category().name()} node, not a LOP node, "
-            "so it can't be used as the LOP path."
+            f"Selected node '{node.path()}' ({label}) does not output "
+            "a USD stage, so it can't be used as the LOP path."
         )
         if not hou.isUIAvailable():
             self.log.warning(f"{message} The LOP path is left empty.")
