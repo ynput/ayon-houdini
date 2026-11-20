@@ -93,7 +93,7 @@ class CollectUsdRenderLayerAndStage(plugin.HoudiniInstancePlugin):
     # Run after Collect Output Node
     # Run just before regular CollectorOrder to have stage accessible
     # to default collector orders
-    order = pyblish.api.CollectorOrder - 0.01
+    order = pyblish.api.CollectorOrder - 0.449
     hosts = ["houdini"]
     families = ["usdrender", "usdrop"]
 

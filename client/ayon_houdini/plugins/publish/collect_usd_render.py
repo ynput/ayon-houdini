@@ -24,7 +24,7 @@ class CollectUsdRender(plugin.HoudiniInstancePlugin):
     """
 
     label = "Collect USD Render Rop"
-    order = pyblish.api.CollectorOrder
+    order = pyblish.api.CollectorOrder - 0.4
     hosts = ["houdini"]
     families = ["usdrender"]
 
