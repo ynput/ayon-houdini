@@ -184,6 +184,9 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         extensions.insert(0, preferred_extension)
         return extensions
 
+    def get_workfile_save_extensions(self):
+        return [get_license_workfile_extension()]
+
     def save_workfile_with_context(
         self,
         filepath,
@@ -195,8 +198,8 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         description=None,
         prepared_data=None,
     ):
-        # Houdini saves with the license's extension whatever path it gets,
-        # so fix the path before Core records it on the workfile entity.
+        # 'save_workfile' saves with the license's extension, so Core must
+        # record that path on the workfile entity.
         filepath = to_license_workfile_path(filepath)
         if prepared_data is not None and prepared_data.rootless_path:
             prepared_data.rootless_path = to_license_workfile_path(
