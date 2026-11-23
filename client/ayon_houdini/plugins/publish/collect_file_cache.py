@@ -5,7 +5,7 @@ import os
 import hou
 import pyblish.api
 
-from ayon_core.pipeline.publish import KnownPublishError
+from ayon_core.pipeline.publish import PublishError
 from ayon_houdini.api import plugin
 
 
@@ -20,13 +20,13 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
     def process(self, instance):
         node = hou.node(instance.data.get("instance_node"))
         if node is None:
-            raise KnownPublishError(
+            raise PublishError(
                 "AYON File Cache instance node no longer exists."
             )
 
         cache_dir = self._get_cache_dir(node)
         if not cache_dir or not os.path.isdir(cache_dir):
-            raise KnownPublishError(
+            raise PublishError(
                 "AYON File Cache output folder does not exist: "
                 f"{cache_dir}"
             )
@@ -36,7 +36,7 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
             if name.endswith((".bgeo.sc", ".bgeo", ".vdb"))
         )
         if not files:
-            raise KnownPublishError(
+            raise PublishError(
                 "No cache files were found. Click Save to Disk first.\n"
                 f"Cache folder: {cache_dir}"
             )
@@ -79,3 +79,4 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
         return os.path.join(
             cache_root, folder, task, name, "v%03d" % version
         )
+
