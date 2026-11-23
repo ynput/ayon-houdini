@@ -25,13 +25,6 @@ class ExtractFileCache(plugin.HoudiniExtractorPlugin):
             files = [files]
 
         staging_dir = instance.data.get("stagingDir")
-        if (
-            not staging_dir
-            or os.path.abspath(staging_dir) == os.path.abspath(cache_dir)
-        ):
-            staging_dir = tempfile.mkdtemp(prefix="ayon_filecache_")
-
-        os.makedirs(staging_dir, exist_ok=True)
         copied_files = []
         for name in files:
             source = os.path.join(cache_dir, name)
@@ -43,10 +36,10 @@ class ExtractFileCache(plugin.HoudiniExtractorPlugin):
         if first_name.endswith(".bgeo.sc"):
             extension = "bgeo.sc"
         else:
-            extension = os.path.splitext(first_name)[1].lstrip(".") or "bgeo"
+            extension = os.path.splitext(first_name)[-1].lstrip(".") or "bgeo"
 
         representation = {
-            "name": "bgeo" if extension.startswith("bgeo") else extension,
+            "name": extension,
             "ext": extension,
             "files": copied_files,
             "stagingDir": staging_dir,
@@ -54,7 +47,6 @@ class ExtractFileCache(plugin.HoudiniExtractorPlugin):
             "frameEnd": instance.data.get("frameEnd"),
         }
         instance.data.setdefault("representations", []).append(representation)
-        instance.data["stagingDir"] = staging_dir
 
         self.log.debug(
             "Extracted %d cache file(s) to %s",
