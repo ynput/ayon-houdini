@@ -45,6 +45,15 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
             )
 
         cache_dir = os.path.dirname(outputs[0]).replace("\\", "/")
+        if any(
+            os.path.normcase(os.path.abspath(os.path.dirname(path)))
+            != os.path.normcase(os.path.abspath(cache_dir))
+            for path in outputs
+        ):
+            raise PublishError(
+                "Cache outputs must share one directory. "
+                "Remove frame-dependent directory components from Geometry File."
+            )
         names = [os.path.basename(path) for path in outputs]
         missing = [
             path for path in outputs if not os.path.isfile(path)
