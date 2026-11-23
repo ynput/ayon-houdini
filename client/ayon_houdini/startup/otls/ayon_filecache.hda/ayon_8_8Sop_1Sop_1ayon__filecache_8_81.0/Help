@@ -50,4 +50,9 @@ Cancel Cook:
     Cancel a running cache cook.
 Next Version:
     Set Version to the next free version folder.
+Scheduling:
+    TOP Network / Custom TOP Scheduler control the background cook.
+    Save Retries retries failed writes.
+    Create Intermediate Directories creates missing cache folders.
+    Missing Frame controls how missing sequence frames are handled.
 

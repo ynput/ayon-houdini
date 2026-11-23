@@ -421,6 +421,50 @@ Content-Type: text/plain
 
 	 length = 0 expr = ch(\"../loadfromdisk\") }
     }
+    channel targettopnetwork {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"topnet1\"
+      flags = 0
+      segment { options = {	 autoslope  ai ao }
+
+	 length = 0 accel = 0.33333333333333331 0.33333333333333331 expr = chs(\"../targettopnetwork\") }
+    }
+    channel topscheduler {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"\"
+      flags = 0
+      segment { options = {	 autoslope  ai ao }
+
+	 length = 0 accel = 0.33333333333333331 0.33333333333333331 expr = chs(\"../topscheduler\") }
+    }
+    channel saveretry {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../saveretry\") }
+    }
+    channel mkpath {
+      lefttype = extend
+      righttype = extend
+      default = 1
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../mkpath\") }
+    }
+    channel missingframe {
+      lefttype = extend
+      righttype = extend
+      default = 1
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../missingframe\") }
+    }
   }
 
 --HOUDINIMIMEBOUNDARY0xD3ADD339-0x00000F49-0x56B122C9-0x00000001HOUDINIMIMEBOUNDARY
@@ -468,8 +512,8 @@ packexpanded	[ 0	locks=0 ]	(	"on"	)
 delayload	[ 0	locks=0 ]	(	"off"	)
 index	[ 0	locks=0 ]	(	[ index	0 ] 	)
 wrap	[ 0	locks=0 ]	(	"cycle"	)
-targettopnetwork	[ 0	locks=0 ]	(	topnet1	)
-topscheduler	[ 0	locks=0 ]	(	""	)
+targettopnetwork	[ 0	locks=0 ]	(	[ targettopnetwork	topnet1 ] 	)
+topscheduler	[ 0	locks=0 ]	(	[ topscheduler	"" ] 	)
 deleteattributes	[ 0	locks=0 ]	(	""	)
 deletegroups	[ 0	locks=0 ]	(	""	)
 numcasts	[ 0	locks=0 ]	(	0	)
@@ -477,15 +521,15 @@ folder7	[ 0	locks=0 ]	(	0	)
 loadfromdiskonsave	[ 0	locks=0 ]	(	"off"	)
 hardenbasename	[ 0	locks=0 ]	(	"off"	)
 sepparm	[ 0	locks=0 ]	(	)
-mkpath	[ 0	locks=0 ]	(	"on"	)
+mkpath	[ 0	locks=0 ]	(	[ mkpath	1 ] 	)
 initsim	[ 0	locks=0 ]	(	"off"	)
 alfprogress	[ 0	locks=0 ]	(	"off"	)
 savebackground	[ 0	locks=0 ]	(	"on"	)
-saveretry	[ 0	locks=0 ]	(	0	)
+saveretry	[ 0	locks=0 ]	(	[ saveretry	0 ] 	)
 sepparm2	[ 0	locks=0 ]	(	)
 take	[ 0	locks=0 ]	(	_current_	)
 folder8	[ 0	locks=0 ]	(	0	)
-missingframe	[ 0	locks=0 ]	(	"empty"	)
+missingframe	[ 0	locks=0 ]	(	[ missingframe	1 ] 	)
 loadretry	[ 0	locks=0 ]	(	0	)
 cachesize	[ 0	locks=0 ]	(	0	)
 prefetch	[ 0	locks=0 ]	(	"off"	)

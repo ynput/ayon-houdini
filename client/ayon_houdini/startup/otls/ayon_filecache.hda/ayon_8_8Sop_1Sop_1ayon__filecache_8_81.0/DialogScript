@@ -231,5 +231,46 @@
 
     }
 
+    group {
+        name    "scheduling"
+        label   "Scheduling"
+
+        parm {
+            name    "targettopnetwork"
+            label   "TOP Network"
+            type    string
+            default { "topnet1" }
+        }
+        parm {
+            name    "topscheduler"
+            label   "Custom TOP Scheduler"
+            type    string
+            default { "" }
+        }
+        parm {
+            name    "saveretry"
+            label   "Save Retries"
+            type    integer
+            default { "0" }
+            range   { 0 10 }
+        }
+        parm {
+            name    "mkpath"
+            label   "Create Intermediate Directories"
+            type    toggle
+            default { "1" }
+        }
+        parm {
+            name    "missingframe"
+            label   "Missing Frame"
+            type    ordinal
+            default { "1" }
+            menu {
+                "error" "Report Error"
+                "empty" "No Geometry"
+            }
+        }
+    }
+
 }
 
