@@ -41,8 +41,8 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
                 f"Cache folder: {cache_dir}"
             )
 
-        frame_start = int(node.evalParm("f1"))
-        frame_end = int(node.evalParm("f2"))
+        frame_start = instance.data["frameStartHandle"]
+        frame_end = instance.data["frameEndHandle"]
         if frame_end < frame_start:
             frame_end = frame_start
 
