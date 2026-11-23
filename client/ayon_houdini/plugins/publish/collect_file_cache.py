@@ -24,31 +24,41 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
                 "AYON File Cache instance node no longer exists."
             )
 
-        cache_dir = self._get_cache_dir(node)
-        if not cache_dir or not os.path.isdir(cache_dir):
-            raise PublishError(
-                "AYON File Cache output folder does not exist: "
-                f"{cache_dir}"
-            )
-
-        files = sorted(
-            name for name in os.listdir(cache_dir)
-            if name.endswith((".bgeo.sc", ".bgeo", ".vdb"))
+        # Instance data from a reloaded scene may only have the namespaced
+        # copies because folderPath/task are HDA definition parameters.
+        instance.data.setdefault(
+            "folderPath",
+            instance.data.get("AYON_CACHE_FOLDER_PATH")
+            or node.evalParm("folderPath"),
         )
-        if not files:
+        instance.data.setdefault(
+            "task",
+            instance.data.get("AYON_CACHE_TASK")
+            or node.evalParm("task"),
+        )
+
+        outputs = self._expected_outputs(node)
+        if not outputs:
             raise PublishError(
-                "No cache files were found. Click Save to Disk first.\n"
-                f"Cache folder: {cache_dir}"
+                "Could not resolve any expected cache files. "
+                "Check the frame range and Save to Disk first."
             )
 
-        frame_start = instance.data["frameStartHandle"]
-        frame_end = instance.data["frameEndHandle"]
-        if frame_end < frame_start:
-            frame_end = frame_start
+        cache_dir = os.path.dirname(outputs[0]).replace("\\", "/")
+        names = [os.path.basename(path) for path in outputs]
+        missing = [
+            path for path in outputs if not os.path.isfile(path)
+        ]
+        if missing:
+            raise PublishError(
+                "The cache is incomplete. Missing output files:\n- "
+                + "\n- ".join(missing)
+            )
 
+        frame_start, frame_end = self._frame_range(node)
         instance.data.update({
             "cacheDir": cache_dir,
-            "frames": files,
+            "frames": names,
             "stagingDir": cache_dir,
             "frameStart": frame_start,
             "frameEnd": frame_end,
@@ -57,26 +67,53 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
         })
 
         self.log.debug(
-            "Collected %d cache file(s) from %s", len(files), cache_dir
+            "Collected %d cache file(s) from %s", len(names), cache_dir
         )
 
     @staticmethod
-    def _get_cache_dir(node):
-        if node.evalParm("filemethod"):
-            filepath = hou.expandString(node.evalParm("geometryFile"))
-            return os.path.dirname(filepath) if filepath else None
+    def _expected_outputs(node):
+        cache = node.node("filecache1")
+        if cache is None:
+            raise PublishError("Inner File Cache node was not found.")
 
-        resolved = node.evalParm("resolvedPath")
-        if resolved:
-            return hou.expandString(resolved)
+        output_parm = cache.parm("sopoutput")
+        frame_start, frame_end = CollectFileCache._frame_range(node)
+        trange = node.evalParm("trange")
+        substeps = max(1, int(node.evalParm("substeps")))
+        frame_step = float(node.evalParm("f3"))
 
-        # Fallback for older cached HDA definitions.
-        cache_root = hou.expandString(node.evalParm("cacheRoot"))
-        folder = hou.expandString(node.evalParm("folderPath")).lstrip("/\\")
-        task = hou.expandString(node.evalParm("task"))
-        name = hou.expandString(node.evalParm("cacheName"))
-        version = int(node.evalParm("version"))
-        return os.path.join(
-            cache_root, folder, task, name, "v%03d" % version
-        )
+        if trange:
+            frames = []
+            frame = frame_start
+            while frame <= frame_end + 1e-6:
+                for substep in range(substeps):
+                    frames.append(frame + substep / substeps)
+                frame += frame_step or 1.0
+        else:
+            if node.evalParm("useframeoverride"):
+                frames = [float(node.evalParm("frameoverride"))]
+            else:
+                frames = [float(hou.frame())]
 
+        outputs = []
+        for frame in frames:
+            path = output_parm.evalAtFrame(frame)
+            path = hou.expandString(path)
+            if path and path not in outputs:
+                outputs.append(path)
+        return outputs
+
+    @staticmethod
+    def _frame_range(node):
+        if not node.evalParm("trange"):
+            if node.evalParm("useframeoverride"):
+                frame = int(node.evalParm("frameoverride"))
+            else:
+                frame = int(hou.frame())
+            return frame, frame
+
+        start = int(node.evalParm("f1"))
+        end = int(node.evalParm("f2"))
+        if end < start:
+            end = start
+        return start, end

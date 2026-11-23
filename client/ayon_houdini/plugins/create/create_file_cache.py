@@ -57,8 +57,30 @@ class CreateFileCache(plugin.HoudiniCreator):
         )
 
         self._add_instance_to_context(instance)
-        self.imprint(cache_node, instance.data_to_store())
+        self._imprint_instance(cache_node, instance)
         return instance
+
+    def remove_instances(self, instances):
+        """Remove publish metadata without deleting the artist's cache node."""
+        for instance in instances:
+            node = hou.node(instance.data.get("instance_node"))
+            if node:
+                for parm in list(node.spareParms()):
+                    if parm.name().startswith("AYON_"):
+                        parm.destroy()
+            self._remove_instance_from_context(instance)
+
+    def _imprint_instance(self, node, instance):
+        """Store instance data without colliding with HDA definition parms."""
+        data = instance.data_to_store()
+        for key, storage_key in (
+            ("folderPath", "AYON_CACHE_FOLDER_PATH"),
+            ("task", "AYON_CACHE_TASK"),
+        ):
+            value = data.pop(key, None)
+            if value is not None:
+                data[storage_key] = value
+        self.imprint(node, data)
 
     def get_publish_families(self):
         return ["filecache", "cache", "publish.hou"]

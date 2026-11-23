@@ -188,7 +188,6 @@ Content-Type: text/plain
       lefttype = extend
       righttype = extend
       flags = 0
-      start = 40
       segment { options = {	 untie  iv ov is os ia oa }
 
 	 length = 0 expr = ch(\"../f1\") }
@@ -197,7 +196,6 @@ Content-Type: text/plain
       lefttype = extend
       righttype = extend
       flags = 0
-      start = 40
       segment { options = {	 untie  iv ov is os ia oa }
 
 	 length = 0 expr = ch(\"../f2\") }
@@ -206,28 +204,24 @@ Content-Type: text/plain
       lefttype = extend
       righttype = extend
       flags = 0
-      start = 40
       segment { length = 0 expr = ch(\"f1\") }
     }
     channel clamplast {
       lefttype = extend
       righttype = extend
       flags = 0
-      start = 40
       segment { length = 0 expr = ch(\"f2\") }
     }
     channel index {
       lefttype = extend
       righttype = extend
       flags = 0
-      start = 40
       segment { length = 0 expr = $FF-1 }
     }
     channel frame {
       lefttype = extend
       righttype = extend
       flags = 0
-      start = 40
       segment { length = 0 expr = "{
     if(ch(\"timedependent\"))
     {
@@ -253,7 +247,6 @@ Content-Type: text/plain
       righttype = extend
       defaultString = \"\"
       flags = 0
-      start = 40
       segment { length = 0 expr = "ifs(ch(\"filemethod\"),chsraw(\"file\"),strreplace(strreplace(chs(\"cachename\"),chs(\"basename\"),chsraw(\"basename\")),chs(\"framestr\"),\".\" + '$F' + 4))" }
     }
     channel sopoutput {
@@ -261,7 +254,6 @@ Content-Type: text/plain
       righttype = extend
       defaultString = \"\"
       flags = 0
-      start = 40
       segment { length = 0 expr = "{
     if(ch('filemethod'))
     {
@@ -280,7 +272,7 @@ Content-Type: text/plain
       flags = 0
       segment { options = {	 autoslope  ai ao }
 
-	 length = 0 accel = 0.33333333333333331 0.33333333333333331 expr = "chs(\"../cacheRoot\") + chs(\"../folderPath\") + \"/\" + chs(\"../task\")" }
+	 length = 0 accel = 0.33333333333333331 0.33333333333333331 expr = "strreplace(chs(\"../cacheRoot\") + \"/\" + chs(\"../folderPath\") + \"/\" + chs(\"../task\"), \"//\", \"/\")" }
     }
     channel basename {
       lefttype = extend

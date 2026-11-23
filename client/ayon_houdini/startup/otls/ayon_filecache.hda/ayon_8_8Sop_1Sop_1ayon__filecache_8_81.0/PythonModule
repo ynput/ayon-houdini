@@ -6,12 +6,9 @@ def _expand_parm(node, name):
 
 
 def _cache_dir(node):
-    if node.evalParm("filemethod"):
-        cache = node.node("filecache1")
-        if cache is not None:
-            return os.path.dirname(
-                hou.expandString(cache.evalParm("file"))
-            )
+    resolved = hou.expandString(node.evalParm("resolvedPath"))
+    if resolved:
+        return resolved
 
     base = os.path.join(
         _expand_parm(node, "cacheRoot"),
@@ -23,8 +20,20 @@ def _cache_dir(node):
         base = os.path.join(base, "v%03d" % node.evalParm("version"))
     return base
 
+
 def _check_overwrite(node):
     if node.evalParm("overwriteExisting"):
+        return True
+
+    if node.evalParm("filemethod"):
+        cache = node.node("filecache1")
+        if cache is not None:
+            target = hou.expandString(cache.evalParm("sopoutput"))
+            if os.path.isfile(target):
+                raise hou.Error(
+                    "Cache already exists: {}. Enable Overwrite Existing "
+                    "Cache or use another Geometry File.".format(target)
+                )
         return True
 
     target = _cache_dir(node)
@@ -38,7 +47,6 @@ def _check_overwrite(node):
         "Cache already exists: {}. Enable Overwrite Existing Cache "
         "or use Next Version.".format(target)
     )
-
 
 def save_cache(node):
     """Save the input geometry through the inner File Cache."""
