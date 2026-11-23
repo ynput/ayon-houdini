@@ -87,7 +87,7 @@ class ValidateFBXOutputNode(plugin.HoudiniInstancePlugin,
                 invalid.append(output_node)  # empty_objs
                 cls.log.error(
                     "Output Node '%s' is empty!",
-                    node.path()
+                    output_node.path()
                 )
 
         # elif output_node is an ObjNode
@@ -96,10 +96,10 @@ class ValidateFBXOutputNode(plugin.HoudiniInstancePlugin,
             if out:
                 all_out_sops.append(out)
             else:
-                invalid.append(node)  # empty_objs
+                invalid.append(output_node)  # empty_objs
                 cls.log.error(
                     "Output Node '%s' is empty!",
-                    node.path()
+                    output_node.path()
                 )
 
         # elif output_node is a SopNode

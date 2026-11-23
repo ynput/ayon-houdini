@@ -1,6 +1,7 @@
 from typing import Optional
 import hou
 
+import ayon_api
 from ayon_core.lib import EnumDef
 
 from ayon_houdini.api import (
@@ -166,7 +167,9 @@ return aperture
                        self.camera_aperture_expression) == "match_maya":
             self._match_maya_render_mask(camera)
 
-        set_camera_resolution(camera, entity=context["folder"])
+        set_camera_resolution(
+            camera, entity=self._get_resolution_entity(context)
+        )
         self[:] = nodes
 
         return pipeline.containerise(node_name,
@@ -220,12 +223,30 @@ return aperture
         ):
             self._match_maya_render_mask(new_camera)
 
-        set_camera_resolution(new_camera)
+        set_camera_resolution(
+            new_camera, entity=self._get_resolution_entity(context)
+        )
 
         temp_camera.destroy()
 
     def switch(self, container, context):
         self.update(container, context)
+
+    @staticmethod
+    def _get_resolution_entity(context):
+        """Return the task the version was published from, else its folder.
+
+        Falls back to the folder for versions published without a task or
+        when that task no longer exists.
+        """
+        task_id = context["version"].get("taskId")
+        if task_id:
+            task_entity = ayon_api.get_task_by_id(
+                context["project"]["name"], task_id, fields={"attrib"}
+            )
+            if task_entity:
+                return task_entity
+        return context["folder"]
 
     def remove(self, container):
         node = container["node"]
