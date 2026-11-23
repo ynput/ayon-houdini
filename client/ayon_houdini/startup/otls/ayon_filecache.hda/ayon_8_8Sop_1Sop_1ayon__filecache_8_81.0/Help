@@ -33,6 +33,8 @@ Start/End/Inc:
     Frame range written by the File Cache.
 Substeps:
     Number of simulation substeps.
+Override Frame:
+    Cache or load an explicit frame instead of the current playbar frame.
 Load:
     How the cached geometry is loaded.
 Load from Disk:

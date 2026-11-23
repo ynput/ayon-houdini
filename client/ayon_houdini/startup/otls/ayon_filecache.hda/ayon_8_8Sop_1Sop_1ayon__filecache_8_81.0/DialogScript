@@ -193,6 +193,19 @@
                 default { "1" }
                 range   { 0 10 }
             }
+            parm {
+                name    "useframeoverride"
+                label   "Override Frame"
+                type    toggle
+                default { "0" }
+            }
+            parm {
+                name    "frameoverride"
+                label   "Override Frame"
+                type    float
+                default { "1" }
+                range   { 0 10 }
+            }
         }
 
         group {

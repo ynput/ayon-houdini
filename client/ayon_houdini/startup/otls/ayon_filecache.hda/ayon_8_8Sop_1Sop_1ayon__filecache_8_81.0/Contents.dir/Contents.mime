@@ -89,7 +89,7 @@ sopflags sopflags =
 comment ""
 position 0 0
 connectornextid 1
-flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on
+flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
 outputsNamed3
 {
 0 "output1"
@@ -388,6 +388,23 @@ Content-Type: text/plain
 
 	 length = 0 expr = ch(\"../substeps\") }
     }
+    channel useframeoverride {
+      lefttype = extend
+      righttype = extend
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../useframeoverride\") }
+    }
+    channel frameoverride {
+      lefttype = extend
+      righttype = extend
+      default = 1
+      flags = 0
+      segment { options = {	 untie  iv ov is os ia oa }
+
+	 length = 0 expr = ch(\"../frameoverride\") }
+    }
     channel loadtype {
       lefttype = extend
       righttype = extend
@@ -436,8 +453,8 @@ cachesim	[ 0	locks=0 ]	(	[ cachesim	1 ] 	)
 f	[ 0	locks=0 ]	(	[ f1	0 ] 	[ f2	0 ] 	[ f3	1 ] 	)
 fmenu	[ 0	locks=0 ]	(	"fstartend"	)
 substeps	[ 0	locks=0 ]	(	[ substeps	1 ] 	)
-useframeoverride	[ 0	locks=0 ]	(	"off"	)
-frameoverride	[ 0	locks=0 ]	(	1	)
+useframeoverride	[ 0	locks=0 ]	(	[ useframeoverride	0 ] 	)
+frameoverride	[ 0	locks=0 ]	(	[ frameoverride	1 ] 	)
 folder1_2	[ 0	locks=0 ]	(	0	)
 doclampfirst	[ 0	locks=0 ]	(	"off"	)
 clampfirst	[ 0	locks=0 ]	(	[ clampfirst	0 ] 	)
@@ -534,7 +551,7 @@ sopflags sopflags =
 comment ""
 position 0 0
 connectornextid 1
-flags =  lock off model off template off footprint off xray off bypass off display off render off highlight off unload off savedata off compress on colordefault on exposed on
+flags =  lock off model off template off footprint off xray off bypass off display on render on highlight off unload off savedata off compress on colordefault on exposed on
 outputsNamed3
 {
 }

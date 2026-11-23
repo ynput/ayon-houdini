@@ -6,6 +6,13 @@ def _expand_parm(node, name):
 
 
 def _cache_dir(node):
+    if node.evalParm("filemethod"):
+        cache = node.node("filecache1")
+        if cache is not None:
+            return os.path.dirname(
+                hou.expandString(cache.evalParm("file"))
+            )
+
     base = os.path.join(
         _expand_parm(node, "cacheRoot"),
         _expand_parm(node, "folderPath").lstrip("/\\"),
@@ -15,7 +22,6 @@ def _cache_dir(node):
     if node.evalParm("enableVersion"):
         base = os.path.join(base, "v%03d" % node.evalParm("version"))
     return base
-
 
 def _check_overwrite(node):
     if node.evalParm("overwriteExisting"):
