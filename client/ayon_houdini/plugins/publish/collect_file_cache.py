@@ -52,7 +52,8 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
         ):
             raise PublishError(
                 "Cache outputs must share one directory. "
-                "Remove frame-dependent directory components from Geometry File."
+                "Remove frame-dependent directory components from Geometry "
+                "File."
             )
         names = [os.path.basename(path) for path in outputs]
         missing = [
@@ -79,15 +80,18 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
             "Collected %d cache file(s) from %s", len(names), cache_dir
         )
 
-    @staticmethod
-    def _expected_outputs(node):
+    def _expected_outputs(self, node):
         cache = node.node("filecache1")
         if cache is None:
             raise PublishError("Inner File Cache node was not found.")
 
         output_parm = cache.parm("sopoutput")
-        frame_start, frame_end = CollectFileCache._frame_range(node)
         trange = node.evalParm("trange")
+        if trange:
+             frame_start = float(node.evalParm("f1"))
+             frame_end = float(node.evalParm("f2"))
+        else:
+            frame_start, frame_end = self._frame_range(node)
         substeps = max(1, int(node.evalParm("substeps")))
         frame_step = float(node.evalParm("f3"))
         if trange and frame_step <= 0:
@@ -115,8 +119,7 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
                 outputs.append(path)
         return outputs
 
-    @staticmethod
-    def _frame_range(node):
+    def _frame_range(self, node):
         if not node.evalParm("trange"):
             if node.evalParm("useframeoverride"):
                 frame = int(node.evalParm("frameoverride"))

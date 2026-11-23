@@ -4,15 +4,23 @@
 The AYON File Cache is a SOP HDA instead of a ROP, so this creator uses the
 cache node itself as the publish instance node. The instance data keeps the
 cache node path for the later collect/extract/publish phases.
+
+Context is stored in namespaced spare parms to avoid the HDA's own parms,
+then restored to canonical instance keys when collecting.
 """
 import hou
 
 from ayon_core.pipeline import CreatedInstance, CreatorError
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import read
 
 
 FILE_CACHE_TYPE = "ayon::Sop/ayon_filecache::1.0"
+CONTEXT_ALIASES = (
+    ("folderPath", "AYON_CACHE_FOLDER_PATH"),
+    ("task", "AYON_CACHE_TASK"),
+)
 
 
 class CreateFileCache(plugin.HoudiniCreator):
@@ -57,8 +65,29 @@ class CreateFileCache(plugin.HoudiniCreator):
         )
 
         self._add_instance_to_context(instance)
-        self._imprint_instance(cache_node, instance)
+        self.imprint(cache_node, instance.data_to_store())
         return instance
+
+    def collect_instances(self):
+        self.cache_instance_data(self.collection_shared_data)
+        nodes = self.collection_shared_data["houdini_cached_instances"].get(
+            self.identifier, []
+        )
+        for node in nodes:
+            node_data = read(node)
+            for key, storage_key in CONTEXT_ALIASES:
+                if storage_key in node_data:
+                    node_data[key] = node_data.pop(storage_key)
+
+            node_path = node.path()
+            node_data["instance_id"] = node_path
+            node_data["instance_node"] = node_path
+            node_data["families"] = self.get_publish_families()
+            if "AYON_productName" in node_data:
+                node_data["productName"] = node_data.pop("AYON_productName")
+
+            created_instance = CreatedInstance.from_existing(node_data, self)
+            self._add_instance_to_context(created_instance)
 
     def remove_instances(self, instances):
         """Remove publish metadata without deleting the artist's cache node."""
@@ -75,17 +104,13 @@ class CreateFileCache(plugin.HoudiniCreator):
                 node.setParmTemplateGroup(parm_group)
             self._remove_instance_from_context(instance)
 
-    def _imprint_instance(self, node, instance):
-        """Store instance data without colliding with HDA definition parms."""
-        data = instance.data_to_store()
-        for key, storage_key in (
-            ("folderPath", "AYON_CACHE_FOLDER_PATH"),
-            ("task", "AYON_CACHE_TASK"),
-        ):
-            value = data.pop(key, None)
-            if value is not None:
-                data[storage_key] = value
-        self.imprint(node, data)
+    def imprint(self, node, values, update=False):
+        """Namespace context keys for both creation and instance updates."""
+        values = values.copy()
+        for key, storage_key in CONTEXT_ALIASES:
+            if key in values:
+                values[storage_key] = values.pop(key)
+        super().imprint(node, values, update=update)
 
     def get_publish_families(self):
         return ["filecache", "cache"]

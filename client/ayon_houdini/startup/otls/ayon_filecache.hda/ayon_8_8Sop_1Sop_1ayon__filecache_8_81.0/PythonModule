@@ -1,3 +1,4 @@
+import math
 import os
 
 
@@ -21,6 +22,36 @@ def _cache_dir(node):
     return base
 
 
+def _save_frames(cache):
+    if not cache.evalParm("trange"):
+        if cache.evalParm("useframeoverride"):
+            yield cache.evalParm("frameoverride")
+        else:
+            yield hou.frame()
+        return
+
+    start = cache.evalParm("f1")
+    end = cache.evalParm("f2")
+    increment = cache.evalParm("f3")
+    substeps = cache.evalParm("substeps")
+    if not all(math.isfinite(value) for value in (start, end, increment)):
+        raise hou.Error("Cache frame range and increment must be finite.")
+    if increment <= 0 or substeps <= 0:
+        raise hou.Error(
+            "Cache frame increment and substeps must be greater than zero."
+        )
+    if end < start:
+        raise hou.Error("Cache end frame must not precede the start frame.")
+
+    step = increment / substeps
+    index = 0
+    frame = start
+    while frame <= end + 1e-6:
+        yield frame
+        index += 1
+        frame = start + index * step
+
+
 def _check_overwrite(node):
     if node.evalParm("overwriteExisting"):
         return True
@@ -28,12 +59,16 @@ def _check_overwrite(node):
     if node.evalParm("filemethod"):
         cache = node.node("filecache1")
         if cache is not None:
-            target = hou.expandString(cache.evalParm("sopoutput"))
-            if os.path.isfile(target):
-                raise hou.Error(
-                    "Cache already exists: {}. Enable Overwrite Existing "
-                    "Cache or use another Geometry File.".format(target)
+            output_parm = cache.parm("sopoutput")
+            for frame in _save_frames(cache):
+                target = hou.expandStringAtFrame(
+                    output_parm.evalAtFrame(frame), frame
                 )
+                if os.path.isfile(target):
+                    raise hou.Error(
+                        "Cache already exists: {}. Enable Overwrite Existing "
+                        "Cache or use another Geometry File.".format(target)
+                    )
         return True
 
     target = _cache_dir(node)

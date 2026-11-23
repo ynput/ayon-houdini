@@ -41,7 +41,10 @@ Load from Disk:
     Read the cache back from disk instead of the input.
 Overwrite Existing Cache:
     Allow Save to Disk or Save in Background to overwrite an existing
-    cache version. Disabled by default.
+    cache version. In Explicit mode, both actions check every output in
+    the configured frame range, including substeps, or the current/override
+    frame in Single Frame mode. Saving is refused if any output already
+    exists. Disabled by default.
 Save Cache:
     Save the current input geometry.
 Save to Disk in Background:

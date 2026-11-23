@@ -272,7 +272,7 @@ Content-Type: text/plain
       flags = 0
       segment { options = {	 autoslope  ai ao }
 
-	 length = 0 accel = 0.33333333333333331 0.33333333333333331 expr = "chs(\"../cacheRoot\") + \"/\" + chs(\"../folderPath\") + \"/\" + chs(\"../task\")" }
+	 length = 0 accel = 0.33333333333333331 0.33333333333333331 expr = "strreplace(chs(\"../cacheRoot\") + \"/\" + chs(\"../folderPath\") + \"/\" + chs(\"../task\"), \"//\", \"/\")" }
     }
     channel basename {
       lefttype = extend
