@@ -23,6 +23,12 @@ class ExtractFileCache(plugin.HoudiniExtractorPlugin):
             files = [files]
 
         staging_dir = instance.data.get("stagingDir")
+        if (
+            not staging_dir
+            or os.path.realpath(staging_dir) == os.path.realpath(cache_dir)
+        ):
+            staging_dir = tempfile.mkdtemp(prefix="ayon_filecache_")
+            instance.data["stagingDir"] = staging_dir
         copied_files = []
         for name in files:
             source = os.path.join(cache_dir, name)
