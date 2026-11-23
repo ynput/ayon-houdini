@@ -86,9 +86,8 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
             frames = []
             frame = frame_start
             while frame <= frame_end + 1e-6:
-                for substep in range(substeps):
-                    frames.append(frame + substep / substeps)
-                frame += frame_step or 1.0
+                frames.append(frame)
+                frame += frame_step / substeps
         else:
             if node.evalParm("useframeoverride"):
                 frames = [float(node.evalParm("frameoverride"))]
