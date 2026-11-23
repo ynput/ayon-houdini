@@ -2,11 +2,9 @@
 """Extract AYON File Cache files into a publishable representation."""
 import os
 import shutil
-import tempfile
 
 import pyblish.api
 
-from ayon_core.pipeline import publish
 from ayon_houdini.api import plugin
 
 
