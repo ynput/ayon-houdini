@@ -116,6 +116,13 @@
         label   "Caching"
 
         parm {
+            name    "overwriteExisting"
+            label   "Overwrite Existing Cache"
+            type    toggle
+            default { "0" }
+            help    "Allow Save to Disk to overwrite an existing cache version."
+        }
+        parm {
             name    "saveCache"
             label   "Save to Disk"
             type    button

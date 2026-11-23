@@ -37,6 +37,9 @@ Load:
     How the cached geometry is loaded.
 Load from Disk:
     Read the cache back from disk instead of the input.
+Overwrite Existing Cache:
+    Allow Save to Disk or Save in Background to overwrite an existing
+    cache version. Disabled by default.
 Save Cache:
     Save the current input geometry.
 Save to Disk in Background:

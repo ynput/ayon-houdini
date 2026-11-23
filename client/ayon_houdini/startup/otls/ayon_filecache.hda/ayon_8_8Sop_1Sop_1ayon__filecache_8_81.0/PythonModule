@@ -1,5 +1,43 @@
+import os
+
+
+def _expand_parm(node, name):
+    return hou.expandString(node.evalParm(name)).rstrip("/\\")
+
+
+def _cache_dir(node):
+    base = os.path.join(
+        _expand_parm(node, "cacheRoot"),
+        _expand_parm(node, "folderPath").lstrip("/\\"),
+        _expand_parm(node, "task"),
+        _expand_parm(node, "cacheName"),
+    )
+    if node.evalParm("enableVersion"):
+        base = os.path.join(base, "v%03d" % node.evalParm("version"))
+    return base
+
+
+def _check_overwrite(node):
+    if node.evalParm("overwriteExisting"):
+        return True
+
+    target = _cache_dir(node)
+    if not os.path.isdir(target):
+        return True
+
+    if not any(os.scandir(target)):
+        return True
+
+    raise hou.Error(
+        "Cache already exists: {}. Enable Overwrite Existing Cache "
+        "or use Next Version.".format(target)
+    )
+
+
 def save_cache(node):
     """Save the input geometry through the inner File Cache."""
+    _check_overwrite(node)
+
     cache = node.node("filecache1")
     if cache is not None:
         cache.parm("execute").pressButton()
@@ -7,6 +45,8 @@ def save_cache(node):
 
 def save_background(node):
     """Save the input geometry through the background cache button."""
+    _check_overwrite(node)
+
     cache = node.node("filecache1")
     if cache is not None:
         cache.parm("cookoutputnode").pressButton()

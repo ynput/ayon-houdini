@@ -309,6 +309,15 @@ Content-Type: text/plain
 
 	 length = 0 expr = ch(\"../version\") }
     }
+    channel versionstr {
+      lefttype = extend
+      righttype = extend
+      defaultString = \"v\"+chs(\"version\")
+      flags = 0
+      segment { options = {	 autoslope  ai ao }
+
+	 length = 0 accel = 0.33333333333333331 0.33333333333333331 expr = "\"v\" + padzero(3, ch(\"../version\"))" }
+    }
     channel trange {
       lefttype = extend
       righttype = extend
@@ -482,7 +491,7 @@ lpostrender	[ 0	locks=0 ]	(	hscript	)
 folder9	[ 0	locks=0 ]	(	0	)
 frame	[ 0	locks=0 ]	(	[ frame	0 ] 	)
 framestr	[ 0	locks=0 ]	(	"`ifs (ch(\"timedependent\"), \".\" + fpadzero(4, if(ch(\"substeps\")>1, 3, 0), ch(\"frame\")), \"\")`"	)
-versionstr	[ 0	locks=0 ]	(	v`chs(\"version\")`	)
+versionstr	[ 0	locks=0 ]	(	[ versionstr	v`chs(\"version\")` ] 	)
 sepparm8	[ 0	locks=0 ]	(	)
 cachedir	[ 0	locks=0 ]	(	"`chs(\"basedir\") + \"/\" + chs(\"basename\")``ifs(ch(\"enableversion\"), \"/\" + chs(\"versionstr\"),\"\")`"	)
 cachename	[ 0	locks=0 ]	(	"`chs(\"basename\")``ifs(ch(\"enableversion\"), \"_\" + chs(\"versionstr\"),\"\")``chs(\"framestr\")``chs(\"filetype\")`"	)
