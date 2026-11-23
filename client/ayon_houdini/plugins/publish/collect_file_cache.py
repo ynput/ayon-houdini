@@ -90,6 +90,10 @@ class CollectFileCache(plugin.HoudiniInstancePlugin):
         trange = node.evalParm("trange")
         substeps = max(1, int(node.evalParm("substeps")))
         frame_step = float(node.evalParm("f3"))
+        if trange and frame_step <= 0:
+            raise PublishError(
+                "Cache frame increment must be greater than zero."
+            )
 
         if trange:
             frames = []
