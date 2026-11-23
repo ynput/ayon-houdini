@@ -65,9 +65,14 @@ class CreateFileCache(plugin.HoudiniCreator):
         for instance in instances:
             node = hou.node(instance.data.get("instance_node"))
             if node:
-                for parm in list(node.spareParms()):
-                    if parm.name().startswith("AYON_"):
-                        parm.destroy()
+                parm_group = node.parmTemplateGroup()
+                for parm in node.spareParms():
+                    if (
+                        parm.name() in {"id", "creator_identifier"}
+                        or parm.name().startswith("AYON_")
+                    ):
+                        parm_group.remove(parm.name())
+                node.setParmTemplateGroup(parm_group)
             self._remove_instance_from_context(instance)
 
     def _imprint_instance(self, node, instance):
