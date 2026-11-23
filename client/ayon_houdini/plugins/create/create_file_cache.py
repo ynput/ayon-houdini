@@ -88,7 +88,7 @@ class CreateFileCache(plugin.HoudiniCreator):
         self.imprint(node, data)
 
     def get_publish_families(self):
-        return ["filecache", "cache", "publish.hou"]
+        return ["filecache", "cache"]
 
     def get_network_categories(self):
         return [
