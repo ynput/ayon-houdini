@@ -104,16 +104,21 @@ class CollectUSDValueClips(plugin.HoudiniInstancePlugin):
         if not editor_nodes:
             return
 
+        # Consider only geoclipsequence nodes
+        clip_nodes = []
+        for node_id in editor_nodes:
+            node = hou.nodeBySessionId(node_id)
+            if node and node.type().name() == "geoclipsequence":
+                clip_nodes.append(node)
+        if not clip_nodes:
+            return
+
         # Get frame range of the ROP node
         start: int = int(instance.data["frameStartHandle"])
         end: int = int(instance.data["frameEndHandle"])
 
         asset_remap = instance.data.setdefault("assetRemap", {})
-        for node_id in editor_nodes:
-            # Consider only geoclipsequence nodes
-            node = hou.nodeBySessionId(node_id)
-            if node.type().name() != "geoclipsequence":
-                continue
+        for node in clip_nodes:
 
             self.log.debug(
                 f"Collecting outputs for Geometry Clip Sequence: {node.path()}"
