@@ -163,3 +163,4 @@ Temporary Items
 
 # ignore mkdocs build
 site/
+.docs-setup/

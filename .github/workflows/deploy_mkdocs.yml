@@ -4,14 +4,17 @@ on:
   push:
     tags:
       - "*"
+    branches:
+      - "chore/mkdocs-shared-setup"
   workflow_dispatch:
 
 jobs:
   build-mk-docs:
     # FIXME: Update @develop to @main after `ops-repo-automation` release.
-    uses: ynput/ops-repo-automation/.github/workflows/deploy_mkdocs.yml@develop
+    uses: ynput/ops-repo-automation/.github/workflows/deploy_mkdocs.yml@feature/mkdocs-ayon-theme
     with:
       repo: ${{ github.repository }}
+      docs_setup_ref: feature/mkdocs-ayon-theme
     secrets:
       YNPUT_BOT_TOKEN: ${{ secrets.YNPUT_BOT_TOKEN }}
       CI_USER: ${{ secrets.CI_USER }}
