@@ -1,10 +1,15 @@
 [
   {
-    "version": "0.10.11",
-    "title": "0.10.11",
+    "version": "test-build",
+    "title": "test-build",
     "aliases": [
       "latest"
     ]
+  },
+  {
+    "version": "0.10.11",
+    "title": "0.10.11",
+    "aliases": []
   },
   {
     "version": "0.10.10",

@@ -1,0 +1,973 @@
+/*
+ * AYON theme for the API docs, so they look like AYONpedia (docs.ayon.dev)
+ * and the AYON web app.
+ *
+ * The token values follow AYONpedia's ayon-theme.css (ynput/ayon-documentation,
+ * website/src/css/ayon-theme.css), which takes them from the AYON web app:
+ *   - ynput/ayon-react-components  src/theme/tokens.css, states.css
+ *   - ynput/ayon-frontend          src/styles/index.scss
+ * To follow a change in the app, update the `--ayon-*` values below; the second
+ * section maps them onto Material for MkDocs.
+ *
+ * Fonts: Inter for text (`theme.font` in base.yml), Jost for headings.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@400..700&display=swap");
+/* Inter with every weight, like AYONpedia's Inter Variable: Material loads only
+   300, 400 and 700, and the navbar uses 500 */
+/* Nunito Sans for the header tab, like the AYON web app's page tabs */
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&display=swap");
+/* only the icons of the theme picker; `block` hides the icon names while loading */
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=computer,dark_mode,light_mode&display=block");
+
+/* ---------- AYON tokens: dark (slate, the default) ---------- */
+[data-md-color-scheme="slate"] {
+    color-scheme: dark;
+    --ayon-primary: #8fceff;
+    --ayon-primary-hover: hsl(206, 80%, 73%);
+    --ayon-on-primary-container: #ebf5ff;
+    --ayon-outline: #9aa0a7;
+    --ayon-outline-variant: #41474d;
+    --ayon-on-surface: #f4f5f5;
+    --ayon-on-surface-variant: #c1c7ce;
+    --ayon-surface-highest: #424a57;
+    --ayon-surface-high-hover: hsl(217, 11%, 29%);
+    --ayon-surface-high: #353b46;
+    --ayon-surface: #272d35;
+    --ayon-surface-low: #1c2026;
+    --ayon-surface-lowest: #16191d;
+    --ayon-selected: #1b4154;
+    --ayon-overlay: var(--ayon-surface-high);
+    --ayon-overlay-hover: var(--ayon-surface-highest);
+    --ayon-overlay-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --ayon-diagram-node: var(--ayon-surface-high);
+    --ayon-diagram-line: #8b9198;
+    --ayon-tertiary: #23e0a9;
+    --ayon-on-primary: #00344f;
+    --ayon-hover-overlay: rgba(255, 255, 255, 0.05);
+    --ayon-back-to-top-icon: #ffffff;
+    --ayon-logo: url("../img/AYON_docs_white.svg");
+}
+
+/* ---------- AYON tokens: light ---------- */
+[data-md-color-scheme="default"] {
+    color-scheme: light;
+    --ayon-primary: #0b76ba;
+    --ayon-primary-hover: #0a69a6;
+    --ayon-on-primary-container: #08304d;
+    --ayon-outline: #545d68;
+    --ayon-outline-variant: #ccd3db;
+    --ayon-on-surface: #1a1e23;
+    --ayon-on-surface-variant: #47505a;
+    --ayon-surface-highest: #d8dde4;
+    --ayon-surface-high-hover: #dae0e6;
+    --ayon-surface-high: #e4e8ed;
+    --ayon-surface: #eef1f4;
+    --ayon-surface-low: #f8f9fb;
+    --ayon-surface-lowest: #ffffff;
+    --ayon-selected: #d5eafa;
+    --ayon-overlay: var(--ayon-surface-lowest);
+    --ayon-overlay-hover: var(--ayon-surface);
+    --ayon-overlay-shadow: 0 8px 24px rgba(16, 24, 40, 0.14), 0 0 0 1px var(--ayon-outline-variant);
+    --ayon-diagram-node: var(--ayon-surface-lowest);
+    --ayon-diagram-line: var(--ayon-outline);
+    --ayon-tertiary: #00845e;
+    --ayon-on-primary: #ffffff;
+    --ayon-hover-overlay: rgba(0, 0, 0, 0.05);
+    --ayon-back-to-top-icon: #000000;
+    --ayon-logo: url("../img/AYON_docs_black.svg");
+}
+
+/* ---------- Shared by both schemes ---------- */
+:root {
+    /* brand swatch */
+    --ayon-brand-mint: #00dcb4;
+    --ayon-brand-blue: #009be1;
+    --ayon-brand-yellow: #ffb400;
+    --ayon-brand-red: #ff6446;
+
+    --ayon-radius: 4px;
+    --ayon-radius-large: 8px;
+    --ayon-font-heading: "Jost", var(--md-text-font-family);
+}
+
+/* ---------- Map the tokens onto Material for MkDocs ---------- */
+[data-md-color-scheme="slate"],
+[data-md-color-scheme="default"] {
+    /* page */
+    --md-default-bg-color: var(--ayon-surface-low);
+    --md-default-fg-color: var(--ayon-on-surface);
+    --md-default-fg-color--light: var(--ayon-on-surface-variant);
+    --md-default-fg-color--lighter: var(--ayon-outline);
+    --md-default-fg-color--lightest: var(--ayon-outline-variant);
+
+    /* header: the page colour, as the AYON web app's top bar and page tabs */
+    --md-primary-fg-color: var(--ayon-surface-low);
+    --md-primary-fg-color--light: var(--ayon-surface-low);
+    --md-primary-fg-color--dark: var(--ayon-surface-low);
+    --md-primary-bg-color: var(--ayon-on-surface);
+    --md-primary-bg-color--light: var(--ayon-on-surface-variant);
+
+    /* links and hover */
+    --md-accent-fg-color: var(--ayon-primary-hover);
+    --md-accent-fg-color--transparent: var(--ayon-selected);
+    --md-typeset-a-color: var(--ayon-primary);
+
+    /* code: the system monospace of AYONpedia (Infima's stack) */
+    --md-code-font: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
+    --md-code-bg-color: var(--ayon-surface-lowest);
+    --md-code-fg-color: var(--ayon-on-surface);
+
+    /* footer */
+    --md-footer-bg-color: var(--ayon-surface-lowest);
+    --md-footer-bg-color--dark: var(--ayon-surface-lowest);
+    --md-footer-fg-color: var(--ayon-on-surface);
+    --md-footer-fg-color--light: var(--ayon-on-surface-variant);
+    --md-footer-fg-color--lighter: var(--ayon-outline);
+
+    /* admonitions and tables */
+    --md-admonition-bg-color: var(--ayon-surface);
+    --md-admonition-fg-color: var(--ayon-on-surface);
+    --md-typeset-table-color: var(--ayon-outline-variant);
+
+    /* Mermaid: AYONpedia's diagram colors. A system font, as on AYONpedia:
+       Mermaid measures labels before webfonts load, so Inter could clip them */
+    --md-mermaid-font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --md-mermaid-node-bg-color: var(--ayon-diagram-node);
+    --md-mermaid-node-fg-color: var(--ayon-primary);
+    --md-mermaid-edge-color: var(--ayon-diagram-line);
+    --md-mermaid-label-bg-color: var(--ayon-surface-low);
+    --md-mermaid-label-fg-color: var(--ayon-on-surface);
+}
+
+/* Mermaid subgraphs: Material colors them with these two page colors, so set
+   them for the diagrams only (they inherit into Material's shadow DOM) */
+.mermaid {
+    --md-default-fg-color--lightest: var(--ayon-surface);
+    --md-default-fg-color--lighter: var(--ayon-outline-variant);
+}
+
+/* ---------- Component touches ---------- */
+
+/* One size on every screen, like AYONpedia: Material enlarges everything on
+   wide screens (137.5% from 100em, 150% from 125em) */
+html {
+    font-size: 125%;
+}
+
+/* Ynput bar above the header (partials/ynput-bar.html), as on AYONpedia */
+.ynput-bar {
+    display: flex;
+    align-items: flex-start;
+    height: 48px;
+    padding: 8px 16px 0;
+    background-color: var(--ayon-surface-low);
+    border-bottom: 1px solid var(--ayon-outline-variant);
+    font-size: 0.8rem;
+}
+.ynput-bar__logo {
+    display: flex;
+    margin-right: auto;
+}
+.ynput-bar__logo img {
+    height: 32px;
+    width: auto;
+}
+[data-md-color-scheme="default"] .ynput-bar__logo img {
+    content: url("../img/ynput_logo_small_BG.svg");
+}
+.ynput-bar__links {
+    display: flex;
+    gap: 0.5em;
+    margin-right: 0.5em;
+    white-space: nowrap;
+}
+.ynput-bar__links a {
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 6px 12px;
+    color: var(--ayon-on-surface);
+    font-weight: 500;
+    line-height: 1;
+    transition: background-color 0.2s, color 0.2s;
+}
+.ynput-bar__links a:hover {
+    background-color: var(--ayon-tertiary);
+    color: var(--ayon-on-primary);
+}
+.ynput-bar__icons {
+    display: flex;
+    margin-left: 5px;
+}
+/* laid out like AYONpedia's (inline, 28px line, icon nudged by
+   vertical-align), so it lands on the same pixels at every display scale */
+.ynput-bar__icons a {
+    display: block;
+    width: 28px;
+    height: 28px;
+    margin: 2px;
+    color: var(--ayon-on-surface);
+    font-size: 16px;
+    line-height: 28px;
+    text-align: center;
+}
+.ynput-bar__icons svg {
+    position: relative;
+    display: inline-flex;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    fill: currentColor;
+    overflow: visible;
+}
+/* eight links need ~1100px: keep the product links first, drop the rest */
+@media screen and (max-width: 1100px) {
+    .ynput-bar__links a:nth-child(n + 5) {
+        display: none;
+    }
+}
+@media screen and (max-width: 640px) {
+    .ynput-bar__links a:nth-child(n + 2) {
+        display: none;
+    }
+}
+
+/* AYONpedia's navbar line: a 1px border plus a 1px shadow below it */
+.md-header,
+.md-header--shadow {
+    box-shadow: 0 1px 0 var(--ayon-outline-variant);
+    border-bottom: 1px solid var(--ayon-outline-variant);
+}
+.md-header__button.md-logo img,
+.md-nav__button.md-logo img {
+    content: var(--ayon-logo);
+    width: auto;
+}
+
+/* AYONpedia's navbar: full width, 60px, the logo on the left and the site name
+   as the active tab, attached to the page below it. Like AYONpedia's, the 60px
+   include the bottom line: scaled (125%, 150% displays) the line stays a whole
+   screen pixel and the bar inside gets the rest, so its content lands on the
+   same screen pixels as on AYONpedia */
+.md-header {
+    box-sizing: border-box;
+    height: 60px;
+}
+.md-header__inner {
+    max-width: none;
+    height: 100%;
+    padding: 0 16px;
+}
+.md-header__source {
+    margin-right: 12px;
+}
+.md-sidebar {
+    top: 61px;
+}
+.md-header__button.md-logo {
+    margin: 0 16px 0 0;
+    padding: 0;
+}
+/* the logo turns AYON green on hover, as on AYONpedia (same filter) */
+.md-header__button.md-logo:hover {
+    opacity: 1;
+}
+.md-header__button.md-logo:hover img {
+    filter: brightness(0) saturate(100%) invert(57%) sepia(79%) saturate(1448%) hue-rotate(120deg) brightness(98%) contrast(101%);
+}
+.md-header__button.md-logo img {
+    transition: filter 0.1s;
+    position: relative;
+    top: -2px;
+    height: 40px;
+}
+.md-header__title.ayon-tabs {
+    display: flex;
+    align-self: stretch;
+    align-items: flex-end;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    font-size: 0.8rem;
+    line-height: 1.65;
+}
+/* the AYON web app's page tabs: the tab stands on the header's line and is
+   underlined in the primary colour when open; on hover a shade sits behind the
+   name, clear of the underline */
+.ayon-tab {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    height: 2.08rem;
+    margin: 0 1.6px -1px;
+    padding: 4px 12px;
+    color: var(--ayon-on-surface-variant);
+    font-family: "Nunito Sans", var(--md-text-font-family);
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0.1px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.ayon-tab::before {
+    content: "";
+    position: absolute;
+    inset: 5.6px 0 7.2px;
+    border-radius: var(--ayon-radius);
+    z-index: -1;
+}
+.md-header .ayon-tab:hover {
+    color: var(--ayon-on-surface);
+}
+.md-header .ayon-tab:hover::before {
+    background-color: var(--ayon-surface-high-hover);
+}
+.ayon-tab--active,
+.md-header .ayon-tab--active:hover {
+    color: var(--ayon-on-surface);
+    font-weight: 600;
+    box-shadow: inset 0 -2px 0 0 var(--ayon-primary);
+}
+
+/* Version selector (mike) after the site name tab, its menu like the theme menu */
+.md-header__topic.ayon-version {
+    position: static;
+    display: flex;
+    align-items: center;
+    /* the tab's height and bottom edge, so both labels share one line */
+    align-self: flex-end;
+    height: 2.08rem;
+    max-width: none;
+    margin: 0 0 -1px 8px;
+    opacity: 1;
+    transform: none;
+}
+.ayon-version .md-version {
+    position: relative;
+    height: auto;
+    font-size: 14.4px;
+    line-height: 20px;
+}
+/* a chip, raised like the search field, so it reads as a control */
+[dir] .ayon-version .md-version__current {
+    top: 0;
+    margin: 0;
+    padding: 3.6px 9.6px;
+    border: 1px solid var(--ayon-outline-variant);
+    border-radius: var(--ayon-radius-large);
+    background-color: var(--ayon-surface-high);
+    color: var(--ayon-on-surface);
+    font-weight: 500;
+}
+.ayon-version .md-version:hover .md-version__current,
+.ayon-version .md-version:focus-within .md-version__current {
+    background-color: var(--ayon-surface-highest);
+    /* light blue, like the breadcrumb home button */
+    color: var(--ayon-primary);
+}
+.ayon-version .md-version__list {
+    top: 100%;
+    margin: 4px 0 0;
+    padding: 4px;
+    border-radius: var(--ayon-radius-large);
+    background-color: var(--ayon-overlay);
+    box-shadow: var(--ayon-overlay-shadow);
+    color: var(--ayon-on-surface);
+}
+.ayon-version .md-version__item {
+    line-height: 20px;
+}
+[dir] .ayon-version .md-version__link {
+    padding: 5.6px 9.6px;
+    border-radius: var(--ayon-radius);
+}
+.ayon-version .md-version__link:hover,
+.ayon-version .md-version__link:focus {
+    background-color: var(--ayon-overlay-hover);
+    color: var(--ayon-primary);
+}
+/* Search: a rounded field with the Ctrl+K keys (js/ayon-theme.js), as on AYONpedia */
+.md-search__form {
+    background-color: var(--ayon-surface-high);
+    border-radius: 1rem;
+}
+/* hover: one step up in the AYON surfaces (Material uses 12% white, which
+   turns the field white on the light theme) */
+.md-search__form:hover {
+    background-color: var(--ayon-surface-highest);
+}
+[data-md-toggle="search"]:checked ~ .md-header .md-search__form {
+    border-radius: var(--ayon-radius-large) var(--ayon-radius-large) 0 0;
+}
+.md-search__input::placeholder {
+    color: var(--ayon-on-surface-variant);
+}
+/* closed: AYONpedia's 200 x 32 pill; open, Material's wide field */
+@media screen and (min-width: 60em) {
+    [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__inner {
+        width: 200px;
+    }
+    /* AYONpedia's navbar places these from the bottom: the search field 4px
+       above it (Material's search box already leaves 4px under the field),
+       the theme button on it */
+    [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search {
+        align-self: flex-end;
+        margin-bottom: 0;
+    }
+    [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__inner {
+        padding: 0;
+    }
+    .md-header .ayon-theme {
+        align-self: flex-end;
+    }
+    [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__form {
+        height: 32px;
+        border-radius: 32px;
+    }
+    [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__input {
+        padding-left: 36px;
+        font-size: 14.4px;
+        /* AYONpedia's search input doesn't inherit the page font, so it shows Arial */
+        font-family: Arial, sans-serif;
+    }
+    [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__icon[for="__search"] {
+        top: 8px;
+        left: 12px;
+        width: 16px;
+        height: 16px;
+        color: var(--ayon-on-surface-variant);
+    }
+    [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__icon[for="__search"] svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+/* the keys as AYONpedia's search plugin draws them (Infima's kbd) */
+.ayon-search__keys {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    pointer-events: none;
+}
+.ayon-search__keys kbd {
+    padding: 2.4px 4.8px;
+    border: 1px solid #bec3c9;
+    border-radius: 3.2px;
+    box-shadow: inset 0 -1px 0 #bec3c9;
+    background-color: transparent; /* the field's color, also on hover */
+    color: var(--ayon-on-surface-variant);
+    font-family: var(--md-code-font-family);
+    font-size: 12.8px;
+    line-height: normal;
+}
+/* the keys give way to the reset button and the query once search is open */
+[data-md-toggle="search"]:checked ~ .md-header .ayon-search__keys {
+    display: none;
+}
+
+/* Theme picker (partials/palette.html), after the search like on AYONpedia */
+.ayon-theme__picker {
+    position: relative;
+}
+.ayon-theme .material-symbols-outlined {
+    font-size: 20px;
+    line-height: 1;
+    /* AYONpedia's settings: the 48px optical size draws thinner, larger glyphs */
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 48;
+}
+.md-header .ayon-theme__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin: 0 0 0 12px;
+    padding: 0;
+    border-radius: var(--ayon-radius);
+    color: var(--ayon-on-surface-variant);
+    cursor: pointer;
+}
+.md-header .ayon-theme__button[hidden] {
+    display: none;
+}
+.ayon-theme__button:hover,
+.ayon-theme__button[aria-expanded="true"] {
+    background-color: var(--ayon-surface-high);
+    color: var(--ayon-on-surface);
+    opacity: 1;
+}
+.ayon-theme__menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 136px;
+    padding: 4px;
+    border-radius: var(--ayon-radius-large);
+    background-color: var(--ayon-overlay);
+    box-shadow: var(--ayon-overlay-shadow);
+}
+.ayon-theme__menu[hidden] {
+    display: none;
+}
+.ayon-theme__option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5.6px 9.6px;
+    border-radius: var(--ayon-radius);
+    color: var(--ayon-on-surface);
+    font-size: 14.4px;
+    cursor: pointer;
+}
+.ayon-theme__option .material-symbols-outlined {
+    font-size: 18px;
+    color: var(--ayon-on-surface-variant);
+}
+.ayon-theme__option:hover {
+    background-color: var(--ayon-overlay-hover);
+}
+/* the chosen option: one rule per entry of `theme.palette` */
+#__palette_0:checked ~ .ayon-theme__menu [for="__palette_0"],
+#__palette_1:checked ~ .ayon-theme__menu [for="__palette_1"],
+#__palette_2:checked ~ .ayon-theme__menu [for="__palette_2"] {
+    background-color: var(--ayon-selected);
+    color: var(--ayon-on-primary-container);
+}
+#__palette_0:checked ~ .ayon-theme__menu [for="__palette_0"] .material-symbols-outlined,
+#__palette_1:checked ~ .ayon-theme__menu [for="__palette_1"] .material-symbols-outlined,
+#__palette_2:checked ~ .ayon-theme__menu [for="__palette_2"] .material-symbols-outlined {
+    color: inherit;
+}
+
+/* Text and headings with AYONpedia's sizes and rhythm (Infima's): Jost 600
+   headings, 16px text on a 1.65 line height, 20px after each block */
+.md-typeset {
+    line-height: 1.65;
+}
+.md-typeset p,
+.md-typeset ul,
+.md-typeset ol {
+    margin: 0 0 20px;
+}
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+    font-family: var(--ayon-font-heading);
+    font-weight: 600;
+    letter-spacing: normal;
+    color: var(--ayon-on-surface);
+}
+.md-typeset h1 {
+    margin: 0 0 25px;
+    font-size: 48px;
+    line-height: 60px;
+}
+.md-typeset h2 {
+    margin: 40px 0 20px;
+    font-size: 32px;
+    line-height: 40px;
+}
+.md-typeset h3 {
+    margin: 30px 0 20px;
+    font-size: 24px;
+    line-height: 30px;
+}
+.md-typeset h4 {
+    margin: 25px 0 20px;
+    font-size: 20px;
+    line-height: 25px;
+}
+
+/* Breadcrumbs (partials/path.html) as on AYONpedia (Infima's): rounded
+   items, small chevrons, the current page highlighted */
+.md-path {
+    font-size: 12.8px;
+    line-height: 21.12px;
+}
+.md-path__list {
+    gap: 0;
+}
+.md-path__item:not(:first-child) {
+    gap: 0;
+    align-items: center;
+}
+.md-path__item:not(:first-child)::before {
+    width: 8px;
+    height: 8px;
+    margin: 0 8px;
+    background-color: var(--ayon-outline);
+    opacity: 0.5;
+    -webkit-mask-size: 100%;
+    mask-size: 100%;
+}
+.md-path__link {
+    padding: 5.12px 10.24px;
+    border-radius: 24px;
+    color: var(--ayon-on-surface);
+}
+.md-path__link:hover {
+    background-color: var(--ayon-hover-overlay);
+    color: var(--ayon-primary);
+}
+.ayon-path__home svg {
+    width: 17.6px;
+    height: 17.6px;
+    fill: currentColor;
+}
+.ayon-path__current,
+.ayon-path__current:hover {
+    background-color: var(--ayon-hover-overlay);
+    color: var(--ayon-primary);
+}
+
+/* Page layout like AYONpedia's docs pages, on desktop (Material shows both
+   sidebars from 76.25em): the page list in a 300px column on the left edge,
+   the content, and the table of contents in the right quarter behind a line */
+@media screen and (min-width: 76.25em) {
+    .md-main__inner.md-grid {
+        max-width: none;
+        margin: 0;
+    }
+    .md-content__inner {
+        margin: 0 16px 24px;
+        padding-top: 16px;
+    }
+    .md-content__inner::before {
+        display: none;
+    }
+    .md-path {
+        margin: 0 16px;
+        padding-top: 16px;
+    }
+    .md-path + .md-content__inner {
+        padding-top: 12.8px;
+    }
+    /* reset Material's sidebar offsets, which are set under [dir] */
+    [dir] .md-nav--primary,
+    [dir] .md-nav--secondary {
+        margin: 0;
+    }
+    [dir] .md-nav--secondary .md-nav {
+        margin: 0;
+    }
+    [dir] .md-nav--primary .md-nav__list,
+    [dir] .md-nav--secondary .md-nav__list {
+        padding: 0;
+    }
+    [dir] .md-nav--primary .md-nav__item > .md-nav__link,
+    [dir] .md-nav--secondary .md-nav__item > .md-nav__link {
+        margin-right: 0;
+    }
+    [dir] .md-sidebar__inner {
+        padding-right: 0;
+    }
+    [dir] .md-sidebar--primary:not([hidden]) ~ .md-content > .md-content__inner {
+        margin-left: 16px;
+    }
+    [dir] .md-sidebar--secondary:not([hidden]) ~ .md-content > .md-content__inner {
+        margin-right: 16px;
+    }
+    .md-nav--primary .md-nav,
+    .md-nav--secondary .md-nav {
+        font-size: inherit;
+        line-height: inherit;
+    }
+
+    /* Page list. Material's sidebar is sticky and only as tall as the
+       window, so the line next to it is drawn by the page instead */
+    .md-main__inner {
+        background: linear-gradient(var(--ayon-outline-variant), var(--ayon-outline-variant)) 299px 0 / 1px 100% no-repeat;
+    }
+    .md-sidebar--primary {
+        width: 300px;
+        padding: 0;
+    }
+    .md-sidebar--primary .md-sidebar__scrollwrap {
+        margin: 0;
+        scrollbar-width: thin;
+    }
+    .md-sidebar--primary .md-sidebar__inner {
+        padding: 8px 9px 8px 8px;
+    }
+    .md-nav--primary .md-nav__title {
+        display: none;
+    }
+    .md-nav--primary {
+        font-size: 16px;
+        line-height: 20px;
+    }
+    /* Material pulls each nested list up by -0.4rem to undo a bottom padding
+       this theme doesn't have; with it, every open level lost 8px and the
+       last pages of deep sections were clipped */
+    .md-nav--primary .md-nav__item--nested > .md-nav {
+        margin-bottom: 0;
+    }
+    .md-nav--primary .md-nav__item {
+        padding: 0;
+    }
+    .md-nav--primary .md-nav__item + .md-nav__item {
+        margin-top: 4px;
+    }
+    .md-nav--primary .md-nav__link {
+        align-items: center;
+        margin: 0;
+        padding: 6px 12px;
+        border-radius: var(--ayon-radius);
+        color: var(--ayon-on-surface-variant);
+    }
+    .md-nav--primary .md-nav__link:is([href], [for]):hover {
+        background-color: var(--ayon-surface-high);
+        color: inherit;
+    }
+    .md-nav--primary .md-ellipsis {
+        white-space: normal;
+    }
+    .md-nav--primary .md-nav__icon {
+        width: 20px;
+        height: 20px;
+    }
+    /* top level: the strongest entries */
+    .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link {
+        font-weight: 600;
+        color: var(--ayon-on-surface);
+    }
+    /* a section's pages: indented, regular weight, muted */
+    .md-nav--primary .md-nav[data-md-level="1"] > .md-nav__list {
+        margin-top: 4px;
+        padding-left: 12px;
+    }
+    .md-nav--primary .md-nav[data-md-level="1"] .md-nav__link {
+        font-weight: 400;
+    }
+    /* deeper levels: smaller, behind a guide line */
+    .md-nav--primary .md-nav[data-md-level="1"] .md-nav[data-md-level] > .md-nav__list {
+        margin-top: 4px;
+        margin-left: 12px;
+        padding-left: 4px;
+        border-left: 1px solid var(--ayon-outline-variant);
+    }
+    .md-nav--primary .md-nav[data-md-level="1"] .md-nav[data-md-level] .md-nav__link {
+        font-size: 0.9em;
+    }
+    /* the current page */
+    .md-nav--primary .md-nav__link.md-nav__link--active,
+    .md-nav--primary .md-nav__link.md-nav__link--active:hover {
+        background-color: var(--ayon-selected);
+        color: var(--ayon-on-primary-container);
+    }
+    .md-nav--primary .md-nav[data-md-level="1"] .md-nav__link--active {
+        font-weight: 500;
+    }
+
+    /* Table of contents */
+    .md-sidebar--secondary {
+        width: calc((100% - 300px) / 4);
+        padding: 16px;
+    }
+    .md-sidebar--secondary .md-sidebar__scrollwrap {
+        margin: 0;
+        scrollbar-width: thin;
+    }
+    .md-nav--secondary > .md-nav__title {
+        display: none;
+    }
+    .md-nav--secondary {
+        font-size: 12.8px;
+        line-height: 21.12px;
+    }
+    [dir] .md-nav--secondary > .md-nav__list {
+        padding: 8px 0 8px 8px;
+        border-left: 1px solid var(--ayon-outline-variant);
+    }
+    [dir] .md-nav--secondary .md-nav .md-nav__list {
+        padding-left: 8px;
+    }
+    .md-nav--secondary .md-nav__item {
+        margin: 8px;
+        padding: 0;
+    }
+    .md-nav--secondary .md-nav__link {
+        margin: 0;
+        color: var(--ayon-on-surface);
+    }
+    .md-nav--secondary .md-nav__link:hover,
+    .md-nav--secondary .md-nav__link--active {
+        color: var(--ayon-primary);
+    }
+}
+
+/* Code: a raised block, inline code on a lighter chip */
+.md-typeset pre > code {
+    border-radius: var(--ayon-radius-large);
+    border: 1px solid var(--ayon-outline-variant);
+}
+.md-typeset :not(pre) > code {
+    padding: 0.1rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.1);
+    background-color: var(--ayon-surface-high);
+    border-radius: var(--ayon-radius);
+}
+/* 90% of the text, as on AYONpedia (Material uses 85%) */
+.md-typeset code,
+.md-typeset pre {
+    font-size: 0.9em;
+}
+.md-typeset pre > code {
+    font-size: 1em;
+}
+
+/* Admonitions: raised surface with a hairline and a colored edge */
+.md-typeset .admonition,
+.md-typeset details {
+    border-width: 1px 1px 1px 4px;
+    border-radius: var(--ayon-radius);
+    box-shadow: none;
+}
+
+/* Tables as on AYONpedia (Infima's): a line around every cell, a bold centred
+   header on the raised surface, striped rows, 16px text, no hover highlight.
+   Material draws one outer frame, small text and highlights rows on hover */
+.md-typeset__scrollwrap {
+    margin: 0 0 16px;
+}
+.md-typeset__table {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+.md-typeset table:not([class]) {
+    display: block;
+    max-width: 100%;
+    overflow: auto;
+    border: 0;
+    border-collapse: collapse;
+    border-radius: var(--ayon-radius);
+    background-color: transparent;
+    font-size: 16px;
+    line-height: 26.4px;
+}
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid var(--ayon-outline-variant);
+    vertical-align: middle;
+}
+.md-typeset table:not([class]) th {
+    background-color: var(--ayon-surface-highest);
+    font-weight: 700;
+}
+.md-typeset table:not([class]) th:not([align]) {
+    text-align: center;
+}
+.md-typeset table:not([class]) thead tr {
+    border-bottom: 2px solid var(--ayon-outline-variant);
+}
+.md-typeset table:not([class]) tbody tr {
+    border-top: 1px solid var(--ayon-outline-variant);
+}
+.md-typeset table:not([class]) tbody tr:hover {
+    background-color: transparent;
+    box-shadow: none;
+}
+.md-typeset table:not([class]) tbody tr:nth-child(2n),
+.md-typeset table:not([class]) tbody tr:nth-child(2n):hover {
+    background-color: var(--ayon-surface);
+}
+
+/* Back-to-top button (navigation.top) as on AYONpedia (Docusaurus'): a round
+   button in the bottom right corner with a chevron, growing in when shown.
+   Material's version is a "Back to top" pill at the top of the page */
+[dir] .md-top {
+    top: auto !important; /* Material's script sets it under the header */
+    right: 20.8px;
+    bottom: 20.8px;
+    left: auto;
+    z-index: 4;
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--ayon-outline-variant);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    color: transparent;
+    font-size: 0;
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.2s cubic-bezier(0.08, 0.52, 0.52, 1);
+}
+[dir] .md-top[hidden] {
+    opacity: 0;
+    transform: scale(0);
+    transition-duration: 0.2s;
+}
+.md-top svg {
+    display: none;
+}
+.md-top::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--ayon-back-to-top-icon);
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="rgba(0,0,0,0.5)" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>') 50% / 32px 32px no-repeat;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="rgba(0,0,0,0.5)" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>') 50% / 32px 32px no-repeat;
+}
+.md-top:focus,
+.md-top:hover {
+    background-color: var(--ayon-surface-highest);
+    color: transparent;
+}
+
+/* Thin scrollbars, as in the app. Everywhere one color, as on AYONpedia (the
+   browser darkens it on hover); Material colors its sidebars, search results
+   and code blocks grey and turns them blue on hover */
+html,
+.md-sidebar__scrollwrap,
+.md-sidebar__scrollwrap:hover,
+.md-sidebar__scrollwrap:focus-within,
+.md-search__scrollwrap,
+.md-search__scrollwrap:hover,
+.md-typeset pre > code,
+.md-typeset pre > code:hover {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ayon-surface-highest) transparent;
+}
+
+/* Medium screens, like AYONpedia's navbar: the tab text, the logo and the
+   search box get smaller in steps */
+@media screen and (min-width: 60em) and (max-width: 1420px) {
+    .ayon-tab {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .md-header__button.md-logo img {
+        height: 25.6px;
+    }
+    [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__inner {
+        width: 144px;
+    }
+}
+@media screen and (min-width: 60em) and (max-width: 1160px) {
+    .ayon-tab {
+        font-size: 13px;
+    }
+    .md-header__button.md-logo img {
+        height: 21.6px;
+    }
+    .ayon-search__keys {
+        display: none;
+    }
+}

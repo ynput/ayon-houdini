@@ -1,0 +1,428 @@
+<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=prev href=usd.html><link rel=next href=../hooks/index.html><link rel=icon href=../../../../img/favicon.ico><meta name=generator content="mkdocs-1.6.1, mkdocs-material-9.8.2"><title>workfile_template_builder - ayon-houdini</title><link rel=stylesheet href=../../../../assets/stylesheets/main.57a0d79d.min.css><link rel=stylesheet href=../../../../assets/stylesheets/palette.fb2fffe2.min.css><script src=https://unpkg.com/iframe-worker/shim></script><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback"><style>:root{--md-text-font:"Inter";--md-code-font:"Roboto Mono"}</style><link rel=stylesheet href=../../../../assets/_mkdocstrings.css><link rel=stylesheet href=../../../../css/ayon-theme.css><script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script></head> <body dir=ltr data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#client.ayon_houdini.api.workfile_template_builder class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <div data-md-color-scheme=default data-md-component=outdated hidden> </div> <div class=ynput-bar> <a class=ynput-bar__logo href=https://ynput.io target=_blank rel="noopener noreferrer"> <img src=../../../../img/ynput_logo_small_W.svg alt=Ynput> </a> <nav class=ynput-bar__links aria-label=Ynput> <a href=https://ayon.app/ target=_blank rel="noopener noreferrer">Visit website</a> <a href=https://ynput.cloud/ target=_blank rel="noopener noreferrer">Ynput Cloud</a> <a href=https://playground.ayon.app/ target=_blank rel="noopener noreferrer">Try AYON</a> <a href=https://feedback.ayon.app/ target=_blank rel="noopener noreferrer">Feedback</a> <a href=https://ayon.app/services target=_blank rel="noopener noreferrer">Services</a> <a href=https://ynput.io/community/ target=_blank rel="noopener noreferrer">Community</a> <a href=https://ayon.app/about-us target=_blank rel="noopener noreferrer">Company</a> <a href=https://ayon.app/contact target=_blank rel="noopener noreferrer">Contact</a> </nav> <div class=ynput-bar__icons> <a href=https://x.com/ynput_io target=_blank rel="noopener noreferrer" aria-label=X class=md-icon> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 512 512"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg> </a> <a href=https://github.com/ynput target=_blank rel="noopener noreferrer" aria-label=GitHub class=md-icon> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 512 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </a> </div> </div> <header class="md-header md-header--shadow" data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=https://docs.ayon.dev/ title=AYONpedia class="md-header__button md-logo" aria-label=AYONpedia data-md-component=logo> <img src=../../../../img/AYON_docs_white.svg alt=logo> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg> </label> <div class="md-header__title ayon-tabs"> <a href=../../../../index.html class="ayon-tab ayon-tab--active">ayon-houdini</a><div class="md-header__topic ayon-version"></div> </div> <div class=md-header__source> <a href=https://github.com/ynput/ayon-houdini title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg> </div> <div class=md-source__repository> GitHub </div> </a> </div> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 16 16"><path d=M6.02945,10.20327a4.17382,4.17382,0,1,1,4.17382-4.17382A4.15609,4.15609,0,0,1,6.02945,10.20327Zm9.69195,4.2199L10.8989,9.59979A5.88021,5.88021,0,0,0,12.058,6.02856,6.00467,6.00467,0,1,0,9.59979,10.8989l4.82338,4.82338a.89729.89729,0,0,0,1.29912,0,.89749.89749,0,0,0-.00087-1.29909Z /></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 16 16"><path d=M6.02945,10.20327a4.17382,4.17382,0,1,1,4.17382-4.17382A4.15609,4.15609,0,0,1,6.02945,10.20327Zm9.69195,4.2199L10.8989,9.59979A5.88021,5.88021,0,0,0,12.058,6.02856,6.00467,6.00467,0,1,0,9.59979,10.8989l4.82338,4.82338a.89729.89729,0,0,0,1.29912,0,.89749.89749,0,0,0-.00087-1.29909Z /></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg> </label> <nav class=md-search__options aria-label=Search> <button type=reset class="md-search__icon md-icon" title=Clear aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg> </button> </nav> </form> <div class=md-search__output> <div class=md-search__scrollwrap tabindex=0 data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list role=presentation></ol> </div> </div> </div> </div> </div> <form class="md-header__option ayon-theme" data-md-component=palette><script>__md_get("__palette")||__md_set("__palette",{index:0})</script> <div class=ayon-theme__picker> <input class=md-option data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo aria-label=Dark type=radio name=__palette id=__palette_0 tabindex=-1> <button type=button class="md-header__button md-icon ayon-theme__button" title="Theme: Dark" aria-label="Theme: Dark" aria-haspopup=true aria-expanded=false hidden> <span class=material-symbols-outlined aria-hidden=true>dark_mode</span> </button> <input class=md-option data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme=default data-md-color-primary=indigo data-md-color-accent=indigo aria-label=Light type=radio name=__palette id=__palette_1 tabindex=-1> <button type=button class="md-header__button md-icon ayon-theme__button" title="Theme: Light" aria-label="Theme: Light" aria-haspopup=true aria-expanded=false hidden> <span class=material-symbols-outlined aria-hidden=true>light_mode</span> </button> <input class=md-option data-md-color-media=(prefers-color-scheme) data-md-color-scheme=default data-md-color-primary=indigo data-md-color-accent=indigo aria-label=System type=radio name=__palette id=__palette_2 tabindex=-1> <button type=button class="md-header__button md-icon ayon-theme__button" title="Theme: System" aria-label="Theme: System" aria-haspopup=true aria-expanded=false hidden> <span class=material-symbols-outlined aria-hidden=true>computer</span> </button> <div class=ayon-theme__menu role=menu aria-label=Theme hidden> <label class=ayon-theme__option for=__palette_0 role=menuitemradio> <span class=material-symbols-outlined aria-hidden=true>dark_mode</span> Dark </label> <label class=ayon-theme__option for=__palette_1 role=menuitemradio> <span class=material-symbols-outlined aria-hidden=true>light_mode</span> Light </label> <label class=ayon-theme__option for=__palette_2 role=menuitemradio> <span class=material-symbols-outlined aria-hidden=true>computer</span> System </label> </div> </div> </form> <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script> </nav> </header> <div class=md-container data-md-component=container> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=https://docs.ayon.dev/ title=ayon-houdini class="md-nav__button md-logo" aria-label=ayon-houdini data-md-component=logo> <img src=../../../../img/AYON_docs_white.svg alt=logo> </a> ayon-houdini </label> <div class=md-nav__source> <a href=https://github.com/ynput/ayon-houdini title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg> </div> <div class=md-source__repository> GitHub </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../../../index.html class=md-nav__link> <span class=md-ellipsis> Home </span> </a> </li> <li class=md-nav__item> <a href=../../../../license.html class=md-nav__link> <span class=md-ellipsis> License </span> </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3 checked> <label class=md-nav__link for=__nav_3 id=__nav_3_label tabindex=0> <span class=md-ellipsis> Reference </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_3_label aria-expanded=true> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> Reference </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1 checked> <label class=md-nav__link for=__nav_3_1 id=__nav_3_1_label tabindex=0> <span class=md-ellipsis> client </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_3_1_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1> <span class="md-nav__icon md-icon"></span> client </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1_1 checked> <label class=md-nav__link for=__nav_3_1_1 id=__nav_3_1_1_label tabindex=0> <span class=md-ellipsis> ayon_houdini </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=3 aria-labelledby=__nav_3_1_1_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1_1> <span class="md-nav__icon md-icon"></span> ayon_houdini </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../addon.html class=md-nav__link> <span class=md-ellipsis> addon </span> </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3_1_1_2 checked> <label class=md-nav__link for=__nav_3_1_1_2 id=__nav_3_1_1_2_label tabindex=0> <span class=md-ellipsis> api </span> <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=4 aria-labelledby=__nav_3_1_1_2_label aria-expanded=true> <label class=md-nav__title for=__nav_3_1_1_2> <span class="md-nav__icon md-icon"></span> api </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=action.html class=md-nav__link> <span class=md-ellipsis> action </span> </a> </li> <li class=md-nav__item> <a href=colorspace.html class=md-nav__link> <span class=md-ellipsis> colorspace </span> </a> </li> <li class=md-nav__item> <a href=creator_node_shelves.html class=md-nav__link> <span class=md-ellipsis> creator_node_shelves </span> </a> </li> <li class=md-nav__item> <a href=hda_utils.html class=md-nav__link> <span class=md-ellipsis> hda_utils </span> </a> </li> <li class=md-nav__item> <a href=lib.html class=md-nav__link> <span class=md-ellipsis> lib </span> </a> </li> <li class=md-nav__item> <a href=pipeline.html class=md-nav__link> <span class=md-ellipsis> pipeline </span> </a> </li> <li class=md-nav__item> <a href=plugin.html class=md-nav__link> <span class=md-ellipsis> plugin </span> </a> </li> <li class=md-nav__item> <a href=shelves.html class=md-nav__link> <span class=md-ellipsis> shelves </span> </a> </li> <li class=md-nav__item> <a href=usd.html class=md-nav__link> <span class=md-ellipsis> usd </span> </a> </li> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> <span class=md-ellipsis> workfile_template_builder </span> <span class="md-nav__icon md-icon"></span> </label> <a href=workfile_template_builder.html class="md-nav__link md-nav__link--active"> <span class=md-ellipsis> workfile_template_builder </span> </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder class=md-nav__link> <span class=md-ellipsis> workfile_template_builder </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniPlaceholderPlugin class=md-nav__link> <span class=md-ellipsis> HoudiniPlaceholderPlugin </span> </a> <nav class=md-nav aria-label=HoudiniPlaceholderPlugin> <ul class=md-nav__list> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniPlaceholderPlugin.create_placeholder_node class=md-nav__link> <span class=md-ellipsis> create_placeholder_node </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniTemplateBuilder class=md-nav__link> <span class=md-ellipsis> HoudiniTemplateBuilder </span> </a> <nav class=md-nav aria-label=HoudiniTemplateBuilder> <ul class=md-nav__list> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniTemplateBuilder.import_template class=md-nav__link> <span class=md-ellipsis> import_template </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniTemplateBuilder.resolve_template_path class=md-nav__link> <span class=md-ellipsis> resolve_template_path </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.trigger_on_app_launch class=md-nav__link> <span class=md-ellipsis> trigger_on_app_launch </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.trigger_on_new_file class=md-nav__link> <span class=md-ellipsis> trigger_on_new_file </span> </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../hooks/set_default_display_and_view.html class=md-nav__link> <span class=md-ellipsis> hooks </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../plugins/create/convert_legacy.html class=md-nav__link> <span class=md-ellipsis> plugins </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../startup/husdplugins/outputprocessors/ayon_uri_processor.html class=md-nav__link> <span class=md-ellipsis> startup </span> <span class="md-nav__icon md-icon"></span> </a> </li> <li class=md-nav__item> <a href=../version.html class=md-nav__link> <span class=md-ellipsis> version </span> </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--pruned md-nav__item--nested"> <a href=../../../server/settings/conversion.html class=md-nav__link> <span class=md-ellipsis> server </span> <span class="md-nav__icon md-icon"></span> </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder class=md-nav__link> <span class=md-ellipsis> workfile_template_builder </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniPlaceholderPlugin class=md-nav__link> <span class=md-ellipsis> HoudiniPlaceholderPlugin </span> </a> <nav class=md-nav aria-label=HoudiniPlaceholderPlugin> <ul class=md-nav__list> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniPlaceholderPlugin.create_placeholder_node class=md-nav__link> <span class=md-ellipsis> create_placeholder_node </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniTemplateBuilder class=md-nav__link> <span class=md-ellipsis> HoudiniTemplateBuilder </span> </a> <nav class=md-nav aria-label=HoudiniTemplateBuilder> <ul class=md-nav__list> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniTemplateBuilder.import_template class=md-nav__link> <span class=md-ellipsis> import_template </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.HoudiniTemplateBuilder.resolve_template_path class=md-nav__link> <span class=md-ellipsis> resolve_template_path </span> </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.trigger_on_app_launch class=md-nav__link> <span class=md-ellipsis> trigger_on_app_launch </span> </a> </li> <li class=md-nav__item> <a href=#client.ayon_houdini.api.workfile_template_builder.trigger_on_new_file class=md-nav__link> <span class=md-ellipsis> trigger_on_new_file </span> </a> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <nav class=md-path aria-label=Navigation> <ol class=md-path__list> <li class=md-path__item> <a href=../../../../index.html class="md-path__link ayon-path__home" aria-label=Home title=Home> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> </a> </li> <li class=md-path__item> <a href=../addon.html class=md-path__link> <span class=md-ellipsis> Reference </span> </a> </li> <li class=md-path__item> <a href=../addon.html class=md-path__link> <span class=md-ellipsis> client </span> </a> </li> <li class=md-path__item> <a href=../addon.html class=md-path__link> <span class=md-ellipsis> ayon_houdini </span> </a> </li> <li class=md-path__item> <a href=action.html class=md-path__link> <span class=md-ellipsis> api </span> </a> </li> <li class=md-path__item> <span class="md-path__link ayon-path__current" aria-current=page> <span class=md-ellipsis>workfile_template_builder</span> </span> </li> </ol> </nav> <article class="md-content__inner md-typeset"> <h1>workfile_template_builder</h1> <div class="doc doc-object doc-module"> <a id=client.ayon_houdini.api.workfile_template_builder></a> <div class="doc doc-contents first"> <div class="doc doc-children"> <div class="doc doc-object doc-class"> <h2 id=client.ayon_houdini.api.workfile_template_builder.HoudiniPlaceholderPlugin class="doc doc-heading"> <code>HoudiniPlaceholderPlugin</code> </h2> <div class="doc doc-contents "> <p class="doc doc-class-bases"> Bases: <code><span title=ayon_core.pipeline.workfile.workfile_template_builder.PlaceholderPlugin>PlaceholderPlugin</span></code></p> <p>Base Placeholder Plugin for Houdini with one unified cache.</p> <p>Inherited classes must still implement <code>populate_placeholder</code></p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/workfile_template_builder.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal> 65</span>
+<span class=normal> 66</span>
+<span class=normal> 67</span>
+<span class=normal> 68</span>
+<span class=normal> 69</span>
+<span class=normal> 70</span>
+<span class=normal> 71</span>
+<span class=normal> 72</span>
+<span class=normal> 73</span>
+<span class=normal> 74</span>
+<span class=normal> 75</span>
+<span class=normal> 76</span>
+<span class=normal> 77</span>
+<span class=normal> 78</span>
+<span class=normal> 79</span>
+<span class=normal> 80</span>
+<span class=normal> 81</span>
+<span class=normal> 82</span>
+<span class=normal> 83</span>
+<span class=normal> 84</span>
+<span class=normal> 85</span>
+<span class=normal> 86</span>
+<span class=normal> 87</span>
+<span class=normal> 88</span>
+<span class=normal> 89</span>
+<span class=normal> 90</span>
+<span class=normal> 91</span>
+<span class=normal> 92</span>
+<span class=normal> 93</span>
+<span class=normal> 94</span>
+<span class=normal> 95</span>
+<span class=normal> 96</span>
+<span class=normal> 97</span>
+<span class=normal> 98</span>
+<span class=normal> 99</span>
+<span class=normal>100</span>
+<span class=normal>101</span>
+<span class=normal>102</span>
+<span class=normal>103</span>
+<span class=normal>104</span>
+<span class=normal>105</span>
+<span class=normal>106</span>
+<span class=normal>107</span>
+<span class=normal>108</span>
+<span class=normal>109</span>
+<span class=normal>110</span>
+<span class=normal>111</span>
+<span class=normal>112</span>
+<span class=normal>113</span>
+<span class=normal>114</span>
+<span class=normal>115</span>
+<span class=normal>116</span>
+<span class=normal>117</span>
+<span class=normal>118</span>
+<span class=normal>119</span>
+<span class=normal>120</span>
+<span class=normal>121</span>
+<span class=normal>122</span>
+<span class=normal>123</span>
+<span class=normal>124</span>
+<span class=normal>125</span>
+<span class=normal>126</span>
+<span class=normal>127</span>
+<span class=normal>128</span>
+<span class=normal>129</span>
+<span class=normal>130</span>
+<span class=normal>131</span>
+<span class=normal>132</span>
+<span class=normal>133</span>
+<span class=normal>134</span>
+<span class=normal>135</span>
+<span class=normal>136</span>
+<span class=normal>137</span>
+<span class=normal>138</span>
+<span class=normal>139</span>
+<span class=normal>140</span>
+<span class=normal>141</span>
+<span class=normal>142</span>
+<span class=normal>143</span>
+<span class=normal>144</span>
+<span class=normal>145</span>
+<span class=normal>146</span>
+<span class=normal>147</span>
+<span class=normal>148</span>
+<span class=normal>149</span>
+<span class=normal>150</span>
+<span class=normal>151</span>
+<span class=normal>152</span>
+<span class=normal>153</span>
+<span class=normal>154</span>
+<span class=normal>155</span>
+<span class=normal>156</span>
+<span class=normal>157</span>
+<span class=normal>158</span>
+<span class=normal>159</span>
+<span class=normal>160</span>
+<span class=normal>161</span>
+<span class=normal>162</span>
+<span class=normal>163</span>
+<span class=normal>164</span>
+<span class=normal>165</span>
+<span class=normal>166</span>
+<span class=normal>167</span>
+<span class=normal>168</span>
+<span class=normal>169</span>
+<span class=normal>170</span>
+<span class=normal>171</span>
+<span class=normal>172</span>
+<span class=normal>173</span>
+<span class=normal>174</span>
+<span class=normal>175</span>
+<span class=normal>176</span>
+<span class=normal>177</span>
+<span class=normal>178</span>
+<span class=normal>179</span>
+<span class=normal>180</span>
+<span class=normal>181</span>
+<span class=normal>182</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>class</span><span class=w> </span><span class=nc>HoudiniPlaceholderPlugin</span><span class=p>(</span><span class=n>PlaceholderPlugin</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>"""Base Placeholder Plugin for Houdini with one unified cache.</span>
+
+<span class=sd>    Inherited classes must still implement `populate_placeholder`</span>
+<span class=sd>    """</span>
+    <span class=n>skip_discovery</span> <span class=o>=</span> <span class=kc>True</span>
+
+    <span class=n>attr_prefix</span><span class=p>:</span> <span class=nb>str</span> <span class=o>=</span> <span class=s2>"AYON_placeholder_"</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>get_placeholder_node_name</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>placeholder_data</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>identifier</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>"."</span><span class=p>,</span> <span class=s2>"_"</span><span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>create_placeholder_node</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>node_name</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+<span class=w>        </span><span class=sd>"""Create node to be used as placeholder.</span>
+
+<span class=sd>        By default, it creates a null node in '/out'.</span>
+<span class=sd>        Feel free to override it in different workfile build plugins.</span>
+<span class=sd>        """</span>
+
+        <span class=n>node</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=s2>"/out"</span><span class=p>)</span><span class=o>.</span><span class=n>createNode</span><span class=p>(</span>
+            <span class=s2>"null"</span><span class=p>,</span> <span class=n>node_name</span><span class=p>,</span> <span class=n>force_valid_node_name</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+        <span class=n>node</span><span class=o>.</span><span class=n>moveToGoodPosition</span><span class=p>()</span>
+        <span class=n>parms</span> <span class=o>=</span> <span class=n>node</span><span class=o>.</span><span class=n>parmTemplateGroup</span><span class=p>()</span>
+        <span class=k>for</span> <span class=n>parm</span> <span class=ow>in</span> <span class=p>{</span><span class=s2>"execute"</span><span class=p>,</span> <span class=s2>"renderdialog"</span><span class=p>}:</span>
+            <span class=n>p</span> <span class=o>=</span> <span class=n>parms</span><span class=o>.</span><span class=n>find</span><span class=p>(</span><span class=n>parm</span><span class=p>)</span>
+            <span class=n>p</span><span class=o>.</span><span class=n>hide</span><span class=p>(</span><span class=kc>True</span><span class=p>)</span>
+            <span class=n>parms</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=n>parm</span><span class=p>,</span> <span class=n>p</span><span class=p>)</span>
+        <span class=n>node</span><span class=o>.</span><span class=n>setParmTemplateGroup</span><span class=p>(</span><span class=n>parms</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>node</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>create_placeholder</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>placeholder_data</span><span class=p>):</span>
+        <span class=n>node_name</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>get_placeholder_node_name</span><span class=p>(</span><span class=n>placeholder_data</span><span class=p>)</span>
+
+        <span class=n>placeholder_node</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>create_placeholder_node</span><span class=p>(</span><span class=n>node_name</span><span class=p>)</span>
+        <span class=n>HoudiniCreator</span><span class=o>.</span><span class=n>customize_node_look</span><span class=p>(</span><span class=n>placeholder_node</span><span class=p>)</span>
+
+        <span class=n>placeholder_data</span><span class=p>[</span><span class=s2>"plugin_identifier"</span><span class=p>]</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>identifier</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>_imprint</span><span class=p>(</span><span class=n>placeholder_node</span><span class=p>,</span> <span class=n>placeholder_data</span><span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>collect_scene_placeholders</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>list</span><span class=p>[</span><span class=n>hou</span><span class=o>.</span><span class=n>Node</span><span class=p>]:</span>
+        <span class=c1># Read the cache by identifier</span>
+        <span class=n>placeholder_nodes</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>builder</span><span class=o>.</span><span class=n>get_shared_populate_data</span><span class=p>(</span>
+            <span class=bp>self</span><span class=o>.</span><span class=n>identifier</span>
+        <span class=p>)</span>
+        <span class=k>if</span> <span class=n>placeholder_nodes</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span>
+
+            <span class=n>placeholder_nodes</span> <span class=o>=</span> <span class=n>lsattr</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>attr_prefix</span> <span class=o>+</span> <span class=s2>"plugin_identifier"</span><span class=p>,</span>
+                                       <span class=bp>self</span><span class=o>.</span><span class=n>identifier</span><span class=p>)</span>
+            <span class=k>if</span> <span class=bp>self</span><span class=o>.</span><span class=n>attr_prefix</span><span class=p>:</span>
+                <span class=c1># Backwards compatibility: support cases without attr prefix</span>
+                <span class=n>placeholder_nodes</span><span class=o>.</span><span class=n>extend</span><span class=p>(</span>
+                    <span class=n>lsattr</span><span class=p>(</span><span class=s2>"plugin_identifier"</span><span class=p>,</span> <span class=bp>self</span><span class=o>.</span><span class=n>identifier</span><span class=p>)</span>
+                <span class=p>)</span>
+
+            <span class=c1># Set the cache by identifier</span>
+            <span class=bp>self</span><span class=o>.</span><span class=n>builder</span><span class=o>.</span><span class=n>set_shared_populate_data</span><span class=p>(</span>
+                    <span class=bp>self</span><span class=o>.</span><span class=n>identifier</span><span class=p>,</span> <span class=n>placeholder_nodes</span>
+                <span class=p>)</span>
+
+        <span class=k>return</span> <span class=n>placeholder_nodes</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>collect_placeholders</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>list</span><span class=p>[</span><span class=n>PlaceholderItem</span><span class=p>]:</span>
+        <span class=n>output</span> <span class=o>=</span> <span class=p>[]</span>
+        <span class=n>placeholder_nodes</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>collect_scene_placeholders</span><span class=p>()</span>
+
+        <span class=k>for</span> <span class=n>node</span> <span class=ow>in</span> <span class=n>placeholder_nodes</span><span class=p>:</span>
+            <span class=n>placeholder_data</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>_read</span><span class=p>(</span><span class=n>node</span><span class=p>)</span>
+            <span class=n>output</span><span class=o>.</span><span class=n>append</span><span class=p>(</span>
+                <span class=n>PlaceholderItem</span><span class=p>(</span><span class=n>node</span><span class=o>.</span><span class=n>path</span><span class=p>(),</span> <span class=n>placeholder_data</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span>
+            <span class=p>)</span>
+
+        <span class=k>return</span> <span class=n>output</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>update_placeholder</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>placeholder_item</span><span class=p>,</span> <span class=n>placeholder_data</span><span class=p>):</span>
+        <span class=n>placeholder_node</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=n>placeholder_item</span><span class=o>.</span><span class=n>scene_identifier</span><span class=p>)</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>_imprint</span><span class=p>(</span><span class=n>placeholder_node</span><span class=p>,</span> <span class=n>placeholder_data</span><span class=p>,</span> <span class=n>update</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+
+        <span class=c1># Update node name</span>
+        <span class=n>node_name</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>get_placeholder_node_name</span><span class=p>(</span><span class=n>placeholder_data</span><span class=p>)</span>
+        <span class=n>node_name</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>text</span><span class=o>.</span><span class=n>variableName</span><span class=p>(</span><span class=n>node_name</span><span class=p>)</span>
+        <span class=n>placeholder_node</span><span class=o>.</span><span class=n>setName</span><span class=p>(</span><span class=n>node_name</span><span class=p>,</span> <span class=n>unique_name</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>delete_placeholder</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>placeholder</span><span class=p>):</span>
+        <span class=n>placeholder_node</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=n>placeholder</span><span class=o>.</span><span class=n>scene_identifier</span><span class=p>)</span>
+
+        <span class=c1># Connections should have been transferred but may also have been</span>
+        <span class=c1># inserted to output nodes with the placeholder node, in that case</span>
+        <span class=c1># the connection with placeholder node still exists, but we don't want</span>
+        <span class=c1># Houdini to delete the node and then 'keep' the connection passed</span>
+        <span class=c1># through from input node to output node.</span>
+        <span class=n>disconnect_node</span><span class=p>(</span><span class=n>placeholder_node</span><span class=p>)</span>
+
+        <span class=n>placeholder_node</span><span class=o>.</span><span class=n>destroy</span><span class=p>()</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>_imprint</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>placeholder_node</span><span class=p>,</span> <span class=n>placeholder_data</span><span class=p>,</span> <span class=n>update</span><span class=o>=</span><span class=kc>False</span><span class=p>):</span>
+        <span class=n>imprint</span><span class=p>(</span>
+            <span class=n>placeholder_node</span><span class=p>,</span>
+            <span class=n>placeholder_data</span><span class=p>,</span>
+            <span class=n>update</span><span class=o>=</span><span class=n>update</span><span class=p>,</span>
+            <span class=n>folder</span><span class=o>=</span><span class=s2>"AYON Placeholder"</span><span class=p>,</span>
+            <span class=n>prefix</span><span class=o>=</span><span class=bp>self</span><span class=o>.</span><span class=n>attr_prefix</span>
+        <span class=p>)</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>_read</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>placeholder_node</span><span class=p>:</span> <span class=n>hou</span><span class=o>.</span><span class=n>Node</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>dict</span><span class=p>[</span><span class=nb>str</span><span class=p>,</span> <span class=n>Any</span><span class=p>]:</span>
+<span class=w>        </span><span class=sd>"""Read attributes from the node, removing the placeholder prefix"""</span>
+        <span class=n>data</span> <span class=o>=</span> <span class=n>read</span><span class=p>(</span><span class=n>placeholder_node</span><span class=p>)</span>
+
+        <span class=c1># Convert prefixed attributes to the regular data keys overriding</span>
+        <span class=c1># any backwards compatible keys that pre-existed from before we</span>
+        <span class=c1># started adding prefixes.</span>
+        <span class=k>for</span> <span class=n>key</span> <span class=ow>in</span> <span class=nb>list</span><span class=p>(</span><span class=n>data</span><span class=p>):</span>
+            <span class=k>if</span> <span class=n>key</span><span class=o>.</span><span class=n>startswith</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>attr_prefix</span><span class=p>):</span>
+                <span class=c1># Remove prefix and re-assign it</span>
+                <span class=n>value</span> <span class=o>=</span> <span class=n>data</span><span class=o>.</span><span class=n>pop</span><span class=p>(</span><span class=n>key</span><span class=p>)</span>
+                <span class=n>key</span> <span class=o>=</span> <span class=n>key</span><span class=p>[</span><span class=nb>len</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>attr_prefix</span><span class=p>):]</span>
+                <span class=n>data</span><span class=p>[</span><span class=n>key</span><span class=p>]</span> <span class=o>=</span> <span class=n>value</span>
+
+        <span class=k>return</span> <span class=n>data</span>
+</code></pre></div></td></tr></table></div> </details> <div class="doc doc-children"> <div class="doc doc-object doc-function"> <h3 id=client.ayon_houdini.api.workfile_template_builder.HoudiniPlaceholderPlugin.create_placeholder_node class="doc doc-heading"> <code class="highlight language-python"><span class=n>create_placeholder_node</span><span class=p>(</span><span class=n>node_name</span><span class=o>=</span><span class=kc>None</span><span class=p>)</span></code> </h3> <div class="doc doc-contents "> <p>Create node to be used as placeholder.</p> <p>By default, it creates a null node in '/out'. Feel free to override it in different workfile build plugins.</p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/workfile_template_builder.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>77</span>
+<span class=normal>78</span>
+<span class=normal>79</span>
+<span class=normal>80</span>
+<span class=normal>81</span>
+<span class=normal>82</span>
+<span class=normal>83</span>
+<span class=normal>84</span>
+<span class=normal>85</span>
+<span class=normal>86</span>
+<span class=normal>87</span>
+<span class=normal>88</span>
+<span class=normal>89</span>
+<span class=normal>90</span>
+<span class=normal>91</span>
+<span class=normal>92</span>
+<span class=normal>93</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>create_placeholder_node</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>node_name</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>"""Create node to be used as placeholder.</span>
+
+<span class=sd>    By default, it creates a null node in '/out'.</span>
+<span class=sd>    Feel free to override it in different workfile build plugins.</span>
+<span class=sd>    """</span>
+
+    <span class=n>node</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>node</span><span class=p>(</span><span class=s2>"/out"</span><span class=p>)</span><span class=o>.</span><span class=n>createNode</span><span class=p>(</span>
+        <span class=s2>"null"</span><span class=p>,</span> <span class=n>node_name</span><span class=p>,</span> <span class=n>force_valid_node_name</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+    <span class=n>node</span><span class=o>.</span><span class=n>moveToGoodPosition</span><span class=p>()</span>
+    <span class=n>parms</span> <span class=o>=</span> <span class=n>node</span><span class=o>.</span><span class=n>parmTemplateGroup</span><span class=p>()</span>
+    <span class=k>for</span> <span class=n>parm</span> <span class=ow>in</span> <span class=p>{</span><span class=s2>"execute"</span><span class=p>,</span> <span class=s2>"renderdialog"</span><span class=p>}:</span>
+        <span class=n>p</span> <span class=o>=</span> <span class=n>parms</span><span class=o>.</span><span class=n>find</span><span class=p>(</span><span class=n>parm</span><span class=p>)</span>
+        <span class=n>p</span><span class=o>.</span><span class=n>hide</span><span class=p>(</span><span class=kc>True</span><span class=p>)</span>
+        <span class=n>parms</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=n>parm</span><span class=p>,</span> <span class=n>p</span><span class=p>)</span>
+    <span class=n>node</span><span class=o>.</span><span class=n>setParmTemplateGroup</span><span class=p>(</span><span class=n>parms</span><span class=p>)</span>
+    <span class=k>return</span> <span class=n>node</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> </div> </div> </div> <div class="doc doc-object doc-class"> <h2 id=client.ayon_houdini.api.workfile_template_builder.HoudiniTemplateBuilder class="doc doc-heading"> <code>HoudiniTemplateBuilder</code> </h2> <div class="doc doc-contents "> <p class="doc doc-class-bases"> Bases: <code><span title=ayon_core.pipeline.workfile.workfile_template_builder.AbstractTemplateBuilder>AbstractTemplateBuilder</span></code></p> <p>Concrete implementation of AbstractTemplateBuilder for Houdini</p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/workfile_template_builder.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>26</span>
+<span class=normal>27</span>
+<span class=normal>28</span>
+<span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span>
+<span class=normal>42</span>
+<span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span>
+<span class=normal>52</span>
+<span class=normal>53</span>
+<span class=normal>54</span>
+<span class=normal>55</span>
+<span class=normal>56</span>
+<span class=normal>57</span>
+<span class=normal>58</span>
+<span class=normal>59</span>
+<span class=normal>60</span>
+<span class=normal>61</span>
+<span class=normal>62</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>class</span><span class=w> </span><span class=nc>HoudiniTemplateBuilder</span><span class=p>(</span><span class=n>AbstractTemplateBuilder</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>"""Concrete implementation of AbstractTemplateBuilder for Houdini"""</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>resolve_template_path</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>path</span><span class=p>,</span> <span class=n>fill_data</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+<span class=w>        </span><span class=sd>"""Allows additional resolving over the template path using custom</span>
+<span class=sd>        integration methods, like Houdini's expand string functionality.</span>
+
+<span class=sd>        This only works with ayon-core 0.4.5+</span>
+<span class=sd>        """</span>
+        <span class=c1># use default template data formatting</span>
+        <span class=n>path</span> <span class=o>=</span> <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=n>resolve_template_path</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=n>fill_data</span><span class=p>)</span>
+
+        <span class=c1># escape backslashes for `expandString` and expand houdini vars</span>
+        <span class=n>path</span> <span class=o>=</span> <span class=n>path</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>"</span><span class=se>\\</span><span class=s2>"</span><span class=p>,</span> <span class=s2>"</span><span class=se>\\\\</span><span class=s2>"</span><span class=p>)</span>
+        <span class=n>path</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>text</span><span class=o>.</span><span class=n>expandString</span><span class=p>(</span><span class=n>path</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>path</span>
+
+    <span class=k>def</span><span class=w> </span><span class=nf>import_template</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>path</span><span class=p>):</span>
+<span class=w>        </span><span class=sd>"""Import template into current scene.</span>
+<span class=sd>        Block if a template is already loaded.</span>
+
+<span class=sd>        Args:</span>
+<span class=sd>            path (str): A path to current template (usually given by</span>
+<span class=sd>            get_template_preset implementation)</span>
+
+<span class=sd>        Returns:</span>
+<span class=sd>            bool: Whether the template was successfully imported or not</span>
+<span class=sd>        """</span>
+
+        <span class=c1># TODO Check if template is already imported</span>
+
+        <span class=c1># Merge (Load) template workfile in the current scene.</span>
+        <span class=k>try</span><span class=p>:</span>
+            <span class=n>hou</span><span class=o>.</span><span class=n>hipFile</span><span class=o>.</span><span class=n>merge</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=n>ignore_load_warnings</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+            <span class=k>return</span> <span class=kc>True</span>
+        <span class=k>except</span> <span class=n>hou</span><span class=o>.</span><span class=n>OperationFailed</span><span class=p>:</span>
+            <span class=k>return</span> <span class=kc>False</span>
+</code></pre></div></td></tr></table></div> </details> <div class="doc doc-children"> <div class="doc doc-object doc-function"> <h3 id=client.ayon_houdini.api.workfile_template_builder.HoudiniTemplateBuilder.import_template class="doc doc-heading"> <code class="highlight language-python"><span class=n>import_template</span><span class=p>(</span><span class=n>path</span><span class=p>)</span></code> </h3> <div class="doc doc-contents "> <p>Import template into current scene. Block if a template is already loaded.</p> <p><span class=doc-section-title>Parameters:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> <th>Default</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td> <code>path</code> </td> <td> <code><span title=str>str</span></code> </td> <td> <div class=doc-md-description> <p>A path to current template (usually given by</p> </div> </td> <td> <em>required</em> </td> </tr> </tbody> </table> <p><span class=doc-section-title>Returns:</span></p> <table> <thead> <tr> <th>Name</th> <th>Type</th> <th>Description</th> </tr> </thead> <tbody> <tr class=doc-section-item> <td><code>bool</code></td> <td> </td> <td> <div class=doc-md-description> <p>Whether the template was successfully imported or not</p> </div> </td> </tr> </tbody> </table> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/workfile_template_builder.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>43</span>
+<span class=normal>44</span>
+<span class=normal>45</span>
+<span class=normal>46</span>
+<span class=normal>47</span>
+<span class=normal>48</span>
+<span class=normal>49</span>
+<span class=normal>50</span>
+<span class=normal>51</span>
+<span class=normal>52</span>
+<span class=normal>53</span>
+<span class=normal>54</span>
+<span class=normal>55</span>
+<span class=normal>56</span>
+<span class=normal>57</span>
+<span class=normal>58</span>
+<span class=normal>59</span>
+<span class=normal>60</span>
+<span class=normal>61</span>
+<span class=normal>62</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>import_template</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>path</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>"""Import template into current scene.</span>
+<span class=sd>    Block if a template is already loaded.</span>
+
+<span class=sd>    Args:</span>
+<span class=sd>        path (str): A path to current template (usually given by</span>
+<span class=sd>        get_template_preset implementation)</span>
+
+<span class=sd>    Returns:</span>
+<span class=sd>        bool: Whether the template was successfully imported or not</span>
+<span class=sd>    """</span>
+
+    <span class=c1># TODO Check if template is already imported</span>
+
+    <span class=c1># Merge (Load) template workfile in the current scene.</span>
+    <span class=k>try</span><span class=p>:</span>
+        <span class=n>hou</span><span class=o>.</span><span class=n>hipFile</span><span class=o>.</span><span class=n>merge</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=n>ignore_load_warnings</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+        <span class=k>return</span> <span class=kc>True</span>
+    <span class=k>except</span> <span class=n>hou</span><span class=o>.</span><span class=n>OperationFailed</span><span class=p>:</span>
+        <span class=k>return</span> <span class=kc>False</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h3 id=client.ayon_houdini.api.workfile_template_builder.HoudiniTemplateBuilder.resolve_template_path class="doc doc-heading"> <code class="highlight language-python"><span class=n>resolve_template_path</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=n>fill_data</span><span class=o>=</span><span class=kc>None</span><span class=p>)</span></code> </h3> <div class="doc doc-contents "> <p>Allows additional resolving over the template path using custom integration methods, like Houdini's expand string functionality.</p> <p>This only works with ayon-core 0.4.5+</p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/workfile_template_builder.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>29</span>
+<span class=normal>30</span>
+<span class=normal>31</span>
+<span class=normal>32</span>
+<span class=normal>33</span>
+<span class=normal>34</span>
+<span class=normal>35</span>
+<span class=normal>36</span>
+<span class=normal>37</span>
+<span class=normal>38</span>
+<span class=normal>39</span>
+<span class=normal>40</span>
+<span class=normal>41</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>resolve_template_path</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>path</span><span class=p>,</span> <span class=n>fill_data</span><span class=o>=</span><span class=kc>None</span><span class=p>):</span>
+<span class=w>    </span><span class=sd>"""Allows additional resolving over the template path using custom</span>
+<span class=sd>    integration methods, like Houdini's expand string functionality.</span>
+
+<span class=sd>    This only works with ayon-core 0.4.5+</span>
+<span class=sd>    """</span>
+    <span class=c1># use default template data formatting</span>
+    <span class=n>path</span> <span class=o>=</span> <span class=nb>super</span><span class=p>()</span><span class=o>.</span><span class=n>resolve_template_path</span><span class=p>(</span><span class=n>path</span><span class=p>,</span> <span class=n>fill_data</span><span class=p>)</span>
+
+    <span class=c1># escape backslashes for `expandString` and expand houdini vars</span>
+    <span class=n>path</span> <span class=o>=</span> <span class=n>path</span><span class=o>.</span><span class=n>replace</span><span class=p>(</span><span class=s2>"</span><span class=se>\\</span><span class=s2>"</span><span class=p>,</span> <span class=s2>"</span><span class=se>\\\\</span><span class=s2>"</span><span class=p>)</span>
+    <span class=n>path</span> <span class=o>=</span> <span class=n>hou</span><span class=o>.</span><span class=n>text</span><span class=o>.</span><span class=n>expandString</span><span class=p>(</span><span class=n>path</span><span class=p>)</span>
+    <span class=k>return</span> <span class=n>path</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> </div> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.workfile_template_builder.trigger_on_app_launch class="doc doc-heading"> <code class="highlight language-python"><span class=n>trigger_on_app_launch</span><span class=p>()</span></code> </h2> <div class="doc doc-contents "> <p>Build the workfile template during application launch if the setting is enabled.</p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/workfile_template_builder.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>185</span>
+<span class=normal>186</span>
+<span class=normal>187</span>
+<span class=normal>188</span>
+<span class=normal>189</span>
+<span class=normal>190</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>trigger_on_app_launch</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+<span class=w>    </span><span class=sd>"""Build the workfile template during application</span>
+<span class=sd>    launch if the setting is enabled.</span>
+<span class=sd>    """</span>
+    <span class=n>builder</span> <span class=o>=</span> <span class=n>HoudiniTemplateBuilder</span><span class=p>(</span><span class=n>registered_host</span><span class=p>())</span>
+    <span class=n>builder</span><span class=o>.</span><span class=n>trigger_on_app_launch</span><span class=p>()</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> <div class="doc doc-object doc-function"> <h2 id=client.ayon_houdini.api.workfile_template_builder.trigger_on_new_file class="doc doc-heading"> <code class="highlight language-python"><span class=n>trigger_on_new_file</span><span class=p>()</span></code> </h2> <div class="doc doc-contents "> <p>Build the workfile template during new file creation if the setting is enabled.</p> <details class=mkdocstrings-source> <summary>Source code in <code>client/ayon_houdini/api/workfile_template_builder.py</code></summary> <div class=highlight><table class=highlighttable><tr><td class=linenos><div class=linenodiv><pre><span></span><span class=normal>193</span>
+<span class=normal>194</span>
+<span class=normal>195</span>
+<span class=normal>196</span>
+<span class=normal>197</span>
+<span class=normal>198</span></pre></div></td><td class=code><div><pre><span></span><code><span class=k>def</span><span class=w> </span><span class=nf>trigger_on_new_file</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=kc>None</span><span class=p>:</span>
+<span class=w>    </span><span class=sd>"""Build the workfile template during new file creation</span>
+<span class=sd>    if the setting is enabled.</span>
+<span class=sd>    """</span>
+    <span class=n>builder</span> <span class=o>=</span> <span class=n>HoudiniTemplateBuilder</span><span class=p>(</span><span class=n>registered_host</span><span class=p>())</span>
+    <span class=n>builder</span><span class=o>.</span><span class=n>trigger_on_new_file</span><span class=p>()</span>
+</code></pre></div></td></tr></table></div> </details> </div> </div> </div> </div> </div> </article> </div> <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script> </div> <button type=button class="md-top md-icon" data-md-component=top hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg> Back to top </button> </main> <footer class=md-footer> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-copyright> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"annotate": null, "base": "../../../..", "features": ["navigation.path", "navigation.top", "navigation.prune"], "search": "../../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script> <script src=../../../../assets/javascripts/bundle.a5f9d56c.min.js></script> <script src=../../../../js/ayon-theme.js></script> </body> </html>
