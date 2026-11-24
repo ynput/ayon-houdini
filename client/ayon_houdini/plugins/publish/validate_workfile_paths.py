@@ -13,6 +13,7 @@ from ayon_core.pipeline import (
 from ayon_core.pipeline.publish import RepairAction
 
 from ayon_houdini.api import plugin
+from ayon_houdini.api.lib import expand_houdini_vars
 
 
 def find_used_vars(value: str) -> set[str]:
@@ -92,7 +93,8 @@ class ValidateWorkfilePaths(
             raise PublishValidationError(message, title=self.label)
 
     @classmethod
-    def get_invalid(cls):
+    def get_invalid(cls) -> list[hou.Parm]:
+        """Return invalid parameters."""
         invalid = []
         for param, _ in hou.fileReferences():
             # it might return None for some reason
@@ -118,8 +120,13 @@ class ValidateWorkfilePaths(
     def repair(cls, instance):
         invalid = cls.get_invalid()
         for param in invalid:
-            cls.log.info("Processing: {}".format(param.path()))
-            cls.log.info("Replacing {} for {}".format(
-                param.unexpandedString(),
-                hou.text.expandString(param.unexpandedString())))
-            param.set(hou.text.expandString(param.unexpandedString()))
+            cls.log.info(f"Processing: '{param.path()}'.")
+            value = param.unexpandedString()
+            expanded = expand_houdini_vars(
+                text=value,
+                names=cls.prohibited_vars,
+                context=param,
+            )
+            cls.log.info(f"Replacing '{value}' for '{expanded}'.")
+
+            param.set(expanded)
