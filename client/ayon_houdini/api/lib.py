@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import sys
 import os
 import errno
@@ -7,6 +9,7 @@ import logging
 import json
 import clique
 from functools import lru_cache
+from typing import Iterable
 from contextlib import contextmanager
 
 import ayon_api
@@ -48,7 +51,7 @@ def get_output_parameter(node: hou.Node) -> hou.Parm:
     Example:
         root = hou.node("/obj")
         my_alembic_node = root.createNode("alembic")
-        get_output_parameter(my_alembic_node)
+        get_output_parameter(my_alembic_node).name()
         >>> "filename"
 
     Notes:
@@ -67,8 +70,34 @@ def get_output_parameter(node: hou.Node) -> hou.Parm:
 
     Returns:
         hou.Parm
-    """
 
+    Raises:
+        TypeError: If no built-in mapping applies and neither a configured
+            parameter nor a fallback parameter exists.
+    """
+    node_type: str = node.type().name()
+    explicit = get_explicit_output_parameter(node)
+    if explicit is not None:
+        return explicit
+
+    fallback = get_fallback_output_parameter(node)
+    if fallback is not None:
+        return fallback
+
+    raise TypeError("Node type '%s' not supported" % node_type)
+
+
+def get_explicit_output_parameter(node: hou.Node) -> "hou.Parm | None":
+    """Get the explicit output parameter for a Houdini node based on its type.
+
+    Args:
+        node (hou.Node): The Houdini node for which to find the explicit
+            output parameter.
+
+    Returns:
+        hou.Parm | None: The explicit output parameter if found,
+            otherwise None.
+    """
     node_type: str = node.type().name()
 
     # Figure out which type of node is being rendered
@@ -109,8 +138,45 @@ def get_output_parameter(node: hou.Node) -> hou.Parm:
     elif node_type == "PRT_ROPDriver":
         return node.parm("file")
 
-    raise TypeError("Node type '%s' not supported" % node_type)
+    return None
 
+
+def get_fallback_output_parameter(node: hou.Node) -> hou.Parm | None:
+    """Get a fallback output parameter for a Houdini node if no specific
+    output parameter is set.
+
+    Args:
+        node (hou.Node): The Houdini node for which to find a fallback
+            output parameter.
+
+    Returns:
+        hou.Parm | None: The fallback output parameter if found,
+            otherwise None.
+    """
+    names = (
+        "vm_picture", "sopoutput", "dopoutput", "lopoutput", "picture",
+        "copoutput", "filename", "usdfile", "file", "output",
+        "outputfilepath", "outputimage", "outfile",
+    )
+    parms = [
+        parm
+        for parm in (
+            node.parm(name) for name in names
+        )
+        if parm is not None
+    ]
+    if len(parms) > 1:
+        raise TypeError(
+            "Ambiguous output parameter for node type '{}' on '{}', "
+            "candidates: {}. Please add an explicit output parameter "
+            "mapping for this node type.".format(
+                node.type().name(),
+                node.path(),
+                ", ".join(parm.name() for parm in parms),
+            )
+        )
+
+    return parms[0] if parms else None
 
 def get_lops_rop_context_options(
         ropnode: hou.RopNode) -> "dict[str, str | float]":
@@ -856,7 +922,7 @@ def get_resolution_from_entity(entity):
 
 
 def set_camera_resolution(camera, entity=None):
-    """Apply resolution to camera from task or folder entity.
+    """Apply resolution and pixel aspect to camera from task or folder entity.
 
     Arguments:
         camera (hou.OpNode): Camera node.
@@ -875,6 +941,16 @@ def set_camera_resolution(camera, entity=None):
         ))
         camera.parm("resx").set(resolution[0])
         camera.parm("resy").set(resolution[1])
+
+    pixel_aspect = entity["attrib"].get("pixelAspect")
+    aspect_parm = camera.parm("aspect")
+    if pixel_aspect is not None and aspect_parm.eval() != pixel_aspect:
+        print(
+            f"Setting camera pixel aspect: {camera.name()} -> {pixel_aspect}"
+        )
+        # Remove the Alembic archive channel expression, if any
+        aspect_parm.deleteAllKeyframes()
+        aspect_parm.set(pixel_aspect)
 
 
 def get_camera_from_container(container):
@@ -1733,7 +1809,11 @@ def save_slapcomp_to_file(
     sopnet.destroy()
 
 
-def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
+def expand_houdini_string(
+    text: str,
+    pattern=r"\$[a-zA-Z0-9_]+",
+    context: hou.OpNode | hou.Parm | None = None,
+) -> str:
     r"""Expand Houdini String with More Control
 
     It applies the `hou.text.expandString` function selectively.
@@ -1771,6 +1851,10 @@ def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
     Args:
         text(str): text to expand.
         pattern(str): regex pattern to apply.
+        context(hou.OpNode | hou.Parm | None): Node or parm to
+            evaluate in (`hou.ScriptEvalContext`), so local variables like
+            `$OS` and relative `chs()` references resolve correctly.
+            Defaults to the current node (`hou.pwd()`).
 
     Returns:
         str: expanded text.
@@ -1780,7 +1864,43 @@ def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
         matched_string  = match.group(0)
         return hou.text.expandString(matched_string)
 
-    return re.sub(pattern, expand_match, text)
+    if context is None:
+        return re.sub(pattern, expand_match, text)
+
+    with hou.ScriptEvalContext(context):
+        return re.sub(pattern, expand_match, text)
+
+
+def expand_houdini_vars(
+    text: str,
+    names: Iterable[str],
+    context: hou.OpNode | hou.Parm | None = None,
+) -> str:
+    """Expand the given Houdini variables in a string.
+
+    Matches whole variable names only (`HIP` does not match `$HIPNAME`),
+    with or without braces and with modifiers, e.g. `$HIP`, `${HIP}`,
+    `$HIP:h`.
+
+    Example:
+        >>> expand_houdini_vars("$HIP/ayon/$HIPNAME/cache.abc", {"HIP"})
+        "/path/to/hip/ayon/$HIPNAME/cache.abc"
+
+    Args:
+        text (str): Text to expand.
+        names (Iterable[str]): Variable names to expand, `$` prefix optional.
+        context (hou.OpNode | hou.Parm | None): Node or parm to
+            evaluate in.
+
+    Returns:
+        str: Text with only the given variables expanded.
+
+    """
+    names = "|".join(re.escape(name.removeprefix("$")) for name in names)
+    if not names:
+        return text
+    pattern = rf"\$\{{?(?:{names})\b(?::\w)*\}}?"
+    return expand_houdini_string(text, pattern, context=context)
 
 
 def disconnect_connection(connection: hou.NodeConnection):
