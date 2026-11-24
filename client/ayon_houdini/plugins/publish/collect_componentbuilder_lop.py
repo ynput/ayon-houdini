@@ -58,7 +58,6 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
         })
 
         # Get all its files and dependencies
-        # TODO: Ignore any files that are not 'relative' to the USD file
         layers, assets, unresolved_paths = compute_all_dependencies(filepath)
         paths: List[str] = []
         paths.extend(layer.realPath for layer in layers)
@@ -83,12 +82,20 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
             if filepath == src_path:
                 continue
 
+            # Files outside the component folder only appear when
+            # "Localize External Non-USD Files" is off. They are skipped
+            # here so collection doesn't crash (e.g. on another drive);
+            # `ValidateComponentBuilderLocalize` fails the publish instead.
             try:
                 relative_path = src_path.relative_to(src_root_dir)
             except ValueError:
+                # Shorten paths under the workfile folder to `$HIP/...`
+                hip = Path(hou.getenv("HIP")).resolve().as_posix()
+                root_dir = src_root_dir.as_posix().replace(hip, "$HIP", 1)
+                dependency = src_path.as_posix().replace(hip, "$HIP", 1)
                 self.log.debug(
-                    "Skipping external dependency outside component "
-                    f"directory: {src}"
+                    "Skipping dependency outside component directory "
+                    f"'{root_dir}': {dependency}"
                 )
                 continue
 
