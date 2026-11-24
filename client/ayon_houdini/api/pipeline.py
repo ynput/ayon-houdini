@@ -37,6 +37,7 @@ log = logging.getLogger("ayon_houdini")
 
 AYON_CONTAINERS = "/obj/AYON_CONTAINERS"
 CONTEXT_CONTAINER = "/obj/AYONContext"
+WORKFILE_EXTENSIONS = (".hip", ".hiplc", ".hipnc")
 
 # legacy backwards compatibility
 LEGACY_AVALON_CONTAINERS = "/obj/AVALON_CONTAINERS"
@@ -53,6 +54,47 @@ WORKFILE_BUILD_PATH = os.path.join(PLUGINS_DIR, "workfile_build")
 
 # Track whether the workfile tool is about to save
 _about_to_save = False
+
+
+def get_license_workfile_extension():
+    """Return the workfile extension Houdini saves with for its license.
+
+    Houdini forces this extension on save, e.g. saving 'file.hip' with an
+    Indie license writes 'file.hiplc'.
+
+    Returns:
+        str: '.hip', '.hiplc' or '.hipnc'.
+
+    """
+    category = hou.licenseCategory()
+    if category == hou.licenseCategoryType.Indie:
+        return ".hiplc"
+    if category in (
+        hou.licenseCategoryType.Apprentice,
+        hou.licenseCategoryType.ApprenticeHD,
+        hou.licenseCategoryType.Education,
+    ):
+        return ".hipnc"
+    return ".hip"
+
+
+def to_license_workfile_path(path):
+    """Return the path with the extension Houdini saves it with.
+
+    Houdini saves with its license's extension, e.g. 'file.hip' with an
+    Indie license becomes 'file.hiplc'. A path that already has the
+    license's extension comes back unchanged, so it is safe to call on any
+    workfile path. The returned extension is always lower case.
+
+    Args:
+        path (str): Workfile path ending with '.hip', '.hiplc' or '.hipnc',
+            absolute or rootless.
+
+    Returns:
+        str: The path with the license's extension.
+
+    """
+    return os.path.splitext(path)[0] + get_license_workfile_extension()
 
 
 class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
@@ -75,10 +117,11 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         elif hou_name == "houdinifx":
             app_name = "Houdini FX"
 
-        elif hou_name == "happrentice":
+        elif hou_name in ("happrentice", "hindie"):
+            # The license name added below tells these apart
             app_name = "Houdini"
         else:
-            print(f"Unknown houdini app name: {hou_name}")
+            log.debug(f"Unknown houdini app name: {hou_name}")
             app_name = "Houdini"
 
         full_app_name = f"{app_name} {license_name}"
@@ -134,12 +177,41 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         return hou.hipFile.hasUnsavedChanges()
 
     def get_workfile_extensions(self):
-        return [".hip", ".hiplc", ".hipnc"]
+        extensions = list(WORKFILE_EXTENSIONS)
+        # Workfiles uses the first extension for a new scene.
+        preferred_extension = get_license_workfile_extension()
+        extensions.remove(preferred_extension)
+        extensions.insert(0, preferred_extension)
+        return extensions
+
+    def get_workfile_save_extensions(self):
+        return [get_license_workfile_extension()]
+
+    def save_workfile_with_context(
+        self,
+        filepath,
+        *args,
+        prepared_data=None,
+        **kwargs,
+    ):
+        # 'save_workfile' saves with the license's extension, so Core must
+        # record that path on the workfile entity.
+        filepath = to_license_workfile_path(filepath)
+        if prepared_data is not None and prepared_data.rootless_path:
+            prepared_data.rootless_path = to_license_workfile_path(
+                prepared_data.rootless_path
+            )
+        super().save_workfile_with_context(
+            filepath,
+            *args,
+            prepared_data=prepared_data,
+            **kwargs,
+        )
 
     def save_workfile(self, dst_path=None):
-        # Force forwards slashes to avoid segfault
         if dst_path:
-            dst_path = dst_path.replace("\\", "/")
+            # Force forwards slashes to avoid segfault
+            dst_path = to_license_workfile_path(dst_path.replace("\\", "/"))
         hou.hipFile.save(file_name=dst_path,
                          save_to_recent_files=True)
         return dst_path
@@ -159,11 +231,16 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
 
     def get_current_workfile(self):
         current_filepath = hou.hipFile.path()
-        if (os.path.basename(current_filepath) == "untitled.hip" and
-                not os.path.exists(current_filepath)):
-            # By default a new scene in houdini is saved in the current
-            # working directory as "untitled.hip" so we need to capture
-            # that and consider it 'not saved' when it's in that state.
+        filename, extension = os.path.splitext(
+            os.path.basename(current_filepath)
+        )
+        if (
+            filename == "untitled"
+            and extension in WORKFILE_EXTENSIONS
+            and not os.path.exists(current_filepath)
+        ):
+            # Houdini gives new scenes an 'untitled' path before they are
+            # saved. A file that really exists under that name is a workfile.
             return None
 
         return current_filepath
