@@ -39,11 +39,17 @@ class CollectKarmaXPUDisableCPU(plugin.HoudiniInstancePlugin,
 
     @staticmethod
     def is_karma_xpu(node_path):
-        """Return whether the ROP at `node_path` renders with Karma XPU."""
+        """Return whether the ROP at `node_path` renders with Karma XPU.
+
+        Returns False when it isn't a Karma or USD Render ROP, e.g. for
+        custom creators that share the families.
+        """
         node = hou.node(node_path)
         if node.type().name() == "karma":
             return node.evalParm("engine") == "xpu"
-        return node.evalParm("renderer") == "BRAY_HdKarmaXPU"
+        elif node.type().name() == "usdrender":
+            return node.evalParm("renderer") == "BRAY_HdKarmaXPU"
+        return False
 
     def process(self, instance):
         if not self.is_active(instance.data):
