@@ -6,8 +6,8 @@ from ayon_core.pipeline.publish import FARM_JOB_ENV_DATA_KEY
 from ayon_houdini.api import plugin
 
 
-class CollectKarmaXPUDevice(plugin.HoudiniInstancePlugin,
-                            OptionalPyblishPluginMixin):
+class CollectKarmaXPUDisableCPU(plugin.HoudiniInstancePlugin,
+                               OptionalPyblishPluginMixin):
     """Collect farm job environment to restrict the Karma XPU devices.
 
     When active, `KARMA_XPU_DISABLE_EMBREE_DEVICE=1` is added to the farm

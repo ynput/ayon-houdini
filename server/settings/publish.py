@@ -150,7 +150,7 @@ class PublishPluginsModel(BaseSettingsModel):
         default_factory=CollectLocalRenderInstancesModel,
         title="Collect Local Render Instances"
     )
-    CollectKarmaXPUDevice: BasicEnabledStatesModel = SettingsField(
+    CollectKarmaXPUDisableCPU: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Disable CPU (Karma XPU)",
         description=(
@@ -275,7 +275,7 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
             ]
         }
     },
-    "CollectKarmaXPUDevice": {
+    "CollectKarmaXPUDisableCPU": {
         "enabled": True,
         "optional": True,
         "active": False
