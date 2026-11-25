@@ -969,6 +969,11 @@ def get_camera_from_container(container):
 def get_camera_from_alembic_rop(rop):
     """Return the object an Alembic ROP exports from 'Root' and 'Objects'.
 
+    The ROP doesn't error when 'Root' and 'Objects' don't resolve to an
+    object, it writes an Alembic file without it, e.g. an empty camera
+    export. Following the same rules as the ROP lets callers check the
+    file will contain the camera before exporting.
+
     The Alembic ROP resolves a single 'Objects' path like this:
 
     - An absolute path is used as is.
