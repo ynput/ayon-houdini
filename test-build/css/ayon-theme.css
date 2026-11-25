@@ -285,7 +285,7 @@ html {
 .md-header__title.ayon-tabs {
     display: flex;
     align-self: stretch;
-    align-items: flex-end;
+    align-items: stretch;
     height: auto;
     margin: 0;
     overflow: visible;
@@ -300,7 +300,8 @@ html {
     isolation: isolate;
     display: flex;
     align-items: center;
-    height: 2.08rem;
+    /* the full height of the bar, so the name is centred like the logo and
+       the search, and the underline sits on the bar's bottom line */
     margin: 0 1.6px -1px;
     padding: 4px 12px;
     color: var(--ayon-on-surface-variant);
@@ -314,7 +315,7 @@ html {
 .ayon-tab::before {
     content: "";
     position: absolute;
-    inset: 5.6px 0 7.2px;
+    inset: calc(50% - 14.4px) 0;
     border-radius: var(--ayon-radius);
     z-index: -1;
 }
@@ -336,11 +337,10 @@ html {
     position: static;
     display: flex;
     align-items: center;
-    /* the tab's height and bottom edge, so both labels share one line */
-    align-self: flex-end;
-    height: 2.08rem;
+    /* centred, on the line of the tab name */
+    align-self: center;
     max-width: none;
-    margin: 0 0 -1px 8px;
+    margin: 0 0 0 8px;
     opacity: 1;
     transform: none;
 }
@@ -409,18 +409,16 @@ html {
     [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__inner {
         width: 200px;
     }
-    /* AYONpedia's navbar places these from the bottom: the search field 4px
-       above it (Material's search box already leaves 4px under the field),
-       the theme button on it */
+    /* centred in the bar, on the line of the tab name, as on AYONpedia */
     [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search {
-        align-self: flex-end;
+        align-self: center;
         margin-bottom: 0;
     }
     [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__inner {
         padding: 0;
     }
     .md-header .ayon-theme {
-        align-self: flex-end;
+        align-self: center;
     }
     [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__form {
         height: 32px;
@@ -959,6 +957,11 @@ html,
     [data-md-toggle="search"]:not(:checked) ~ .md-header .md-search__inner {
         width: 144px;
     }
+    /* at 144px the keys would cover the end of "Search": shown only in the
+       200px box */
+    .ayon-search__keys {
+        display: none;
+    }
 }
 @media screen and (min-width: 60em) and (max-width: 1160px) {
     .ayon-tab {
@@ -967,7 +970,59 @@ html,
     .md-header__button.md-logo img {
         height: 21.6px;
     }
-    .ayon-search__keys {
-        display: none;
+}
+
+/* Narrow screens: Material swaps the search box for an icon button that opens
+   the search. Drawn as AYONpedia's search box there: the 144px "Search" pill,
+   and below 576px the pill with the icon only. The theme button stays */
+@media screen and (max-width: 59.984375em) {
+    .md-header label.md-header__button[for="__search"] {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-sizing: border-box;
+        width: 144px;
+        height: 32px;
+        margin: 0;
+        padding: 0 8px 0 12px;
+        border-radius: 32px;
+        background-color: var(--ayon-surface-high);
+        color: var(--ayon-on-surface-variant);
+        font-family: Arial, sans-serif;
+        font-size: 14.4px;
+        line-height: 1;
+        opacity: 1;
+        transition: background-color 0.2s;
     }
+    .md-header label.md-header__button[for="__search"]:hover {
+        background-color: var(--ayon-surface-highest);
+        opacity: 1;
+    }
+    .md-header label.md-header__button[for="__search"] svg {
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+    }
+    .md-header label.md-header__button[for="__search"]::after {
+        content: "Search";
+    }
+}
+@media screen and (max-width: 36em) {
+    .md-header label.md-header__button[for="__search"] {
+        width: 44px;
+    }
+    .md-header label.md-header__button[for="__search"]::after {
+        content: none;
+    }
+}
+
+/* The menu button of the narrow layout (below 1220px), as AYONpedia's: its
+   30px icon (theme.icon.menu), 16px from the left, 8px before the tab */
+.md-header label.md-header__button[for="__drawer"] {
+    margin: 0 8px 0 0;
+    padding: 0;
+}
+.md-header label.md-header__button[for="__drawer"] svg {
+    width: 30px;
+    height: 30px;
 }
