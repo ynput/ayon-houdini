@@ -53,10 +53,13 @@ class ValidateUSDOutputNode(plugin.HoudiniInstancePlugin):
 
         # Output node must be a LOP node.
         if not isinstance(output_node, hou.LopNode):
+            node_type = output_node.type()
+            category = node_type.category().name()
+            label = node_type.description() if category == "Lop" else category
             cls.log.error(
-                f"LOP path '{output_node.path()}' is a "
-                f"{output_node.type().category().name()} node, "
-                "it must point to a LOP node."
+                f"LOP path '{output_node.path()}' ({label}) does not "
+                "output a USD stage. Point it to a Solaris LOP node "
+                "instead."
             )
             return [output_node]
 
