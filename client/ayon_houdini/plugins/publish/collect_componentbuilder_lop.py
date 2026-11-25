@@ -86,9 +86,7 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
             # "Localize External Non-USD Files" is off. They are skipped
             # here so collection doesn't crash (e.g. on another drive);
             # `ValidateComponentBuilderLocalize` fails the publish instead.
-            try:
-                relative_path = src_path.relative_to(src_root_dir)
-            except ValueError:
+            if not src_path.is_relative_to(src_root_dir):
                 # Shorten paths under the workfile folder to `$HIP/...`
                 hip = Path(hou.getenv("HIP")).resolve().as_posix()
                 root_dir = src_root_dir.as_posix().replace(hip, "$HIP", 1)
@@ -99,6 +97,7 @@ class CollectComponentBuilderLOPs(plugin.HoudiniInstancePlugin,
                 )
                 continue
 
+            relative_path = src_path.relative_to(src_root_dir)
             self.log.debug(f"Collected dependency: {relative_path}")
             dest = os.path.normpath(os.path.join(publish_root, relative_path))
             transfers.append((src, dest))
