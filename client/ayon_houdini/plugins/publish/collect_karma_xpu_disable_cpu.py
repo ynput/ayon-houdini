@@ -1,23 +1,33 @@
 import pyblish.api
 
+from ayon_core.pipeline import OptionalPyblishPluginMixin
 from ayon_core.pipeline.publish import FARM_JOB_ENV_DATA_KEY
 
 from ayon_houdini.api import plugin
 
 
-class CollectKarmaXPUDevice(plugin.HoudiniInstancePlugin):
+class CollectKarmaXPUDisableCPU(plugin.HoudiniInstancePlugin,
+                               OptionalPyblishPluginMixin):
     """Collect farm job environment to restrict the Karma XPU devices.
+
+    When active, `KARMA_XPU_DISABLE_EMBREE_DEVICE=1` is added to the farm
+    job environment so Karma XPU renders on GPU devices only. Only Karma
+    XPU reads this variable, other renderers ignore it.
     """
 
     # runs after `CollectFarmInstances` so `farm` is collected.
     order = pyblish.api.CollectorOrder
-    label = "Collect Karma XPU Device"
+    label = "Disable CPU (Karma XPU)"
     families = ["karma_rop", "usdrender"]
+    optional_tooltip = (
+        "Disable the Embree (CPU) device so Karma XPU renders on GPU "
+        "devices only.\n"
+        "Sets KARMA_XPU_DISABLE_EMBREE_DEVICE=1 in the farm job "
+        "environment. Only affects farm renders with Karma XPU."
+    )
 
     def process(self, instance):
-        creator_attribute = instance.data["creator_attributes"]
-
-        if not creator_attribute.get("xpu_disable_cpu"):
+        if not self.is_active(instance.data):
             return
 
         if not instance.data.get("farm"):
