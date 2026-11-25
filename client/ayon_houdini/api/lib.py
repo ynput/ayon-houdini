@@ -976,18 +976,18 @@ def get_camera_from_alembic_rop(rop):
 
     The Alembic ROP resolves a single 'Objects' path like this:
 
-    - An 'Objects' path starting with `/` is used as is, when it's below
-      'Root'. E.g. `/obj/cameras/cam1` for Root `/obj` or `/obj/cameras`,
-      but not for Root `/obj/props`.
-    - Otherwise, the 'Objects' path is looked up in the top-most object
-      network at or above 'Root'. E.g. for Root `/obj/cameras`,
+    - An 'Objects' path starting with `/` is used as is.
+    - The object must be below 'Root', with only object networks
+      in between, e.g. not inside a LOP network below 'Root'.
+      E.g. `/obj/cameras/cam1` is below Root `/obj` or `/obj/cameras`,
+      but not below Root `/obj/props`.
+    - An 'Objects' path not starting with `/` is looked up in the top-most
+      object network at or above 'Root'. E.g. for Root `/obj/cameras`,
       `cameras/cam1` resolves to `/obj/cameras/cam1`.
     - When 'Root' isn't an object network, e.g. a LOP network, the ROP
       looks the 'Objects' path up in every object network inside 'Root'.
       That isn't supported here, artists should set 'Root' to an object
       network or use an 'Objects' path starting with `/`.
-    - The object must be below 'Root', with only object networks
-      in between, e.g. not inside a LOP network below 'Root'.
 
     Patterns, multiple objects and relative parts like `..` don't resolve.
 
