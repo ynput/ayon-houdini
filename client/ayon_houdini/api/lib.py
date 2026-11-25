@@ -983,8 +983,9 @@ def get_camera_from_alembic_rop(rop):
       network at or above 'Root'. E.g. for Root `/obj/cameras`,
       `cameras/cam1` resolves to `/obj/cameras/cam1`.
     - When 'Root' isn't an object network, e.g. a LOP network, the ROP
-      looks the 'Objects' path up in every object network inside 'Root',
-      which can match several cameras, so it's not supported here.
+      looks the 'Objects' path up in every object network inside 'Root'.
+      That isn't supported here, artists should set 'Root' to an object
+      network or use an 'Objects' path starting with `/`.
     - The object must be below 'Root', with only object networks
       in between, e.g. not inside a LOP network below 'Root'.
 
