@@ -966,6 +966,57 @@ def get_camera_from_container(container):
     return cameras[0]
 
 
+def get_camera_from_alembic_rop(rop):
+    """Return the object an Alembic ROP exports from 'Root' and 'Objects'.
+
+    The Alembic ROP resolves a single 'Objects' path like this:
+
+    - An absolute path is used as is.
+    - A relative path resolves against the top-most object network at or
+      above 'Root', and only when 'Root' is an object network. E.g. for
+      Root `/obj/cameras`, `cameras/cam1` resolves to `/obj/cameras/cam1`.
+    - The object must be below 'Root', with only object networks
+      in between, e.g. not inside a LOP network below 'Root'.
+
+    Patterns, multiple objects and relative parts like `..` don't resolve.
+
+    Args:
+        rop (hou.RopNode): The Alembic ROP node.
+
+    Returns:
+        Optional[hou.ObjNode]: The object the ROP exports, or None when
+            'Root' and 'Objects' don't resolve to a single object.
+    """
+    root = rop.parm("root").evalAsNode()
+    objects = rop.evalParm("objects").strip()
+    if root is None or root.path() == "/" or not objects:
+        return None
+
+    obj_category = hou.objNodeTypeCategory()
+    if objects.startswith("/"):
+        path = objects
+    elif root.childTypeCategory() != obj_category:
+        return None
+    else:
+        relative_root = root
+        while relative_root.parent().childTypeCategory() == obj_category:
+            relative_root = relative_root.parent()
+        path = f"{relative_root.path()}/{objects}"
+
+    # Patterns and multiple objects don't resolve to a node, and
+    # relative parts like `..` resolve to a different path.
+    node = hou.node(path)
+    if node is None or node.path() != path:
+        return None
+
+    parent = node.parent()
+    while parent != root:
+        if parent is None or parent.childTypeCategory() != obj_category:
+            return None
+        parent = parent.parent()
+    return node
+
+
 def get_current_context_template_data_with_entity_attrs():
     """Return template data including current context folder and task attribs.
 

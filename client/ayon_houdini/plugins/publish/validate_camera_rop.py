@@ -3,7 +3,7 @@
 import pyblish.api
 from ayon_core.pipeline import PublishValidationError
 
-from ayon_houdini.api import plugin
+from ayon_houdini.api import lib, plugin
 
 
 class ValidateCameraROP(plugin.HoudiniInstancePlugin):
@@ -13,12 +13,10 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
 
     - 'Use SOP Path' is disabled.
     - 'Root' is set and is not `/`.
-    - 'Objects' is set to a single object, without patterns or relative
-      parts like `..`.
-    - 'Objects' is an absolute path when 'Root' isn't an object network.
-    - That object exists below 'Root', with only object networks
-      in between, and is a camera: `cam`, `agentcam`, `stereocam`,
-      `stereocamrig`, `vrcam` or `lopimportcam`.
+    - 'Objects' is set to a single object, without patterns.
+    - 'Root' and 'Objects' resolve to a camera the ROP exports,
+      see `lib.get_camera_from_alembic_rop`. Camera types are `cam`,
+      `agentcam`, `stereocam`, `stereocamrig`, `vrcam` and `lopimportcam`.
     """
 
     order = pyblish.api.ValidatorOrder
@@ -27,6 +25,10 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
 
     # Houdini pattern characters, e.g. `cameras/*` or `@bundle`
     pattern_chars = ("*", "?", "[", "^", "@")
+    camera_types = {
+        "cam", "agentcam", "stereocam", "stereocamrig",
+        "vrcam", "lopimportcam"
+    }
 
     def process(self, instance):
 
@@ -60,19 +62,6 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
             errors.append(
                 "Objects parameter must not use patterns, set the "
                 f"camera path explicitly. Got: {objects}")
-        elif any(part.startswith(".") for part in objects.split("/")):
-            # Node names can't start with a dot, e.g. `..` or `.`
-            errors.append(
-                "Objects parameter must not use relative parts like `..`. "
-                f"Got: {objects}")
-        elif (
-            root_node
-            and objects.startswith("/")
-            and not objects.startswith(f"{root_node.path()}/")
-        ):
-            errors.append(
-                "Objects parameter starts with a slash but isn't an absolute "
-                f"path below Root. Got: {objects} (Root: {root_node.path()})")
 
         if errors:
             for error in errors:
@@ -81,60 +70,18 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
                 "Some checks failed, see validator log.",
                 title=self.label)
 
-        obj_category = hou.objNodeTypeCategory()
-        if objects.startswith("/"):
-            camera = hou.node(objects)
-        elif root_node.childTypeCategory() != obj_category:
-            # When Root isn't an object network, e.g. a LOP network, the ROP
-            # resolves relative objects in each object network inside Root,
-            # so the same path may match multiple cameras.
+        camera = lib.get_camera_from_alembic_rop(node)
+        if camera is None:
             raise PublishValidationError(
-                f"Objects parameter {objects} must be an absolute path, "
-                f"Root {root_node.path()} is not an object network.",
-                title=self.label)
-        else:
-            # The Alembic ROP resolves relative objects against the top-most
-            # object network at or above Root without a non-object network in
-            # between, e.g.
-            # - Relative root `/obj` for Root `/obj/cameras`
-            # - Relative root `objnet1` for Root `/stage/lopnet1/objnet1`
-            relative_root = root_node
-            while relative_root.parent().childTypeCategory() == obj_category:
-                relative_root = relative_root.parent()
-            camera = relative_root.node(objects)
-
-        if not camera:
-            raise PublishValidationError(
-                f"Camera path {objects} does not exist "
-                f"(Root: {root_node.path()})",
+                f"Root {root_node.path()} and Objects {objects} don't "
+                "resolve to a camera the Alembic ROP exports. Objects must "
+                "be an absolute path, or relative to the object network "
+                "containing Root (e.g. Root /obj and Objects cameras/cam1), "
+                "and the camera must be below Root.",
                 title=self.label)
 
-        if not camera.path().startswith(f"{root_node.path()}/"):
-            raise PublishValidationError(
-                f"Camera {camera.path()} must be below "
-                f"Root {root_node.path()}",
-                title=self.label)
-
-        # The ROP skips cameras below a non-object network, e.g. a LOP
-        # network between Root and the camera. For Objects
-        # `/stage/objnet/lopnet1/objnet1/subnet1/cam1`:
-        # - Root `/stage/objnet` exports nothing, `lopnet1` is in between
-        # - Root `/stage/objnet/lopnet1` or below exports the camera
-        parent = camera.parent()
-        while parent != root_node:
-            if parent.childTypeCategory() != obj_category:
-                raise PublishValidationError(
-                    f"Camera {camera.path()} must only have object networks "
-                    f"between it and Root {root_node.path()}. "
-                    f"Got: {parent.path()}",
-                    title=self.label)
-            parent = parent.parent()
-
-        if camera.type().name().lower() not in {
-            "cam", "agentcam", "stereocam", "stereocamrig",
-            "vrcam", "lopimportcam"
-        }:
+        if camera.type().name().lower() not in self.camera_types:
             raise PublishValidationError(
                 (f"Object set in Alembic ROP is not a camera: "
-                 f"{camera} (type: {camera.type().name()})"),
+                 f"{camera.path()} (type: {camera.type().name()})"),
                 title=self.label)

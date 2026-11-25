@@ -1,6 +1,6 @@
 import pyblish.api
 from ayon_core.pipeline.publish import KnownPublishError
-from ayon_houdini.api import plugin
+from ayon_houdini.api import lib, plugin
 
 
 class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
@@ -39,10 +39,9 @@ class CollectOutputSOPPath(plugin.HoudiniInstancePlugin):
             if node.parm("use_sop_path").eval():
                 out_node = node.parm("sop_path").evalAsNode()
             else:
-                root = node.parm("root").eval()
-                objects = node.parm("objects").eval()
-                path = root + "/" + objects
-                out_node = hou.node(path)
+                # Only the camera creator disables 'Use SOP Path', so the
+                # ROP exports a camera from 'Root' and 'Objects'.
+                out_node = lib.get_camera_from_alembic_rop(node)
 
         elif node_type == "comp":
             out_node = node.parm("coppath").evalAsNode()
