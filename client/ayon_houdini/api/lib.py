@@ -976,10 +976,13 @@ def get_camera_from_alembic_rop(rop):
 
     The Alembic ROP resolves a single 'Objects' path like this:
 
-    - An absolute path is used as is.
-    - A relative path resolves against the top-most object network at or
-      above 'Root', and only when 'Root' is an object network. E.g. for
-      Root `/obj/cameras`, `cameras/cam1` resolves to `/obj/cameras/cam1`.
+    - An 'Objects' path starting with `/` is used as is.
+    - Otherwise, the 'Objects' path is looked up in the top-most object
+      network at or above 'Root'. E.g. for Root `/obj/cameras`,
+      `cameras/cam1` resolves to `/obj/cameras/cam1`.
+    - When 'Root' isn't an object network, e.g. a LOP network, the ROP
+      looks the 'Objects' path up in every object network inside 'Root',
+      which can match several cameras, so it's not supported here.
     - The object must be below 'Root', with only object networks
       in between, e.g. not inside a LOP network below 'Root'.
 
