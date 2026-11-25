@@ -977,17 +977,20 @@ def get_camera_from_alembic_rop(rop):
     The Alembic ROP resolves a single 'Objects' path like this:
 
     - An 'Objects' path starting with `/` is used as is.
-    - The object must be below 'Root', with only object networks
-      in between, e.g. not inside a LOP network below 'Root'.
-      E.g. `/obj/cameras/cam1` is below Root `/obj` or `/obj/cameras`,
-      but not below Root `/obj/props`.
+    - The object must be below 'Root', and every network between 'Root'
+      and the object must be an object network. E.g. for Root `/obj`,
+      `/obj/cameras/cam1` is valid but `/obj/lopnet/objnet/cam1` isn't,
+      since `lopnet` is in between. For Root `/obj/lopnet` it's valid.
     - An 'Objects' path not starting with `/` is looked up in the top-most
       object network at or above 'Root'. E.g. for Root `/obj/cameras`,
-      `cameras/cam1` resolves to `/obj/cameras/cam1`.
+      `cameras/cam1` resolves to `/obj/cameras/cam1`, and for Root
+      `/obj/lopnet/objnet`, `cam1` resolves to `/obj/lopnet/objnet/cam1`.
     - When 'Root' isn't an object network, e.g. a LOP network, the ROP
       looks the 'Objects' path up in every object network inside 'Root'.
       That isn't supported here, artists should set 'Root' to an object
-      network or use an 'Objects' path starting with `/`.
+      network or use an 'Objects' path starting with `/`. E.g. for Root
+      `/obj/lopnet`, use `/obj/lopnet/objnet/cam1` instead of
+      `objnet/cam1`.
 
     Patterns, multiple objects and relative parts like `..` don't resolve.
 
