@@ -88,7 +88,9 @@
 
     --ayon-radius: 4px;
     --ayon-radius-large: 8px;
-    --ayon-font-heading: "Jost", var(--md-text-font-family);
+    /* AYONpedia's heading stack; not built on var(--md-text-font-family),
+       which isn't defined on :root, so it dropped the whole value */
+    --ayon-font-heading: "Jost", "Inter", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
 }
 
 /* ---------- Map the tokens onto Material for MkDocs ---------- */
