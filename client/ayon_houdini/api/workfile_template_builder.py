@@ -67,6 +67,7 @@ class HoudiniPlaceholderPlugin(PlaceholderPlugin):
 
     Inherited classes must still implement `populate_placeholder`
     """
+    skip_discovery = True
 
     attr_prefix: str = "AYON_placeholder_"
 

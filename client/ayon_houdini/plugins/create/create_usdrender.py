@@ -40,7 +40,7 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
         creator_attributes = instance_data.setdefault(
             "creator_attributes", dict())
 
-        for key in ["render_target", "review"]:
+        for key in ["render_target", "review", "xpu_disable_cpu"]:
             if key in pre_create_data:
                 creator_attributes[key] = pre_create_data[key]
 
@@ -48,17 +48,6 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
         # pre_create_data["parent"] = "/stage"
 
         instance_data.update({"node_type": "usdrender"})
-
-        # Override default value for the Export Chunk Size because if the
-        # a single USD file is written as opposed to per frame we want to
-        # ensure only one machine picks up that sequence
-        # TODO: Probably better to change the default somehow for just this
-        #    Creator on the HoudiniSubmitDeadline plug-in, if possible?
-        (
-            instance_data
-            .setdefault("publish_attributes", {})
-            .setdefault("HoudiniSubmitDeadlineUsdRender", {})["export_chunk"]
-        ) = 1000
 
         instance = super(CreateUSDRender, self).create(
             product_name,
@@ -136,6 +125,14 @@ class CreateUSDRender(plugin.RenderLegacyProductTypeCreator):
                     label="Review",
                     tooltip="Mark as reviewable",
                     default=True),
+            BoolDef("xpu_disable_cpu",
+                    label="Disable CPU (XPU)",
+                    tooltip="Disable the Embree (CPU) device so Karma XPU "
+                            "renders on GPU devices only.\n"
+                            "Sets KARMA_XPU_DISABLE_EMBREE_DEVICE=1 in the "
+                            "farm job environment. Only affects renders with "
+                            "the Karma XPU renderer.",
+                    default=False),
             EnumDef("render_target",
                     items=render_target_items,
                     label="Render target",
