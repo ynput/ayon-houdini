@@ -1,7 +1,7 @@
 Operator:     ayon::mute_layers::1.0
 Label:        AYON Mute Layers
 Path:         oplib:/ayon::Lop/mute_layers::1.0?ayon::Lop/mute_layers::1.0
-Icon:         opdef:/ayon::Lop/mute_layers::1.0?IconImage
+Icon:         opdef:/ayon::Lop/mute_layers::1.0?AYON_icon.svg
 Table:        Lop
 License:      
 Extra:        

@@ -1,7 +1,7 @@
 Operator:     ayon::load_shot::1.0
 Label:        AYON Load Shot
 Path:         oplib:/ayon::Lop/load_shot::1.0?ayon::Lop/load_shot::1.0
-Icon:         opdef:/ayon::Lop/load_shot::1.0?IconImage
+Icon:         opdef:/ayon::Lop/load_shot::1.0?AYON_icon.svg
 Table:        Lop
 License:      
 Extra:        

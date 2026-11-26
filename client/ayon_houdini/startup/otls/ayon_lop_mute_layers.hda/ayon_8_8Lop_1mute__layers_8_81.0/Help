@@ -1,6 +1,6 @@
 = AYON Mute Layers =
 
-#icon: opdef:/ayon::Lop/mute_layers::1.0?AYON_icon.png
+#icon: opdef:/ayon::Lop/mute_layers::1.0?AYON_icon.svg
 
 """Mute USD layers by wildcard path matching."""
 
