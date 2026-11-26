@@ -45,9 +45,10 @@ class CollectKarmaXPUDisableCPU(plugin.HoudiniInstancePlugin,
         custom creators that share the families.
         """
         node = hou.node(node_path)
-        if node.type().name() == "karma":
+        node_type_name = node.type().name()
+        if node_type_name == "karma":
             return node.evalParm("engine") == "xpu"
-        elif node.type().name() == "usdrender":
+        elif node_type_name == "usdrender":
             return node.evalParm("renderer") == "BRAY_HdKarmaXPU"
         return False
 
