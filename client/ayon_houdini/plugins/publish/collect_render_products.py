@@ -26,7 +26,7 @@ class CollectRenderProducts(plugin.HoudiniInstancePlugin):
     label = "Collect Render Products"
     # This plugin should run after CollectUsdRender
     #   and, before CollectLocalRenderInstances
-    order = pyblish.api.CollectorOrder + 0.04
+    order = pyblish.api.CollectorOrder - 0.395
     families = ["usdrender"]
 
     def process(self, instance):
