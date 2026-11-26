@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 import sys
 import os
 import errno
@@ -7,6 +9,7 @@ import logging
 import json
 import clique
 from functools import lru_cache
+from typing import Iterable
 from contextlib import contextmanager
 
 import ayon_api
@@ -919,7 +922,7 @@ def get_resolution_from_entity(entity):
 
 
 def set_camera_resolution(camera, entity=None):
-    """Apply resolution to camera from task or folder entity.
+    """Apply resolution and pixel aspect to camera from task or folder entity.
 
     Arguments:
         camera (hou.OpNode): Camera node.
@@ -939,6 +942,16 @@ def set_camera_resolution(camera, entity=None):
         camera.parm("resx").set(resolution[0])
         camera.parm("resy").set(resolution[1])
 
+    pixel_aspect = entity["attrib"].get("pixelAspect")
+    aspect_parm = camera.parm("aspect")
+    if pixel_aspect is not None and aspect_parm.eval() != pixel_aspect:
+        print(
+            f"Setting camera pixel aspect: {camera.name()} -> {pixel_aspect}"
+        )
+        # Remove the Alembic archive channel expression, if any
+        aspect_parm.deleteAllKeyframes()
+        aspect_parm.set(pixel_aspect)
+
 
 def get_camera_from_container(container):
     """Get camera from container node. """
@@ -951,6 +964,66 @@ def get_camera_from_container(container):
 
     assert len(cameras) == 1, "Camera instance must have only one camera"
     return cameras[0]
+
+
+def get_camera_from_alembic_rop(rop):
+    """Return the object an Alembic ROP exports from 'Root' and 'Objects'.
+
+    The ROP doesn't error when 'Root' and 'Objects' don't resolve to an
+    object, it writes an Alembic file without it, e.g. an empty camera
+    export. Following the same rules as the ROP lets callers check the
+    file will contain the camera before exporting.
+
+    The Alembic ROP resolves 'Objects' like this:
+
+    - 'Objects' must point to one object.
+    - The object must be below 'Root', with only object networks
+      in between.
+    - An 'Objects' path starting with `/` is used as is, and 'Root' can
+      be a non-object network, e.g. Root `/stage` with
+      `/stage/objnet/cam1`.
+    - An 'Objects' path not starting with `/` is looked up from the
+      top-most object network at or above 'Root', e.g. `/obj` for Root
+      `/obj/cameras`, and 'Root' must be an object network, e.g.
+      `/stage/objnet`, not `/stage`.
+
+    Patterns and relative parts like `..` don't resolve.
+
+    Args:
+        rop (hou.RopNode): The Alembic ROP node.
+
+    Returns:
+        Optional[hou.ObjNode]: The object the ROP exports, or None when
+            'Root' and 'Objects' don't resolve to a single object.
+    """
+    root = rop.parm("root").evalAsNode()
+    objects = rop.evalParm("objects").strip()
+    if root is None or root.path() == "/" or not objects:
+        return None
+
+    obj_category = hou.objNodeTypeCategory()
+    if objects.startswith("/"):
+        path = objects
+    elif root.childTypeCategory() != obj_category:
+        return None
+    else:
+        relative_root = root
+        while relative_root.parent().childTypeCategory() == obj_category:
+            relative_root = relative_root.parent()
+        path = f"{relative_root.path()}/{objects}"
+
+    # Patterns and multiple objects don't resolve to a node, and
+    # relative parts like `..` resolve to a different path.
+    node = hou.node(path)
+    if node is None or node.path() != path:
+        return None
+
+    parent = node.parent()
+    while parent != root:
+        if parent is None or parent.childTypeCategory() != obj_category:
+            return None
+        parent = parent.parent()
+    return node
 
 
 def get_current_context_template_data_with_entity_attrs():
@@ -1796,7 +1869,11 @@ def save_slapcomp_to_file(
     sopnet.destroy()
 
 
-def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
+def expand_houdini_string(
+    text: str,
+    pattern=r"\$[a-zA-Z0-9_]+",
+    context: hou.OpNode | hou.Parm | None = None,
+) -> str:
     r"""Expand Houdini String with More Control
 
     It applies the `hou.text.expandString` function selectively.
@@ -1834,6 +1911,10 @@ def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
     Args:
         text(str): text to expand.
         pattern(str): regex pattern to apply.
+        context(hou.OpNode | hou.Parm | None): Node or parm to
+            evaluate in (`hou.ScriptEvalContext`), so local variables like
+            `$OS` and relative `chs()` references resolve correctly.
+            Defaults to the current node (`hou.pwd()`).
 
     Returns:
         str: expanded text.
@@ -1843,7 +1924,43 @@ def expand_houdini_string(text: str, pattern=r"\$[a-zA-Z0-9_]+") -> str:
         matched_string  = match.group(0)
         return hou.text.expandString(matched_string)
 
-    return re.sub(pattern, expand_match, text)
+    if context is None:
+        return re.sub(pattern, expand_match, text)
+
+    with hou.ScriptEvalContext(context):
+        return re.sub(pattern, expand_match, text)
+
+
+def expand_houdini_vars(
+    text: str,
+    names: Iterable[str],
+    context: hou.OpNode | hou.Parm | None = None,
+) -> str:
+    """Expand the given Houdini variables in a string.
+
+    Matches whole variable names only (`HIP` does not match `$HIPNAME`),
+    with or without braces and with modifiers, e.g. `$HIP`, `${HIP}`,
+    `$HIP:h`.
+
+    Example:
+        >>> expand_houdini_vars("$HIP/ayon/$HIPNAME/cache.abc", {"HIP"})
+        "/path/to/hip/ayon/$HIPNAME/cache.abc"
+
+    Args:
+        text (str): Text to expand.
+        names (Iterable[str]): Variable names to expand, `$` prefix optional.
+        context (hou.OpNode | hou.Parm | None): Node or parm to
+            evaluate in.
+
+    Returns:
+        str: Text with only the given variables expanded.
+
+    """
+    names = "|".join(re.escape(name.removeprefix("$")) for name in names)
+    if not names:
+        return text
+    pattern = rf"\$\{{?(?:{names})\b(?::\w)*\}}?"
+    return expand_houdini_string(text, pattern, context=context)
 
 
 def disconnect_connection(connection: hou.NodeConnection):
