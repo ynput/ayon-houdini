@@ -8,7 +8,14 @@ from typing import Optional
 
 import hou  # noqa
 
-from ayon_core.host import HostBase, IWorkfileHost, ILoadHost, IPublishHost
+from ayon_core.host import (
+    ContextChangeData,
+    ContextChangeReason,
+    HostBase,
+    ILoadHost,
+    IPublishHost,
+    IWorkfileHost,
+)
 from ayon_core.tools.utils import host_tools
 import pyblish.api
 
@@ -51,9 +58,6 @@ LOAD_PATH = os.path.join(PLUGINS_DIR, "load")
 CREATE_PATH = os.path.join(PLUGINS_DIR, "create")
 INVENTORY_PATH = os.path.join(PLUGINS_DIR, "inventory")
 WORKFILE_BUILD_PATH = os.path.join(PLUGINS_DIR, "workfile_build")
-
-# Track whether the workfile tool is about to save
-_about_to_save = False
 
 
 def get_license_workfile_extension():
@@ -145,12 +149,10 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         log.info("Installing callbacks ... ")
         # register_event_callback("init", on_init)
         self._register_callbacks()
-        register_event_callback("workfile.save.before", before_workfile_save)
         register_event_callback("before.save", before_save)
         register_event_callback("save", on_save)
         register_event_callback("open", on_open)
         register_event_callback("new", on_new)
-        register_event_callback("taskChanged", on_task_changed)
 
         self._has_been_setup = True
 
@@ -303,6 +305,20 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             return {}
         return lib.read(context_node)
 
+    def _after_context_change(self, context_change_data: ContextChangeData):
+        """Offer to match the scene to the new context when saving into it.
+
+        Args:
+            context_change_data (ContextChangeData): Object with information
+                about context change.
+        """
+        super()._after_context_change(context_change_data)
+        if IS_HEADLESS:
+            return
+
+        if context_change_data.reason == ContextChangeReason.workfile_save:
+            lib.prompt_reset_context()
+
 
 def on_file_event_callback(event):
     if event == hou.hipFileEventType.AfterLoad:
@@ -432,11 +448,6 @@ def ls():
         yield parse_container(container)
 
 
-def before_workfile_save(event):
-    global _about_to_save
-    _about_to_save = True
-
-
 def before_save():
     return lib.validate_fps()
 
@@ -450,17 +461,6 @@ def on_save():
 
     # update houdini vars
     lib.update_houdini_vars_context_dialog()
-
-    # We are now starting the actual save directly
-    global _about_to_save
-    _about_to_save = False
-
-
-def on_task_changed():
-    global _about_to_save
-    if not IS_HEADLESS and _about_to_save:
-        # Let's prompt the user to update the context settings or not
-        lib.prompt_reset_context()
 
 
 def _show_outdated_content_popup():
