@@ -1,3 +1,4 @@
+import hou
 import pyblish.api
 
 from ayon_core.pipeline import OptionalPyblishPluginMixin
@@ -23,8 +24,33 @@ class CollectKarmaXPUDisableCPU(plugin.HoudiniInstancePlugin,
         "Disable the Embree (CPU) device so Karma XPU renders on GPU "
         "devices only.\n"
         "Sets KARMA_XPU_DISABLE_EMBREE_DEVICE=1 in the farm job "
-        "environment. Only affects farm renders with Karma XPU."
+        "environment. Only affects farm renders."
     )
+
+    @classmethod
+    def get_attr_defs_for_instance(cls, create_context, instance):
+        # Show the toggle only when the node renders with Karma XPU.
+        # Changing the renderer on the node needs a publisher refresh.
+        if not cls.instance_matches_plugin_families(instance):
+            return []
+        if not cls.is_karma_xpu(instance["instance_node"]):
+            return []
+        return cls.get_attribute_defs()
+
+    @staticmethod
+    def is_karma_xpu(node_path):
+        """Return whether the ROP at `node_path` renders with Karma XPU.
+
+        Returns False when it isn't a Karma or USD Render ROP, e.g. for
+        custom creators that share the families.
+        """
+        node = hou.node(node_path)
+        node_type_name = node.type().name()
+        if node_type_name == "karma":
+            return node.evalParm("engine") == "xpu"
+        elif node_type_name == "usdrender":
+            return node.evalParm("renderer") == "BRAY_HdKarmaXPU"
+        return False
 
     def process(self, instance):
         if not self.is_active(instance.data):
@@ -33,6 +59,12 @@ class CollectKarmaXPUDisableCPU(plugin.HoudiniInstancePlugin,
         if not instance.data.get("farm"):
             self.log.info("Instance doesn't render on farm. "
                            "Skipping Karma XPU device environment.")
+            return
+
+        # The toggle is hidden for other renderers, but `is_active` can
+        # still pass there as it falls back to the settings default.
+        if not self.is_karma_xpu(instance.data["instance_node"]):
+            self.log.debug("Renderer isn't Karma XPU. Skipping.")
             return
 
         job_env = instance.data.setdefault(FARM_JOB_ENV_DATA_KEY, {})
