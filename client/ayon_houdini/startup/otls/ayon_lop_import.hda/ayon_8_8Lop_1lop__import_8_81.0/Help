@@ -1,6 +1,6 @@
 = AYON Load Asset =
 
-#icon: opdef:/ayon::Lop/lop_import::1.0?AYON_icon.png
+#icon: opdef:/ayon::Lop/lop_import::1.0?AYON_icon.svg
 
 """References an AYON USD product, usually an asset or a shot."""
 

@@ -1,7 +1,7 @@
 Operator:     ayon::lop_import::1.0
 Label:        AYON Load Asset
 Path:         oplib:/ayon::Lop/lop_import::1.0?ayon::Lop/lop_import::1.0
-Icon:         opdef:/ayon::Lop/lop_import::1.0?IconImage
+Icon:         opdef:/ayon::Lop/lop_import::1.0?AYON_icon.svg
 Table:        Lop
 License:      
 Extra:        
