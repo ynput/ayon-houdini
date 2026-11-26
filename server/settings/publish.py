@@ -231,6 +231,14 @@ class PublishPluginsModel(BaseSettingsModel):
     ValidateUSDRenderProductPaths: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate USD Render Product Paths")
+    ValidateUSDRenderTiles: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Validate USD Render Tiles",
+        description=(
+            "Validate that a USD Render ROP rendering tiles writes EXR files"
+            " without a denoiser, and uses a split farm render when it does"
+            " not stitch the tiles itself.")
+    )
     ValidateRenderResolution: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate USD Render Resolution",
@@ -375,6 +383,11 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
     },
     "ValidateUSDRenderProductPaths": {
         "enabled": False,
+        "optional": True,
+        "active": True
+    },
+    "ValidateUSDRenderTiles": {
+        "enabled": True,
         "optional": True,
         "active": True
     },
