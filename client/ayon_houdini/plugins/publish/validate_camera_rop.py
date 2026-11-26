@@ -3,15 +3,32 @@
 import pyblish.api
 from ayon_core.pipeline import PublishValidationError
 
-from ayon_houdini.api import plugin
+from ayon_houdini.api import lib, plugin
 
 
 class ValidateCameraROP(plugin.HoudiniInstancePlugin):
-    """Validate Camera ROP settings."""
+    """Validate the Alembic ROP exports exactly one camera.
+
+    The Alembic ROP of a camera instance must meet these criteria:
+
+    - 'Use SOP Path' is disabled.
+    - 'Root' is set and is not `/`.
+    - 'Objects' is set to a single object, without patterns.
+    - 'Root' and 'Objects' resolve to a camera the ROP exports,
+      see `lib.get_camera_from_alembic_rop`. Camera types are `cam`,
+      `agentcam`, `stereocam`, `stereocamrig`, `vrcam` and `lopimportcam`.
+    """
 
     order = pyblish.api.ValidatorOrder
     families = ["camera"]
-    label = "Camera ROP"
+    label = "Validate Camera ROP"
+
+    # Houdini pattern characters, e.g. `cameras/*` or `@bundle`
+    pattern_chars = ("*", "?", "[", "^", "@")
+    camera_types = {
+        "cam", "agentcam", "stereocam", "stereocamrig",
+        "vrcam", "lopimportcam"
+    }
 
     def process(self, instance):
 
@@ -26,17 +43,25 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
             )
 
         # Get the root and objects parameter of the Alembic ROP node
-        root = node.parm("root").eval()
+        root_node = node.parm("root").evalAsNode()
         objects = node.parm("objects").eval()
         errors = []
-        if not root:
+        if not root_node:
             errors.append("Root parameter must be set on Alembic ROP")
-        if not root.startswith("/"):
-            errors.append("Root parameter must start with slash /")
+        elif root_node.path() == "/":
+            errors.append("Root parameter must not be /, e.g. use /obj")
+
         if not objects:
             errors.append("Objects parameter must be set on Alembic ROP")
-        if len(objects.split(" ")) != 1:
-            errors.append("Must have only a single object.")
+        elif len(objects.split()) != 1:
+            errors.append(
+                f"Objects parameter must have a single object. Got: {objects}")
+        elif any(char in objects for char in self.pattern_chars):
+            # A pattern may match one camera now, but more once cameras
+            # are added to the scene.
+            errors.append(
+                "Objects parameter must not use patterns, set the "
+                f"camera path explicitly. Got: {objects}")
 
         if errors:
             for error in errors:
@@ -45,17 +70,18 @@ class ValidateCameraROP(plugin.HoudiniInstancePlugin):
                 "Some checks failed, see validator log.",
                 title=self.label)
 
-        # Check if the object exists and is a camera
-        path = root + "/" + objects
-        camera = hou.node(path)
-
-        if not camera:
+        camera = lib.get_camera_from_alembic_rop(node)
+        if camera is None:
             raise PublishValidationError(
-                "Camera path does not exist: %s" % path,
+                f"Root {root_node.path()} and Objects {objects} don't "
+                "resolve to a camera the Alembic ROP exports. Objects must "
+                "be an absolute path, or relative to the object network "
+                "containing Root (e.g. Root /obj and Objects cameras/cam1), "
+                "and the camera must be below Root.",
                 title=self.label)
 
-        if camera.type().name() != "cam":
+        if camera.type().name().lower() not in self.camera_types:
             raise PublishValidationError(
-                ("Object set in Alembic ROP is not a camera: "
-                 "{} (type: {})").format(camera, camera.type().name()),
+                (f"Object set in Alembic ROP is not a camera: "
+                 f"{camera.path()} (type: {camera.type().name()})"),
                 title=self.label)
