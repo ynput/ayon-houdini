@@ -5,7 +5,7 @@ import hou
 import pyblish.api
 from ayon_core.pipeline import PublishValidationError
 
-from ayon_houdini.api import lib, plugin
+from ayon_houdini.api import lib, plugin, ayon_publish
 
 
 class ValidateFileExtension(plugin.HoudiniInstancePlugin):
@@ -38,6 +38,12 @@ class ValidateFileExtension(plugin.HoudiniInstancePlugin):
 
     @classmethod
     def get_invalid(cls, instance):
+        if ayon_publish.is_rop_publish_instance(instance):
+            cls.log.debug(
+                "Skipping output file extension validation for AYON Publish "
+                f"ROP instance: {instance.data.get('instance_node')}")
+            return []
+
         # Get expected extension
         product_base_type = instance.data["productBaseType"]
         extension = cls.product_base_type_extensions.get(product_base_type)

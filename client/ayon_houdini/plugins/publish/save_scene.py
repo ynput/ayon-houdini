@@ -3,7 +3,7 @@ import pyblish.api
 
 from ayon_core.pipeline import registered_host, PublishError
 
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, lib
 
 
 class SaveCurrentScene(plugin.HoudiniContextPlugin):
@@ -25,7 +25,8 @@ class SaveCurrentScene(plugin.HoudiniContextPlugin):
             )
         if host.workfile_has_unsaved_changes():
             self.log.info("Saving current file: {}".format(current_file))
-            host.save_workfile(current_file)
+            with lib.suppress_context_var_popup():
+                host.save_workfile(current_file)
         else:
             self.log.debug("No unsaved changes, skipping file save..")
 

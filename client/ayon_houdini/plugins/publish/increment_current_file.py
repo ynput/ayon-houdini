@@ -2,15 +2,15 @@ import os
 
 import pyblish.api
 
-from ayon_core.lib import version_up
 from ayon_core.pipeline import (
     registered_host,
     KnownPublishError
 )
-from ayon_core.host import IWorkfileHost
 from ayon_core.pipeline.publish import get_errored_plugins_from_context
+from ayon_core.pipeline.workfile import save_next_version
+from ayon_core.host.interfaces import SaveWorkfileOptionalData
 
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, lib
 
 
 class IncrementCurrentFile(plugin.HoudiniContextPlugin):
@@ -54,11 +54,8 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
                 f" from current scene name '{current_filepath}'."
             )
 
-        try:
-            from ayon_core.pipeline.workfile import save_next_version
-            from ayon_core.host.interfaces import SaveWorkfileOptionalData
-
-            current_filename = os.path.basename(current_filepath)
+        current_filename = os.path.basename(current_filepath)
+        with lib.suppress_context_var_popup():
             save_next_version(
                 description=(
                     f"Incremented by publishing from {current_filename}"
@@ -70,12 +67,3 @@ class IncrementCurrentFile(plugin.HoudiniContextPlugin):
                     anatomy=context.data["anatomy"],
                 )
             )
-        except ImportError:
-            # Backwards compatibility before ayon-core 1.5.0
-            self.log.debug(
-                "Using legacy `version_up`. Update AYON core addon to "
-                "use newer `save_next_version` function."
-            )
-            new_filepath = version_up(current_filepath)
-            host: IWorkfileHost = registered_host()
-            host.save_workfile(new_filepath)

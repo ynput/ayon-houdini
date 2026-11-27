@@ -30,6 +30,27 @@ class CreatorModel(BaseSettingsModel):
     )
 
 
+class CreateAyonPublishROPModel(CreatorModel):
+    product_type_items: list[ProductTypeItemModel] = SettingsField(
+        default_factory=list,
+        title="Product Type Items",
+        description=(
+            "Product types selectable for the AYON Publish ROP. When empty, "
+            "the common AYON product types are used."
+        )
+    )
+    auto_open_publisher_on_error: bool = SettingsField(
+        title="Auto-open Publisher UI on Errors",
+        description=(
+            "When a ROP-triggered publish fails, open the AYON Publisher UI "
+            "so the publish can be investigated. When disabled, the node is "
+            "still marked as failed and the Publisher UI can be opened from "
+            "the node."
+        ),
+        default=False,
+    )
+
+
 def review_node_types_enum():
     return [
         {"label": "OpenGL", "value": "opengl"},
@@ -205,6 +226,9 @@ class CreatePluginsModel(BaseSettingsModel):
     CreateArnoldRop: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Arnold ROP")
+    CreateAyonPublishROP: CreateAyonPublishROPModel = SettingsField(
+        default_factory=CreateAyonPublishROPModel,
+        title="Create AYON Publish ROP")
     CreateCompositeSequence: CreatorModel = SettingsField(
         default_factory=CreatorModel,
         title="Create Composite (Image Sequence)")
@@ -291,6 +315,11 @@ DEFAULT_HOUDINI_CREATE_SETTINGS = {
     "CreateArnoldRop": {
         "enabled": True,
         "default_variants": ["Main"]
+    },
+    "CreateAyonPublishROP": {
+        "enabled": True,
+        "default_variants": ["Main"],
+        "auto_open_publisher_on_error": False,
     },
     "CreateCompositeSequence": {
         "enabled": True,

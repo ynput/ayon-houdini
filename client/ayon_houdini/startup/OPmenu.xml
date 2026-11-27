@@ -24,5 +24,20 @@ create_interactive("io.openpype.creators.houdini.hda", **kwargs)
 ]]>
             </scriptCode>
         </scriptItem>
+
+        <scriptItem id="opmenu.ayon_publish_reset_error">
+            <insertAfter>opmenu.vhda_create</insertAfter>
+            <label>Reset AYON Publish Error</label>
+            <context>
+                <expression><![CDATA[
+from ayon_houdini.api import ayon_publish
+return ayon_publish.has_node_error(kwargs["node"])
+]]></expression>
+            </context>
+            <scriptCode><![CDATA[
+from ayon_houdini.api import ayon_publish
+ayon_publish.clear_node_error(kwargs["node"])
+]]></scriptCode>
+        </scriptItem>
     </menu>
 </menuDocument>

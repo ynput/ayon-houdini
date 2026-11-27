@@ -1,0 +1,14 @@
+Operator:     ayon::ayon_publish::1.0
+Label:        AYON Publish
+Path:         oplib:/ayon::Driver/ayon_publish::1.0?ayon::Driver/ayon_publish::1.0
+Icon:         opdef:/ayon::Driver/ayon_publish::1.0?IconImage
+Table:        Driver
+License:      
+Extra:        
+User:         
+Inputs:       0 to 99999
+Subnet:       false
+Python:       false
+Empty:        false
+Modified:     Fri Nov  1 10:28:13 2024
+

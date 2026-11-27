@@ -7,7 +7,7 @@ from ayon_core.pipeline import (
     OptionalPyblishPluginMixin
 )
 
-from ayon_houdini.api import plugin
+from ayon_houdini.api import plugin, ayon_publish
 from ayon_houdini.api.action import (
     SelectInvalidAction,
     SelectROPAction,
@@ -48,6 +48,12 @@ class ValidateSopOutputNode(plugin.HoudiniInstancePlugin,
 
     @classmethod
     def get_invalid(cls, instance):
+        if ayon_publish.is_rop_publish_instance(instance):
+            cls.log.debug(
+                "Skipping SOP output node validation for AYON Publish ROP "
+                f"instance: {instance.data.get('instance_node')}")
+            return []
+
         output_node = instance.data.get("output_node")
 
         if output_node is None:

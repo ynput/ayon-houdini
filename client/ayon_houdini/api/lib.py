@@ -36,6 +36,27 @@ self._parent = None
 log = logging.getLogger(__name__)
 JSON_PREFIX = "JSON:::"
 
+# Counter used to suppress the "outdated task variables" pop-up for
+# programmatic workfile saves (e.g. during publishing or auto-increment).
+_suppress_context_var_popup = 0
+
+
+@contextmanager
+def suppress_context_var_popup():
+    """Suppress the outdated task-variables pop-up during a save.
+
+    AYON's save callback normally checks whether the Houdini context variables
+    still match the current folder/task and prompts the user to update them.
+    That prompt is not useful for saves performed as part of publishing or a
+    workfile auto-increment, so those saves run inside this context manager.
+    """
+    global _suppress_context_var_popup
+    _suppress_context_var_popup += 1
+    try:
+        yield
+    finally:
+        _suppress_context_var_popup -= 1
+
 
 def get_entity_fps(entity=None):
     """Return current task fps or fps from an entity."""
@@ -111,7 +132,7 @@ def get_explicit_output_parameter(node: hou.Node) -> "hou.Parm | None":
         "geometry",
         "rop_geometry",
         "filmboxfbx",
-        "rop_fbx"
+        "rop_fbx",
     }:
         return node.parm("sopoutput")
     elif node_type == "comp":
@@ -119,6 +140,9 @@ def get_explicit_output_parameter(node: hou.Node) -> "hou.Parm | None":
     elif node_type in {"image", "image_rop"}:
         # Copernicus
         return node.parm("copoutput")
+    elif node_type == "fetch":
+        fetched_node = hou.node(node.parm("source").eval())
+        return get_output_parameter(fetched_node)
     elif node_type in {"karma", "opengl", "flipbook"}:
         return node.parm("picture")
     elif node_type == "ifd":  # Mantra
@@ -1212,6 +1236,13 @@ def update_houdini_vars_context():
 
 def update_houdini_vars_context_dialog():
     """Show pop-up to update task context variables"""
+    if _suppress_context_var_popup:
+        log.debug(
+            "Skipping outdated task variables pop-up during a programmatic "
+            "save."
+        )
+        return
+
     update_vars = get_context_var_changes()
     if not update_vars:
         # Nothing to change
@@ -1417,7 +1448,7 @@ def sceneview_snapshot(
 
 
 def get_background_images(node, raw=False):
-    """"Return background images defined inside node.
+    """Return background images defined inside node.
 
     Similar to `nodegraphutils.saveBackgroundImages` but this method also
     allows to retrieve the data as JSON encodable data instead of
@@ -1479,7 +1510,7 @@ def set_background_images(node, images):
             data["relativetopath"] = image.relativeToPath()
         return data
 
-    with hou.undos.group('Edit Background Images'):
+    with hou.undos.group("Edit Background Images"):
         if images:
             assert all(isinstance(image, (dict, hou.NetworkImage))
                        for image in images)
@@ -1518,8 +1549,9 @@ def set_node_thumbnail(node, image_path, rect=None):
     # Find first existing image attached to node
     index, image = next(
         (
-            (index, image) for index, image in enumerate(images) if
-            image.relativeToPath() == node_path
+            (index, image)
+            for index, image in enumerate(images)
+            if image.relativeToPath() == node_path
         ),
         (None, None)
     )

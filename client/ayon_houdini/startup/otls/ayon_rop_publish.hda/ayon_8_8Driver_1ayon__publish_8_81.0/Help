@@ -1,0 +1,57 @@
+= AYON Publish ROP =
+
+#icon: opdef:/ayon::Driver/ayon_publish::1.0?AYON_icon.png
+
+"""Publishes the output of connected ROPs as a single AYON product."""
+
+== Overview ==
+
+The AYON Publish ROP is a generic publish node for the `/out` context. Connect
+one or more ROPs that write files to it; each input ROP becomes a
+representation of the published product. This works with standard Houdini ROPs,
+custom studio ROPs and cache nodes such as [Node:out/filecache].
+
+Set the AYON `Folder Path`, `Task Name`, `Variant` and `Product Type` on the
+node. The folder, task and variant controls have picker buttons; the product
+type menu lists the common AYON product types. Publish by rendering the AYON
+Publish ROP, or create a publish instance from the node in the Publisher UI.
+
+The latest publish report is kept on the node as cached data (not saved with
+the hip file); use **Save Publish Report...** or **Copy Publish Report** at the
+bottom of the parameters to inspect it. **Open Publisher UI** opens the AYON
+Publisher UI (report tab) to investigate a failed publish. With the creator
+setting **Auto-open Publisher UI on Errors** enabled, the Publisher UI opens
+automatically after a failed ROP-triggered publish.
+
+Full documentation:
+https://github.com/ynput/ayon-houdini/blob/develop/docs/publish-rop.md
+
+== Parameters ==
+
+@parameters
+
+Folder Path:
+    AYON folder to publish into. Use the picker button to choose from the
+    current project's folders.
+Task Name:
+    Task of the folder. Use the picker button to choose from the folder's
+    tasks.
+Variant:
+    Product variant. The picker lists the creator's default variants and the
+    variants already used by AYON Publish ROPs in the scene.
+Product Type:
+    AYON product type; defaults to `rop_publish`.
+Active:
+    When off, publishing this node is skipped.
+Save Publish Report...:
+    Save the last publish report of this node to a JSON file.
+Copy Publish Report:
+    Copy the last publish report of this node to the clipboard.
+Open Publisher UI:
+    Open the AYON Publisher UI (report tab) to investigate a failed publish.
+
+@related
+
+* [Node:out/rop]
+* [Node:out/filecache]
+* [https://github.com/ynput/ayon-houdini/blob/develop/docs/publish-rop.md]
