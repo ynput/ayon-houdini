@@ -990,6 +990,66 @@ def get_camera_from_container(container):
     return cameras[0]
 
 
+def get_camera_from_alembic_rop(rop):
+    """Return the object an Alembic ROP exports from 'Root' and 'Objects'.
+
+    The ROP doesn't error when 'Root' and 'Objects' don't resolve to an
+    object, it writes an Alembic file without it, e.g. an empty camera
+    export. Following the same rules as the ROP lets callers check the
+    file will contain the camera before exporting.
+
+    The Alembic ROP resolves 'Objects' like this:
+
+    - 'Objects' must point to one object.
+    - The object must be below 'Root', with only object networks
+      in between.
+    - An 'Objects' path starting with `/` is used as is, and 'Root' can
+      be a non-object network, e.g. Root `/stage` with
+      `/stage/objnet/cam1`.
+    - An 'Objects' path not starting with `/` is looked up from the
+      top-most object network at or above 'Root', e.g. `/obj` for Root
+      `/obj/cameras`, and 'Root' must be an object network, e.g.
+      `/stage/objnet`, not `/stage`.
+
+    Patterns and relative parts like `..` don't resolve.
+
+    Args:
+        rop (hou.RopNode): The Alembic ROP node.
+
+    Returns:
+        Optional[hou.ObjNode]: The object the ROP exports, or None when
+            'Root' and 'Objects' don't resolve to a single object.
+    """
+    root = rop.parm("root").evalAsNode()
+    objects = rop.evalParm("objects").strip()
+    if root is None or root.path() == "/" or not objects:
+        return None
+
+    obj_category = hou.objNodeTypeCategory()
+    if objects.startswith("/"):
+        path = objects
+    elif root.childTypeCategory() != obj_category:
+        return None
+    else:
+        relative_root = root
+        while relative_root.parent().childTypeCategory() == obj_category:
+            relative_root = relative_root.parent()
+        path = f"{relative_root.path()}/{objects}"
+
+    # Patterns and multiple objects don't resolve to a node, and
+    # relative parts like `..` resolve to a different path.
+    node = hou.node(path)
+    if node is None or node.path() != path:
+        return None
+
+    parent = node.parent()
+    while parent != root:
+        if parent is None or parent.childTypeCategory() != obj_category:
+            return None
+        parent = parent.parent()
+    return node
+
+
 def get_current_context_template_data_with_entity_attrs():
     """Return template data including current context folder and task attribs.
 
