@@ -10,7 +10,7 @@ from ayon_houdini.api import (
 class VdbLoader(plugin.HoudiniLoader):
     """Load VDB"""
 
-    product_base_types = {"vdbcache"}
+    product_base_types = {"vdbcache", "filecache"}
     product_types = product_base_types
     label = "Load VDB"
     representations = {"*"}

@@ -1,0 +1,5 @@
+node = kwargs["node"]
+node.parm("resolvedPath").setExpression(
+    'chs("cacheRoot") + chs("folderPath") + "/" + chs("task") '
+    '+ "/" + chs("cacheName") + "/v" + padzero(3, ch("version"))'
+)

@@ -1,0 +1,2 @@
+node = kwargs["node"]
+node.parm("resolvedPath").setExpression('chs("filecache1/cachedir")')

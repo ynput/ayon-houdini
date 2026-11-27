@@ -1,0 +1,276 @@
+# Dialog script for ayon::Sop/ayon_filecache::1.0 automatically generated
+
+{
+    name	ayon::Sop/ayon_filecache::1.0
+    script	ayon::Sop/ayon_filecache::1.0
+    label	"AYON File Cache"
+
+    help {
+    }
+
+    inputlabel	1	"Sub-Network Input #1"
+    inputlabel	2	"Sub-Network Input #2"
+    inputlabel	3	"Sub-Network Input #3"
+    inputlabel	4	"Sub-Network Input #4"
+
+    parm {
+        name    "folderPath"
+        label   "Folder Path"
+        type    string
+        default { "$AYON_FOLDER_PATH" }
+        help    "AYON folder path for the cache context."
+    }
+    parm {
+        name    "task"
+        label   "Task Name"
+        type    string
+        default { "$AYON_TASK_NAME" }
+        help    "AYON task name for the cache context."
+    }
+    parm {
+        name    "cacheRoot"
+        label   "Base Folder"
+        type    string
+        default { "$HIP/ayon_cache" }
+        help    "Root folder for generated cache files."
+    }
+    parm {
+        name    "cacheName"
+        label   "Base Name"
+        type    string
+        default { "$OS" }
+        help    "Name of the cache folder."
+    }
+    parm {
+        name    "enableVersion"
+        label   "Enable Version"
+        type    toggle
+        default { "1" }
+        help    "Write the cache into a version folder."
+    }
+    parm {
+        name    "version"
+        label   "Version"
+        type    integer
+        default { "1" }
+        help    "Cache version."
+        range   { 0 10 }
+    }
+    parm {
+        name    "resolvedPath"
+        label   "Resolved Cache Path"
+        type    string
+        default { "" }
+        help    "Resolved cache folder generated from the parameters."
+    }
+    parm {
+        name    "loadfromdisk"
+        label   "Load from Disk"
+        type    toggle
+        default { "0" }
+    }
+    parm {
+        name    "reload"
+        label   "Reload Geometry"
+        type    button
+        default { "0" }
+        help    "Reload the cached geometry from disk."
+        parmtag { "script_callback" "hou.phm().reload_geometry(kwargs['node'])" }
+        parmtag { "script_callback_language" "python" }
+    }
+    parm {
+        name    "filemethod"
+        label   "File Path"
+        type    ordinal
+        default { "0" }
+        menu {
+            "constructed"   "Constructed"
+            "explicit"      "Explicit"
+        }
+    }
+    parm {
+        name    "timedependent"
+        label   "Time Dependent Cache"
+        type    toggle
+        default { "1" }
+    }
+    parm {
+        name    "filetype"
+        label   "File Type"
+        type    ordinal
+        default { "0" }
+        menu {
+            ".bgeo.sc"  "bgeo.sc"
+            ".vdb"      "vdb"
+        }
+    }
+    parm {
+        name    "geometryFile"
+        label   "Geometry File"
+        type    string
+        default { "" }
+        help    "Explicit geometry file path when File Path is Explicit."
+    }
+    group {
+        name    "caching"
+        label   "Caching"
+
+        parm {
+            name    "overwriteExisting"
+            label   "Overwrite Existing Cache"
+            type    toggle
+            default { "0" }
+            help    "Allow Save to Disk to overwrite an existing cache version."
+        }
+        parm {
+            name    "saveCache"
+            label   "Save to Disk"
+            type    button
+            default { "0" }
+            help    "Save the input geometry to disk."
+            parmtag { "script_callback" "hou.phm().save_cache(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "saveBackground"
+            label   "Save to Disk in Background"
+            type    button
+            default { "0" }
+            help    "Save the input geometry to disk in the background."
+            parmtag { "script_callback" "hou.phm().save_background(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "cancelCook"
+            label   "Cancel Cook"
+            type    button
+            default { "0" }
+            help    "Cancel the running cache cook."
+            parmtag { "script_callback" "hou.phm().cancel_cook(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        parm {
+            name    "nextVersion"
+            label   "Next Version"
+            type    button
+            default { "0" }
+            help    "Set the version to the next free cache version."
+            parmtag { "script_callback" "hou.phm().next_version(kwargs['node'])" }
+            parmtag { "script_callback_language" "python" }
+        }
+        group {
+            name    "sequence"
+            label   "Sequence"
+
+            parm {
+                name    "trange"
+                label   "Evaluate As"
+                type    ordinal
+                default { "1" }
+                menu {
+                    "off"       "Single Frame"
+                    "normal"    "Frame Range"
+                }
+            }
+            parm {
+                name    "cachesim"
+                label   "Simulation"
+                type    toggle
+                default { "1" }
+            }
+            parm {
+                name    "f"
+                label   "Start/End/Inc"
+                type    float
+                size    3
+                default { "1001" "1001" "1" }
+                range   { 0 10 }
+            }
+            parm {
+                name    "substeps"
+                label   "Substeps"
+                type    integer
+                default { "1" }
+                range   { 0 10 }
+            }
+            parm {
+                name    "useframeoverride"
+                label   "Override Frame"
+                type    toggle
+                default { "0" }
+            }
+            parm {
+                name    "frameoverride"
+                label   "Override Frame"
+                type    float
+                default { "1" }
+                range   { 0 10 }
+            }
+        }
+
+        group {
+            name    "load"
+            label   "Load"
+
+            parm {
+                name    "loadtype"
+                label   "Load"
+                type    ordinal
+                default { "0" }
+                menu {
+                    "full"      "All Geometry"
+                    "infobbox"  "Info Bounding Box"
+                    "info"      "Info"
+                    "points"    "Point Cloud"
+                    "delayed"   "Packed Disk Primitive"
+                    "packedseq" "Packed Disk Sequence"
+                    "packedgeo" "Packed Geometry"
+                }
+            }
+        }
+
+    }
+
+    group {
+        name    "scheduling"
+        label   "Scheduling"
+
+        parm {
+            name    "targettopnetwork"
+            label   "TOP Network"
+            type    string
+            default { "topnet1" }
+        }
+        parm {
+            name    "topscheduler"
+            label   "Custom TOP Scheduler"
+            type    string
+            default { "" }
+        }
+        parm {
+            name    "saveretry"
+            label   "Save Retries"
+            type    integer
+            default { "0" }
+            range   { 0 10 }
+        }
+        parm {
+            name    "mkpath"
+            label   "Create Intermediate Directories"
+            type    toggle
+            default { "1" }
+        }
+        parm {
+            name    "missingframe"
+            label   "Missing Frame"
+            type    ordinal
+            default { "1" }
+            menu {
+                "error" "Report Error"
+                "empty" "No Geometry"
+            }
+        }
+    }
+
+}
+

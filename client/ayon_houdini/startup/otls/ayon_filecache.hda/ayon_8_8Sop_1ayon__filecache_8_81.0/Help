@@ -1,0 +1,48 @@
+= AYON File Cache =
+
+#icon: opdef:/ayon::Sop/ayon_filecache::1.0?IconImage
+
+"""Caches input geometry into an AYON versioned cache folder."""
+
+== Overview ==
+
+Wraps Houdini's File Cache SOP and builds the cache path from the AYON
+context. Use **Save Cache** to write the current input to disk.
+
+== Parameters ==
+
+@parameters
+
+Folder Path:
+    AYON folder for the cache context.
+Task Name:
+    AYON task for the cache context.
+Cache Root:
+    Root folder for generated cache files.
+Cache Name:
+    Name of the cache folder.
+Enable Version:
+    Write the cache into a version folder.
+Version:
+    Cache version.
+Evaluate As:
+    Single Frame or Frame Range.
+Simulation:
+    Cache simulation frames through substeps.
+Start/End/Inc:
+    Frame range written by the File Cache.
+Substeps:
+    Number of simulation substeps.
+Load:
+    How the cached geometry is loaded.
+Load from Disk:
+    Read the cache back from disk instead of the input.
+Save Cache:
+    Save the current input geometry.
+Save to Disk in Background:
+    Save the cache in a background process.
+Cancel Cook:
+    Cancel a running cache cook.
+Next Version:
+    Set Version to the next free version folder.
+
