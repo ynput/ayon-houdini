@@ -150,6 +150,15 @@ class PublishPluginsModel(BaseSettingsModel):
         default_factory=CollectLocalRenderInstancesModel,
         title="Collect Local Render Instances"
     )
+    CollectKarmaXPUDisableCPU: BasicEnabledStatesModel = SettingsField(
+        default_factory=BasicEnabledStatesModel,
+        title="Disable CPU (Karma XPU)",
+        description=(
+            "Set KARMA_XPU_DISABLE_EMBREE_DEVICE=1 on farm renders so "
+            "Karma XPU renders on GPU devices only. 'Active' is the "
+            "default state of the toggle in the publisher."
+        )
+    )
     ValidateAbcPrimitiveToDetail: BasicEnabledStatesModel = SettingsField(
         default_factory=BasicEnabledStatesModel,
         title="Validate Abc Primitive To Detail",
@@ -265,6 +274,11 @@ DEFAULT_HOUDINI_PUBLISH_SETTINGS = {
                 ".*([Bb]eauty).*"
             ]
         }
+    },
+    "CollectKarmaXPUDisableCPU": {
+        "enabled": True,
+        "optional": True,
+        "active": False
     },
     "ValidateAbcPrimitiveToDetail": {
         "enabled": True,
