@@ -8,7 +8,14 @@ from typing import Optional
 
 import hou  # noqa
 
-from ayon_core.host import HostBase, IWorkfileHost, ILoadHost, IPublishHost
+from ayon_core.host import (
+    ContextChangeData,
+    ContextChangeReason,
+    HostBase,
+    ILoadHost,
+    IPublishHost,
+    IWorkfileHost,
+)
 from ayon_core.tools.utils import host_tools
 import pyblish.api
 
@@ -37,6 +44,7 @@ log = logging.getLogger("ayon_houdini")
 
 AYON_CONTAINERS = "/obj/AYON_CONTAINERS"
 CONTEXT_CONTAINER = "/obj/AYONContext"
+WORKFILE_EXTENSIONS = (".hip", ".hiplc", ".hipnc")
 
 # legacy backwards compatibility
 LEGACY_AVALON_CONTAINERS = "/obj/AVALON_CONTAINERS"
@@ -51,8 +59,46 @@ CREATE_PATH = os.path.join(PLUGINS_DIR, "create")
 INVENTORY_PATH = os.path.join(PLUGINS_DIR, "inventory")
 WORKFILE_BUILD_PATH = os.path.join(PLUGINS_DIR, "workfile_build")
 
-# Track whether the workfile tool is about to save
-_about_to_save = False
+
+def get_license_workfile_extension():
+    """Return the workfile extension Houdini saves with for its license.
+
+    Houdini forces this extension on save, e.g. saving 'file.hip' with an
+    Indie license writes 'file.hiplc'.
+
+    Returns:
+        str: '.hip', '.hiplc' or '.hipnc'.
+
+    """
+    category = hou.licenseCategory()
+    if category == hou.licenseCategoryType.Indie:
+        return ".hiplc"
+    if category in (
+        hou.licenseCategoryType.Apprentice,
+        hou.licenseCategoryType.ApprenticeHD,
+        hou.licenseCategoryType.Education,
+    ):
+        return ".hipnc"
+    return ".hip"
+
+
+def to_license_workfile_path(path):
+    """Return the path with the extension Houdini saves it with.
+
+    Houdini saves with its license's extension, e.g. 'file.hip' with an
+    Indie license becomes 'file.hiplc'. A path that already has the
+    license's extension comes back unchanged, so it is safe to call on any
+    workfile path. The returned extension is always lower case.
+
+    Args:
+        path (str): Workfile path ending with '.hip', '.hiplc' or '.hipnc',
+            absolute or rootless.
+
+    Returns:
+        str: The path with the license's extension.
+
+    """
+    return os.path.splitext(path)[0] + get_license_workfile_extension()
 
 
 class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
@@ -75,10 +121,11 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         elif hou_name == "houdinifx":
             app_name = "Houdini FX"
 
-        elif hou_name == "happrentice":
+        elif hou_name in ("happrentice", "hindie"):
+            # The license name added below tells these apart
             app_name = "Houdini"
         else:
-            print(f"Unknown houdini app name: {hou_name}")
+            log.debug(f"Unknown houdini app name: {hou_name}")
             app_name = "Houdini"
 
         full_app_name = f"{app_name} {license_name}"
@@ -102,12 +149,10 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         log.info("Installing callbacks ... ")
         # register_event_callback("init", on_init)
         self._register_callbacks()
-        register_event_callback("workfile.save.before", before_workfile_save)
         register_event_callback("before.save", before_save)
         register_event_callback("save", on_save)
         register_event_callback("open", on_open)
         register_event_callback("new", on_new)
-        register_event_callback("taskChanged", on_task_changed)
 
         self._has_been_setup = True
 
@@ -134,12 +179,41 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
         return hou.hipFile.hasUnsavedChanges()
 
     def get_workfile_extensions(self):
-        return [".hip", ".hiplc", ".hipnc"]
+        extensions = list(WORKFILE_EXTENSIONS)
+        # Workfiles uses the first extension for a new scene.
+        preferred_extension = get_license_workfile_extension()
+        extensions.remove(preferred_extension)
+        extensions.insert(0, preferred_extension)
+        return extensions
+
+    def get_workfile_save_extensions(self):
+        return [get_license_workfile_extension()]
+
+    def save_workfile_with_context(
+        self,
+        filepath,
+        *args,
+        prepared_data=None,
+        **kwargs,
+    ):
+        # 'save_workfile' saves with the license's extension, so Core must
+        # record that path on the workfile entity.
+        filepath = to_license_workfile_path(filepath)
+        if prepared_data is not None and prepared_data.rootless_path:
+            prepared_data.rootless_path = to_license_workfile_path(
+                prepared_data.rootless_path
+            )
+        super().save_workfile_with_context(
+            filepath,
+            *args,
+            prepared_data=prepared_data,
+            **kwargs,
+        )
 
     def save_workfile(self, dst_path=None):
-        # Force forwards slashes to avoid segfault
         if dst_path:
-            dst_path = dst_path.replace("\\", "/")
+            # Force forwards slashes to avoid segfault
+            dst_path = to_license_workfile_path(dst_path.replace("\\", "/"))
         hou.hipFile.save(file_name=dst_path,
                          save_to_recent_files=True)
         return dst_path
@@ -159,11 +233,16 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
 
     def get_current_workfile(self):
         current_filepath = hou.hipFile.path()
-        if (os.path.basename(current_filepath) == "untitled.hip" and
-                not os.path.exists(current_filepath)):
-            # By default a new scene in houdini is saved in the current
-            # working directory as "untitled.hip" so we need to capture
-            # that and consider it 'not saved' when it's in that state.
+        filename, extension = os.path.splitext(
+            os.path.basename(current_filepath)
+        )
+        if (
+            filename == "untitled"
+            and extension in WORKFILE_EXTENSIONS
+            and not os.path.exists(current_filepath)
+        ):
+            # Houdini gives new scenes an 'untitled' path before they are
+            # saved. A file that really exists under that name is a workfile.
             return None
 
         return current_filepath
@@ -226,6 +305,20 @@ class HoudiniHost(HostBase, IWorkfileHost, ILoadHost, IPublishHost):
             return {}
         return lib.read(context_node)
 
+    def _after_context_change(self, context_change_data: ContextChangeData):
+        """Offer to match the scene to the new context when saving into it.
+
+        Args:
+            context_change_data (ContextChangeData): Object with information
+                about context change.
+        """
+        super()._after_context_change(context_change_data)
+        if IS_HEADLESS:
+            return
+
+        if context_change_data.reason == ContextChangeReason.workfile_save:
+            lib.prompt_reset_context()
+
 
 def on_file_event_callback(event):
     if event == hou.hipFileEventType.AfterLoad:
@@ -244,30 +337,33 @@ def containerise(name,
                  context,
                  loader=None,
                  suffix=""):
-    """Bundle `nodes` into a subnet and imprint it with metadata
+    """Move `nodes[0]` into `AYON_CONTAINERS` and imprint it with metadata.
 
-    Containerisation enables a tracking of version, author and origin
-    for loaded products.
+    Containerisation enables tracking of version, author and origin
+    for loaded products. The first node in `nodes` becomes the container
+    itself (it is moved under `AYON_CONTAINERS`, renamed, and imprinted).
 
-    Arguments:
-        name (str): Name of resulting assembly
-        namespace (str): Namespace under which to host container
-        nodes (list): Long names of nodes to containerise
-        context (dict): Loaded product context information
+    Args:
+        name (str): Name of resulting assembly.
+        namespace (str): Namespace under which to host container.
+        nodes (list[hou.Node]): Created nodes with the container root first;
+            `nodes[0]` itself becomes the container node.
+        context (dict): Loaded product context information.
         loader (str, optional): Name of loader used to produce this container.
         suffix (str, optional): Suffix of container, defaults to `_CON`.
 
     Returns:
-        container (hou.Node): Name of container assembly
+        hou.Node: Container node inside `AYON_CONTAINERS`.
 
     """
+    container = nodes[0]
 
-    # Get AYON Containers subnet
+    # Move before renaming so uniqueness and node type are validated against
+    # AYON_CONTAINERS rather than /obj.
     subnet = get_or_create_ayon_container()
+    container = hou.moveNodesTo([container], subnet)[0]
 
-    # Create proper container name
     container_name = "{}_{}".format(name, suffix or "CON")
-    container = hou.node("/obj/{}".format(name))
     container.setName(container_name, unique_name=True)
 
     data = {
@@ -281,9 +377,6 @@ def containerise(name,
     }
 
     lib.imprint(container, data)
-
-    # "Parent" the container under the container network
-    container = hou.moveNodesTo([container], subnet)[0]
     container.moveToGoodPosition()
 
     return container
@@ -355,11 +448,6 @@ def ls():
         yield parse_container(container)
 
 
-def before_workfile_save(event):
-    global _about_to_save
-    _about_to_save = True
-
-
 def before_save():
     return lib.validate_fps()
 
@@ -373,17 +461,6 @@ def on_save():
 
     # update houdini vars
     lib.update_houdini_vars_context_dialog()
-
-    # We are now starting the actual save directly
-    global _about_to_save
-    _about_to_save = False
-
-
-def on_task_changed():
-    global _about_to_save
-    if not IS_HEADLESS and _about_to_save:
-        # Let's prompt the user to update the context settings or not
-        lib.prompt_reset_context()
 
 
 def _show_outdated_content_popup():
